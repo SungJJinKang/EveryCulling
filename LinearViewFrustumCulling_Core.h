@@ -1,0 +1,4 @@
+#pragma once
+
+#define MAX_ENTITY_BLOCK_COUNT 20
+#define ENTITY_COUNT_IN_ENTITY_BLOCK 100
