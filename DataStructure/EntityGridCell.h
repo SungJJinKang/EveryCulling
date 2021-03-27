@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../LinearViewFrustumCulling_Core.h"
+#include "../LinearTransformDataCulling_Core.h"
 
 namespace doom
 {
@@ -21,8 +21,8 @@ namespace doom
 			/// So we use array of pointers
 			/// </summary>
 			EntityBlock* mEntityBlocks[MAX_ENTITY_BLOCK_COUNT];
-			size_t EntityCountInBlocks[MAX_ENTITY_BLOCK_COUNT];
-			unsigned long int TotalEntityCount;
+			unsigned int EntityCountInBlocks[MAX_ENTITY_BLOCK_COUNT];
+			unsigned long int mBlockCount;
 		};
 	}
 }
