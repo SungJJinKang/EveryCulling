@@ -4,6 +4,9 @@
 #include "DataStructure/EntityGridCell.h"
 #include "DataStructure/EntityBlockViewer.h"
 
+#include <memory>
+#include <vector>
+
 #include <Vector4.h>
 #include <Matrix4x4.h>
 
@@ -41,46 +44,64 @@ namespace doom
 		{
 		private:
 
+			
+			static inline constexpr unsigned int M256_COUNT_OF_VISIBLE_ARRAY = 1 + ( (ENTITY_COUNT_IN_ENTITY_BLOCK * sizeof(decltype(*EntityBlock::mIsVisibleBitflag)) - 1) / 32 );
 			/// <summary>
 			/// will be used at CullBlockEntityJob
 			/// </summary>
 			std::atomic<unsigned int> mAtomicCurrentBlockIndex;
+			std::atomic<unsigned int> mCullJobFinishedBlockCount;
 
 			unsigned int mCameraCount;
 			SIMDFrustumPlanes mSIMDFrustumPlanes[MAX_CAMERA_COUNT];
 
 			bool bmIsInitializedEntityBlockPool{ false };
-			EntityBlock* EntityBlockPool;
-
+			std::unique_ptr<EntityBlock[]> mEntityBlockPool;
+			std::vector<EntityBlock*> mFreeEntityBlockList{};
 			EntityGridCell mEntityGridCell{};
+
+			void RemoveEntityFromBlock(EntityBlock* ownerEntityBlock, unsigned int entityIndexInBlock);
 
 			/// <summary>
 			/// Block Swap removedblock with last block, and return swapped lastblock to pool
 			/// </summary>
-			void RemoveBlock();
-			/// <summary>
-			/// Remove Entity is nothing, Just decrement EntityCountInBlocks
-			/// And if EntityCountInBlocks Of Block become zero, Remove the block using RemoveBlock function
-			/// </summary>
-			void RemoveEnitty();
+			void FreeEntityBlock(EntityBlock* freedEntityBlock);
+			EntityBlock* GetNewEntityBlockFromPool();
 		public:
 
 			LinearTransformDataCulling();
 
 			/// <summary>
+			/// Remove Entity is nothing, Just decrement AllocatedEntityCountInBlocks
+			/// And if AllocatedEntityCountInBlocks Of Block become zero, Remove the block using RemoveBlock function
+			/// 
+			/// Removing Entity isn't thread safe
+			/// </summary>
+			void RemoveEntityFromBlock(EntityBlockViewer* entityBlockViewer);
+			
+			/// <summary>
 			/// increment EntityCountInBlock of TargetBlock.
 			/// If All blocks is full, Get new block from Block Pool
+			/// 
+			/// Allocating New Entity isn't thread safe
 			/// </summary>
-			EntityBlockViewer AllocateNewEntity();
+			EntityBlockViewer AllocateNewEntity(const math::Vector3& position, float radius);
+
+
+			// ////////////////////////////////////////////
+			
 
 			void UpdateFrustumPlane(unsigned int frustumPlaneIndex, const math::Matrix4x4& mvpMatrix);
-
 			/// <summary>
 			/// Solve View Frustum Culling from multiple threads
 			/// </summary>
 			void CullBlockEntityJob();
+			bool GetIsCullJobFinished();
 			void ClearIsVisibleFlag();
-			void ResetAtomicCurrentBlockIndex();
+			/// <summary>
+			/// Reset before starting cull job
+			/// </summary>
+			void ResetCullJobState();
 		};
 	}
 }

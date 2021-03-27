@@ -42,15 +42,19 @@ namespace doom
 			math::Vector4 mPositions[ENTITY_COUNT_IN_ENTITY_BLOCK];
 			
 			//math::Vector4 is aligned to 16 byte and ENTITY_COUNT_IN_ENTITY_BLOCK is even number
-			//so maybe  bool mIsVisible is at right next to mPositions
+			//so maybe  bool mIsVisibleBitflag is at right next to mPositions
 			//
 			// first low bit have Is Visible from First Camera,
 			// second low bit have Is Visible from Second Camera
-			alignas(32) bool mIsVisible[ENTITY_COUNT_IN_ENTITY_BLOCK];
+			alignas(32) bool mIsVisibleBitflag[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 			EntityHandle mHandles[ENTITY_COUNT_IN_ENTITY_BLOCK];
 			TransformData mTransformDatas[ENTITY_COUNT_IN_ENTITY_BLOCK];
-			
+
+			/// <summary>
+			/// this variable is only used to decide whether to free this EntityBlock
+			/// </summary>
+			unsigned int mCurrentEntityCount;
 		};
 	}
 }
