@@ -23,6 +23,7 @@ namespace doom
 
 		public:
 
+			EntityBlockViewer() = default;
 			EntityBlockViewer(EntityBlock* entityBlock, unsigned int entityIndexInBlock)
 				: mTargetEntityBlock{ entityBlock }, mEntityIndexInBlock{ entityIndexInBlock }, bmIsActive{ true }
 			{}

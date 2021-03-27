@@ -46,7 +46,8 @@ namespace doom
 			//
 			// first low bit have Is Visible from First Camera,
 			// second low bit have Is Visible from Second Camera
-			alignas(32) bool mIsVisibleBitflag[ENTITY_COUNT_IN_ENTITY_BLOCK];
+			// ......
+			alignas(32) char mIsVisibleBitflag[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 			EntityHandle mHandles[ENTITY_COUNT_IN_ENTITY_BLOCK];
 			TransformData mTransformDatas[ENTITY_COUNT_IN_ENTITY_BLOCK];

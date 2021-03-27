@@ -6,11 +6,15 @@
 
 #include <memory>
 #include <vector>
+#include <atomic>
+#include <condition_variable>
+#include <functional>
+#include <mutex>
 
 #include <Vector4.h>
 #include <Matrix4x4.h>
 
-#include <atomic>
+#include <Simple_SingleTon/Singleton.h>
 
 namespace doom
 {
@@ -44,14 +48,6 @@ namespace doom
 		{
 		private:
 
-			
-			static inline constexpr unsigned int M256_COUNT_OF_VISIBLE_ARRAY = 1 + ( (ENTITY_COUNT_IN_ENTITY_BLOCK * sizeof(decltype(*EntityBlock::mIsVisibleBitflag)) - 1) / 32 );
-			/// <summary>
-			/// will be used at CullBlockEntityJob
-			/// </summary>
-			std::atomic<unsigned int> mAtomicCurrentBlockIndex;
-			std::atomic<unsigned int> mCullJobFinishedBlockCount;
-
 			unsigned int mCameraCount;
 			SIMDFrustumPlanes mSIMDFrustumPlanes[MAX_CAMERA_COUNT];
 
@@ -59,6 +55,20 @@ namespace doom
 			std::unique_ptr<EntityBlock[]> mEntityBlockPool;
 			std::vector<EntityBlock*> mFreeEntityBlockList{};
 			EntityGridCell mEntityGridCell{};
+
+			//static inline constexpr unsigned int M256_COUNT_OF_VISIBLE_ARRAY = 1 + ( (ENTITY_COUNT_IN_ENTITY_BLOCK * sizeof(decltype(*EntityBlock::mIsVisibleBitflag)) - 1) / 32 );
+			/// <summary>
+			/// will be used at CullBlockEntityJob
+			/// </summary>
+			//std::atomic<unsigned int> mAtomicCurrentBlockIndex;
+			std::atomic<unsigned int> mFinishedCullJobBlockCount;
+			/// <summary>
+			/// 
+			/// </summary>
+			std::condition_variable mCullJobConditionVaraible;
+			std::mutex mCullJobMutex;
+
+			void ClearIsVisibleFlag();
 
 			void RemoveEntityFromBlock(EntityBlock* ownerEntityBlock, unsigned int entityIndexInBlock);
 
@@ -91,17 +101,42 @@ namespace doom
 			// ////////////////////////////////////////////
 			
 
-			void UpdateFrustumPlane(unsigned int frustumPlaneIndex, const math::Matrix4x4& mvpMatrix);
+			
 			/// <summary>
 			/// Solve View Frustum Culling from multiple threads
+			/// 
+			/// for pushing to job pool , this function is declared with static
+			/// 
+			/// CullBlockEntityJob never access to shared variable.
+			/// So CullBlockEntityJob is thread safe.
 			/// </summary>
-			void CullBlockEntityJob();
-			bool GetIsCullJobFinished();
-			void ClearIsVisibleFlag();
+			void CullBlockEntityJob(unsigned int blockIndex);
 			/// <summary>
-			/// Reset before starting cull job
+			/// Get Culling BlockEntity Jobs
+			/// return type is std::vector<std::function<void()>>
+			/// 
+			/// So push returned all std::function to JobPool
+			/// </summary>
+			/// <returns></returns>
+			std::vector<std::function<void()>> GetCullBlockEnityJobs();
+
+			bool GetIsCullJobFinished();
+			/// <summary>
+			/// Call thread will stall until cull job of all entity block is finished
+			/// </summary>
+			bool WaitToFinishCullJobs();
+
+		
+			/// <summary>
+			/// Reset cull job state before pushing cull job to job pool
 			/// </summary>
 			void ResetCullJobState();
+			/// <summary>
+			/// before Start solving culling, Update Every Camera's frustum plane
+			/// </summary>
+			/// <param name="frustumPlaneIndex"></param>
+			/// <param name="mvpMatrix"></param>
+			void UpdateFrustumPlane(unsigned int frustumPlaneIndex, const math::Matrix4x4& mvpMatrix);
 		};
 	}
 }

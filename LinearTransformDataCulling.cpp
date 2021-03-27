@@ -134,32 +134,26 @@ void doom::graphics::LinearTransformDataCulling::UpdateFrustumPlane(unsigned int
 	math::ExtractSIMDPlanesFromMVPMatrix(mvpMatrix, this->mSIMDFrustumPlanes[frustumPlaneIndex].mFrustumPlanes, true); // TODO : normalize 해야하는지 check 하자
 }
 
-void doom::graphics::LinearTransformDataCulling::CullBlockEntityJob()
+void doom::graphics::LinearTransformDataCulling::CullBlockEntityJob(unsigned int blockIndex)
 {
-	unsigned int currentBlockIndex = this->mAtomicCurrentBlockIndex++; // return curren block index and increment it
+	assert(blockIndex < this->mEntityGridCell.mBlockCount);
 
-	if (currentBlockIndex >= this->mEntityGridCell.mBlockCount)
-	{
-		return; // Alread All blocks is executed culling job
-	}
+	EntityBlock* currentEntityBlock = this->mEntityGridCell.mEntityBlocks[blockIndex];
+	unsigned int entityCountInBlock = this->mEntityGridCell.AllocatedEntityCountInBlocks[blockIndex]; // don't use mCurrentEntityCount
 
-	EntityBlock* currentEntityBlock = this->mEntityGridCell.mEntityBlocks[currentBlockIndex];
-	unsigned int entityCountInBlock = this->mEntityGridCell.AllocatedEntityCountInBlocks[currentBlockIndex]; // don't use mCurrentEntityCount
-
-	alignas(32) bool cullingMask[ENTITY_COUNT_IN_ENTITY_BLOCK] = { 0 };
+	alignas(32) char cullingMask[ENTITY_COUNT_IN_ENTITY_BLOCK] = { 0 };
 	for (unsigned int i = 0; i < this->mCameraCount; ++i)
 	{
 		math::Vector4* frustumPlane = this->mSIMDFrustumPlanes[i].mFrustumPlanes;
 		for (unsigned int j = 0; j < entityCountInBlock; j = j + 2)
 		{
-			bool result = math::InFrustumSIMDWithTwoPoint(frustumPlane, currentEntityBlock->mPositions + j);
+			char result = math::InFrustumSIMDWithTwoPoint(frustumPlane, currentEntityBlock->mPositions + j);
 			// if first low bit has 1 value, Pos A is In Frustum
 			// if second low bit has 1 value, Pos A is In Frustum
 
-
 			//for maximizing cache hit, Don't set Entity's IsVisiable at here
-			cullingMask[j] |= (result & 1) << i; 
-			cullingMask[j + 1] |= ((result & 2) >> 1) << i; 
+			cullingMask[j] |= (result & 1) << i;
+			cullingMask[j + 1] |= ((result & 2) >> 1) << i;
 		}
 
 	}
@@ -167,10 +161,10 @@ void doom::graphics::LinearTransformDataCulling::CullBlockEntityJob()
 	M256F* m256f_isVisible = reinterpret_cast<M256F*>(currentEntityBlock->mIsVisibleBitflag);
 	const M256F* m256f_cullingMask = reinterpret_cast<const M256F*>(cullingMask);
 
-	
-	
-	unsigned int m256_count_isvisible = 1 + ( ( currentEntityBlock->mCurrentEntityCount * sizeof(decltype(*EntityBlock::mIsVisibleBitflag)) - 1 ) / 32 );
-	
+
+
+	unsigned int m256_count_isvisible = 1 + ((currentEntityBlock->mCurrentEntityCount * sizeof(decltype(*EntityBlock::mIsVisibleBitflag)) - 1) / 32);
+
 	/// <summary>
 	/// M256 = 8bit(1byte = bool size) * 32 
 	/// 
@@ -186,12 +180,70 @@ void doom::graphics::LinearTransformDataCulling::CullBlockEntityJob()
 // 	{
 // 		currentEntityBlock->mIsVisibleBitflag[entityIndex] &= cullingMask[entityIndex];
 // 	}
-	mCullJobFinishedBlockCount++;
+
+// 	{
+// 		std::lock_guard<std::mutex> lk(this->mCullJobMutex); // Is this required??
+// 
+// 	}
+
+
+	unsigned int finshiedBlockCount;
+	{
+		// even if this->mFinishedCullJobBlockCount is atomic, why need this? 
+		// this will prevent from condition variable being fullfilled between Waiting thread checking predicate and waiting
+
+		// What happen this->mFinishedCullJobBlockCount is set without mutex lock
+		//
+		// 1. Waiting thread wakes spuriously, aquires mutex, checks predicate and evaluates it to false, so it must wait on cv again(now thread is on between checks predicate and starting wait)
+		// 2. Controlling thread sets shared variable to true.
+		// 3. Controlling thread sends notification, which is not received by anybody, because there is no threads waiting on conditional variable.
+		// 4. Waiting thread waits on conditional variable.Since notification was already sent, it would wait until next spurious wakeup, or next time when controlling thread sends notification.Potentially waiting indefinetly.
+		
+		std::scoped_lock<std::mutex> sk(this->mCullJobMutex);
+		finshiedBlockCount = ++(this->mFinishedCullJobBlockCount);
+	}
+	
+	assert(finshiedBlockCount <= this->mEntityGridCell.mBlockCount);
+	if (finshiedBlockCount == this->mEntityGridCell.mBlockCount)
+	{
+		this->mCullJobConditionVaraible.notify_one();
+	}
+}
+
+std::vector<std::function<void()>> doom::graphics::LinearTransformDataCulling::GetCullBlockEnityJobs()
+{
+	std::vector<std::function<void()>> cullJobs{};
+	for (unsigned int i = 0; i < this->mEntityGridCell.mBlockCount; i++)
+	{
+		cullJobs.push_back(std::bind(&LinearTransformDataCulling::CullBlockEntityJob, this, i));
+	}
+	return cullJobs;
 }
 
 bool doom::graphics::LinearTransformDataCulling::GetIsCullJobFinished()
 {
-	return this->mCullJobFinishedBlockCount == this->mEntityGridCell.mBlockCount;
+	assert(mFinishedCullJobBlockCount <= this->mEntityGridCell.mBlockCount);
+	return this->mFinishedCullJobBlockCount == this->mEntityGridCell.mBlockCount;
+}
+
+bool doom::graphics::LinearTransformDataCulling::WaitToFinishCullJobs()
+{
+	{
+		std::unique_lock<std::mutex> lk(this->mCullJobMutex);
+		this->mCullJobConditionVaraible.wait(lk, [this] {return this->GetIsCullJobFinished(); });
+		//
+		//	condition variable check pred first
+		//	
+		//	while (!pred()) 
+		//	{
+		//		wait(lock);
+		//	}
+		//
+		//
+
+	}
+	
+	return true;
 }
 
 void doom::graphics::LinearTransformDataCulling::ClearIsVisibleFlag()
@@ -204,7 +256,8 @@ void doom::graphics::LinearTransformDataCulling::ClearIsVisibleFlag()
 
 void doom::graphics::LinearTransformDataCulling::ResetCullJobState()
 {
-	this->mAtomicCurrentBlockIndex = 0;
-	this->mCullJobFinishedBlockCount = 0;
+	//this->mAtomicCurrentBlockIndex = 0;
+	this->mFinishedCullJobBlockCount = 0;
+	this->ClearIsVisibleFlag();
 }
 

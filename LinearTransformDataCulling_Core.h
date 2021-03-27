@@ -3,7 +3,7 @@
 #define MAX_ENTITY_BLOCK_COUNT 200
 #define ENTITY_COUNT_IN_ENTITY_BLOCK 40
 
-#define MAX_CAMERA_COUNT 4
+#define MAX_CAMERA_COUNT 8
 
 #if defined(_MSC_VER)
 #  define COMPILER_MSVC
