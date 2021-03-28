@@ -57,5 +57,10 @@ namespace doom
 			/// </summary>
 			unsigned int mCurrentEntityCount;
 		};
+		
+		/// <summary>
+		/// Size of Entity block should be less than 4kb(page size)
+		/// </summary>
+		static_assert(sizeof(EntityBlock) < 4000);
 	}
 }
