@@ -96,7 +96,7 @@ namespace doom
 			/// will be used at CullBlockEntityJob
 			/// </summary>
 			//std::atomic<unsigned int> mAtomicCurrentBlockIndex;
-			std::atomic<unsigned int> mFinishedCullJobBlockCount;
+			unsigned int mFinishedCullJobBlockCount;
 			/// <summary>
 			/// 
 			/// </summary>

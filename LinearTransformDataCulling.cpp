@@ -148,10 +148,10 @@ doom::graphics::EntityBlockViewer doom::graphics::LinearTransformDataCulling::Al
 
 
 
-void doom::graphics::LinearTransformDataCulling::UpdateFrustumPlane(unsigned int frustumPlaneIndex, const math::Matrix4x4& viewProjectionMatrix)
+void doom::graphics::LinearTransformDataCulling::UpdateFrustumPlane(unsigned int frustumPlaneIndex, const math::Matrix4x4& modelViewProjectionMatrix)
 {
 	assert(frustumPlaneIndex >= 0 && frustumPlaneIndex < MAX_CAMERA_COUNT);
-	math::ExtractSIMDPlanesFromMVPMatrix(viewProjectionMatrix, this->mSIMDFrustumPlanes[frustumPlaneIndex].mFrustumPlanes, true); // TODO : normalize 해야하는지 check 하자
+	math::ExtractSIMDPlanesFromMVPMatrix(modelViewProjectionMatrix, this->mSIMDFrustumPlanes[frustumPlaneIndex].mFrustumPlanes, true); // TODO : normalize 해야하는지 check 하자
 }
 
 void doom::graphics::LinearTransformDataCulling::SetCameraCount(unsigned int cameraCount)
@@ -230,7 +230,7 @@ void doom::graphics::LinearTransformDataCulling::CullBlockEntityJob(unsigned int
 		// 4. Waiting thread waits on conditional variable.Since notification was already sent, it would wait until next spurious wakeup, or next time when controlling thread sends notification.Potentially waiting indefinetly.
 		
 		std::scoped_lock<std::mutex> sk(this->mCullJobMutex);
-		finshiedBlockCount = ++(this->mFinishedCullJobBlockCount);
+		finshiedBlockCount = ++(this->mFinishedCullJobBlockCount); 
 	}
 	
 	assert(finshiedBlockCount <= this->mEntityGridCell.mBlockCount);
