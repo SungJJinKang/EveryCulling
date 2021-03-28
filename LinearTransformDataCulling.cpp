@@ -22,6 +22,7 @@ void doom::graphics::LinearTransformDataCulling::FreeEntityBlock(EntityBlock* fr
 	}
 	assert(freedEntityBlockIndex != -1);
 
+	//swap and pop back trick
 	std::swap(this->mEntityGridCell.mEntityBlocks[this->mEntityGridCell.mBlockCount - 1], this->mEntityGridCell.mEntityBlocks[freedEntityBlockIndex]);
 	std::swap(this->mEntityGridCell.AllocatedEntityCountInBlocks[this->mEntityGridCell.mBlockCount - 1], this->mEntityGridCell.AllocatedEntityCountInBlocks[freedEntityBlockIndex]);
 	freedEntityBlock->mCurrentEntityCount = 0;
@@ -58,23 +59,37 @@ void doom::graphics::LinearTransformDataCulling::RemoveEntityFromBlock(EntityBlo
 	assert(ownerEntityBlock != nullptr);
 	assert(entityIndexInBlock >= 0 && entityIndexInBlock < ENTITY_COUNT_IN_ENTITY_BLOCK);
 
+	//Do nothing......
+
+	//Never Decrease this->mEntityGridCell.AllocatedEntityCountInBlocks
+	//Entities Indexs in EntityBlock should not be swapped because already allocated EntityBlockViewer can't see it
+
 	ownerEntityBlock->mCurrentEntityCount--;
 	if (ownerEntityBlock->mCurrentEntityCount == 0)
 	{
 		this->FreeEntityBlock(ownerEntityBlock);
 	}
-	//Do nothing......
-
-	//Never Decrease this->mEntityGridCell.AllocatedEntityCountInBlocks
-	//Entities Indexs in EntityBlock should not be swapped because already allocated EntityBlockViewer can't see it
+	
 }
 
-void doom::graphics::LinearTransformDataCulling::RemoveEntityFromBlock(EntityBlockViewer* entityBlockViewer)
+doom::graphics::EntityBlock* doom::graphics::LinearTransformDataCulling::AllocateNewEntityBlockFromPool()
+{
+	EntityBlock* newEntityBlock = this->GetNewEntityBlockFromPool();
+
+
+	this->mEntityGridCell.mBlockCount++;
+	this->mEntityGridCell.mEntityBlocks[this->mEntityGridCell.mBlockCount - 1] = newEntityBlock;
+	this->mEntityGridCell.AllocatedEntityCountInBlocks[this->mEntityGridCell.mBlockCount - 1] = 0;
+	newEntityBlock->mCurrentEntityCount = 0;
+	return newEntityBlock;
+}
+
+void doom::graphics::LinearTransformDataCulling::RemoveEntityFromBlock(EntityBlockViewer& entityBlockViewer)
 {
 	//Do nothing......
 
-	entityBlockViewer->bmIsActive = false;
-	this->RemoveEntityFromBlock(entityBlockViewer->mTargetEntityBlock, entityBlockViewer->mEntityIndexInBlock);
+	entityBlockViewer.bmIsActive = false;
+	this->RemoveEntityFromBlock(entityBlockViewer.mTargetEntityBlock, entityBlockViewer.mEntityIndexInBlock);
 	//Never Decrease this->mEntityGridCell.AllocatedEntityCountInBlocks
 	//Entities Indexs in EntityBlock should not be swapped because already allocated EntityBlockViewer can't see it
 }
@@ -82,15 +97,20 @@ void doom::graphics::LinearTransformDataCulling::RemoveEntityFromBlock(EntityBlo
 
 doom::graphics::EntityBlockViewer doom::graphics::LinearTransformDataCulling::AllocateNewEntity(const math::Vector3& position, float radius)
 {
+	if (this->mEntityGridCell.mBlockCount == 0)
+	{
+		this->AllocateNewEntityBlockFromPool();
+	}
+
 	EntityBlock* lastEntityBlock = this->mEntityGridCell.mEntityBlocks[this->mEntityGridCell.mBlockCount - 1];
 	unsigned int currentEntityCountInEntityBlock = this->mEntityGridCell.AllocatedEntityCountInBlocks[this->mEntityGridCell.mBlockCount - 1];
 	
-	assert(currentEntityCountInEntityBlock > MAX_ENTITY_BLOCK_COUNT); // something is weird........
+	assert(currentEntityCountInEntityBlock <= ENTITY_COUNT_IN_ENTITY_BLOCK); // something is weird........
 	
 	EntityBlock* entityBlockOfNewEntity{ nullptr };
 	unsigned int entityIndexInBlock;
 
-	if (currentEntityCountInEntityBlock < MAX_ENTITY_BLOCK_COUNT)
+	if (currentEntityCountInEntityBlock < ENTITY_COUNT_IN_ENTITY_BLOCK)
 	{
 		//lastEntityBlock have empty Entity space
 		lastEntityBlock->mCurrentEntityCount++;
@@ -99,15 +119,15 @@ doom::graphics::EntityBlockViewer doom::graphics::LinearTransformDataCulling::Al
 		entityBlockOfNewEntity = lastEntityBlock;
 		entityIndexInBlock = currentEntityCountInEntityBlock;
 	}
-	else if (currentEntityCountInEntityBlock == MAX_ENTITY_BLOCK_COUNT)
+	else if (currentEntityCountInEntityBlock == ENTITY_COUNT_IN_ENTITY_BLOCK)
 	{
 		//lastEntityBlock is full, Get new entity block from pool
-		EntityBlock* newEntityBlock = this->GetNewEntityBlockFromPool();
+		EntityBlock* newEntityBlock = this->AllocateNewEntityBlockFromPool();
 		
-		this->mEntityGridCell.mBlockCount++;
-		this->mEntityGridCell.mEntityBlocks[this->mEntityGridCell.mBlockCount - 1] = newEntityBlock;
+		assert(newEntityBlock == this->mEntityGridCell.mEntityBlocks[this->mEntityGridCell.mBlockCount - 1]);
+
 		this->mEntityGridCell.AllocatedEntityCountInBlocks[this->mEntityGridCell.mBlockCount - 1] = 1;
-		newEntityBlock->mCurrentEntityCount = 1;
+		this->mEntityGridCell.mEntityBlocks[this->mEntityGridCell.mBlockCount - 1]->mCurrentEntityCount = 1;
 
 		entityBlockOfNewEntity = newEntityBlock;
 		entityIndexInBlock = 0;
@@ -128,10 +148,20 @@ doom::graphics::EntityBlockViewer doom::graphics::LinearTransformDataCulling::Al
 
 
 
-void doom::graphics::LinearTransformDataCulling::UpdateFrustumPlane(unsigned int frustumPlaneIndex, const math::Matrix4x4& mvpMatrix)
+void doom::graphics::LinearTransformDataCulling::UpdateFrustumPlane(unsigned int frustumPlaneIndex, const math::Matrix4x4& viewProjectionMatrix)
 {
 	assert(frustumPlaneIndex >= 0 && frustumPlaneIndex < MAX_CAMERA_COUNT);
-	math::ExtractSIMDPlanesFromMVPMatrix(mvpMatrix, this->mSIMDFrustumPlanes[frustumPlaneIndex].mFrustumPlanes, true); // TODO : normalize 해야하는지 check 하자
+	math::ExtractSIMDPlanesFromMVPMatrix(viewProjectionMatrix, this->mSIMDFrustumPlanes[frustumPlaneIndex].mFrustumPlanes, true); // TODO : normalize 해야하는지 check 하자
+}
+
+void doom::graphics::LinearTransformDataCulling::SetCameraCount(unsigned int cameraCount)
+{
+	this->mCameraCount = cameraCount;
+}
+
+doom::graphics::SIMDFrustumPlanes* doom::graphics::LinearTransformDataCulling::GetSIMDPlanes()
+{
+	return this->mSIMDFrustumPlanes;
 }
 
 void doom::graphics::LinearTransformDataCulling::CullBlockEntityJob(unsigned int blockIndex)
@@ -150,7 +180,7 @@ void doom::graphics::LinearTransformDataCulling::CullBlockEntityJob(unsigned int
 			char result = math::InFrustumSIMDWithTwoPoint(frustumPlane, currentEntityBlock->mPositions + j);
 			// if first low bit has 1 value, Pos A is In Frustum
 			// if second low bit has 1 value, Pos A is In Frustum
-
+			
 			//for maximizing cache hit, Don't set Entity's IsVisiable at here
 			cullingMask[j] |= (result & 1) << i;
 			cullingMask[j + 1] |= ((result & 2) >> 1) << i;
@@ -229,6 +259,9 @@ bool doom::graphics::LinearTransformDataCulling::GetIsCullJobFinished()
 bool doom::graphics::LinearTransformDataCulling::WaitToFinishCullJobs()
 {
 	{
+		// why need mutex lock ? 
+		// read this : https://sungjjinkang.github.io/computerscience/2021/03/28/condtionvariable_atomic.html
+
 		std::unique_lock<std::mutex> lk(this->mCullJobMutex);
 		this->mCullJobConditionVaraible.wait(lk, [this] {return this->GetIsCullJobFinished(); });
 		//
@@ -246,11 +279,11 @@ bool doom::graphics::LinearTransformDataCulling::WaitToFinishCullJobs()
 	return true;
 }
 
-void doom::graphics::LinearTransformDataCulling::ClearIsVisibleFlag()
+void doom::graphics::LinearTransformDataCulling::SetAllOneIsVisibleFlag()
 {
 	for (unsigned int i = 0; i < this->mEntityGridCell.mBlockCount; i++)
 	{
-		std::memset(this->mEntityGridCell.mEntityBlocks[i]->mIsVisibleBitflag, 0, sizeof(bool) * ENTITY_COUNT_IN_ENTITY_BLOCK);
+		std::memset(this->mEntityGridCell.mEntityBlocks[i]->mIsVisibleBitflag, 0xFF, sizeof(bool) * ENTITY_COUNT_IN_ENTITY_BLOCK);
 	}
 }
 
@@ -258,6 +291,6 @@ void doom::graphics::LinearTransformDataCulling::ResetCullJobState()
 {
 	//this->mAtomicCurrentBlockIndex = 0;
 	this->mFinishedCullJobBlockCount = 0;
-	this->ClearIsVisibleFlag();
+	this->SetAllOneIsVisibleFlag();
 }
 

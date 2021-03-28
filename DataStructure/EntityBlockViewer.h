@@ -52,10 +52,26 @@ namespace doom
 				return mTargetEntityBlock->mHandles + mEntityIndexInBlock;
 			}
 
+			/// <summary>
+			/// Get if entity is visible from all camera
+			/// return true when all camera can see this entity ( not culled )
+			/// </summary>
+			/// <returns></returns>
 			FORCE_INLINE bool GetIsVisibleBitflag() const
 			{
 				assert(this->bmIsActive == true);
 				return mTargetEntityBlock->mIsVisibleBitflag[mEntityIndexInBlock];
+			}
+			/// <summary>
+			/// Get if entity is visible from Camera of parameter cameraIndex
+			/// </summary>
+			/// <param name="cameraIndex">0 <= cameraIndex < LinearTransformDataCulling::mCameraCount</param>
+			/// <returns></returns>
+			FORCE_INLINE bool GetIsVisibleBitflag(int cameraIndex) const
+			{
+				assert(this->bmIsActive == true);
+				assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
+				return mTargetEntityBlock->mIsVisibleBitflag[mEntityIndexInBlock] & (1 << cameraIndex);
 			}
 		};
 	}

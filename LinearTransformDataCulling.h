@@ -36,6 +36,41 @@ namespace doom
 		/// 3. Frustum vs Sphere intersections check per loop
 		/// 3. Threads solve intersections(blocks) parrallily
 		/// 
+		/// this library require math library : https://github.com/SungJJinKang/LightMath_Cpp/blob/main/Matrix4x4Float_Aligned.inl
+		/// 
+		/// Example : 
+		/// 
+		/// LinearTransformDataCulling mLinearTransformDataCulling;
+		/// 
+		/// std::vector<Camera> CameraList = ~~~~;
+		// 	for (unsigned int i = 0; i < CameraList.size(); i++)
+		// 	{
+		// 		this->mLinearTransformDataCulling.UpdateFrustumPlane(i, CameraList[i]->GetViewProjectionMatrix());
+		// 	}
+		//
+		//  this->mLinearTransformDataCulling.SetCameraCount(CameraList.size());
+		// 	this->mLinearTransformDataCulling.ResetCullJobState();S
+		// 	auto CullingBlockJobs = this->mLinearTransformDataCulling.GetCullBlockEnityJobs();
+		//
+		// 	JobSystem.PushBackJobChunkToJobPool(std::move(CullingBlockJobs));
+		// 	this->mLinearTransformDataCulling.WaitToFinishCullJobs();
+		// 
+		//  for(unsigned int cameraIndex = 0 ; cameraIndex < MAX_CAMERA_COUNT ; cameraIndex++)
+		// 	{
+		// 		for (size_t i = 0; i < EntityCount; ++i)
+		// 		{
+		// 			if (Entity[i]->EntityBlockViewer.GetIsVisibleBitflag(cameraIndex) == true) 
+		// 			{
+		// 				Entity[i]->Draw(); 
+		// 			}
+		// 		}
+		// 	}
+		// 	
+		/// 
+		/// 
+		/// 
+		/// 
+		/// 
 		/// references : 
 		/// https://www.gdcvault.com/play/1014491/Culling-the-Battlefield-Data-Oriented
 		/// https://www.slideshare.net/DICEStudio/culling-the-battlefield-data-oriented-design-in-practice
@@ -68,10 +103,11 @@ namespace doom
 			std::condition_variable mCullJobConditionVaraible;
 			std::mutex mCullJobMutex;
 
-			void ClearIsVisibleFlag();
+			void SetAllOneIsVisibleFlag();
 
 			void RemoveEntityFromBlock(EntityBlock* ownerEntityBlock, unsigned int entityIndexInBlock);
 
+			EntityBlock* AllocateNewEntityBlockFromPool();
 			/// <summary>
 			/// Block Swap removedblock with last block, and return swapped lastblock to pool
 			/// </summary>
@@ -82,14 +118,18 @@ namespace doom
 			LinearTransformDataCulling();
 
 			/// <summary>
+			/// You should call this function on your Transform Component or In your game engine
+			/// 
 			/// Remove Entity is nothing, Just decrement AllocatedEntityCountInBlocks
 			/// And if AllocatedEntityCountInBlocks Of Block become zero, Remove the block using RemoveBlock function
 			/// 
 			/// Removing Entity isn't thread safe
 			/// </summary>
-			void RemoveEntityFromBlock(EntityBlockViewer* entityBlockViewer);
+			void RemoveEntityFromBlock(EntityBlockViewer& entityBlockViewer);
 			
 			/// <summary>
+			/// You should call this function on your Transform Component or In your game engine
+			///
 			/// increment EntityCountInBlock of TargetBlock.
 			/// If All blocks is full, Get new block from Block Pool
 			/// 
@@ -104,6 +144,7 @@ namespace doom
 			
 			/// <summary>
 			/// Solve View Frustum Culling from multiple threads
+			/// Call this before start draw
 			/// 
 			/// for pushing to job pool , this function is declared with static
 			/// 
@@ -113,30 +154,42 @@ namespace doom
 			void CullBlockEntityJob(unsigned int blockIndex);
 			/// <summary>
 			/// Get Culling BlockEntity Jobs
+			/// Push returned all std::function to JobPool!!!!!!!!!
+			/// 
 			/// return type is std::vector<std::function<void()>>
 			/// 
-			/// So push returned all std::function to JobPool
+			/// 
 			/// </summary>
 			/// <returns></returns>
 			std::vector<std::function<void()>> GetCullBlockEnityJobs();
 
-			bool GetIsCullJobFinished();
 			/// <summary>
-			/// Call thread will stall until cull job of all entity block is finished
+			/// Get Is All block's culling job is finished.
+			/// if true, you can check object's visibility(culled)
+			/// </summary>
+			/// <returns></returns>
+			bool GetIsCullJobFinished();
+
+			/// <summary>
+			/// Caller thread will stall until cull job of all entity block is finished
 			/// </summary>
 			bool WaitToFinishCullJobs();
 
 		
 			/// <summary>
-			/// Reset cull job state before pushing cull job to job pool
+			/// Reset cull job state before pushing cull jobs to job pool
 			/// </summary>
 			void ResetCullJobState();
 			/// <summary>
 			/// before Start solving culling, Update Every Camera's frustum plane
+			/// Do this at main thread
 			/// </summary>
 			/// <param name="frustumPlaneIndex"></param>
-			/// <param name="mvpMatrix"></param>
-			void UpdateFrustumPlane(unsigned int frustumPlaneIndex, const math::Matrix4x4& mvpMatrix);
+			/// <param name="viewProjectionMatix"></param>
+			void UpdateFrustumPlane(unsigned int frustumPlaneIndex, const math::Matrix4x4& viewProjectionMatix);
+
+			void SetCameraCount(unsigned int cameraCount);
+			SIMDFrustumPlanes* GetSIMDPlanes();
 		};
 	}
 }

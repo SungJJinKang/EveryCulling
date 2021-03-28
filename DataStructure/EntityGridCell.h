@@ -22,6 +22,10 @@ namespace doom
 			/// So we use array of pointers
 			/// </summary>
 			EntityBlock* mEntityBlocks[MAX_ENTITY_BLOCK_COUNT];
+
+			/// <summary>
+			/// 
+			/// </summary>
 			unsigned int AllocatedEntityCountInBlocks[MAX_ENTITY_BLOCK_COUNT];
 			unsigned int mBlockCount{ 0 };
 		};
