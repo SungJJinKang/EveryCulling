@@ -52,14 +52,20 @@ namespace doom
 		// 	this->mLinearTransformDataCulling.ResetCullJobState();S
 		// 	auto CullingBlockJobs = this->mLinearTransformDataCulling.GetCullBlockEnityJobs();
 		//
+		//	//Put pushing job to jobpool at FORMOST OF REDNERING LOOP !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		// 	JobSystem.PushBackJobChunkToJobPool(std::move(CullingBlockJobs));
+		//
+		//	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		//	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		//  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		//
 		// 	this->mLinearTransformDataCulling.WaitToFinishCullJobs();
 		// 
 		//  for(unsigned int cameraIndex = 0 ; cameraIndex < MAX_CAMERA_COUNT ; cameraIndex++)
 		// 	{
 		// 		for (size_t i = 0; i < EntityCount; ++i)
 		// 		{
-		// 			if (Entity[i]->EntityBlockViewer.GetIsVisibleBitflag(cameraIndex) == true) 
+		// 			if (Entity[i]->EntityBlockViewer.GetIsVisibleBitflag(cameraIndex) != 0) 
 		// 			{
 		// 				Entity[i]->Draw(); 
 		// 			}
@@ -97,6 +103,9 @@ namespace doom
 			/// </summary>
 			//std::atomic<unsigned int> mAtomicCurrentBlockIndex;
 			unsigned int mFinishedCullJobBlockCount;
+
+			std::vector<std::function<void()>> mCachedCullBlockEntityJobs{};
+
 			/// <summary>
 			/// 
 			/// </summary>
@@ -107,15 +116,22 @@ namespace doom
 
 			void RemoveEntityFromBlock(EntityBlock* ownerEntityBlock, unsigned int entityIndexInBlock);
 
+			void AllocateEntityBlockPool();
 			EntityBlock* AllocateNewEntityBlockFromPool();
+
 			/// <summary>
 			/// Block Swap removedblock with last block, and return swapped lastblock to pool
 			/// </summary>
 			void FreeEntityBlock(EntityBlock* freedEntityBlock);
 			EntityBlock* GetNewEntityBlockFromPool();
+
+			void CacheCullBlockEntityJobs();
+
 		public:
 
 			LinearTransformDataCulling();
+
+		
 
 			/// <summary>
 			/// You should call this function on your Transform Component or In your game engine
@@ -152,16 +168,24 @@ namespace doom
 			/// So CullBlockEntityJob is thread safe.
 			/// </summary>
 			void CullBlockEntityJob(unsigned int blockIndex);
+			
 			/// <summary>
 			/// Get Culling BlockEntity Jobs
+			/// 
 			/// Push returned all std::function to JobPool!!!!!!!!!
+			/// Put pushing culljob to jobpool at foremost of rendering loop!!!!!!!!!!!!
 			/// 
 			/// return type is std::vector<std::function<void()>>
 			/// 
 			/// 
 			/// </summary>
 			/// <returns></returns>
-			std::vector<std::function<void()>> GetCullBlockEnityJobs();
+			FORCE_INLINE std::vector<std::function<void()>> GetCullBlockEnityJobs()
+			{
+				std::vector<std::function<void()>> cullJobs{};
+				cullJobs.assign(this->mCachedCullBlockEntityJobs.begin(), this->mCachedCullBlockEntityJobs.begin() + this->mEntityGridCell.mBlockCount);
+				return cullJobs;
+			}
 
 			/// <summary>
 			/// Get Is All block's culling job is finished.

@@ -5,6 +5,7 @@
 
 #include "DataStructure/EntityBlock.h"
 
+#include <iostream>
 
 void doom::graphics::LinearTransformDataCulling::FreeEntityBlock(EntityBlock* freedEntityBlock)
 {
@@ -40,7 +41,23 @@ doom::graphics::EntityBlock* doom::graphics::LinearTransformDataCulling::GetNewE
 	return entityBlock;
 }
 
+void doom::graphics::LinearTransformDataCulling::CacheCullBlockEntityJobs()
+{
+	for (unsigned int i = 0; i < MAX_ENTITY_BLOCK_COUNT; i++)
+	{
+		this->mCachedCullBlockEntityJobs.push_back(std::bind(&LinearTransformDataCulling::CullBlockEntityJob, this, i));
+	}
+}
+
 doom::graphics::LinearTransformDataCulling::LinearTransformDataCulling()
+{
+	AllocateEntityBlockPool();
+
+	this->CacheCullBlockEntityJobs();
+	this->bmIsInitializedEntityBlockPool = true;
+}
+
+void doom::graphics::LinearTransformDataCulling::AllocateEntityBlockPool()
 {
 	/// <summary>
 	/// Entity Block size should be less than 4KB(Page Size On Window Platform)
@@ -51,7 +68,6 @@ doom::graphics::LinearTransformDataCulling::LinearTransformDataCulling()
 	{
 		this->mFreeEntityBlockList.push_back(this->mEntityBlockPool.get() + i);
 	}
-	this->bmIsInitializedEntityBlockPool = true;
 }
 
 void doom::graphics::LinearTransformDataCulling::RemoveEntityFromBlock(EntityBlock* ownerEntityBlock, unsigned int entityIndexInBlock)
@@ -151,7 +167,8 @@ doom::graphics::EntityBlockViewer doom::graphics::LinearTransformDataCulling::Al
 void doom::graphics::LinearTransformDataCulling::UpdateFrustumPlane(unsigned int frustumPlaneIndex, const math::Matrix4x4& modelViewProjectionMatrix)
 {
 	assert(frustumPlaneIndex >= 0 && frustumPlaneIndex < MAX_CAMERA_COUNT);
-	math::ExtractSIMDPlanesFromMVPMatrix(modelViewProjectionMatrix, this->mSIMDFrustumPlanes[frustumPlaneIndex].mFrustumPlanes, true); // TODO : normalize 해야하는지 check 하자
+
+	math::ExtractSIMDPlanesFromMVPMatrix(modelViewProjectionMatrix, this->mSIMDFrustumPlanes[frustumPlaneIndex].mFrustumPlanes, true); 
 }
 
 void doom::graphics::LinearTransformDataCulling::SetCameraCount(unsigned int cameraCount)
@@ -184,6 +201,7 @@ void doom::graphics::LinearTransformDataCulling::CullBlockEntityJob(unsigned int
 			//for maximizing cache hit, Don't set Entity's IsVisiable at here
 			cullingMask[j] |= (result & 1) << i;
 			cullingMask[j + 1] |= ((result & 2) >> 1) << i;
+
 		}
 
 	}
@@ -238,16 +256,6 @@ void doom::graphics::LinearTransformDataCulling::CullBlockEntityJob(unsigned int
 	{
 		this->mCullJobConditionVaraible.notify_one();
 	}
-}
-
-std::vector<std::function<void()>> doom::graphics::LinearTransformDataCulling::GetCullBlockEnityJobs()
-{
-	std::vector<std::function<void()>> cullJobs{};
-	for (unsigned int i = 0; i < this->mEntityGridCell.mBlockCount; i++)
-	{
-		cullJobs.push_back(std::bind(&LinearTransformDataCulling::CullBlockEntityJob, this, i));
-	}
-	return cullJobs;
 }
 
 bool doom::graphics::LinearTransformDataCulling::GetIsCullJobFinished()

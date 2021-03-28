@@ -67,7 +67,7 @@ namespace doom
 			/// </summary>
 			/// <param name="cameraIndex">0 <= cameraIndex < LinearTransformDataCulling::mCameraCount</param>
 			/// <returns></returns>
-			FORCE_INLINE bool GetIsVisibleBitflag(int cameraIndex) const
+			FORCE_INLINE char GetIsVisibleBitflag(unsigned int cameraIndex) const
 			{
 				assert(this->bmIsActive == true);
 				assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
