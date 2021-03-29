@@ -176,6 +176,11 @@ void doom::graphics::LinearTransformDataCulling::SetCameraCount(unsigned int cam
 	this->mCameraCount = cameraCount;
 }
 
+unsigned int doom::graphics::LinearTransformDataCulling::GetCameraCount()
+{
+	return this->mCameraCount;
+}
+
 doom::graphics::SIMDFrustumPlanes* doom::graphics::LinearTransformDataCulling::GetSIMDPlanes()
 {
 	return this->mSIMDFrustumPlanes;
@@ -194,7 +199,7 @@ void doom::graphics::LinearTransformDataCulling::CullBlockEntityJob(unsigned int
 		math::Vector4* frustumPlane = this->mSIMDFrustumPlanes[i].mFrustumPlanes;
 		for (unsigned int j = 0; j < entityCountInBlock; j = j + 2)
 		{
-			char result = math::InFrustumSIMDWithTwoPoint(frustumPlane, currentEntityBlock->mPositions + j);
+			char result = math::CheckInFrustumSIMDWithTwoPoint(frustumPlane, currentEntityBlock->mPositions + j);
 			// if first low bit has 1 value, Pos A is In Frustum
 			// if second low bit has 1 value, Pos A is In Frustum
 			
@@ -224,18 +229,6 @@ void doom::graphics::LinearTransformDataCulling::CullBlockEntityJob(unsigned int
 	{
 		m256f_isVisible[i] = _mm256_and_ps(m256f_isVisible[i], m256f_cullingMask[i]);
 	}
-
-	// We don't need this because currentEntityBlock->mIsVisibleBitflag and cullingMask is aligned to 32 byte
-// 	for (; entityIndex < entityCountInBlock; entityIndex++)
-// 	{
-// 		currentEntityBlock->mIsVisibleBitflag[entityIndex] &= cullingMask[entityIndex];
-// 	}
-
-// 	{
-// 		std::lock_guard<std::mutex> lk(this->mCullJobMutex); // Is this required??
-// 
-// 	}
-
 
 	unsigned int finshiedBlockCount;
 	{

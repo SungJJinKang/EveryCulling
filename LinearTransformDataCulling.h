@@ -228,6 +228,7 @@ namespace doom
 			void UpdateFrustumPlane(unsigned int frustumPlaneIndex, const math::Matrix4x4& viewProjectionMatix);
 
 			void SetCameraCount(unsigned int cameraCount);
+			unsigned int GetCameraCount();
 			SIMDFrustumPlanes* GetSIMDPlanes();
 		};
 	}

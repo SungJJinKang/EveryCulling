@@ -45,7 +45,7 @@ namespace doom
 			/// return true when all camera can see this entity ( not culled )
 			/// </summary>
 			/// <returns></returns>
-			FORCE_INLINE bool GetIsVisibleBitflag() const
+			FORCE_INLINE char GetIsVisibleBitflag() const
 			{
 				assert(this->bmIsActive == true);
 				return mTargetEntityBlock->mIsVisibleBitflag[mEntityIndexInBlock];
