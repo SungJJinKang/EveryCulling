@@ -206,6 +206,8 @@ void doom::graphics::LinearTransformDataCulling::CullBlockEntityJob(unsigned int
 
 	}
 
+	//TODO : If CullingMask is True, Do Calculate ScreenSpace AABB Area And Check Is Culled
+	// use mCulledScreenSpaceAABBArea
 	M256F* m256f_isVisible = reinterpret_cast<M256F*>(currentEntityBlock->mIsVisibleBitflag);
 	const M256F* m256f_cullingMask = reinterpret_cast<const M256F*>(cullingMask);
 

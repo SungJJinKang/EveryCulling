@@ -5,7 +5,7 @@
 
 #define MAX_CAMERA_COUNT 8
 
-#define BOUNDING_SPHRE_RADIUS_MARGIN 1
+#define BOUNDING_SPHRE_RADIUS_MARGIN 0.5f
 
 #if defined(_MSC_VER)
 #  define COMPILER_MSVC

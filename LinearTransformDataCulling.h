@@ -90,12 +90,27 @@ namespace doom
 		private:
 
 			unsigned int mCameraCount;
+			
+			//
+
 			SIMDFrustumPlanes mSIMDFrustumPlanes[MAX_CAMERA_COUNT];
 
 			bool bmIsInitializedEntityBlockPool{ false };
 			std::unique_ptr<EntityBlock[]> mEntityBlockPool;
 			std::vector<EntityBlock*> mFreeEntityBlockList{};
 			EntityGridCell mEntityGridCell{};
+
+			//
+
+			//For Calculating ScreenSpace AABB Area
+			//AABB로 할지 아님 Sphere로 할지(https://stackoverflow.com/questions/21648630/radius-of-projected-sphere-in-screen-space)...
+			//
+			math::Matrix4x4 mMVPMatrix;
+			/// <summary>
+			/// If Screen Space AABB area is less than this variable,
+			/// It Object is culled
+			/// </summary>
+			float mCulledScreenSpaceAABBArea;
 
 			//static inline constexpr unsigned int M256_COUNT_OF_VISIBLE_ARRAY = 1 + ( (ENTITY_COUNT_IN_ENTITY_BLOCK * sizeof(decltype(*EntityBlock::mIsVisibleBitflag)) - 1) / 32 );
 			/// <summary>
