@@ -15,11 +15,11 @@ namespace doom
 		/// </summary>
 		struct TransformData
 		{
-			math::Quaternion rotation;
-			math::Vector3 minAABB;
+			math::Quaternion mRotation;
+			math::Vector3 mMinAABBPoint;
 			float pad[1]; // for aligned to 8byte
-			math::Vector3 maxAABB;
-			math::Vector3 scale;
+			math::Vector3 mMaxAABBPoint;
+			math::Vector3 mScale;
 		};
 	}
 }

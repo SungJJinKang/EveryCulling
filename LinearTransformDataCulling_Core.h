@@ -5,6 +5,8 @@
 
 #define MAX_CAMERA_COUNT 8
 
+#define BOUNDING_SPHRE_RADIUS_MARGIN 1
+
 #if defined(_MSC_VER)
 #  define COMPILER_MSVC
 #elif defined(__GNUC__)

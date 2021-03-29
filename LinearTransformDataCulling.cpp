@@ -164,11 +164,11 @@ doom::graphics::EntityBlockViewer doom::graphics::LinearTransformDataCulling::Al
 
 
 
-void doom::graphics::LinearTransformDataCulling::UpdateFrustumPlane(unsigned int frustumPlaneIndex, const math::Matrix4x4& modelViewProjectionMatrix)
+void doom::graphics::LinearTransformDataCulling::UpdateFrustumPlane(unsigned int frustumPlaneIndex, const math::Matrix4x4& viewProjectionMatrix)
 {
 	assert(frustumPlaneIndex >= 0 && frustumPlaneIndex < MAX_CAMERA_COUNT);
 
-	math::ExtractSIMDPlanesFromMVPMatrix(modelViewProjectionMatrix, this->mSIMDFrustumPlanes[frustumPlaneIndex].mFrustumPlanes, true); 
+	math::ExtractSIMDPlanesFromViewProjectionMatrix(viewProjectionMatrix, this->mSIMDFrustumPlanes[frustumPlaneIndex].mFrustumPlanes, true); 
 }
 
 void doom::graphics::LinearTransformDataCulling::SetCameraCount(unsigned int cameraCount)

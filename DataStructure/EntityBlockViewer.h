@@ -28,18 +28,6 @@ namespace doom
 				: mTargetEntityBlock{ entityBlock }, mEntityIndexInBlock{ entityIndexInBlock }, bmIsActive{ true }
 			{}
 
-			FORCE_INLINE void SetEntityPosition(const math::Vector3& worldPosition)
-			{
-				assert(this->bmIsActive == true);
-				std::memcpy((mTargetEntityBlock->mPositions + mEntityIndexInBlock)->data(), worldPosition.data(), sizeof(math::Vector3));
-			}
-
-			FORCE_INLINE void SetSphereBoundRadius(float sphereRadius)
-			{
-				assert(this->bmIsActive == true);
-				mTargetEntityBlock->mPositions[mEntityIndexInBlock].w = sphereRadius;
-			}
-
 			FORCE_INLINE TransformData* GetTransformData() const
 			{
 				assert(this->bmIsActive == true);
@@ -72,6 +60,48 @@ namespace doom
 				assert(this->bmIsActive == true);
 				assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
 				return mTargetEntityBlock->mIsVisibleBitflag[mEntityIndexInBlock] & (1 << cameraIndex);
+			}
+
+
+			FORCE_INLINE void SetEntityPosition(const math::Vector3& worldPosition)
+			{
+				assert(this->bmIsActive == true);
+				std::memcpy((mTargetEntityBlock->mPositions + mEntityIndexInBlock)->data(), worldPosition.data(), sizeof(math::Vector3));
+			}
+
+
+			FORCE_INLINE void SetWorldAABB(const math::Vector3& minPoint, const math::Vector3& maxPoint)
+			{
+				assert(this->bmIsActive == true);
+				TransformData* transformData = this->GetTransformData();
+				transformData->mMinAABBPoint = minPoint;
+				transformData->mMaxAABBPoint = maxPoint;
+			}
+
+			FORCE_INLINE void SetEntityRotation(const math::Quaternion& rotation)
+			{
+				assert(this->bmIsActive == true);
+				TransformData* transformData = this->GetTransformData();
+				transformData->mRotation = rotation;
+			}
+
+			FORCE_INLINE void SetEntityScale(const math::Vector3& scale)
+			{
+				assert(this->bmIsActive == true);
+				TransformData* transformData = this->GetTransformData();
+				transformData->mScale = scale;
+			}
+
+			FORCE_INLINE void SetSphereBoundRadius(float sphereRadius)
+			{
+				assert(this->bmIsActive == true);
+				assert(sphereRadius >= 0.0f);
+
+				// WHY NEGATIVE??
+				// Think Sphere is on(!!) frustum plane. But it still should be drawd
+				// Distance from plane to EntityPoint is negative.
+				// If Distance from plane to EntityPoint is larget than negative radius, it should be drawed
+				mTargetEntityBlock->mPositions[mEntityIndexInBlock].w = -(sphereRadius + BOUNDING_SPHRE_RADIUS_MARGIN);
 			}
 		};
 	}
