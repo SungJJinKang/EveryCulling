@@ -21,10 +21,7 @@ namespace doom
 // 			Position TwoPosition[2];
 // 		};
 		
-		/// <summary>
-		/// ENTITY_COUNT_IN_ENTITY_BLOCK should be even number
-		/// </summary>
-		static_assert(ENTITY_COUNT_IN_ENTITY_BLOCK != 0 && ENTITY_COUNT_IN_ENTITY_BLOCK % 2 == 0);
+		
 
 		/// <summary>
 		/// EntityBlock size should be less 4KB(Page size) for Block data being allocated in a page
@@ -62,5 +59,9 @@ namespace doom
 		/// Size of Entity block should be less than 4kb(page size)
 		/// </summary>
 		static_assert(sizeof(EntityBlock) < 4000);
+		/// <summary>
+		/// ENTITY_COUNT_IN_ENTITY_BLOCK should be even number
+		/// </summary>
+		static_assert(ENTITY_COUNT_IN_ENTITY_BLOCK != 0 && ENTITY_COUNT_IN_ENTITY_BLOCK % 2 == 0);
 	}
 }
