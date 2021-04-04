@@ -1,13 +1,11 @@
 #pragma once
-#include "../LinearTransformDataCulling_Core.h"
+#include "../FrotbiteCullingSystemCore.h"
 
-namespace doom
+
+namespace culling
 {
-	namespace graphics
+	class EntityHandle
 	{
-		class EntityHandle
-		{
-		protected:
-		};
-	}
+	protected:
+	};
 }
