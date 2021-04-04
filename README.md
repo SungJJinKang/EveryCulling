@@ -11,15 +11,20 @@ This library is implementation of Culling the Battlefield: Data Oriented Design 
 - Software Occlusion Culling
 - Screen Space AABB Area Culling ( Project Entity's AABB bount to Screen Space, if Aread of Projected AABB is less than setting, Cull it )
 
-## View Frustum Culling using SIMD
-Transform Data of Entities is stored linearlly to maximize utilizing SIMD. ( **Data oriented Design** )     
-Data oriented Design!!!!!!    
+## View Frustum Culling using SIMD, Multithreading
+Transform Data of Entities is stored linearlly to maximize utilizing SIMD.        
+**Data oriented Design!!!!!!**    
 For calculating Object is In Frustum, Objects Position data is stored linearlly....    
 This will increase cache hitting!!   
-like this   
+
+Ordinary Way
 ```c++
-float objectData[] = {Entity1-PosX, Entity1-PosY, Entity1-PosZ, Entity1-SphereRadius(Bound Sphere), Entity2-PosX, Entity2-PosY, Entity2-PosZ, Entity2-SphereRadius,
-, Entity3-PosX, Entity3-PosY, Entity3-PosZ, Entity3-SphereRadius, Entity4-PosX, Entity4-PosY, Entity4-PosZ, Entity4-SphereRadius}
+float objectData[] = { FrustumPlane1-NormalX, FrustumPlane1-NormalY, FrustumPlane1-NormalZ, FrustumPlane1-Distance, FrustumPlane2-NormalX, FrustumPlane2-NormalY, FrustumPlane2-NormalZ, FrustumPlane2-Distance, FrustumPlane3-NormalX, FrustumPlane3-NormalY, FrustumPlane3-NormalZ, FrustumPlane3-Distance, FrustumPlane4-NormalX, FrustumPlane4-NormalY, FrustumPlane4-NormalZ, FrustumPlane4-Distance }
+```
+
+Data oriented Design
+```c++
+float objectData[] = { FrustumPlane1-NormalX, FrustumPlane2-NormalX, FrustumPlane3-NormalX, FrustumPlane4-NormalX, FrustumPlane1-NormalY, FrustumPlane2-NormalY, FrustumPlane3-NormalY, FrustumPlane4-NormalY, FrustumPlane1-NormalZ, FrustumPlane2-NormalZ, FrustumPlane3-NormalZ, FrustumPlane4-NormalZ, FrustumPlane1-Distance, FrustumPlane2-Distance, FrustumPlane3-Distance, FrustumPlane4-Distance }
 ```
 
 And Frustun checking use SIMD instruction.   
