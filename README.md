@@ -2,8 +2,8 @@
 
 This library is implementation of Culling the Battlefield: Data Oriented Design in Practice Talk of EA DICE in 2011         
 [Slide Resource](https://www.ea.com/frostbite/news/culling-the-battlefield-data-oriented-design-in-practice)      
-[GDC Talk Video](https://www.gdcvault.com/play/1014491/Culling-the-Battlefield-Data-Oriented)   
-
+[GDC Talk Video](https://www.gdcvault.com/play/1014491/Culling-the-Battlefield-Data-Oriented)        
+[한국어 블로그 글](https://sungjjinkang.github.io/doom/2021/04/02/viewfrustumculling.html)
 
 ## Feature
 
