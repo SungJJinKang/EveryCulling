@@ -13,13 +13,12 @@ namespace doom
 		/// 
 		/// 14 * 4 byte
 		/// </summary>
-		struct TransformData
+		struct alignas(64) TransformData
 		{
-			math::Quaternion mRotation;
-			math::Vector3 mMinAABBPoint;
-			float pad[1]; // for aligned to 8byte
-			math::Vector3 mMaxAABBPoint;
-			math::Vector3 mScale;
+			math::Quaternion mRotation; // 16byte
+			math::Vector3 mMinAABBPoint; // 12 byte
+			math::Vector3 mMaxAABBPoint; // 12 byte
+			math::Vector3 mScale; // 12 byte
 		};
 	}
 }
