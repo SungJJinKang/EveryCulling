@@ -50,6 +50,8 @@ This way don't use Acceleration structure like BVH, KDTree.
 
 ## Software Occlusion Culling
 
+references : https://www.gdcvault.com/play/1017837/Why-Render-Hidden-Objects-Cull
+
 ## Screen Space AABB Area Culling
 
 This is really easy to understand.    
