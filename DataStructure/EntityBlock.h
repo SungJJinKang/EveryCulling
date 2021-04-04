@@ -36,7 +36,7 @@ namespace doom
 			/// 
 			/// This will be used for linearlly Frustum intersection check
 			/// </summary>
-			math::Vector4 mPositions[ENTITY_COUNT_IN_ENTITY_BLOCK];
+			alignas (64) math::Vector4 mPositions[ENTITY_COUNT_IN_ENTITY_BLOCK];
 			
 			//math::Vector4 is aligned to 16 byte and ENTITY_COUNT_IN_ENTITY_BLOCK is even number
 			//so maybe  bool mIsVisibleBitflag is at right next to mPositions
@@ -44,7 +44,7 @@ namespace doom
 			// first low bit have Is Visible from First Camera,
 			// second low bit have Is Visible from Second Camera
 			// ......
-			alignas(32) char mIsVisibleBitflag[ENTITY_COUNT_IN_ENTITY_BLOCK];
+			alignas(64) char mIsVisibleBitflag[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 			EntityHandle mHandles[ENTITY_COUNT_IN_ENTITY_BLOCK];
 			TransformData mTransformDatas[ENTITY_COUNT_IN_ENTITY_BLOCK];

@@ -20,9 +20,9 @@ namespace doom
 {
 	namespace graphics
 	{
-		struct SIMDFrustumPlanes
+		struct alignas(64) SIMDFrustumPlanes // for cache hit, align to 64 byte
 		{
-			math::Vector4 mFrustumPlanes[8];
+			math::Vector4 mFrustumPlanes[8]; // first 4 planes will be on same cache line
 		};
 
 		/// <summary>
