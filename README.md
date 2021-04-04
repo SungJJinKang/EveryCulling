@@ -12,10 +12,9 @@ This library is implementation of Culling the Battlefield: Data Oriented Design 
 - Screen Space AABB Area Culling ( Project Entity's AABB bount to Screen Space, if Aread of Projected AABB is less than setting, Cull it )
 
 ## View Frustum Culling using SIMD, Multithreading
-Transform Data of Entities is stored linearlly to maximize utilizing SIMD.        
-**Data oriented Design!!!!!!**    
-For calculating Object is In Frustum, Objects Position data is stored linearlly....    
-This will increase cache hitting!!   
+
+#### Feature 1 : Transform Data of Entities is stored linearlly to maximize utilizing SIMD. ( **Data oriented Design** )       
+For Maximizing Cache Hitting, Data is allocated adjacently.     
 
 Ordinary Way
 ```c++
@@ -31,27 +30,80 @@ And Frustun checking use SIMD instruction.
 
 Combine upper two feature!.    
 ```c++
-Frustum Plane1-PosX      Frustum Plane2-PosX      Frustum Plane3-PosX      Frustum Plane4-PosX
-Frustum Plane1-PosY      Frustum Plane2-PosY      Frustum Plane3-PosY      Frustum Plane4-PosY
-Frustum Plane1-PosZ      Frustum Plane2-PosZ      Frustum Plane3-PosZ      Frustum Plane4-PosZ
-Frustum Plane1-Dist      Frustum Plane2-Dist      Frustum Plane3-Dist      Frustum Plane4-Dist
+Plane1 NormalX    Plane2 NormalX    Plane3 NormalX    Plane4 NormalX     
+Plane1 NormalY    Plane2 NormalY    Plane3 NormalY    Plane4 NormalY     
+Plane1 NormalZ    Plane2 NormalZ    Plane3 NormalZ    Plane4 NormalZ     
+Plane1 Distance   Plane2 Distance   Plane3 Distance   Plane4 Distance     
 
-   Ojbect PointX           Ojbect PointX            Ojbect PointX            Ojbect PointX
-   Ojbect PointY           Ojbect PointY            Ojbect PointY            Ojbect PointY
-   Ojbect PointZ           Ojbect PointZ            Ojbect PointZ            Ojbect PointZ
-   Ojbect Radius           Ojbect Radius            Ojbect Radius            Ojbect Radius
-   
-                                      |
-                                      |
-                                      V
-   
-SIMD MultiPly Each Row Computation And Add All Row --> Dot Result of Each Plane and Object
-   
+Ojbect PointX     Ojbect PointX     Ojbect PointX      Ojbect PointX
+Ojbect PointY     Ojbect PointY     Ojbect PointY      Ojbect PointY
+Ojbect PointZ     Ojbect PointZ     Ojbect PointZ      Ojbect PointZ
+      1                 1                 1                  1
+      
+      
+Plane5 NormalX    Plane6 NormalX    Plane5 NormalX    Plane6 NormalX     
+Plane5 NormalY    Plane6 NormalY    Plane5 NormalY    Plane6 NormalY     
+Plane5 NormalZ    Plane6 NormalZ    Plane5 NormalZ    Plane6 NormalZ     
+Plane5 Distance   Plane6 Distance   Plane5 Distance   Plane6 Distance     
+
+Ojbect PointX     Ojbect PointX     Ojbect PointX      Ojbect PointX
+Ojbect PointY     Ojbect PointY     Ojbect PointY      Ojbect PointY
+Ojbect PointZ     Ojbect PointZ     Ojbect PointZ      Ojbect PointZ
+      1                 1                 1                  1
+
+                            |
+                            | Multiply each row
+                            V
+                                    
+Plane1 NormalX * Ojbect PointX    Plane2 NormalX * Ojbect PointX    Plane3 NormalX * Ojbect PointX    Plane4 NormalX * Ojbect PointX     
+Plane1 NormalY * Ojbect PointY    Plane2 NormalY * Ojbect PointY    Plane3 NormalY * Ojbect PointY    Plane4 NormalY * Ojbect PointY
+Plane1 NormalZ * Ojbect PointZ    Plane2 NormalZ * Ojbect PointZ    Plane3 NormalZ * Ojbect PointZ    Plane4 NormalZ * Ojbect PointZ
+     Plane1 Distance * 1               Plane2 Distance * 1               Plane3 Distance * 1               Plane4 Distance * 1   
+     
+Plane5 NormalX * Ojbect PointX    Plane6 NormalX * Ojbect PointX    Plane5 NormalX * Ojbect PointX    Plane6 NormalX * Ojbect PointX     
+Plane5 NormalY * Ojbect PointY    Plane6 NormalY * Ojbect PointY    Plane5 NormalY * Ojbect PointY    Plane6 NormalY * Ojbect PointY
+Plane5 NormalZ * Ojbect PointZ    Plane6 NormalZ * Ojbect PointZ    Plane5 NormalZ * Ojbect PointZ    Plane6 NormalZ * Ojbect PointZ
+     Plane1 Distance * 1               Plane2 Distance * 1               Plane3 Distance * 1               Plane4 Distance * 1   
+
+                            |
+                            | Sum all row
+                            V
+                        
+Plane1 Dot Object      Plane2 Dot Object      Plane3 Dot Object      Plane4 Dot Object
+Plane5 Dot Object      Plane6 Dot Object      Plane5 Dot Object      Plane6 Dot Object
+
+                            |
+                            |   If Dot is larget than 0, Set 1
+                            V
+   1      0      1      1                                                1      1      1      1                                                                  
+   1      1      1      1                                                1      1      1      1
+                                                                         
+             |                                                 or                  |
+             |   To be rendered, All value should be 1                             |   To be rendered, All value should be 1
+             V                                                                     V
+                                                                         
+         Culled!!!!!                                                            Rendered
 ```
 
-**Solve frustum intersection parallelly in multiple threads.** 
 
-This way don't use Acceleration structure like BVH, KDTree.      
+#### Feature 2 : Entities is divided to Entity Blocks.        
+```
+Entity Block 1 : Entity 1 ~ Entity 50 
+Entity Block 2 : Entity 51 ~ Entity 100 
+Entity Block 3 : Entity 101 ~ Entity 150
+      
+               |
+               |
+               V
+             
+Thread 1 : Check Frustum of Entity Block 1, 4, 7
+Thread 2 : Check Frustum of Entity Block 2, 5, 8
+```
+
+**Because Each Entity Blocks is seperated, Can Check Is Culled without data race.** 
+
+To minimize waiting time(wait calculating cull finish) , Passing cull job to thread should be placed at foremost of rendering loop.      
+In My experiment, Waiting time is near to zero.
 
 ## Software Occlusion Culling
 
@@ -60,7 +112,7 @@ references : https://www.gdcvault.com/play/1017837/Why-Render-Hidden-Objects-Cul
 ## Screen Space AABB Area Culling
 
 This is really easy to understand.    
-When Area Size of Screen space projected AABB is less than setting value, It will be culled.
+When Area Size of AABB projected to screen space is less than setting value, It will be culled.
 
 ## Required dependency
 
