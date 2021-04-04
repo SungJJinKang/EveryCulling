@@ -100,7 +100,7 @@ Thread 1 : Check Frustum of Entity Block 1, 4, 7
 Thread 2 : Check Frustum of Entity Block 2, 5, 8
 ```
 
-**Because Each Entity Blocks is seperated, Can Check Is Culled without data race.** 
+**Because Each Entity Blocks is seperated, Can Check Is Culled on multiple threads without data race.** 
 
 To minimize waiting time(wait calculating cull finish) , Passing cull job to thread should be placed at foremost of rendering loop.      
 In My experiment, Waiting time is near to zero.
