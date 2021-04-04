@@ -1,4 +1,4 @@
-# LinearData_ViewFrustumCulling
+# Frostbite_CullingSystem
 
 This library is implementation of Culling the Battlefield: Data Oriented Design in Practice Talk of EA DICE in 2011         
 [Slide Resource](https://www.ea.com/frostbite/news/culling-the-battlefield-data-oriented-design-in-practice)      
@@ -11,8 +11,8 @@ This library is implementation of Culling the Battlefield: Data Oriented Design 
 - Software Occlusion Culling
 - Screen Space AABB Area Culling ( Project Entity's AABB bount to Screen Space, if Aread of Projected AABB is less than setting, Cull it )
 
-## Why this system is fast
-Transform Data of Entities is stored linearlly to maximize utilizing SIMD.
+## View Frustum Culling using SIMD
+Transform Data of Entities is stored linearlly to maximize utilizing SIMD. ( **Data oriented Design** )     
 Data oriented Design!!!!!!    
 For calculating Object is In Frustum, Objects Position data is stored linearlly....    
 This will increase cache hitting!!   
@@ -47,7 +47,13 @@ SIMD MultiPly Each Row Computation And Add All Row --> Dot Result of Each Plane 
 **Solve frustum intersection parallelly in multiple threads.** 
 
 This way don't use Acceleration structure like BVH, KDTree.      
-     
+
+## Software Occlusion Culling
+
+## Screen Space AABB Area Culling
+
+This is really easy to understand.    
+When Area Size of Screen space projected AABB is less than setting value, It will be culled.
 
 ## Required dependency
 
