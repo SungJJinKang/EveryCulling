@@ -16,8 +16,11 @@ void culling::ScreenSpaceAABBCulling::CullBlockEntityJob(EntityBlock* currentEnt
 		mScreenSpaceAABBMin /= mScreenSpaceAABBMin.w;
 		mScreenSpaceAABBMax /= mScreenSpaceAABBMax.w;
 
-		x = math::Max(mScreenSpaceAABBMin.x, mScreenSpaceAABBMax.x) - math::Min(mScreenSpaceAABBMin.x, mScreenSpaceAABBMax.x);
-		y = math::Max(mScreenSpaceAABBMin.y, mScreenSpaceAABBMax.y) - math::Min(mScreenSpaceAABBMin.y, mScreenSpaceAABBMax.y);
+		//x = math::Max(mScreenSpaceAABBMin.x, mScreenSpaceAABBMax.x) - math::Min(mScreenSpaceAABBMin.x, mScreenSpaceAABBMax.x);
+		//y = math::Max(mScreenSpaceAABBMin.y, mScreenSpaceAABBMax.y) - math::Min(mScreenSpaceAABBMin.y, mScreenSpaceAABBMax.y);
+		x = math::abs(mScreenSpaceAABBMin.x - mScreenSpaceAABBMax.x);
+		y = math::abs(mScreenSpaceAABBMin.y - mScreenSpaceAABBMax.y);
+		
 		area = x * y;
 
 		if (area > this->mMinimumScreenSpaceAABBArea)
