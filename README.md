@@ -7,9 +7,12 @@ This library is implementation of Culling the Battlefield: Data Oriented Design 
 
 ## Feature
 
+#### Supported
 - View Frustum Culling using SIMD
-- Software Occlusion Culling
 - Screen Space AABB Area Culling ( Project Entity's AABB bount to Screen Space, if Aread of Projected AABB is less than setting, Cull it )
+
+#### Not yet Supported
+- Software Occlusion Culling
 
 ## View Frustum Culling using SIMD, Multithreading
 
