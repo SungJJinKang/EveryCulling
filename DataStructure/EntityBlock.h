@@ -22,6 +22,24 @@ namespace culling
 // 		};
 
 
+#ifndef DISABLE_SCREEN_SAPCE_AABB_CULLING
+#define ENTITY_COUNT_IN_ENTITY_BLOCK (4096 - sizeof(unsigned int)) /	\
+	(																	\
+		sizeof(math::Vector4) +															\
+		sizeof(char) +													\
+		sizeof(void*) +													\
+		sizeof(EntityHandle)	+										\
+	)		
+#else
+#define ENTITY_COUNT_IN_ENTITY_BLOCK (4096 - sizeof(unsigned int)) /	\
+	(																	\
+		sizeof(math::Vector4) +															\
+		sizeof(char) +													\
+		sizeof(void*) +													\
+		sizeof(EntityHandle)	+										\
+		sizeof(AABB)													\
+	)		
+#endif
 
 		/// <summary>
 		/// EntityBlock size should be less 4KB(Page size) for Block data being allocated in a page
@@ -74,7 +92,7 @@ namespace culling
 	/// <summary>
 	/// Size of Entity block should be less than 4kb(page size)
 	/// </summary>
-	static_assert(sizeof(EntityBlock) < 4000);
+	static_assert(sizeof(EntityBlock) < 4096);
 	/// <summary>
 	/// ENTITY_COUNT_IN_ENTITY_BLOCK should be even number
 	/// </summary>

@@ -1,7 +1,6 @@
 #pragma once
 
 #define MAX_ENTITY_BLOCK_COUNT 1000
-#define ENTITY_COUNT_IN_ENTITY_BLOCK 40
 
 #define MAX_CAMERA_COUNT 8
 
