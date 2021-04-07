@@ -5,7 +5,7 @@
 
 #define MAX_CAMERA_COUNT 8
 
-#define BOUNDING_SPHRE_RADIUS_MARGIN 0.5f
+#define BOUNDING_SPHRE_RADIUS_MARGIN 0.2f
 
 #if defined(_MSC_VER)
 #  define COMPILER_MSVC
@@ -18,3 +18,5 @@
 #elif defined(COMPILER_MSVC)
 #  define FORCE_INLINE __forceinline
 #endif
+
+#define DISABLE_SCREEN_SAPCE_AABB_CULLING

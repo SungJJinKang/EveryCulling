@@ -54,7 +54,10 @@ void culling::FrotbiteCullingSystem::CacheCullBlockEntityJobs()
 }
 
 culling::FrotbiteCullingSystem::FrotbiteCullingSystem()
-	:mViewFrustumCulling{ this }, mScreenSpaceAABBCulling{ this }
+	:mViewFrustumCulling{ this } 
+#ifndef DISABLE_SCREEN_SAPCE_AABB_CULLING
+	,mScreenSpaceAABBCulling{ this }
+#endif
 {
 	AllocateEntityBlockPool();
 
@@ -176,7 +179,9 @@ void culling::FrotbiteCullingSystem::SetCameraCount(unsigned int cameraCount)
 {
 	this->mCameraCount = cameraCount;
 	this->mViewFrustumCulling.mCameraCount = cameraCount;
+#ifndef DISABLE_SCREEN_SAPCE_AABB_CULLING
 	this->mScreenSpaceAABBCulling.mCameraCount = cameraCount;
+#endif
 }
 
 unsigned int culling::FrotbiteCullingSystem::GetCameraCount()
@@ -192,7 +197,10 @@ void culling::FrotbiteCullingSystem::CullBlockEntityJob(unsigned int blockIndex,
 	unsigned int entityCountInBlock = this->mEntityGridCell.AllocatedEntityCountInBlocks[blockIndex]; // don't use mCurrentEntityCount
 
 	this->mViewFrustumCulling.CullBlockEntityJob(currentEntityBlock, entityCountInBlock, blockIndex, cameraIndex);
+
+#ifndef DISABLE_SCREEN_SAPCE_AABB_CULLING
 	this->mScreenSpaceAABBCulling.CullBlockEntityJob(currentEntityBlock, entityCountInBlock, blockIndex, cameraIndex);
+#endif
 
 	unsigned int finshiedBlockCount = ++(this->mFinishedCullJobBlockCount);
 	assert(finshiedBlockCount <= this->mEntityGridCell.mBlockCount);

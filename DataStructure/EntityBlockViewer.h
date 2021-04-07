@@ -69,13 +69,6 @@ namespace culling
 		}
 
 
-		FORCE_INLINE void SetWorldAABB(const math::Vector3* minMaxPoint)
-		{
-			assert(this->bmIsActive == true);
-
-			std::memcpy(&(mTargetEntityBlock->mWorldAABB[mEntityIndexInBlock]), minMaxPoint, sizeof(math::Vector3) * 2);
-		}
-
 		/*
 		FORCE_INLINE void SetEntityRotation(const math::Quaternion& rotation)
 		{

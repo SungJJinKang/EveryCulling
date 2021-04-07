@@ -16,8 +16,10 @@
 #include <Matrix4x4.h>
 
 #include "CullingModule/ViewFrustumCulling.h"
-#include "CullingModule/ScreenSpaceAABBCulling.h"
 
+#ifndef DISABLE_SCREEN_SAPCE_AABB_CULLING
+#include "CullingModule/ScreenSpaceAABBCulling.h"
+#endif
 
 namespace culling
 {
@@ -130,8 +132,9 @@ namespace culling
 	public:
 
 		ViewFrustumCulling mViewFrustumCulling;
+#ifndef DISABLE_SCREEN_SAPCE_AABB_CULLING
 		ScreenSpaceAABBCulling mScreenSpaceAABBCulling;
-
+#endif
 		FrotbiteCullingSystem();
 
 		/// <summary>

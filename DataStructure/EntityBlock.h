@@ -31,20 +31,27 @@ namespace culling
 		//SoA (Structure of Array) !!!!!! for performance 
 
 		/// <summary>
-		/// x, y, z components is position of entity
-		/// w component is radius of entity's sphere bound
+		/// x, y, z : components is position of entity
+		/// w : component is radius of entity's sphere bound, should be negative!!!!!!!!!!!!!!
 		/// 
 		/// This will be used for linearlly Frustum intersection check
+		/// 
+		/// IMPORTANT : you should pass nagative value of radius!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		/// </summary>
 		alignas (64) math::Vector4 mPositions[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
+#ifndef DISABLE_SCREEN_SAPCE_AABB_CULLING
 		/// <summary>
 		/// Size of AABB is 32 byte.
 		/// 2 AABB is 64 byte.
 		/// 
+		/// i recommend AABB's point type is Vector4
+		/// because when multiply Matrix4x4 with point for calculating ScreenSpace AABB, we can use SIMD if point is vector
+		/// 
 		/// It's cache friendlly!!
 		/// </summary>
 		alignas (64) AABB mWorldAABB[ENTITY_COUNT_IN_ENTITY_BLOCK];
+#endif
 
 		//math::Vector4 is aligned to 16 byte and ENTITY_COUNT_IN_ENTITY_BLOCK is even number
 		//so maybe  bool mIsVisibleBitflag is at right next to mPositions

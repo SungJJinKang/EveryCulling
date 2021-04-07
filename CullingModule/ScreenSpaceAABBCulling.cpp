@@ -1,3 +1,7 @@
+#include "../FrotbiteCullingSystemCore.h"
+
+#ifndef DISABLE_SCREEN_SAPCE_AABB_CULLING
+
 #include "ScreenSpaceAABBCulling.h"
 
 void culling::ScreenSpaceAABBCulling::CullBlockEntityJob(EntityBlock* currentEntityBlock, unsigned int entityCountInBlock, unsigned int blockIndex, unsigned int cameraIndex)
@@ -53,3 +57,5 @@ void culling::ScreenSpaceAABBCulling::SetViewProjectionMatrix(const math::Matrix
 {
 	this->mViewProjectionMatrix = viewProjectionMatrix;
 }
+
+#endif
