@@ -22,29 +22,28 @@ namespace culling
 // 		};
 
 
-#ifndef DISABLE_SCREEN_SAPCE_AABB_CULLING
-#define ENTITY_COUNT_IN_ENTITY_BLOCK (4096 - sizeof(unsigned int)) /	\
-	(																	\
-		sizeof(math::Vector4) +															\
-		sizeof(char) +													\
-		sizeof(void*) +													\
-		sizeof(EntityHandle)	+										\
-	)		
+#ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
+	inline static constexpr size_t ENTITY_COUNT_IN_ENTITY_BLOCK = (4096 - sizeof(unsigned int)) /
+		(
+			sizeof(math::Vector4) +
+			sizeof(char) +
+			sizeof(void*) +
+			sizeof(EntityHandle) +
+			sizeof(AABB)
+			) - 1;
 #else
-#define ENTITY_COUNT_IN_ENTITY_BLOCK (4096 - sizeof(unsigned int)) /	\
-	(																	\
-		sizeof(math::Vector4) +															\
-		sizeof(char) +													\
-		sizeof(void*) +													\
-		sizeof(EntityHandle)	+										\
-		sizeof(AABB)													\
-	)		
+	inline static constexpr size_t ENTITY_COUNT_IN_ENTITY_BLOCK = (4096 - sizeof(unsigned int)) /
+		(
+			sizeof(math::Vector4) +
+			sizeof(char) +
+			sizeof(void*) +
+			sizeof(EntityHandle)
+			) - 3;
 #endif
-
 		/// <summary>
 		/// EntityBlock size should be less 4KB(Page size) for Block data being allocated in a page
 		/// </summary>
-	struct EntityBlock
+	struct alignas(64) EntityBlock
 	{
 		//SoA (Structure of Array) !!!!!! for performance 
 
@@ -56,9 +55,9 @@ namespace culling
 		/// 
 		/// IMPORTANT : you should pass nagative value of radius!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		/// </summary>
-		alignas (64) math::Vector4 mPositions[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		alignas(32) math::Vector4 mPositions[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
-#ifndef DISABLE_SCREEN_SAPCE_AABB_CULLING
+#ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
 		/// <summary>
 		/// Size of AABB is 32 byte.
 		/// 2 AABB is 64 byte.
@@ -68,7 +67,7 @@ namespace culling
 		/// 
 		/// It's cache friendlly!!
 		/// </summary>
-		alignas (64) AABB mWorldAABB[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		AABB mWorldAABB[ENTITY_COUNT_IN_ENTITY_BLOCK];
 #endif
 
 		//math::Vector4 is aligned to 16 byte and ENTITY_COUNT_IN_ENTITY_BLOCK is even number
@@ -77,10 +76,12 @@ namespace culling
 		// first low bit have Is Visible from First Camera,
 		// second low bit have Is Visible from Second Camera
 		// ......
-		alignas(64) char mIsVisibleBitflag[ENTITY_COUNT_IN_ENTITY_BLOCK];
-		alignas(64) void* mRenderer[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		// This variable should be aligned to 32 byte.
+		// because In Viewfrustum Culling CullJob VisibleFlag is stored per 32byte
+		alignas(32) char mIsVisibleBitflag[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		alignas(32) void* mRenderer[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
-		EntityHandle mHandles[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		alignas(32) EntityHandle mHandles[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		//TransformData mTransformDatas[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 		/// <summary>
@@ -96,5 +97,5 @@ namespace culling
 	/// <summary>
 	/// ENTITY_COUNT_IN_ENTITY_BLOCK should be even number
 	/// </summary>
-	static_assert(ENTITY_COUNT_IN_ENTITY_BLOCK != 0 && ENTITY_COUNT_IN_ENTITY_BLOCK % 2 == 0);
+	static_assert(ENTITY_COUNT_IN_ENTITY_BLOCK > 0 && ENTITY_COUNT_IN_ENTITY_BLOCK % 2 == 0);
 }

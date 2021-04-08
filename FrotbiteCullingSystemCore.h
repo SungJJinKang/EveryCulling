@@ -1,6 +1,7 @@
 #pragma once
 
-#define MAX_ENTITY_BLOCK_COUNT 1000
+#define INITIAL_ENTITY_BLOCK_COUNT 10
+#define MAX_ENTITY_BLOCK_COUNT 500
 
 #define MAX_CAMERA_COUNT 8
 
@@ -18,4 +19,4 @@
 #  define FORCE_INLINE __forceinline
 #endif
 
-#define DISABLE_SCREEN_SAPCE_AABB_CULLING
+//#define ENABLE_SCREEN_SAPCE_AABB_CULLING

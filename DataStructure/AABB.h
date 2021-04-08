@@ -7,8 +7,8 @@ namespace culling
 
 	struct AABB
 	{
-		math::Vector4 mMin;
-		math::Vector4 mMax;
+		math::Vector3 mMin;
+		math::Vector3 mMax;
 	};
 
 }

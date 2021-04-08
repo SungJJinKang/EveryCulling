@@ -1,6 +1,6 @@
-#include "../FrotbiteCullingSystemCore.h"
+#include "../../FrotbiteCullingSystemCore.h"
 
-#ifndef DISABLE_SCREEN_SAPCE_AABB_CULLING
+#ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
 
 #include "ScreenSpaceAABBCulling.h"
 
@@ -14,8 +14,10 @@ void culling::ScreenSpaceAABBCulling::CullBlockEntityJob(EntityBlock* currentEnt
 	{
 		//TODO : Think How to use SIMD
 
-		mScreenSpaceAABBMin = this->mViewProjectionMatrix * currentEntityBlock->mWorldAABB[j].mMin;
-		mScreenSpaceAABBMax = this->mViewProjectionMatrix * currentEntityBlock->mWorldAABB[j].mMax;
+		culling::AABB& entityAABB = currentEntityBlock->mWorldAABB[j];
+
+		mScreenSpaceAABBMin = this->mViewProjectionMatrix * entityAABB.mMin;
+		mScreenSpaceAABBMax = this->mViewProjectionMatrix * entityAABB.mMax;
 
 		mScreenSpaceAABBMin /= mScreenSpaceAABBMin.w;
 		mScreenSpaceAABBMax /= mScreenSpaceAABBMax.w;

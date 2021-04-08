@@ -2,6 +2,7 @@
 
 #include "../FrotbiteCullingSystemCore.h"
 
+#include <vector>
 
 namespace culling
 {
@@ -20,12 +21,11 @@ namespace culling
 		/// the block should be return to BlockPool.
 		/// So we use array of pointers
 		/// </summary>
-		EntityBlock* mEntityBlocks[MAX_ENTITY_BLOCK_COUNT];
+		std::vector<EntityBlock*> mEntityBlocks;
 
 		/// <summary>
 		/// 
 		/// </summary>
-		unsigned int AllocatedEntityCountInBlocks[MAX_ENTITY_BLOCK_COUNT];
-		unsigned int mBlockCount{ 0 };
+		std::vector<unsigned int> AllocatedEntityCountInBlocks;
 	};
 }

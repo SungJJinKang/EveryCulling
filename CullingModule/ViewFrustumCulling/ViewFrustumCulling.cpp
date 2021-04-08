@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-#include "../FrotbiteCullingSystem.h"
+#include "../../FrotbiteCullingSystem.h"
 
 void culling::ViewFrustumCulling::UpdateFrustumPlane(unsigned int frustumPlaneIndex, const math::Matrix4x4& viewProjectionMatrix)
 {
@@ -42,7 +42,7 @@ void culling::ViewFrustumCulling::CullBlockEntityJob(EntityBlock* currentEntityB
 
 
 
-	unsigned int m256_count_isvisible = 1 + ((currentEntityBlock->mCurrentEntityCount * sizeof(decltype(*EntityBlock::mIsVisibleBitflag)) - 1) / 32);
+	unsigned int m256_count_isvisible = 1 + ((currentEntityBlock->mCurrentEntityCount * sizeof(decltype(*EntityBlock::mIsVisibleBitflag)) - 1) / sizeof(M256F));
 
 	/// <summary>
 	/// M256 = 8bit(1byte = bool size) * 32 

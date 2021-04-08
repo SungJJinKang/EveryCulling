@@ -8,17 +8,18 @@
 #include <memory>
 #include <vector>
 #include <atomic>
-#include <condition_variable>
 #include <functional>
+
 #include <mutex>
+#include <condition_variable>
 
 #include <Vector4.h>
 #include <Matrix4x4.h>
 
-#include "CullingModule/ViewFrustumCulling.h"
+#include "CullingModule/ViewFrustumCulling/ViewFrustumCulling.h"
 
-#ifndef DISABLE_SCREEN_SAPCE_AABB_CULLING
-#include "CullingModule/ScreenSpaceAABBCulling.h"
+#ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
+#include "CullingModule/ScreenSpaceAABBCulling/ScreenSpaceAABBCulling.h"
 #endif
 
 namespace culling
@@ -94,9 +95,10 @@ namespace culling
 		unsigned int mCameraCount;
 		
 		bool bmIsInitializedEntityBlockPool{ false };
-		std::unique_ptr<EntityBlock[]> mEntityBlockPool;
+		//std::unique_ptr<EntityBlock[]> mEntityBlockPool;
 		std::vector<EntityBlock*> mFreeEntityBlockList{};
 		std::vector<EntityBlock*> mActiveEntityBlockList{};
+		std::vector<EntityBlock*> mAllocatedEntityBlockChunkList{};
 		EntityGridCell mEntityGridCell{};
 
 		//static inline constexpr unsigned int M256_COUNT_OF_VISIBLE_ARRAY = 1 + ( (ENTITY_COUNT_IN_ENTITY_BLOCK * sizeof(decltype(*EntityBlock::mIsVisibleBitflag)) - 1) / 32 );
@@ -104,22 +106,24 @@ namespace culling
 		/// will be used at CullBlockEntityJob
 		/// </summary>
 		//std::atomic<unsigned int> mAtomicCurrentBlockIndex;
-		std::atomic<unsigned int> mFinishedCullJobBlockCount;
+		std::atomic<size_t> mFinishedCullJobBlockCount;
+		/// <summary>
+		/// Updating atomic variable is slow
+		/// just store finished cull job count in thread local variable and CommitThreadLocalFinishedCullJobBlockCount after finish
+		/// </summary>
+		inline static thread_local size_t mThreadLocalFinishedCullJobBlockCount{ 0 };
+		std::function<void()> mCommitThreadLocalFinishedCullJobBlockCountStdFunction;
+		//std::mutex mCullJobMutex;
+		//std::condition_variable mCullJobConditionVaraible;
 
 		std::array<std::vector<std::function<void()>>, MAX_CAMERA_COUNT> mCachedCullBlockEntityJobs{};
-
-		/// <summary>
-		/// 
-		/// </summary>
-		std::condition_variable mCullJobConditionVaraible;
-		std::mutex mCullJobMutex;
 
 		void SetAllOneIsVisibleFlag();
 
 		void RemoveEntityFromBlock(EntityBlock* ownerEntityBlock, unsigned int entityIndexInBlock);
 
 		void AllocateEntityBlockPool();
-		EntityBlock* AllocateNewEntityBlockFromPool();
+		std::pair<culling::EntityBlock*, unsigned int*> AllocateNewEntityBlockFromPool();
 
 		/// <summary>
 		/// Block Swap removedblock with last block, and return swapped lastblock to pool
@@ -128,14 +132,16 @@ namespace culling
 		EntityBlock* GetNewEntityBlockFromPool();
 
 		void CacheCullBlockEntityJobs();
-
+		void CommitThreadLocalFinishedCullJobBlockCount();
+		
 	public:
 
 		ViewFrustumCulling mViewFrustumCulling;
-#ifndef DISABLE_SCREEN_SAPCE_AABB_CULLING
+#ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
 		ScreenSpaceAABBCulling mScreenSpaceAABBCulling;
 #endif
 		FrotbiteCullingSystem();
+		~FrotbiteCullingSystem();
 
 		/// <summary>
 		/// You should call this function on your Transform Component or In your game engine
@@ -145,7 +151,7 @@ namespace culling
 		/// 
 		/// Allocating New Entity isn't thread safe
 		/// </summary>
-		EntityBlockViewer AllocateNewEntity(void* renderer, const math::Vector3& position, float radius);
+		EntityBlockViewer AllocateNewEntity(void* renderer);
 
 		/// <summary>
 		/// You should call this function on your Transform Component or In your game engine
@@ -182,7 +188,7 @@ namespace culling
 		FORCE_INLINE std::vector<std::function<void()>> GetCullBlockEnityJobs(unsigned int cameraIndex)
 		{
 			std::vector<std::function<void()>> cullJobs{};
-			cullJobs.assign(this->mCachedCullBlockEntityJobs[cameraIndex].begin(), this->mCachedCullBlockEntityJobs[cameraIndex].begin() + this->mEntityGridCell.mBlockCount);
+			cullJobs.assign(this->mCachedCullBlockEntityJobs[cameraIndex].begin(), this->mCachedCullBlockEntityJobs[cameraIndex].begin() + this->mEntityGridCell.mEntityBlocks.size());
 			return cullJobs;
 		}
 
@@ -203,13 +209,18 @@ namespace culling
 		/// Reset cull job state before pushing cull jobs to job pool
 		/// </summary>
 		void ResetCullJobState();
-	
+
+		
 		void SetCameraCount(unsigned int cameraCount);
 		unsigned int GetCameraCount();
 
 		std::vector<EntityBlock*> GetActiveEntityBlockList() const
 		{
 			return this->mActiveEntityBlockList;
+		}
+		std::function<void()> GetCommitThreadLocalFinishedCullJobBlockCountStdFunction()
+		{
+			return this->mCommitThreadLocalFinishedCullJobBlockCountStdFunction;
 		}
 	};
 }
