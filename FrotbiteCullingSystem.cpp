@@ -204,11 +204,13 @@ void culling::FrotbiteCullingSystem::CullBlockEntityJob(unsigned int blockIndex,
 
 	unsigned int finshiedBlockCount = ++(this->mFinishedCullJobBlockCount);
 	assert(finshiedBlockCount <= this->mEntityGridCell.mBlockCount);
+	/*
 	if (finshiedBlockCount == this->mEntityGridCell.mBlockCount)
 	{
 		std::scoped_lock<std::mutex> sk(this->mCullJobMutex);
 		this->mCullJobConditionVaraible.notify_one();
 	}
+	*/
 }
 
 bool culling::FrotbiteCullingSystem::GetIsCullJobFinished()
@@ -217,28 +219,12 @@ bool culling::FrotbiteCullingSystem::GetIsCullJobFinished()
 	return this->mFinishedCullJobBlockCount == this->mEntityGridCell.mBlockCount;
 }
 
-bool culling::FrotbiteCullingSystem::WaitToFinishCullJobs()
+void culling::FrotbiteCullingSystem::WaitToFinishCullJobs()
 {
+	while (this->GetIsCullJobFinished() == false) // busy wait!
 	{
-		// why need mutex lock ? 
-		// read this : https://sungjjinkang.github.io/computerscience/2021/03/28/condtionvariable_atomic.html
-
-		std::unique_lock<std::mutex> lk(this->mCullJobMutex);
-		this->mCullJobConditionVaraible.wait(lk, [this] {return this->GetIsCullJobFinished(); });
-		//resource::JobSystem::GetSingleton()->SetMemoryBarrierOnAllSubThreads();
-		//
-		//	condition variable check pred first
-		//	
-		//	while (!pred()) 
-		//	{
-		//		wait(lock);
-		//	}
-		//
-		//
 
 	}
-	
-	return true;
 }
 
 void culling::FrotbiteCullingSystem::SetAllOneIsVisibleFlag()

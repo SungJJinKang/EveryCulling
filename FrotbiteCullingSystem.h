@@ -196,7 +196,7 @@ namespace culling
 		/// <summary>
 		/// Caller thread will stall until cull job of all entity block is finished
 		/// </summary>
-		bool WaitToFinishCullJobs();
+		void WaitToFinishCullJobs();
 
 
 		/// <summary>
