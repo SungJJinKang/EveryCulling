@@ -63,7 +63,7 @@ void culling::FrotbiteCullingSystem::CacheCullBlockEntityJobs()
 
 
 
-void culling::FrotbiteCullingSystem::CommitThreadLocalFinishedCullJobBlockCount()
+void culling::FrotbiteCullingSystem::ReleaseThreadLocalFinishedCullJobBlockCount()
 {
 	this->mFinishedCullJobBlockCount.fetch_add(this->mThreadLocalFinishedCullJobBlockCount, std::memory_order_release);
 	this->mThreadLocalFinishedCullJobBlockCount = 0;
@@ -71,7 +71,7 @@ void culling::FrotbiteCullingSystem::CommitThreadLocalFinishedCullJobBlockCount(
 
 culling::FrotbiteCullingSystem::FrotbiteCullingSystem()
 	:
-	mCommitThreadLocalFinishedCullJobBlockCountStdFunction{ std::bind(&FrotbiteCullingSystem::CommitThreadLocalFinishedCullJobBlockCount, this) },
+	mCommitThreadLocalFinishedCullJobBlockCountStdFunction{ std::bind(&FrotbiteCullingSystem::ReleaseThreadLocalFinishedCullJobBlockCount, this) },
 	mViewFrustumCulling{ this } 
 #ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
 	,mScreenSpaceAABBCulling{ this }

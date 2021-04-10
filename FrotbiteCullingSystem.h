@@ -109,7 +109,7 @@ namespace culling
 		std::atomic<size_t> mFinishedCullJobBlockCount;
 		/// <summary>
 		/// Updating atomic variable is slow
-		/// just store finished cull job count in thread local variable and CommitThreadLocalFinishedCullJobBlockCount after finish
+		/// just store finished cull job count in thread local variable and ReleaseThreadLocalFinishedCullJobBlockCount after finish
 		/// </summary>
 		inline static thread_local size_t mThreadLocalFinishedCullJobBlockCount{ 0 };
 		std::function<void()> mCommitThreadLocalFinishedCullJobBlockCountStdFunction;
@@ -132,7 +132,7 @@ namespace culling
 		EntityBlock* GetNewEntityBlockFromPool();
 
 		void CacheCullBlockEntityJobs();
-		void CommitThreadLocalFinishedCullJobBlockCount();
+		void ReleaseThreadLocalFinishedCullJobBlockCount();
 		
 	public:
 
