@@ -7,8 +7,8 @@ namespace culling
 	class SWFrameBuffer
 	{
 	public:
-		const size_t mWidth;
-		const size_t mHeight;
+		const int mWidth;
+		const int mHeight;
 		float* mPixels;
 		SWFrameBuffer(size_t width, size_t height)
 			: mWidth{ width }, mHeight{ height }

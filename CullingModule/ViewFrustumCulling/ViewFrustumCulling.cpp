@@ -18,9 +18,9 @@ culling::SIMDFrustumPlanes* culling::ViewFrustumCulling::GetSIMDPlanes()
 
 void culling::ViewFrustumCulling::CullBlockEntityJob(EntityBlock* currentEntityBlock, unsigned int entityCountInBlock, unsigned int blockIndex, unsigned int cameraIndex)
 {
-	alignas(32) char cullingMask[ENTITY_COUNT_IN_ENTITY_BLOCK] = { 0 };
+	char cullingMask[ENTITY_COUNT_IN_ENTITY_BLOCK] = { 0 };
 
-	math::Vector4* frustumPlane = this->mSIMDFrustumPlanes[cameraIndex].mFrustumPlanes;
+	const math::Vector4* frustumPlane = this->mSIMDFrustumPlanes[cameraIndex].mFrustumPlanes;
 	for (unsigned int j = 0; j < entityCountInBlock; j = j + 2)
 	{
 		char result = math::CheckInFrustumSIMDWithTwoPoint(frustumPlane, currentEntityBlock->mPositions + j);
