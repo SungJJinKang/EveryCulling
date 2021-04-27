@@ -80,8 +80,7 @@ namespace culling
 		// because In Viewfrustum Culling CullJob VisibleFlag is stored per 32byte
 		alignas(32) char mIsVisibleBitflag[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		alignas(32) void* mRenderer[ENTITY_COUNT_IN_ENTITY_BLOCK];
-
-		alignas(32) EntityHandle mHandles[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		EntityHandle mHandles[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		//TransformData mTransformDatas[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 		/// <summary>

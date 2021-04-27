@@ -11,4 +11,5 @@ namespace culling
 		math::Vector3 mMax;
 	};
 
+	
 }
