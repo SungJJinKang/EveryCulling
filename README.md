@@ -13,6 +13,7 @@ This library is implementation of Culling the Battlefield: Data Oriented Design 
 
 #### Not yet Supported
 - Software Occlusion Culling
+- Masked SW Occlusion Culling ( https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf )
 
 ## View Frustum Culling using SIMD, Multithreading
 
