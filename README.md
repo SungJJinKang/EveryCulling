@@ -115,7 +115,9 @@ references : https://www.gdcvault.com/play/1017837/Why-Render-Hidden-Objects-Cul
 ## Screen Space AABB Area Culling
 
 This is really easy to understand.    
-When Area Size of AABB projected to screen space is less than setting value, It will be culled.
+When Area Size of AABB projected to screen space is less than setting value, It will be culled.    
+I don't recommend using this feature, because Objects will pop up and this is really distracting...       
+I will add Object fade out.    
 
 ## Required dependency
 
