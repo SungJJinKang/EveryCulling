@@ -1,6 +1,5 @@
 #include "FrotbiteCullingSystem.h"
 
-#include <assert.h>
 #include <utility>
 
 #include "DataStructure/EntityBlock.h"

@@ -1,19 +1,25 @@
 # Frostbite_CullingSystem
 
-This library is implementation of Culling the Battlefield: Data Oriented Design in Practice Talk of EA DICE in 2011         
+This library is implementation of **Culling the Battlefield: Data Oriented Design in Practice Talk of EA DICE in 2011** And **Masked SW Occlusion Culling**            
+Frostbite used Plain SW Occlusion Culling, but I will implement Masked SW Occlusion Culling.       
+Masked SW Occlusion Culling is announced in 2016 by intel.         
+I think this will be much faster than plain occlusion culling, So I will implement it!!!       
+
 [Slide Resource](https://www.ea.com/frostbite/news/culling-the-battlefield-data-oriented-design-in-practice)      
 [GDC Talk Video](https://www.gdcvault.com/play/1014491/Culling-the-Battlefield-Data-Oriented)        
 [한국어 블로그 글](https://sungjjinkang.github.io/doom/2021/04/02/viewfrustumculling.html)
 
 ## Feature
 
-#### Supported
+#### Currently Supported
 - View Frustum Culling using SIMD
 - Screen Space AABB Area Culling ( Project Entity's AABB bount to Screen Space, if Aread of Projected AABB is less than setting, Cull it )
 
-#### Not yet Supported
-- Software Occlusion Culling
+#### In Develop
 - Masked SW Occlusion Culling ( https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf )
+- Distance Culling ( https://docs.unrealengine.com/en-US/RenderingAndGraphics/VisibilityCulling/CullDistanceVolume/index.html )  
+- Precomputed Visibility Volume ( https://docs.unrealengine.com/en-US/RenderingAndGraphics/VisibilityCulling/PrecomputedVisibilityVolume/index.html )
+- Support AVX2, AVX512
 
 ## View Frustum Culling using SIMD, Multithreading
 
@@ -109,9 +115,9 @@ Thread 2 : Check Frustum of Entity Block 2, 5, 8
 To minimize waiting time(wait calculating cull finish) , Passing cull job to thread should be placed at foremost of rendering loop.      
 In My experiment, Waiting time is near to zero.
 
-## Software Occlusion Culling
+## Masked Software Occlusion Culling
 
-references : https://www.gdcvault.com/play/1017837/Why-Render-Hidden-Objects-Cull
+references : https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf
 
 ## Screen Space AABB Area Culling
 
@@ -122,4 +128,13 @@ I will add Object fade out.
 
 ## Required dependency
 
-[LightMath_Cpp](https://github.com/SungJJinKang/LightMath_Cpp)
+[LightMath_Cpp](https://github.com/SungJJinKang/LightMath_Cpp) ( You can make your own, but implement CheckInFrustumSIMDWithTwoPoint function yourself, https://github.com/SungJJinKang/LightMath_Cpp/blob/main/Matrix4x4Float_SIMD.inl )
+
+## References
+
+- https://www.ea.com/frostbite/news/culling-the-battlefield-data-oriented-design-in-practice
+- https://www.gdcvault.com/play/1014491/Culling-the-Battlefield-Data-Oriented
+- https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf
+- http://www.sunshine2k.de/articles/Derivation_DotProduct_R2.pdf
+- http://www.sunshine2k.de/articles/Notes_PerpDotProduct_R2.pdf
+- http://www.sunshine2k.de/coding/java/PointInTriangle/PointInTriangle.html#cramer
