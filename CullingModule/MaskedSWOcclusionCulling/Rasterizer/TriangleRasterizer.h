@@ -43,7 +43,7 @@ namespace culling
 		*/
 		
 
-		static void FillTriangle(const SWDepthBuffer& frameBuffer, const Triangle& triangle)
+		static void FillTriangle(const SWDepthBuffer& frameBuffer, const TwoDTriangle& triangle)
 		{
 			int minX = math::Min(math::Min(triangle.Point1.x, triangle.Point2.x), triangle.Point3.x);
 			int minY = math::Min(math::Min(triangle.Point1.y, triangle.Point2.y), triangle.Point3.y);

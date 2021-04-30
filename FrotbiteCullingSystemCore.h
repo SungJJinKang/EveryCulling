@@ -29,6 +29,10 @@
 //Masked SW Occlusion Culling
 #define TILE_WIDTH 16
 #define TILE_HEIGHT 8
+#define SUB_TILE_WIDTH 8
+#define SUB_TILE_HEIGHT 4
+
+#define TRIANGLE_BIN_CAPACITY_PER_TILE 100
 
 #define MAX_TRIANGLE_COUNT_PER_TILE 100
 

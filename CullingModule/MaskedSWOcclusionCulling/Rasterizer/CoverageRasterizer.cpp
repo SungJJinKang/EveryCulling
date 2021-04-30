@@ -3,7 +3,7 @@
 #include <algorithm>
 
 
-M128I culling::CoverageRasterizer::FillBottomFlatTriangle(CoverageMask& coverageMask, const math::Vector2& LeftBottomPoint, const math::Vector2& point1, const math::Vector2& point2, const math::Vector2& point3)
+M128I culling::CoverageRasterizer::FillBottomFlatTriangle(CoverageMask& coverageMask, const Vector2& LeftBottomPoint, const Vector2& point1, const Vector2& point2, const Vector2& point3)
 {
     M128I Result;
 
@@ -39,7 +39,7 @@ M128I culling::CoverageRasterizer::FillBottomFlatTriangle(CoverageMask& coverage
     return Result;
 }
 
-M128I culling::CoverageRasterizer::FillTopFlatTriangle(CoverageMask& coverageMask, const math::Vector2& LeftBottomPoint, const math::Vector2& point1, const math::Vector2& point2, const math::Vector2& point3)
+M128I culling::CoverageRasterizer::FillTopFlatTriangle(CoverageMask& coverageMask, const Vector2& LeftBottomPoint, const Vector2& point1, const Vector2& point2, const Vector2& point3)
 {
     M128I Result;
 
@@ -73,22 +73,6 @@ M128I culling::CoverageRasterizer::FillTopFlatTriangle(CoverageMask& coverageMas
     return Result;
 }
 
-void culling::CoverageRasterizer::SortTriangle(Triangle& triangle)
-{
-    if (triangle.Point1.y < triangle.Point2.y)
-    {
-        std::swap(triangle.Point1, triangle.Point2);
-    }
-    if (triangle.Point1.y < triangle.Point3.y)
-    {
-        std::swap(triangle.Point1, triangle.Point3);
-    }
-    if (triangle.Point2.y < triangle.Point3.y)
-    {
-        std::swap(triangle.Point2, triangle.Point3);
-    }
-
-}
 
 /// <summary>
 /// reference : http://www.sunshine2k.de/coding/java/TriangleRasterization/TriangleRasterization.html
@@ -96,7 +80,7 @@ void culling::CoverageRasterizer::SortTriangle(Triangle& triangle)
 /// <param name="coverageMask"></param>
 /// <param name="LeftBottomPoint"></param>
 /// <param name="triangle"></param>
-void culling::CoverageRasterizer::FillTriangle(CoverageMask& coverageMask, math::Vector2 LeftBottomPoint, Triangle& triangle)
+void culling::CoverageRasterizer::FillTriangle(CoverageMask& coverageMask, Vector2 LeftBottomPoint, TwoDTriangle& triangle)
 {
     this->SortTriangle(triangle);
 
@@ -112,7 +96,7 @@ void culling::CoverageRasterizer::FillTriangle(CoverageMask& coverageMask, math:
     else
     {
         /* general case - split the triangle in a topflat and bottom-flat one */
-        math::Vector2 point4{ triangle.Point1.x + ((float)(triangle.Point2.y - triangle.Point1.y) / (float)(triangle.Point3.y - triangle.Point1.y)) * (triangle.Point3.x - triangle.Point1.x), triangle.Point2.y };
+        Vector2 point4{ triangle.Point1.x + ((float)(triangle.Point2.y - triangle.Point1.y) / (float)(triangle.Point3.y - triangle.Point1.y)) * (triangle.Point3.x - triangle.Point1.x), triangle.Point2.y };
 
         M128I Result1 = FillBottomFlatTriangle(coverageMask, LeftBottomPoint, triangle.Point1, triangle.Point2, point4);
         M128I Result2 = FillTopFlatTriangle(coverageMask, LeftBottomPoint, triangle.Point2, point4, triangle.Point3);

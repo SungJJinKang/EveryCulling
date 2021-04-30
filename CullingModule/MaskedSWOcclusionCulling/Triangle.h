@@ -16,7 +16,14 @@ namespace culling
 		float x, y, z;
 	};
 
-	struct Triangle
+	struct TwoDTriangle
+	{
+		Vector2 Point1;
+		Vector2 Point2;
+		Vector2 Point3;
+	};
+
+	struct ThreeDTriangle
 	{
 		Vector3 Point1;
 		Vector3 Point2;
@@ -26,12 +33,12 @@ namespace culling
 	/// <summary>
 	/// TriangleList
 	/// 
-	/// Triangle should be reserved after initialized!!!!
+	/// TwoDTriangle should be reserved after initialized!!!!
 	/// </summary>
 	struct TriangleList
 	{
 		size_t mMaxTriangleCount;
 		size_t mCurrentTriangleIndex;
-		Triangle* mTriangleList;
+		TwoDTriangle* mTriangleList;
 	};
 }
