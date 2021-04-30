@@ -2,7 +2,7 @@
 
 namespace culling
 {
-	class MaskedOcclusionCulling
+	class DepthBufferRasterizer
 	{
 
 	private:
@@ -12,4 +12,5 @@ namespace culling
 
 	};
 }
+
 

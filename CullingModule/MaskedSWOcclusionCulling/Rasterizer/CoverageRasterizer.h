@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Vector2.h>
+
 #include "../CoverageMask.h"
 #include "../Triangle.h"
 
@@ -20,17 +22,17 @@ namespace culling
 		/// </summary>
 		/// <param name="coverageMask"></param>
 		/// <param name="triangle"></param>
-		M128I FillBottomFlatTriangle(CoverageMask& coverageMask, const Point& LeftBottomPoint, const Point& point1, const Point& point2, const Point& point3);
+		M128I FillBottomFlatTriangle(CoverageMask& coverageMask, const math::Vector2& LeftBottomPoint, const math::Vector2& point1, const math::Vector2& point2, const math::Vector2& point3);
 		/// <summary>
 		/// Assume Triangle intersect with mask
 		/// </summary>
 		/// <param name="coverageMask"></param>
 		/// <param name="triangle"></param>
-		M128I FillTopFlatTriangle(CoverageMask& coverageMask, const Point& LeftBottomPoint, const Point& point1, const Point& point2, const Point& point3);
+		M128I FillTopFlatTriangle(CoverageMask& coverageMask, const math::Vector2& LeftBottomPoint, const math::Vector2& point1, const math::Vector2& point2, const math::Vector2& point3);
 		
 		/// <summary>
 		/// Sort Triangle Points y ascending.
-		/// Point1 is TopMost Point
+		/// Point1 is TopMost math::Vector2
 		/// </summary>
 		/// <param name="triangle"></param>
 		void SortTriangle(Triangle& triangle);
@@ -43,7 +45,7 @@ namespace culling
 		/// 
 		/// 
 		/// </summary>
-		void FillTriangle(CoverageMask& coverageMask, Point LeftBottomPoint, Triangle& triangle);
+		void FillTriangle(CoverageMask& coverageMask, math::Vector2 LeftBottomPoint, Triangle& triangle);
 
 	};
 }

@@ -7,6 +7,7 @@
 
 #include "../SWDepthBuffer.h"
 #include "../../../DataStructure/AABB.h"
+#include "../Triangle.h"
 
 namespace culling
 {

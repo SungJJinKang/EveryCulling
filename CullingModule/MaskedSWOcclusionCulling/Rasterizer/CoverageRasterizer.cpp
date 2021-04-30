@@ -3,7 +3,7 @@
 #include <algorithm>
 
 
-M128I culling::CoverageRasterizer::FillBottomFlatTriangle(CoverageMask& coverageMask, const Point& LeftBottomPoint, const Point& point1, const Point& point2, const Point& point3)
+M128I culling::CoverageRasterizer::FillBottomFlatTriangle(CoverageMask& coverageMask, const math::Vector2& LeftBottomPoint, const math::Vector2& point1, const math::Vector2& point2, const math::Vector2& point3)
 {
     M128I Result;
 
@@ -39,7 +39,7 @@ M128I culling::CoverageRasterizer::FillBottomFlatTriangle(CoverageMask& coverage
     return Result;
 }
 
-M128I culling::CoverageRasterizer::FillTopFlatTriangle(CoverageMask& coverageMask, const Point& LeftBottomPoint, const Point& point1, const Point& point2, const Point& point3)
+M128I culling::CoverageRasterizer::FillTopFlatTriangle(CoverageMask& coverageMask, const math::Vector2& LeftBottomPoint, const math::Vector2& point1, const math::Vector2& point2, const math::Vector2& point3)
 {
     M128I Result;
 
@@ -96,28 +96,28 @@ void culling::CoverageRasterizer::SortTriangle(Triangle& triangle)
 /// <param name="coverageMask"></param>
 /// <param name="LeftBottomPoint"></param>
 /// <param name="triangle"></param>
-void culling::CoverageRasterizer::FillTriangle(CoverageMask& coverageMask, Point LeftBottomPoint, Triangle& triangle)
+void culling::CoverageRasterizer::FillTriangle(CoverageMask& coverageMask, math::Vector2 LeftBottomPoint, Triangle& triangle)
 {
     this->SortTriangle(triangle);
 
     if (triangle.Point2.y == triangle.Point3.y)
     {
-        coverageMask.mBits = *reinterpret_cast<coverageMaskInternalType*>(&FillBottomFlatTriangle(coverageMask, LeftBottomPoint, triangle.Point1, triangle.Point2, triangle.Point3));
+        coverageMask.mBits = FillBottomFlatTriangle(coverageMask, LeftBottomPoint, triangle.Point1, triangle.Point2, triangle.Point3);
     }
     /* check for trivial case of top-flat triangle */
     else if (triangle.Point1.y == triangle.Point2.y)
     {
-        coverageMask.mBits = *reinterpret_cast<coverageMaskInternalType*>(&FillTopFlatTriangle(coverageMask, LeftBottomPoint, triangle.Point1, triangle.Point2, triangle.Point3));
+        coverageMask.mBits = FillTopFlatTriangle(coverageMask, LeftBottomPoint, triangle.Point1, triangle.Point2, triangle.Point3);
     }
     else
     {
         /* general case - split the triangle in a topflat and bottom-flat one */
-        Point point4{ triangle.Point1.x + ((float)(triangle.Point2.y - triangle.Point1.y) / (float)(triangle.Point3.y - triangle.Point1.y)) * (triangle.Point3.x - triangle.Point1.x), triangle.Point2.y };
+        math::Vector2 point4{ triangle.Point1.x + ((float)(triangle.Point2.y - triangle.Point1.y) / (float)(triangle.Point3.y - triangle.Point1.y)) * (triangle.Point3.x - triangle.Point1.x), triangle.Point2.y };
 
         M128I Result1 = FillBottomFlatTriangle(coverageMask, LeftBottomPoint, triangle.Point1, triangle.Point2, point4);
         M128I Result2 = FillTopFlatTriangle(coverageMask, LeftBottomPoint, triangle.Point2, point4, triangle.Point3);
 
-        coverageMask.mBits = *reinterpret_cast<coverageMaskInternalType*>(&_mm_or_si128(Result1, Result2));
+        coverageMask.mBits = _mm_or_si128(Result1, Result2);
     }
 
 }
