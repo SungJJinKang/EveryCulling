@@ -51,14 +51,28 @@ namespace culling
 		TriangleBin* mTriangleBins;
 	};
 
+	struct alignas(64) Resolution
+	{
+		const unsigned int mWidth;
+		const unsigned int mHeight;
+
+#if NDC_RANGE == MINUS_ONE_TO_POSITIVE_ONE
+		M128F mReplicatedScreenHalfWidth;
+		M128F mReplicatedScreenHalfHeight;
+#elif NDC_RANGE == ZERO_TO_POSITIVE_ONE
+		M128F mReplicatedScreenWidth;
+		M128F mReplicatedScreenHeight;
+#endif
+		
+	};
+
 	class SWDepthBuffer
 	{
 		friend class MaskedSWOcclusionCulling;
 
 	private:
 
-		const unsigned int mWidth;
-		const unsigned int mHeight;
+		const Resolution mResolution;
 
 		const unsigned int mBinCountInRow;
 		const unsigned int mBinCountInColumn;

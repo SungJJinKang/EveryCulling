@@ -13,19 +13,38 @@
 #  define FORCE_INLINE __forceinline
 #endif
 
+///////////////////////////////////////////////////////////////////////////////////////
+//Graphics API
+#define OPENGL
+//#define DIRECTX
+
+#ifdef OPENGL
+#define NDC_RANGE MINUS_ONE_TO_POSITIVE_ONE
+#elif DIRECTX
+#define NDC_RANGE ZERO_TO_POSITIVE_ONE
+#endif
+
+///////////////////////////////////////////////////////////////////////////////////////
+//Math
 #define MAX(A, B) A > B ? A : B
 #define MAX3(A, B, C) MAX(A, MAX(B, C))
 #define MIN(A, B) A < B ? A : B
 #define MIN3(A, B) MIN(A, MIN(B, C))
 
+///////////////////////////////////////////////////////////////////////////////////////
+//EntityBlock
 #define INITIAL_ENTITY_BLOCK_COUNT 10
 #define MAX_ENTITY_BLOCK_COUNT 500
 
 #define MAX_CAMERA_COUNT 8
 
+
+///////////////////////////////////////////////////////////////////////////////////////
 //ViewFrustum Culling
 #define BOUNDING_SPHRE_RADIUS_MARGIN 0.2f
 
+
+///////////////////////////////////////////////////////////////////////////////////////
 //Masked SW Occlusion Culling
 #define TILE_WIDTH 16
 #define TILE_HEIGHT 8

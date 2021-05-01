@@ -24,12 +24,34 @@ namespace culling
 		
 	private:
 
-		unsigned int mScreenWidth;
-		unsigned int mScreenHeight;
+
 		SWDepthBuffer mDepthBuffer;
 
-		float mNearPlaneDis, mFarPlaneDis;
+		float mNearClipPlaneDis, mFarClipPlaneDis;
 		float* mViewProjectionMatrix;
+
+		/// <summary>
+		/// Project Vertex To ScreenSpace
+		/// X, Y, Z, W -> X/W , Y/W, Z/W, W/1
+		/// </summary>
+		/// <param name="outClipVertexX"></param>
+		/// <param name="outClipVertexY"></param>
+		/// <param name="outClipVertexZ"></param>
+		/// <param name="outClipVertexW"></param>
+		void ConverClipSpaceToNDCSpace(M128F* outClipVertexX, M128F* outClipVertexY, const M128F* oneDividedByW, unsigned int& triangleMask);
+		
+		/// <summary>
+		/// Convert NDC Space X,Y To Screen Space X,Y according to Graphics API
+		/// And Snap Screen Space X,Y To Pixel Coordinate in Buffer
+		/// 
+		/// Pixel Coordinate have integer value
+		/// </summary>
+		/// <param name="ndcSpaceVertexX"></param>
+		/// <param name="ndcSpaceVertexY"></param>
+		/// <param name="triangleMask"></param>
+		/// <param name="outScreenPixelSpaceX"></param>
+		/// <param name="outScreenPixelSpaceY"></param>
+		void ConvertNDCSpaceToScreenPixelSpace(const M128F* ndcSpaceVertexX, const M128F* ndcSpaceVertexY, M128I* outScreenPixelSpaceX, M128I* outScreenPixelSpaceY, unsigned int& triangleMask);
 
 		/// <summary>
 		/// Convert 4 TriangSles's Model Vertex to ClipSpace
@@ -39,8 +61,11 @@ namespace culling
 		/// <param name="vertW">"W" !!!!!!!!! three M128F -> 12 floating-point value</param>
 		/// <param name="modelToClipspaceMatrix">column major 4x4 matrix</param>
 		void TransformVertexsToClipSpace(
-			M128F* outClipVertexX, M128F* outClipVertexY, M128F* outClipVertexZ, M128F* outClipVertexW, 
-			const float* toClipspaceMatrix);
+			M128F* outClipVertexX, M128F* outClipVertexY,
+ M128F* outClipVertexW,
+
+ const float* toClipspaceMatrix, 
+			unsigned int& triangleMask);
 
 		/// <summary>
 		/// Sort TwoDTriangle Points y ascending.
@@ -67,8 +92,9 @@ namespace culling
 		/// Gather Vertex from VertexList with IndiceList
 		/// </summary>
 		void GatherVertex(
-			const Vector3* vertices, const unsigned int* vertexIndices, const size_t indiceCount, const size_t currentIndiceIndex, 
-			M128F * outVerticesX, M128F * outVerticesY, M128F * outVerticesZ, unsigned int* triangleMask//, unsigned int* triMask
+			const Vector3* vertices, const unsigned int* vertexIndices, const size_t indiceCount,
+ const size_t currentIndiceIndex, 
+			M128F * outVerticesX, M128F * outVerticesY, unsigned int& triangleMask//, unsigned int* triMask
 		);
 
 		/// <summary>
@@ -115,8 +141,10 @@ namespace culling
 
 		/// <summary>
 		/// Compute Depth in Bin of Tile(Sub Tile)
+		/// 
+		/// CoverageMask, z0DepthMax, z1DepthMax, Triangle Max Depth
 		/// </summary>
-		void DrawBinnedTriangles()
+		void RasterizeBinnedTriangles()
 		{
 			// Compute Min Depth In Tile(SubTile)
 			// ComputeTrianglesDepthValueInTile
@@ -136,29 +164,22 @@ namespace culling
 
 	public:
 
-		void SetViewProjectionMatrix(math::Matrix4x4& viewProjectionMatrix);
+
+		MaskedSWOcclusionCulling(unsigned int width, unsigned int height, float nearClipPlaneDis, float farClipPlaneDis, float* viewProjectionMatrix);
+	
+		void SetNearFarClipPlaneDistance(float nearClipPlaneDis, float farClipPlaneDis);
+		void SetViewProjectionMatrix(float* viewProjectionMatrix);
 		
-		inline void DrawOccluderTriangles(const float* vertices, const unsigned int* vertexIndices, size_t indiceCount)
+		inline void DrawOccluderTriangles(const culling::Vector3* vertices, const unsigned int* vertexIndices, size_t indiceCount, float* modelToClipspaceMatrix)
 		{
 			while (true)
 			{
 				
 				//Gather Vertex
 
-				//Convert Model Space Vertex to Clip space Vertex
+				this->BinTriangles(vertices, vertexIndices, indiceCount, modelToClipspaceMatrix);
 
-
-				//Convert Clip space Vertex to Integer Pixel Position
-				//Check "RenderTriangles" Function of https://github.com/GameTechDev/MaskedOcclusionCulling/blob/master/MaskedOcclusionCullingCommon.inl
-
-				//Backface Culling
-
-				//Compute BoundingBox
-				//Compute Sub Tile intersecting with triangles
-
-				//Bin Triangles 
-
-				
+				this->RasterizeBinnedTriangles();
 			}
 
 	
