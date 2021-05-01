@@ -38,7 +38,10 @@ namespace culling
 		/// <param name="vertY">three M128F -> 12 floating-point value</param>
 		/// <param name="vertW">"W" !!!!!!!!! three M128F -> 12 floating-point value</param>
 		/// <param name="modelToClipspaceMatrix">column major 4x4 matrix</param>
-		void TransformVertexsToClipSpace(M128F* vertX, M128F* vertY, M128F* vertW, const float* toClipspaceMatrix);
+		void TransformVertexsToClipSpace(
+			M128F* outClipVertexX, M128F* outClipVertexY, M128F* outClipVertexZ, M128F* outClipVertexW, 
+			const float* toClipspaceMatrix);
+
 		/// <summary>
 		/// Sort TwoDTriangle Points y ascending.
 		/// Point1 is TopMost Vector2
@@ -64,8 +67,8 @@ namespace culling
 		/// Gather Vertex from VertexList with IndiceList
 		/// </summary>
 		void GatherVertex(
-			const float* vertices, const unsigned int* vertexIndices, size_t indiceCount, size_t currentIndiceCount,
-			M128F* verticesX, M128F* verticesY, M128F* verticesZ//, unsigned int* triMask
+			const Vector3* vertices, const unsigned int* vertexIndices, const size_t indiceCount, const size_t currentIndiceIndex, 
+			M128F * outVerticesX, M128F * outVerticesY, M128F * outVerticesZ, unsigned int* triangleMask//, unsigned int* triMask
 		);
 
 		/// <summary>
@@ -74,7 +77,7 @@ namespace culling
 		/// <param name="vertices"></param>
 		/// <param name="vertexIndices"></param>
 		/// <param name="indiceCount"></param>
-		void BinTriangles(const float* vertices, const unsigned int* vertexIndices, size_t indiceCount, float* modelToClipspaceMatrix);
+		void BinTriangles(const Vector3* vertices, const unsigned int* vertexIndices, size_t indiceCount, float* modelToClipspaceMatrix);
 		
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
