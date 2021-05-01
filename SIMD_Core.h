@@ -123,11 +123,6 @@ FORCE_INLINE M256F M256F_CROSS(const M256F& M256_A, const M256F& M256_B)
 
 
 
-
-
-
-
-
 #endif
 
 

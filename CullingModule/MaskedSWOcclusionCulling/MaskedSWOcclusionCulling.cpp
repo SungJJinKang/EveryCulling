@@ -36,7 +36,7 @@ void culling::MaskedSWOcclusionCulling::ConverClipSpaceToNDCSpace(M128F* outClip
 	
 }
 
-void culling::MaskedSWOcclusionCulling::ConvertNDCSpaceToScreenPixelSpace(const M128F* ndcSpaceVertexX, const M128F* ndcSpaceVertexY, M128I* outScreenPixelSpaceX, M128I* outScreenPixelSpaceY, unsigned int& triangleMask)
+void culling::MaskedSWOcclusionCulling::ConvertNDCSpaceToScreenPixelSpace(const M128F* ndcSpaceVertexX, const M128F* ndcSpaceVertexY, M128F* outScreenPixelSpaceX, M128F* outScreenPixelSpaceY, unsigned int& triangleMask)
 {
 	for (size_t i = 0; i < 3; i++)
 	{
@@ -58,8 +58,8 @@ void culling::MaskedSWOcclusionCulling::ConvertNDCSpaceToScreenPixelSpace(const 
 		// The rounding modes are set to match HW rasterization with OpenGL. In practice our samples are placed
 		// in the (1,0) corner of each pixel, while HW rasterizer uses (0.5, 0.5). We get (1,0) because of the 
 		// floor used when interpolating along triangle edges. The rounding modes match an offset of (0.5, -0.5)
-		outScreenPixelSpaceX[i] = _mm_cvtps_epi32(_mm_ceil_ps(tmpScreenSpaceX));
-		outScreenPixelSpaceY[i] = _mm_cvtps_epi32(_mm_floor_ps(tmpScreenSpaceY));
+		outScreenPixelSpaceX[i] = _mm_ceil_ps(tmpScreenSpaceX);
+		outScreenPixelSpaceY[i] = _mm_floor_ps(tmpScreenSpaceY);
 		
 
 	}
@@ -107,53 +107,34 @@ void culling::MaskedSWOcclusionCulling::SortTriangle(TwoDTriangle& triangle)
 
 void culling::MaskedSWOcclusionCulling::GatherVertex(
 	const Vector3* vertices, const unsigned int* vertexIndices, const size_t indiceCount, const size_t currentIndiceIndex, 
-	M128F * outVerticesX, M128F * outVerticesY, unsigned int& triangleMask)
+	M128F* outVerticesX, M128F* outVerticesY, unsigned int& triangleMask)
 {
 	assert(indiceCount % 3 == 0);
 	assert(currentIndiceIndex % 3 == 0);
 
 	//Gather 12 Point -> 4 Triangles
-	size_t currentTriangleIndex = currentIndiceIndex / 3;
-	const size_t targetTriangleIndex = MIN(currentIndiceIndex / 3 + 4, indiceCount / 3);
-
-	/// maximum index of fOutVertexX : 11
-	float* fOutVertexX = reinterpret_cast<float*>(outVerticesX);
-	float* fOutVertexY = reinterpret_cast<float*>(outVerticesY);
-	//float* fOutVertexZ = reinterpret_cast<float*>(outVerticesZ);
-
-	size_t fOutVertexIndex = 0;
-	size_t storedTriangleCount = 0;
-	for (; currentTriangleIndex < targetTriangleIndex; currentTriangleIndex++)
+	
+	size_t triangleIndex = 0;
+	for (
+		size_t indiceIndex = currentIndiceIndex ; 
+		indiceIndex < indiceCount && indiceIndex < currentIndiceIndex + 4 * 3 ; 
+		indiceIndex += 3
+		)
 	{
-		const size_t targetVertexIndex = currentTriangleIndex * 3 + 3;
-		for (size_t vertexIndex = currentTriangleIndex * 3; vertexIndex < targetVertexIndex; vertexIndex++)
+
+		//store 3 point of a triangle
+		for (size_t pointIndex = 0; pointIndex < 3; pointIndex++)
 		{
-			size_t currentVertexIndex = vertexIndices[vertexIndex];
-			fOutVertexX[fOutVertexIndex] = vertices[currentVertexIndex].x;
-			fOutVertexY[fOutVertexIndex] = vertices[currentVertexIndex].y;
-			//fOutVertexZ[fOutVertexIndex] = vertices[currentVertexIndex].z;
-
-			fOutVertexIndex++;
+			size_t vertexIndice = vertexIndices[currentIndiceIndex + pointIndex];
+			reinterpret_cast<float*>(outVerticesX + pointIndex)[triangleIndex] = vertices[vertexIndice].x;
+			reinterpret_cast<float*>(outVerticesY + pointIndex)[triangleIndex] = vertices[vertexIndice].y;
 		}
-		storedTriangleCount++;
+
+		triangleIndex++;
+		assert(triangleIndex < 4);
 	}
-
-	//invalidate not processed triangle
-	for (size_t triangleIndex = storedTriangleCount; triangleIndex < 4; triangleIndex++)
-	{
-		triangleMask ^= 1 << triangleIndex;
-	}
-
-	//TODO : if A M128F isn't set, We can use SIMD set 0
-	for (; fOutVertexIndex < 12; fOutVertexIndex++)
-	{
-		fOutVertexX[fOutVertexIndex] = 0.0f;
-		fOutVertexY[fOutVertexIndex] = 0.0f;
-		//fOutVertexZ[fOutVertexIndex] = 0.0f;
-	}
-
-	//
-
+	
+	//triangleMask ^= 1 << triangleIndex;
 }
 
 void culling::MaskedSWOcclusionCulling::BinTriangles(const Vector3* vertices, const unsigned int* vertexIndices, size_t indiceCount, float* modelToClipspaceMatrix)
@@ -204,11 +185,32 @@ void culling::MaskedSWOcclusionCulling::BinTriangles(const Vector3* vertices, co
 		//W BECOME USELESS, IGNORE IT
 		this->ConverClipSpaceToNDCSpace(ndcSpaceVertexX, ndcSpaceVertexY, oneDividedByW, triMask);
 
-		M128I screenPixelPosX[3], screenPixelPosY[3];
+		M128F screenPixelPosX[3], screenPixelPosY[3];
 		this->ConvertNDCSpaceToScreenPixelSpace(ndcSpaceVertexX, ndcSpaceVertexY, screenPixelPosX, screenPixelPosY, triMask);
 		//Clip Space Cull
 		
 		//BackFace Cull
+		// 
+		//TODO : I don't now How this Works.........
+		M128F triArea1 = M128F_MUL(M128F_SUB(screenPixelPosX[1], screenPixelPosX[0]), M128F_SUB(screenPixelPosY[2], screenPixelPosY[0]));
+		M128F triArea2 = M128F_MUL(M128F_SUB(screenPixelPosX[0], screenPixelPosX[2]), M128F_SUB(screenPixelPosY[0], screenPixelPosY[1]));
+		M128F triArea = M128F_SUB(triArea1, triArea2);
+		M128F ccwMask = _mm_cmpgt_ps(triArea, _mm_set1_ps(0.0f));
+		//
+		
+		//this->CullBackfaces(screenPixelPosX, screenPixelPosY, oneDividedByW, ccwMask, bfWinding);
+		
+		//Set each bit of mask dst based on the most significant bit of the corresponding packed single-precision (32-bit) floating-point element in a.
+		//https://software.intel.com/sites/landingpage/IntrinsicsGuide/#techs=SSE,SSE2,SSE3,SSSE3,SSE4_1,SSE4_2,AVX&expand=2156,4979,4979,1731,4929,951,4979,3869&text=movemask
+		//if second triangle is front facing, low second bit of triMask is 1
+		triMask = _mm_movemask_ps(ccwMask);
+
+		if (triMask == 0x0)
+		{
+			break;
+		}
+
+		//Bin Triangles to tiles
 
 		currentIndiceIndex += 12;
 	}

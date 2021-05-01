@@ -51,7 +51,7 @@ namespace culling
 		/// <param name="triangleMask"></param>
 		/// <param name="outScreenPixelSpaceX"></param>
 		/// <param name="outScreenPixelSpaceY"></param>
-		void ConvertNDCSpaceToScreenPixelSpace(const M128F* ndcSpaceVertexX, const M128F* ndcSpaceVertexY, M128I* outScreenPixelSpaceX, M128I* outScreenPixelSpaceY, unsigned int& triangleMask);
+		void ConvertNDCSpaceToScreenPixelSpace(const M128F* ndcSpaceVertexX, const M128F* ndcSpaceVertexY, M128F* outScreenPixelSpaceX, M128F* outScreenPixelSpaceY, unsigned int& triangleMask);
 
 		/// <summary>
 		/// Convert 4 TriangSles's Model Vertex to ClipSpace
@@ -90,12 +90,40 @@ namespace culling
 
 		/// <summary>
 		/// Gather Vertex from VertexList with IndiceList
+		/// 
+		/// first float of outVerticesX[0] have Triangle1's Point1 X
+		/// first float of outVerticesX[1] have Triangle1's Point2 X
+		/// first float of outVerticesX[2] have Triangle1's Point3 X
+		/// 
+		/// second float of outVerticesX[0] have Triangle2's Point1 X
+		/// second float of outVerticesX[1] have Triangle2's Point2 X
+		/// second float of outVerticesX[2] have Triangle2's Point3 X
 		/// </summary>
 		void GatherVertex(
-			const Vector3* vertices, const unsigned int* vertexIndices, const size_t indiceCount,
- const size_t currentIndiceIndex, 
-			M128F * outVerticesX, M128F * outVerticesY, unsigned int& triangleMask//, unsigned int* triMask
+			const Vector3* vertices, const unsigned int* vertexIndices, const size_t indiceCount, const size_t currentIndiceIndex, 
+			M128F* outVerticesX, M128F* outVerticesY, unsigned int& triangleMask//, unsigned int* triMask
 		);
+
+		int CullBackfaces(M128F* pVtxX, M128F* pVtxY, M128F* pVtxZ, const M128F& ccwMask, BackfaceWinding bfWinding)
+		{
+			// Reverse vertex order if non cw faces are considered front facing (rasterizer code requires CCW order)
+			if (!(bfWinding & BACKFACE_CW))
+			{
+				__mw tmpX, tmpY, tmpZ;
+				tmpX = _mmw_blendv_ps(pVtxX[2], pVtxX[0], ccwMask);
+				tmpY = _mmw_blendv_ps(pVtxY[2], pVtxY[0], ccwMask);
+				tmpZ = _mmw_blendv_ps(pVtxZ[2], pVtxZ[0], ccwMask);
+				pVtxX[2] = _mmw_blendv_ps(pVtxX[0], pVtxX[2], ccwMask);
+				pVtxY[2] = _mmw_blendv_ps(pVtxY[0], pVtxY[2], ccwMask);
+				pVtxZ[2] = _mmw_blendv_ps(pVtxZ[0], pVtxZ[2], ccwMask);
+				pVtxX[0] = tmpX;
+				pVtxY[0] = tmpY;
+				pVtxZ[0] = tmpZ;
+			}
+
+			// Return a lane mask with all front faces set
+			return ((bfWinding & BACKFACE_CCW) ? 0 : _mmw_movemask_ps(ccwMask)) | ((bfWinding & BACKFACE_CW) ? 0 : ~_mmw_movemask_ps(ccwMask));
+		}
 
 		/// <summary>
 		/// Bin Triangles
@@ -143,6 +171,11 @@ namespace culling
 		/// Compute Depth in Bin of Tile(Sub Tile)
 		/// 
 		/// CoverageMask, z0DepthMax, z1DepthMax, Triangle Max Depth
+		/// 
+		/// reference : 
+		/// https://stackoverflow.com/questions/24441631/how-exactly-does-opengl-do-perspectively-correct-linear-interpolation
+		/// https://www.rose-hulman.edu/class/cs/csse351/m10/triangle_fill.pdf
+		/// https://www.comp.nus.edu.sg/~lowkl/publications/lowk_persp_interp_techrep.pdf
 		/// </summary>
 		void RasterizeBinnedTriangles()
 		{
