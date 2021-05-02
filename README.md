@@ -5,9 +5,10 @@ Frostbite used Plain SW Occlusion Culling, but I will implement Masked SW Occlus
 Masked SW Occlusion Culling is announced in 2016 by intel.         
 I think this will be much faster than plain occlusion culling, So I will implement it!!!       
 
-[Slide Resource](https://www.ea.com/frostbite/news/culling-the-battlefield-data-oriented-design-in-practice)      
-[GDC Talk Video](https://www.gdcvault.com/play/1014491/Culling-the-Battlefield-Data-Oriented)        
-[한국어 블로그 글](https://sungjjinkang.github.io/doom/2021/04/02/viewfrustumculling.html)
+[Slide Resource](https://www.ea.com/frostbite/news/culling-the-battlefield-data-oriented-design-in-practice)        
+[GDC Talk Video](https://www.gdcvault.com/play/1014491/Culling-the-Battlefield-Data-Oriented)          
+[한국어 블로그 글](https://sungjjinkang.github.io/doom/2021/04/02/viewfrustumculling.html)          
+[Masked Occlusion Culling 논문](https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf)             
 
 ## Feature
 

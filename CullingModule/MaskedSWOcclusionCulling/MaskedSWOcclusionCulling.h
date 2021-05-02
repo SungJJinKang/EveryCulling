@@ -16,10 +16,10 @@ namespace culling
 	/// Masked SW Occlusion Culling
 	/// 
 	/// 
-	/// Supported SIMD Version : AVX1
+	/// Supported SIMD Version : AVX2
 	/// 
 	/// 
-	/// references : https://software.intel.com/content/www/us/en/develop/articles/masked-software-occlusion-culling.html
+	/// references : https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf
 	/// </summary>
 	class MaskedSWOcclusionCulling
 	{
