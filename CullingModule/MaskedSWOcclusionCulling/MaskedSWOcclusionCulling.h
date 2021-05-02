@@ -42,7 +42,7 @@ namespace culling
 		/// <param name="outClipVertexW"></param>
 		void ConverClipSpaceToNDCSpace(
 			M256F* outClipVertexX, M256F* outClipVertexY,
- const M256F* oneDividedByW, int & triangleMask
+ const M256F* oneDividedByW, int & triangleCullMask
 		);
 		
 		/// <summary>
@@ -53,14 +53,14 @@ namespace culling
 		/// </summary>
 		/// <param name="ndcSpaceVertexX"></param>
 		/// <param name="ndcSpaceVertexY"></param>
-		/// <param name="triangleMask"></param>
+		/// <param name="triangleCullMask"></param>
 		/// <param name="outScreenPixelSpaceX"></param>
 		/// <param name="outScreenPixelSpaceY"></param>
 		void ConvertNDCSpaceToScreenPixelSpace(
 			const M256F* ndcSpaceVertexX, const M256F* ndcSpaceVertexY,
  
 			M256F* outScreenPixelSpaceX,
- M256F* outScreenPixelSpaceY, int & triangleMask
+ M256F* outScreenPixelSpaceY, int & triangleCullMask
 		);
 
 		/// <summary>
@@ -73,10 +73,10 @@ namespace culling
 		void TransformVertexsToClipSpace(
 			M256F* outClipVertexX, M256F* outClipVertexY,
  M256F* outClipVertexW,
-			const float* toClipspaceMatrix, int & triangleMask
+			const float* toClipspaceMatrix, int& triangleCullMask
 		);
 
-	
+		void CullBackfaces(const M256F* screenPixelX, const M256F* screenPixelY, int& triangleCullMask);
 
 		inline float GetAreaOfTriangle(const TwoDTriangle& triangle)
 		{
@@ -92,6 +92,9 @@ namespace culling
 		// Binning Triangles to Tile(Sub Tile)
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+		
+		
+
 		/// <summary>
 		/// Gather Vertex from VertexList with IndiceList
 		/// 
@@ -103,10 +106,24 @@ namespace culling
 		/// second float of outVerticesX[1] have Triangle2's Point2 X
 		/// second float of outVerticesX[2] have Triangle2's Point3 X
 		/// </summary>
+		/// <param name="vertices"></param>
+		/// <param name="vertexIndices"></param>
+		/// <param name="indiceCount"></param>
+		/// <param name="currentIndiceIndex"></param>
+		/// <param name="vertexStride">
+		/// how far next vertex point is from current vertex point 
+		/// ex) 
+		/// 1.0f(Point1_X), 2.0f(Point2_Y), 0.0f(Point3_Z), 3.0f(Normal_X), 3.0f(Normal_Y), 3.0f(Normal_Z),  1.0f(Point1_X), 2.0f(Point2_Y), 0.0f(Point3_Z)
+		/// --> vertexStride is 6
+		/// </param>
+		/// <param name="fetchTriangleCount"></param>
+		/// <param name="outVerticesX"></param>
+		/// <param name="outVerticesY"></param>
+		/// <param name="triangleCullMask"></param>
 		void GatherVertex(
-			const Vector3* vertices, const unsigned int* vertexIndices, const size_t indiceCount,
- const size_t currentIndiceIndex, 
-			M256F* outVerticesX, M256F* outVerticesY, int & triangleMask//, unsigned int* triMask
+			const float * vertices, const unsigned int* vertexIndices, const size_t indiceCount, const size_t currentIndiceIndex, const size_t vertexStrideByte,
+ const size_t fetchTriangleCount, 
+			M256F* outVerticesX, M256F* outVerticesY, int& triangleCullMask
 		);
 
 		/*
@@ -131,13 +148,23 @@ namespace culling
 			return ((bfWinding & BACKFACE_CCW) ? 0 : _mmw_movemask_ps(ccwMask)) | ((bfWinding & BACKFACE_CW) ? 0 : ~_mmw_movemask_ps(ccwMask));
 		}
 		*/
+
+
+		
 		/// <summary>
 		/// Bin Triangles
 		/// </summary>
 		/// <param name="vertices"></param>
 		/// <param name="vertexIndices"></param>
 		/// <param name="indiceCount"></param>
-		void BinTriangles(const Vector3* vertices, const unsigned int* vertexIndices, size_t indiceCount, float* modelToClipspaceMatrix);
+		/// <param name="vertexStride">
+		/// how far next vertex point is from current vertex point 
+		/// ex) 
+		/// 1.0f(Point1_X), 2.0f(Point2_Y), 0.0f(Point3_Z), 3.0f(Normal_X), 3.0f(Normal_Y), 3.0f(Normal_Z),  1.0f(Point1_X), 2.0f(Point2_Y), 0.0f(Point3_Z)
+		/// --> vertexStride is 6
+		/// </param>
+		/// <param name="modelToClipspaceMatrix"></param>
+		void BinTriangles(const float* vertices, const unsigned int* vertexIndices, size_t indiceCount, size_t vertexStrideByte, float* modelToClipspaceMatrix);
 		
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -209,14 +236,31 @@ namespace culling
 		void SetNearFarClipPlaneDistance(float nearClipPlaneDis, float farClipPlaneDis);
 		void SetViewProjectionMatrix(float* viewProjectionMatrix);
 		
-		inline void DrawOccluderTriangles(const culling::Vector3* vertices, const unsigned int* vertexIndices, size_t indiceCount, float* modelToClipspaceMatrix)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="vertices"></param>
+		/// <param name="vertexIndices"></param>
+		/// <param name="indiceCount"></param>
+		/// <param name="vertexStride">
+		/// how far next vertex point is from current vertex point 
+		/// ex) 
+		/// 1.0f(Point1_X), 2.0f(Point2_Y), 0.0f(Point3_Z), 3.0f(Normal_X), 3.0f(Normal_Y), 3.0f(Normal_Z),  1.0f(Point1_X), 2.0f(Point2_Y), 0.0f(Point3_Z)
+		/// --> vertexStride is 6
+		/// </param>
+		/// <param name="modelToClipspaceMatrix"></param>
+		inline void DrawOccluderTriangles
+		(
+			const float* vertices, const unsigned int* vertexIndices, size_t indiceCount, bool vertexStrideByte, 
+			float* modelToClipspaceMatrix
+		)
 		{
 			while (true)
 			{
 				
 				//Gather Vertex
 
-				this->BinTriangles(vertices, vertexIndices, indiceCount, modelToClipspaceMatrix);
+				this->BinTriangles(vertices, vertexIndices, indiceCount, vertexStrideByte, modelToClipspaceMatrix);
 
 				this->RasterizeBinnedTriangles();
 			}
