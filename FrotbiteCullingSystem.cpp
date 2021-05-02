@@ -9,7 +9,7 @@ void culling::FrotbiteCullingSystem::FreeEntityBlock(EntityBlock* freedEntityBlo
 {
 	assert(freedEntityBlock != nullptr);
 	size_t freedEntityBlockIndex;
-	size_t entityBlockCount = this->mEntityGridCell.mEntityBlocks.size();
+	const size_t entityBlockCount = this->mEntityGridCell.mEntityBlocks.size();
 	bool IsSuccessToFind = false;
 	for (size_t i = 0; i < entityBlockCount; i++)
 	{
@@ -80,7 +80,7 @@ culling::FrotbiteCullingSystem::FrotbiteCullingSystem()
 	this->mEntityGridCell.mEntityBlocks.reserve(100);
 	this->mEntityGridCell.AllocatedEntityCountInBlocks.reserve(100);
 
-	AllocateEntityBlockPool();
+	this->AllocateEntityBlockPool();
 
 	this->CacheCullBlockEntityJobs();
 	this->bmIsInitializedEntityBlockPool = true;
@@ -88,7 +88,7 @@ culling::FrotbiteCullingSystem::FrotbiteCullingSystem()
 
 culling::FrotbiteCullingSystem::~FrotbiteCullingSystem()
 {
-	for (auto allocatedEntityBlockChunk : this->mAllocatedEntityBlockChunkList)
+	for (culling::EntityBlock* allocatedEntityBlockChunk : this->mAllocatedEntityBlockChunkList)
 	{
 		delete[] allocatedEntityBlockChunk;
 	}
@@ -235,7 +235,6 @@ void culling::FrotbiteCullingSystem::SetAllOneIsVisibleFlag()
 
 void culling::FrotbiteCullingSystem::ResetCullJobState()
 {
-	//this->mAtomicCurrentBlockIndex = 0;
 	this->mFinishedCullJobBlockCount = 0;
 	this->SetAllOneIsVisibleFlag();
 }
