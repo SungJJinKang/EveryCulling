@@ -1,14 +1,19 @@
 # Frostbite_CullingSystem
 
 This library is implementation of **Culling the Battlefield: Data Oriented Design in Practice Talk of EA DICE in 2011** And **Masked SW Occlusion Culling**            
-Frostbite used Plain SW Occlusion Culling, but I will implement Masked SW Occlusion Culling.       
-Masked SW Occlusion Culling is announced in 2016 by intel.         
-I think this will be much faster than plain occlusion culling, So I will implement it!!!       
+Frostbite used Plain SW Occlusion Culling, but I will implement Masked SW Occlusion Culling.         
+Masked SW Occlusion Culling is announced in 2016 by intel.          
 
 [Slide Resource](https://www.ea.com/frostbite/news/culling-the-battlefield-data-oriented-design-in-practice)        
 [GDC Talk Video](https://www.gdcvault.com/play/1014491/Culling-the-Battlefield-Data-Oriented)          
 [한국어 블로그 글](https://sungjjinkang.github.io/doom/2021/04/02/viewfrustumculling.html)          
-[Masked Occlusion Culling 논문](https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf)             
+[Masked Occlusion Culling 논문](https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf) 
+
+## Core Feature 
+This library is targeting Maximing SIMD, Cache hit, Multi Threading.       
+1. SIMD : Data is stored for using SIMD Intrinsics
+2. Cache Hit : SoA!! ( Structure of Arrays )
+3. Multi Threading : Data of entities is separately stored in entity block, Then Threads works on a entity block. These structure prevent data race. Don't need locking.
 
 ## Feature
 
