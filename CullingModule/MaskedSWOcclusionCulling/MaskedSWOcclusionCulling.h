@@ -110,11 +110,11 @@ namespace culling
 		/// <param name="vertexIndices"></param>
 		/// <param name="indiceCount"></param>
 		/// <param name="currentIndiceIndex"></param>
-		/// <param name="vertexStride">
+		/// <param name="vertexStrideByte">
 		/// how far next vertex point is from current vertex point 
 		/// ex) 
 		/// 1.0f(Point1_X), 2.0f(Point2_Y), 0.0f(Point3_Z), 3.0f(Normal_X), 3.0f(Normal_Y), 3.0f(Normal_Z),  1.0f(Point1_X), 2.0f(Point2_Y), 0.0f(Point3_Z)
-		/// --> vertexStride is 6
+		/// --> vertexStride is 6 * 4(float)
 		/// </param>
 		/// <param name="fetchTriangleCount"></param>
 		/// <param name="outVerticesX"></param>
@@ -126,30 +126,7 @@ namespace culling
 			M256F* outVerticesX, M256F* outVerticesY, int& triangleCullMask
 		);
 
-		/*
-		int CullBackfaces(M256F* pVtxX, M256F* pVtxY, M256F* pVtxZ, const M256F& ccwMask, BackfaceWinding bfWinding)
-		{
-			// Reverse vertex order if non cw faces are considered front facing (rasterizer code requires CCW order)
-			if (!(bfWinding & BACKFACE_CW))
-			{
-				__mw tmpX, tmpY, tmpZ;
-				tmpX = _mmw_blendv_ps(pVtxX[2], pVtxX[0], ccwMask);
-				tmpY = _mmw_blendv_ps(pVtxY[2], pVtxY[0], ccwMask);
-				tmpZ = _mmw_blendv_ps(pVtxZ[2], pVtxZ[0], ccwMask);
-				pVtxX[2] = _mmw_blendv_ps(pVtxX[0], pVtxX[2], ccwMask);
-				pVtxY[2] = _mmw_blendv_ps(pVtxY[0], pVtxY[2], ccwMask);
-				pVtxZ[2] = _mmw_blendv_ps(pVtxZ[0], pVtxZ[2], ccwMask);
-				pVtxX[0] = tmpX;
-				pVtxY[0] = tmpY;
-				pVtxZ[0] = tmpZ;
-			}
-
-			// Return a lane mask with all front faces set
-			return ((bfWinding & BACKFACE_CCW) ? 0 : _mmw_movemask_ps(ccwMask)) | ((bfWinding & BACKFACE_CW) ? 0 : ~_mmw_movemask_ps(ccwMask));
-		}
-		*/
-
-
+	
 		
 		/// <summary>
 		/// Bin Triangles
@@ -157,11 +134,11 @@ namespace culling
 		/// <param name="vertices"></param>
 		/// <param name="vertexIndices"></param>
 		/// <param name="indiceCount"></param>
-		/// <param name="vertexStride">
+		/// <param name="vertexStrideByte">
 		/// how far next vertex point is from current vertex point 
 		/// ex) 
 		/// 1.0f(Point1_X), 2.0f(Point2_Y), 0.0f(Point3_Z), 3.0f(Normal_X), 3.0f(Normal_Y), 3.0f(Normal_Z),  1.0f(Point1_X), 2.0f(Point2_Y), 0.0f(Point3_Z)
-		/// --> vertexStride is 6
+		/// --> vertexStride is 6 * 4(float)
 		/// </param>
 		/// <param name="modelToClipspaceMatrix"></param>
 		void BinTriangles(const float* vertices, const unsigned int* vertexIndices, size_t indiceCount, size_t vertexStrideByte, float* modelToClipspaceMatrix);
@@ -242,11 +219,11 @@ namespace culling
 		/// <param name="vertices"></param>
 		/// <param name="vertexIndices"></param>
 		/// <param name="indiceCount"></param>
-		/// <param name="vertexStride">
+		/// <param name="vertexStrideByte">
 		/// how far next vertex point is from current vertex point 
 		/// ex) 
 		/// 1.0f(Point1_X), 2.0f(Point2_Y), 0.0f(Point3_Z), 3.0f(Normal_X), 3.0f(Normal_Y), 3.0f(Normal_Z),  1.0f(Point1_X), 2.0f(Point2_Y), 0.0f(Point3_Z)
-		/// --> vertexStride is 6
+		/// --> vertexStride is 6 * 4(float)
 		/// </param>
 		/// <param name="modelToClipspaceMatrix"></param>
 		inline void DrawOccluderTriangles
