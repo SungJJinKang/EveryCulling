@@ -22,13 +22,14 @@ namespace culling
 		/// </summary>
 		/// <param name="coverageMask"></param>
 		/// <param name="triangle"></param>
-		M128I FillBottomFlatTriangle(CoverageMask& coverageMask, const Vector2& LeftBottomPoint, const Vector2& point1, const Vector2& point2, const Vector2& point3);
+		M256I FillBottomFlatTriangle(CoverageMask& coverageMask, const Vector2& LeftBottomPoint, const Vector2& point1, const Vector2& point2, const Vector2& point3);
+		
 		/// <summary>
 		/// Assume TwoDTriangle intersect with mask
 		/// </summary>
 		/// <param name="coverageMask"></param>
 		/// <param name="triangle"></param>
-		M128I FillTopFlatTriangle(CoverageMask& coverageMask, const Vector2& LeftBottomPoint, const Vector2& point1, const Vector2& point2, const Vector2& point3);
+		M256I FillTopFlatTriangle(CoverageMask& coverageMask, const Vector2& LeftBottomPoint, const Vector2& point1, const Vector2& point2, const Vector2& point3);
 		
 		
 

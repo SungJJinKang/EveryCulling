@@ -30,6 +30,7 @@ namespace culling
 		}
 
 		virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, unsigned int entityCountInBlock, unsigned int blockIndex, unsigned int cameraIndex) final;
+		char CheckInFrustumSIMDWithTwoPoint(const math::Vector<4, float>* eightPlanes, const math::Vector<4, float>* twoPoint);
 
 	public:
 		/// <summary>

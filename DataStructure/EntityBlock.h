@@ -78,7 +78,7 @@ namespace culling
 		// ......
 		// This variable should be aligned to 32 byte.
 		// because In Viewfrustum Culling CullJob VisibleFlag is stored per 32byte(128bit * 2)
-		char mIsVisibleBitflag[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		alignas(32) char mIsVisibleBitflag[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		
 		/// <summary>
 		/// mIsVisibleBitflag is stored through two __m128

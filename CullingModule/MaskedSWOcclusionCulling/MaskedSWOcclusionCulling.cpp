@@ -85,9 +85,9 @@ void culling::MaskedSWOcclusionCulling::TransformVertexsToClipSpace(
 		{
 			M256F tmpX, tmpY, tmpW;
 
-			tmpX = culling::M256F_MUL_AND_ADD(outClipVertexX[i], _mm_set1_ps(toClipspaceMatrix[0]), culling::M256F_MUL_AND_ADD(outClipVertexY[i], _mm_set1_ps(toClipspaceMatrix[4]), culling::M256F_MUL_AND_ADD(outClipVertexW[i], _mm_set1_ps(toClipspaceMatrix[8]), _mm_set1_ps(toClipspaceMatrix[12]))));
-			tmpY = culling::M256F_MUL_AND_ADD(outClipVertexX[i], _mm_set1_ps(toClipspaceMatrix[1]), culling::M256F_MUL_AND_ADD(outClipVertexY[i], _mm_set1_ps(toClipspaceMatrix[5]), culling::M256F_MUL_AND_ADD(outClipVertexW[i], _mm_set1_ps(toClipspaceMatrix[9]), _mm_set1_ps(toClipspaceMatrix[13]))));
-			tmpW = culling::M256F_MUL_AND_ADD(outClipVertexX[i], _mm_set1_ps(toClipspaceMatrix[3]), culling::M256F_MUL_AND_ADD(outClipVertexY[i], _mm_set1_ps(toClipspaceMatrix[7]), culling::M256F_MUL_AND_ADD(outClipVertexW[i], _mm_set1_ps(toClipspaceMatrix[11]), _mm_set1_ps(toClipspaceMatrix[15]))));
+			tmpX = culling::M256F_MUL_AND_ADD(outClipVertexX[i], _mm256_set1_ps(toClipspaceMatrix[0]), culling::M256F_MUL_AND_ADD(outClipVertexY[i], _mm256_set1_ps(toClipspaceMatrix[4]), culling::M256F_MUL_AND_ADD(outClipVertexW[i], _mm256_set1_ps(toClipspaceMatrix[8]), _mm256_set1_ps(toClipspaceMatrix[12]))));
+			tmpY = culling::M256F_MUL_AND_ADD(outClipVertexX[i], _mm256_set1_ps(toClipspaceMatrix[1]), culling::M256F_MUL_AND_ADD(outClipVertexY[i], _mm256_set1_ps(toClipspaceMatrix[5]), culling::M256F_MUL_AND_ADD(outClipVertexW[i], _mm256_set1_ps(toClipspaceMatrix[9]), _mm256_set1_ps(toClipspaceMatrix[13]))));
+			tmpW = culling::M256F_MUL_AND_ADD(outClipVertexX[i], _mm256_set1_ps(toClipspaceMatrix[3]), culling::M256F_MUL_AND_ADD(outClipVertexY[i], _mm256_set1_ps(toClipspaceMatrix[7]), culling::M256F_MUL_AND_ADD(outClipVertexW[i], _mm256_set1_ps(toClipspaceMatrix[11]), _mm256_set1_ps(toClipspaceMatrix[15]))));
 		
 			outClipVertexX[i] = tmpX;
 			outClipVertexY[i] = tmpY;
@@ -106,7 +106,7 @@ void culling::MaskedSWOcclusionCulling::GatherVertex(
 	assert(indiceCount % 3 == 0);
 	assert(currentIndiceIndex % 3 == 0);
 
-	//Gather 12 Point -> 4 Triangles
+	//8 Triangles
 	
 	size_t triangleIndex = 0;
 	for (

@@ -7,11 +7,11 @@ culling::SWDepthBuffer::SWDepthBuffer(unsigned int width, unsigned int height)
 	mResolution{
 	width, height,
 #if NDC_RANGE == MINUS_ONE_TO_POSITIVE_ONE
-	_mm_set_ps1(static_cast<float>(width * 0.5f)),
-	_mm_set_ps1(static_cast<float>(height * 0.5f))
+	_mm256_set1_ps(static_cast<float>(width * 0.5f)),
+	_mm256_set1_ps(static_cast<float>(height * 0.5f))
 #elif NDC_RANGE == ZERO_TO_POSITIVE_ONE
-	_mm_set_ps1(static_cast<float>(width)),
-	_mm_set_ps1(static_cast<float>(height))
+	_mm256_set1_ps(static_cast<float>(width)),
+	_mm256_set1_ps(static_cast<float>(height))
 #endif
 	},
 	mBinCountInRow{ width / SUB_TILE_WIDTH }, mBinCountInColumn{ height / SUB_TILE_HEIGHT }, mSubTileCount{ width / SUB_TILE_WIDTH * height / SUB_TILE_HEIGHT }
