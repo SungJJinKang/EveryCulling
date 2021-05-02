@@ -1,5 +1,6 @@
 #pragma once
 
+/*
 #include "../../../FrotbiteCullingSystemCore.h"
 
 #include <Vector2.h>
@@ -40,7 +41,7 @@ namespace culling
 		{
 			return (edgePoint1.x - p.x) * (edgePoint2.y - p.y) - (edgePoint2.x - p.x) * (edgePoint1.y - p.y);
 		}
-		*/
+		
 		
 
 		static void FillTriangle(const SWDepthBuffer& frameBuffer, const TwoDTriangle& triangle)
@@ -64,16 +65,6 @@ namespace culling
 					auto t = PerpDot(triangle.Point1.x, triangle.Point2.x, y - triangle.Point1.y, triangle.Point2.y) / PerpDot(triangle.Point1, triangle.Point2);
 
 				
-					/*
-					int p1 = PerpDot(triangle.Point1.x, triangle.Point1.y, triangle.Point2.x, triangle.Point2.y, x, y);
-					int p2 = PerpDot(triangle.Point2.x, triangle.Point2.y, triangle.Point3.x, triangle.Point3.y, x, y);
-					int p3 = PerpDot(triangle.Point3.x, triangle.Point3.y, triangle.Point1.x, triangle.Point1.y, x, y);
-				
-					if (p1 >= 0 && p2 >= 0 && p3 >= 0) // Can I Use SIMD at here? Check 4 Integer equal or larger than 0
-					{
-						frameBuffer.mPixels[x + y * frameBuffer.mWidth] = 1.0f;
-					}
-					*/
 				}
 			}
 
@@ -81,3 +72,4 @@ namespace culling
 	};
 }
 
+*/

@@ -8,25 +8,19 @@
 namespace culling
 {
 	
-	// TODO : 28 Byte is wasted per HizData because of memory alignment
-	// This is really really huge!!!
-	// But for prevent false sharing, We should do this
-	// 
-	// If A Thread write to continuous 14 HizData, We will waste just 
-
 	/// <summary>
 	/// 
-	/// One 16 * 8 Tile is composed of 4 Subtile(8 * 4)
+	/// One 32 * 8 Tile is composed of 8 Subtile(8 * 4)
 	/// 
-	/// 8 * 4 SubTile Of 16 * 8 DepthBufferTile
+	/// 8 * 4 SubTile Of 32 * 8 DepthBufferTile
 	/// </summary>
 	struct alignas(64) HizData
 	{
 		/// <summary>
-		/// = SubTile Count ( 4 )
+		/// 8 floating-point = SubTile Count ( 8 )
 		/// </summary>
-		M128F z0Max;
-		M128F z1Max;
+		M256F z0Max;
+		M256F z1Max;
 
 		/// <summary>
 		/// Bitmask
@@ -57,11 +51,11 @@ namespace culling
 		const unsigned int mHeight;
 
 #if NDC_RANGE == MINUS_ONE_TO_POSITIVE_ONE
-		M128F mReplicatedScreenHalfWidth;
-		M128F mReplicatedScreenHalfHeight;
+		M256F mReplicatedScreenHalfWidth;
+		M256F mReplicatedScreenHalfHeight;
 #elif NDC_RANGE == ZERO_TO_POSITIVE_ONE
-		M128F mReplicatedScreenWidth;
-		M128F mReplicatedScreenHeight;
+		M256F mReplicatedScreenWidth;
+		M256F mReplicatedScreenHeight;
 #endif
 		
 	};

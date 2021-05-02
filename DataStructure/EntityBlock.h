@@ -43,7 +43,7 @@ namespace culling
 		/// <summary>
 		/// EntityBlock size should be less 4KB(Page size) for Block data being allocated in a page
 		/// </summary>
-	struct alignas(64) EntityBlock
+	struct EntityBlock
 	{
 		//SoA (Structure of Array) !!!!!! for performance 
 
@@ -55,7 +55,7 @@ namespace culling
 		/// 
 		/// IMPORTANT : you should pass nagative value of radius!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		/// </summary>
-		alignas(32) math::Vector4 mPositions[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		math::Vector4 mPositions[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 #ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
 		/// <summary>
@@ -77,8 +77,16 @@ namespace culling
 		// second low bit have Is Visible from Second Camera
 		// ......
 		// This variable should be aligned to 32 byte.
-		// because In Viewfrustum Culling CullJob VisibleFlag is stored per 32byte
-		alignas(32) char mIsVisibleBitflag[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		// because In Viewfrustum Culling CullJob VisibleFlag is stored per 32byte(128bit * 2)
+		char mIsVisibleBitflag[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		
+		/// <summary>
+		/// mIsVisibleBitflag is stored through two __m128
+		/// 
+		/// So if this variable isn't aligned to 256bit,
+		/// To prevent that sttoring mIsVisibleBitflag code set value to this variable
+		/// 
+		/// </summary>
 		alignas(32) void* mRenderer[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		EntityHandle mHandles[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		//TransformData mTransformDatas[ENTITY_COUNT_IN_ENTITY_BLOCK];

@@ -46,7 +46,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //Masked SW Occlusion Culling
-#define TILE_WIDTH 16
+#define TILE_WIDTH 32
 #define TILE_HEIGHT 8
 #define SUB_TILE_WIDTH 8
 #define SUB_TILE_HEIGHT 4

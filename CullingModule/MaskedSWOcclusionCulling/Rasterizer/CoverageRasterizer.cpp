@@ -82,7 +82,7 @@ M128I culling::CoverageRasterizer::FillTopFlatTriangle(CoverageMask& coverageMas
 /// <param name="triangle"></param>
 void culling::CoverageRasterizer::FillTriangle(CoverageMask& coverageMask, Vector2 LeftBottomPoint, TwoDTriangle& triangle)
 {
-    this->SortTriangle(triangle);
+    SortTriangle(triangle);
 
     if (triangle.Point2.y == triangle.Point3.y)
     {

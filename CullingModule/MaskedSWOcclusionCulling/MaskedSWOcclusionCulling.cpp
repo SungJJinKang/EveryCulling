@@ -1,7 +1,6 @@
 #include "MaskedSWOcclusionCulling.h"
 
 
-
 culling::MaskedSWOcclusionCulling::MaskedSWOcclusionCulling(unsigned int width, unsigned int height, float nearClipPlaneDis, float farClipPlaneDis, float* viewProjectionMatrix)
 	: mDepthBuffer{ width, height }, 
 	mNearClipPlaneDis{ nearClipPlaneDis }, mFarClipPlaneDis{ farClipPlaneDis }, mViewProjectionMatrix{ viewProjectionMatrix }
@@ -20,35 +19,42 @@ void culling::MaskedSWOcclusionCulling::SetViewProjectionMatrix(float* viewProje
 }
 
 
-void culling::MaskedSWOcclusionCulling::ConverClipSpaceToNDCSpace(M128F* outClipVertexX, M128F* outClipVertexY, const M128F* oneDividedByW, unsigned int& triangleMask)
+void culling::MaskedSWOcclusionCulling::ConverClipSpaceToNDCSpace(
+	M256F* outClipVertexX, M256F* outClipVertexY, const M256F* oneDividedByW, 
+	int & triangleMask
+)
 {
 	for (size_t i = 0; i < 3; i++)
 	{
 		//Why Do This??
 		//compute 1/w in advance 
 		
-		outClipVertexX[i] = M128F_MUL(outClipVertexX[i], oneDividedByW[i]);
-		outClipVertexY[i] = M128F_MUL(outClipVertexY[i], oneDividedByW[i]);
+		outClipVertexX[i] = culling::M256F_MUL(outClipVertexX[i], oneDividedByW[i]);
+		outClipVertexY[i] = culling::M256F_MUL(outClipVertexY[i], oneDividedByW[i]);
 
 		//This code is useless
-		//outClipVertexW[i] = M128F_MUL(outClipVertexW[i], outClipVertexW[i]);
+		//outClipVertexW[i] = culling::M256F_MUL(outClipVertexW[i], outClipVertexW[i]);
 	}
 	
 }
 
-void culling::MaskedSWOcclusionCulling::ConvertNDCSpaceToScreenPixelSpace(const M128F* ndcSpaceVertexX, const M128F* ndcSpaceVertexY, M128F* outScreenPixelSpaceX, M128F* outScreenPixelSpaceY, unsigned int& triangleMask)
+void culling::MaskedSWOcclusionCulling::ConvertNDCSpaceToScreenPixelSpace(
+	const M256F* ndcSpaceVertexX, const M256F* ndcSpaceVertexY, 
+	M256F* outScreenPixelSpaceX, M256F* outScreenPixelSpaceY, 
+	int & triangleMask
+)
 {
 	for (size_t i = 0; i < 3; i++)
 	{
-		M128F tmpScreenSpaceX, tmpScreenSpaceY;
+		M256F tmpScreenSpaceX, tmpScreenSpaceY;
 
 		//Convert NDC Space Coordinates To Screen Space Coordinates 
 #if NDC_RANGE == MINUS_ONE_TO_POSITIVE_ONE
-		tmpScreenSpaceX = M128F_MUL_AND_ADD(ndcSpaceVertexX[i], this->mDepthBuffer.mResolution.mReplicatedScreenHalfWidth, this->mDepthBuffer.mResolution.mReplicatedScreenHalfWidth);
-		tmpScreenSpaceY = M128F_MUL_AND_ADD(ndcSpaceVertexY[i], this->mDepthBuffer.mResolution.mReplicatedScreenHalfHeight, this->mDepthBuffer.mResolution.mReplicatedScreenHalfHeight);
+		tmpScreenSpaceX = culling::M256F_MUL_AND_ADD(ndcSpaceVertexX[i], this->mDepthBuffer.mResolution.mReplicatedScreenHalfWidth, this->mDepthBuffer.mResolution.mReplicatedScreenHalfWidth);
+		tmpScreenSpaceY = culling::M256F_MUL_AND_ADD(ndcSpaceVertexY[i], this->mDepthBuffer.mResolution.mReplicatedScreenHalfHeight, this->mDepthBuffer.mResolution.mReplicatedScreenHalfHeight);
 #elif NDC_RANGE == ZERO_TO_POSITIVE_ONE
-		tmpScreenSpaceX = M128F_MUL(ndcSpaceVertexX[i], this->mDepthBuffer.mResolution.mReplicatedScreenWidth);
-		tmpScreenSpaceY = M128F_MUL(ndcSpaceVertexY[i], this->mDepthBuffer.mResolution.mReplicatedScreenHeight);
+		tmpScreenSpaceX = culling::M256F_MUL(ndcSpaceVertexX[i], this->mDepthBuffer.mResolution.mReplicatedScreenWidth);
+		tmpScreenSpaceY = culling::M256F_MUL(ndcSpaceVertexY[i], this->mDepthBuffer.mResolution.mReplicatedScreenHeight);
 #else 
 		assert(0); //NEVER HAPPEN
 #endif
@@ -58,15 +64,17 @@ void culling::MaskedSWOcclusionCulling::ConvertNDCSpaceToScreenPixelSpace(const 
 		// The rounding modes are set to match HW rasterization with OpenGL. In practice our samples are placed
 		// in the (1,0) corner of each pixel, while HW rasterizer uses (0.5, 0.5). We get (1,0) because of the 
 		// floor used when interpolating along triangle edges. The rounding modes match an offset of (0.5, -0.5)
-		outScreenPixelSpaceX[i] = _mm_ceil_ps(tmpScreenSpaceX);
-		outScreenPixelSpaceY[i] = _mm_floor_ps(tmpScreenSpaceY);
+		outScreenPixelSpaceX[i] = _mm256_ceil_ps(tmpScreenSpaceX);
+		outScreenPixelSpaceY[i] = _mm256_floor_ps(tmpScreenSpaceY);
 		
 
 	}
 
 }
 
-void culling::MaskedSWOcclusionCulling::TransformVertexsToClipSpace(M128F* outClipVertexX, M128F* outClipVertexY, M128F* outClipVertexW, const float* toClipspaceMatrix, unsigned int& triangleMask)
+void culling::MaskedSWOcclusionCulling::TransformVertexsToClipSpace(
+	M256F* outClipVertexX, M256F* outClipVertexY, M256F* outClipVertexW, 
+	const float* toClipspaceMatrix, int & triangleMask)
 {
 	if (toClipspaceMatrix != nullptr)
 	{
@@ -75,11 +83,11 @@ void culling::MaskedSWOcclusionCulling::TransformVertexsToClipSpace(M128F* outCl
 		//TODO : Consider Trimask
 		for (size_t i = 0; i < 3; ++i)
 		{
-			M128F tmpX, tmpY, tmpW;
+			M256F tmpX, tmpY, tmpW;
 
-			tmpX = M128F_MUL_AND_ADD(outClipVertexX[i], _mm_set1_ps(toClipspaceMatrix[0]), M128F_MUL_AND_ADD(outClipVertexY[i], _mm_set1_ps(toClipspaceMatrix[4]), M128F_MUL_AND_ADD(outClipVertexW[i], _mm_set1_ps(toClipspaceMatrix[8]), _mm_set1_ps(toClipspaceMatrix[12]))));
-			tmpY = M128F_MUL_AND_ADD(outClipVertexX[i], _mm_set1_ps(toClipspaceMatrix[1]), M128F_MUL_AND_ADD(outClipVertexY[i], _mm_set1_ps(toClipspaceMatrix[5]), M128F_MUL_AND_ADD(outClipVertexW[i], _mm_set1_ps(toClipspaceMatrix[9]), _mm_set1_ps(toClipspaceMatrix[13]))));
-			tmpW = M128F_MUL_AND_ADD(outClipVertexX[i], _mm_set1_ps(toClipspaceMatrix[3]), M128F_MUL_AND_ADD(outClipVertexY[i], _mm_set1_ps(toClipspaceMatrix[7]), M128F_MUL_AND_ADD(outClipVertexW[i], _mm_set1_ps(toClipspaceMatrix[11]), _mm_set1_ps(toClipspaceMatrix[15]))));
+			tmpX = culling::M256F_MUL_AND_ADD(outClipVertexX[i], _mm_set1_ps(toClipspaceMatrix[0]), culling::M256F_MUL_AND_ADD(outClipVertexY[i], _mm_set1_ps(toClipspaceMatrix[4]), culling::M256F_MUL_AND_ADD(outClipVertexW[i], _mm_set1_ps(toClipspaceMatrix[8]), _mm_set1_ps(toClipspaceMatrix[12]))));
+			tmpY = culling::M256F_MUL_AND_ADD(outClipVertexX[i], _mm_set1_ps(toClipspaceMatrix[1]), culling::M256F_MUL_AND_ADD(outClipVertexY[i], _mm_set1_ps(toClipspaceMatrix[5]), culling::M256F_MUL_AND_ADD(outClipVertexW[i], _mm_set1_ps(toClipspaceMatrix[9]), _mm_set1_ps(toClipspaceMatrix[13]))));
+			tmpW = culling::M256F_MUL_AND_ADD(outClipVertexX[i], _mm_set1_ps(toClipspaceMatrix[3]), culling::M256F_MUL_AND_ADD(outClipVertexY[i], _mm_set1_ps(toClipspaceMatrix[7]), culling::M256F_MUL_AND_ADD(outClipVertexW[i], _mm_set1_ps(toClipspaceMatrix[11]), _mm_set1_ps(toClipspaceMatrix[15]))));
 		
 			outClipVertexX[i] = tmpX;
 			outClipVertexY[i] = tmpY;
@@ -89,25 +97,11 @@ void culling::MaskedSWOcclusionCulling::TransformVertexsToClipSpace(M128F* outCl
 	}
 }
 
-void culling::MaskedSWOcclusionCulling::SortTriangle(TwoDTriangle& triangle)
-{
-	if (triangle.Point1.y < triangle.Point2.y)
-	{
-		std::swap(triangle.Point1, triangle.Point2);
-	}
-	if (triangle.Point1.y < triangle.Point3.y)
-	{
-		std::swap(triangle.Point1, triangle.Point3);
-	}
-	if (triangle.Point2.y < triangle.Point3.y)
-	{
-		std::swap(triangle.Point2, triangle.Point3);
-	}
-}
+
 
 void culling::MaskedSWOcclusionCulling::GatherVertex(
 	const Vector3* vertices, const unsigned int* vertexIndices, const size_t indiceCount, const size_t currentIndiceIndex, 
-	M128F* outVerticesX, M128F* outVerticesY, unsigned int& triangleMask)
+	M256F* outVerticesX, M256F* outVerticesY, int & triangleMask)
 {
 	assert(indiceCount % 3 == 0);
 	assert(currentIndiceIndex % 3 == 0);
@@ -141,23 +135,23 @@ void culling::MaskedSWOcclusionCulling::BinTriangles(const Vector3* vertices, co
 {
 
 	size_t currentIndiceIndex = 0;
-	unsigned int triangleCountPerLoop = 4;
+	unsigned int triangleCountPerLoop = 8;
 
 	while (currentIndiceIndex < indiceCount)
 	{
 		// First 4 bits show if traingle is valid
-		// Current Value : 00000000 00000000 00000000 00001111
-		unsigned int triMask = (1 << triangleCountPerLoop) - 1;
+		// Current Value : 00000000 00000000 00000000 11111111
+		int triMask = (1 << triangleCountPerLoop) - 1;
 
 		//Why Size of array is 3?
-		//A M128F can have 4 floating-point
+		//A M256F can have 8 floating-point
 		//A TwoDTriangle have 3 point
-		//So If you have just one M128F variable, a floating-point is unused.
+		//So If you have just one M256F variable, a floating-point is unused.
 		//Not to make unused space, 12 floating point is required per axis
-		// M128F * 3 -> 12 floating-point -> 4 TwoDTriangle with no unused space
+		// M256F * 3 -> 8 TwoDTriangle with no unused space
 
 		//We don't need z value at Binning stage
-		M128F ndcSpaceVertexX[3], ndcSpaceVertexY[3], oneDividedByW[3];
+		M256F ndcSpaceVertexX[3], ndcSpaceVertexY[3], oneDividedByW[3];
 		
 
 		//Gather Vertex with indice
@@ -176,7 +170,7 @@ void culling::MaskedSWOcclusionCulling::BinTriangles(const Vector3* vertices, co
 		for (size_t i = 0; i < 3; i++)
 		{
 			//oneDividedByW finally become oneDividedByW
-			oneDividedByW[i] = M128F_DIV(_mm_set1_ps(1.0f), oneDividedByW[i]);
+			oneDividedByW[i] = culling::M256F_DIV(_mm256_set1_ps(1.0f), oneDividedByW[i]);
 		}
 		
 		//WE ARRIVE AT NDC SPACE COORDINATE. 
@@ -185,25 +179,28 @@ void culling::MaskedSWOcclusionCulling::BinTriangles(const Vector3* vertices, co
 		//W BECOME USELESS, IGNORE IT
 		this->ConverClipSpaceToNDCSpace(ndcSpaceVertexX, ndcSpaceVertexY, oneDividedByW, triMask);
 
-		M128F screenPixelPosX[3], screenPixelPosY[3];
+		M256F screenPixelPosX[3], screenPixelPosY[3];
 		this->ConvertNDCSpaceToScreenPixelSpace(ndcSpaceVertexX, ndcSpaceVertexY, screenPixelPosX, screenPixelPosY, triMask);
 		//Clip Space Cull
 		
 		//BackFace Cull
 		// 
-		//TODO : I don't now How this Works.........
-		M128F triArea1 = M128F_MUL(M128F_SUB(screenPixelPosX[1], screenPixelPosX[0]), M128F_SUB(screenPixelPosY[2], screenPixelPosY[0]));
-		M128F triArea2 = M128F_MUL(M128F_SUB(screenPixelPosX[0], screenPixelPosX[2]), M128F_SUB(screenPixelPosY[0], screenPixelPosY[1]));
-		M128F triArea = M128F_SUB(triArea1, triArea2);
-		M128F ccwMask = _mm_cmpgt_ps(triArea, _mm_set1_ps(0.0f));
-		//
+		//I don't know How this Works.........
+		//https://stackoverflow.com/questions/67357115/i-found-back-face-culling-code-but-i-cant-know-how-this-works
+		M256F triArea1 = culling::M256F_MUL(culling::M256F_SUB(screenPixelPosX[1], screenPixelPosX[0]), culling::M256F_SUB(screenPixelPosY[2], screenPixelPosY[0]));
+		M256F triArea2 = culling::M256F_MUL(culling::M256F_SUB(screenPixelPosX[0], screenPixelPosX[2]), culling::M256F_SUB(screenPixelPosY[0], screenPixelPosY[1]));
+		M256F triArea = culling::M256F_SUB(triArea1, triArea2); 
+
+		//_CMP_GT_OQ vs _CMP_GT_OQ : https://stackoverflow.com/questions/16988199/how-to-choose-avx-compare-predicate-variants
+		M256F ccwMask = _mm256_cmp_ps(triArea, _mm256_set1_ps(0.0f), _CMP_GT_OQ);
+		
 		
 		//this->CullBackfaces(screenPixelPosX, screenPixelPosY, oneDividedByW, ccwMask, bfWinding);
 		
 		//Set each bit of mask dst based on the most significant bit of the corresponding packed single-precision (32-bit) floating-point element in a.
 		//https://software.intel.com/sites/landingpage/IntrinsicsGuide/#techs=SSE,SSE2,SSE3,SSSE3,SSE4_1,SSE4_2,AVX&expand=2156,4979,4979,1731,4929,951,4979,3869&text=movemask
 		//if second triangle is front facing, low second bit of triMask is 1
-		triMask = _mm_movemask_ps(ccwMask);
+		triMask = _mm256_movemask_ps(ccwMask);
 
 		if (triMask == 0x0)
 		{

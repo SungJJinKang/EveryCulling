@@ -1,8 +1,7 @@
 #pragma once
 
+#include <algorithm>
 #include <vector>
-
-#include <Vector2.h>
 
 namespace culling
 {
@@ -41,4 +40,25 @@ namespace culling
 		size_t mCurrentTriangleIndex;
 		TwoDTriangle* mTriangleList;
 	};
+
+	/// <summary>
+	/// Sort TwoDTriangle Points y ascending.
+	/// Point1 is TopMost Vector2
+	/// </summary>
+	/// <param name="triangle"></param>
+	inline void SortTriangle(TwoDTriangle& triangle)
+	{
+		if (triangle.Point1.y < triangle.Point2.y)
+		{
+			std::swap(triangle.Point1, triangle.Point2);
+		}
+		if (triangle.Point1.y < triangle.Point3.y)
+		{
+			std::swap(triangle.Point1, triangle.Point3);
+		}
+		if (triangle.Point2.y < triangle.Point3.y)
+		{
+			std::swap(triangle.Point2, triangle.Point3);
+		}
+	}
 }

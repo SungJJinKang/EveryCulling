@@ -7,6 +7,8 @@
 #include "../../DataStructure/AABB.h"
 #include "SWDepthBuffer.h"
 
+#include "SIMD_Core.h"
+
 namespace culling
 {
 	/// <summary>
@@ -38,7 +40,10 @@ namespace culling
 		/// <param name="outClipVertexY"></param>
 		/// <param name="outClipVertexZ"></param>
 		/// <param name="outClipVertexW"></param>
-		void ConverClipSpaceToNDCSpace(M128F* outClipVertexX, M128F* outClipVertexY, const M128F* oneDividedByW, unsigned int& triangleMask);
+		void ConverClipSpaceToNDCSpace(
+			M256F* outClipVertexX, M256F* outClipVertexY,
+ const M256F* oneDividedByW, int & triangleMask
+		);
 		
 		/// <summary>
 		/// Convert NDC Space X,Y To Screen Space X,Y according to Graphics API
@@ -51,28 +56,27 @@ namespace culling
 		/// <param name="triangleMask"></param>
 		/// <param name="outScreenPixelSpaceX"></param>
 		/// <param name="outScreenPixelSpaceY"></param>
-		void ConvertNDCSpaceToScreenPixelSpace(const M128F* ndcSpaceVertexX, const M128F* ndcSpaceVertexY, M128F* outScreenPixelSpaceX, M128F* outScreenPixelSpaceY, unsigned int& triangleMask);
+		void ConvertNDCSpaceToScreenPixelSpace(
+			const M256F* ndcSpaceVertexX, const M256F* ndcSpaceVertexY,
+ 
+			M256F* outScreenPixelSpaceX,
+ M256F* outScreenPixelSpaceY, int & triangleMask
+		);
 
 		/// <summary>
 		/// Convert 4 TriangSles's Model Vertex to ClipSpace
 		/// </summary>
-		/// <param name="vertX">three M128F -> 12 floating-point value</param>
-		/// <param name="vertY">three M128F -> 12 floating-point value</param>
-		/// <param name="vertW">"W" !!!!!!!!! three M128F -> 12 floating-point value</param>
+		/// <param name="vertX">three M256F -> 12 floating-point value</param>
+		/// <param name="vertY">three M256F -> 12 floating-point value</param>
+		/// <param name="vertW">"W" !!!!!!!!! three M256F -> 12 floating-point value</param>
 		/// <param name="modelToClipspaceMatrix">column major 4x4 matrix</param>
 		void TransformVertexsToClipSpace(
-			M128F* outClipVertexX, M128F* outClipVertexY,
- M128F* outClipVertexW,
+			M256F* outClipVertexX, M256F* outClipVertexY,
+ M256F* outClipVertexW,
+			const float* toClipspaceMatrix, int & triangleMask
+		);
 
- const float* toClipspaceMatrix, 
-			unsigned int& triangleMask);
-
-		/// <summary>
-		/// Sort TwoDTriangle Points y ascending.
-		/// Point1 is TopMost Vector2
-		/// </summary>
-		/// <param name="triangle"></param>
-		void SortTriangle(TwoDTriangle& triangle);
+	
 
 		inline float GetAreaOfTriangle(const TwoDTriangle& triangle)
 		{
@@ -100,11 +104,13 @@ namespace culling
 		/// second float of outVerticesX[2] have Triangle2's Point3 X
 		/// </summary>
 		void GatherVertex(
-			const Vector3* vertices, const unsigned int* vertexIndices, const size_t indiceCount, const size_t currentIndiceIndex, 
-			M128F* outVerticesX, M128F* outVerticesY, unsigned int& triangleMask//, unsigned int* triMask
+			const Vector3* vertices, const unsigned int* vertexIndices, const size_t indiceCount,
+ const size_t currentIndiceIndex, 
+			M256F* outVerticesX, M256F* outVerticesY, int & triangleMask//, unsigned int* triMask
 		);
 
-		int CullBackfaces(M128F* pVtxX, M128F* pVtxY, M128F* pVtxZ, const M128F& ccwMask, BackfaceWinding bfWinding)
+		/*
+		int CullBackfaces(M256F* pVtxX, M256F* pVtxY, M256F* pVtxZ, const M256F& ccwMask, BackfaceWinding bfWinding)
 		{
 			// Reverse vertex order if non cw faces are considered front facing (rasterizer code requires CCW order)
 			if (!(bfWinding & BACKFACE_CW))
@@ -124,7 +130,7 @@ namespace culling
 			// Return a lane mask with all front faces set
 			return ((bfWinding & BACKFACE_CCW) ? 0 : _mmw_movemask_ps(ccwMask)) | ((bfWinding & BACKFACE_CW) ? 0 : ~_mmw_movemask_ps(ccwMask));
 		}
-
+		*/
 		/// <summary>
 		/// Bin Triangles
 		/// </summary>
@@ -190,7 +196,7 @@ namespace culling
 		// Occludee Depth Test
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		M128F ComputeMinimumDepths(const M128F* worldAABBVertX, const M128F* worldAABBVertY, const M128F* worldAABBVertZ)
+		M256F ComputeMinimumDepths(const M256F* worldAABBVertX, const M256F* worldAABBVertY, const M256F* worldAABBVertZ)
 		{
 			//mViewProjectionMatrix
 		}
@@ -237,9 +243,9 @@ namespace culling
 			//And Just Compare this minimum depth with Max depth of Tiles
 			//Dont Try drawing triangles of AABB, Just Compute MinDepth of AABB
 
-			M128F aabbVertexX[3];
-			M128F aabbVertexY[3];
-			M128F aabbVertexZ[3];
+			M256F aabbVertexX[3];
+			M256F aabbVertexY[3];
+			M256F aabbVertexZ[3];
 
 			// 3 AABB is checked per loop
 			for (size_t i = 0; i < aabbCount; i += 3)

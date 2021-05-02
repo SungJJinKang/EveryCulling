@@ -14,12 +14,13 @@ I think this will be much faster than plain occlusion culling, So I will impleme
 #### Currently Supported
 - View Frustum Culling using SIMD
 - Screen Space AABB Area Culling ( Project Entity's AABB bount to Screen Space, if Aread of Projected AABB is less than setting, Cull it )
+- Support AVX2
 
 #### In Develop
 - Masked SW Occlusion Culling ( https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf )
 - Distance Culling ( https://docs.unrealengine.com/en-US/RenderingAndGraphics/VisibilityCulling/CullDistanceVolume/index.html )  
 - Precomputed Visibility Volume ( https://docs.unrealengine.com/en-US/RenderingAndGraphics/VisibilityCulling/PrecomputedVisibilityVolume/index.html )
-- Support AVX2, AVX512
+- Support AVX512
 
 ## View Frustum Culling using SIMD, Multithreading
 
