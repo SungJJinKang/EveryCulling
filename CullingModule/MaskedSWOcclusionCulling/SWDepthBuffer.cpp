@@ -13,12 +13,37 @@ culling::SWDepthBuffer::SWDepthBuffer(unsigned int width, unsigned int height)
 	_mm256_set1_ps(static_cast<float>(width)),
 	_mm256_set1_ps(static_cast<float>(height))
 #endif
-	},
-	mBinCountInRow{ width / SUB_TILE_WIDTH }, mBinCountInColumn{ height / SUB_TILE_HEIGHT }, mSubTileCount{ width / SUB_TILE_WIDTH * height / SUB_TILE_HEIGHT }
+	}
 {
-	assert(mResolution.mWidth% SUB_TILE_WIDTH == 0, "DepthBuffer's size should be multiple of DEPTH_BUFFER_TITL_WIDTH");
-	assert(mResolution.mHeight% SUB_TILE_HEIGHT == 0, "DepthBuffer's size should be multiple of DEPTH_BUFFER_TITL_HEIGHT");
+	assert(this->mResolution.mWidth % TILE_WIDTH == 0, "DepthBuffer's size should be multiple of TILE_WIDTH");
+	assert(this->mResolution.mHeight % TILE_HEIGHT == 0, "DepthBuffer's size should be multiple of TILE_HEIGHT");
 
-	this->mSubTiles.mHizDatas = new HizData[static_cast<size_t>(mSubTileCount)];
-	//this->mSubTiles.mTriangleBins = std::aligned_alloc(64, sizeof(TileBin) * mSubTileCount);
+	//assert(mResolution.mWidth% SUB_TILE_WIDTH == 0, "DepthBuffer's size should be multiple of DEPTH_BUFFER_TITL_WIDTH");
+	//assert(mResolution.mHeight% SUB_TILE_HEIGHT == 0, "DepthBuffer's size should be multiple of DEPTH_BUFFER_TITL_HEIGHT");
+	
+	const size_t tileCountInARow = this->mResolution.mWidth / TILE_WIDTH;
+	const size_t tileCountInAColumn = this->mResolution.mHeight / TILE_HEIGHT;
+
+	// TODO : change to Aligned dynamic allocation ( aligned malloc ) 
+	// In current, Tile struct is allocated contiguously, It incur False Sharing!!!!!!!!! 
+	this->mTiles = new Tile[tileCountInARow * tileCountInAColumn];
 }
+
+culling::SWDepthBuffer::~SWDepthBuffer()
+{
+	// TODO : change to Aligned dynamic deallocation
+	delete[] this->mTiles;
+}
+
+/*
+void culling::InitializeTriangleBin(TileBin& triangleBin)
+{
+	for (size_t y = 0; y < TILE_HEIGHT; y++)
+	{
+		for (size_t x = 0; x < TILE_WIDTH; x++)
+		{
+			triangleBin.mBinnedTriangleList[x][y].mTriangleList = std::unique_ptr<TwoDTriangle[]>(new TwoDTriangle[BIN_TRIANGLE_CAPACITY_PER_TILE]);
+		}
+	}
+}
+*/

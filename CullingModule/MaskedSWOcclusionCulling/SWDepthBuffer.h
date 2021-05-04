@@ -2,6 +2,8 @@
 
 #include "../../FrotbiteCullingSystemCore.h"
 
+#include <memory>
+
 #include "../../SIMD_Core.h"
 #include "Triangle.h"
 
@@ -9,70 +11,78 @@ namespace culling
 {
 	
 	/// <summary>
-	/// 
-	/// One 32 * 8 Tile is composed of 8 Subtile(8 * 4)
-	/// 
-	/// 8 * 4 SubTile Of 32 * 8 DepthBufferTile
+	/// Hierarchical depth for a Tile ( 32 X 8 )
 	/// </summary>
-	struct alignas(64) HizData
+	struct HizData
 	{
 		/// <summary>
+		/// Depth value of subtiles
 		/// 8 floating-point = SubTile Count ( 8 )
+		/// 
+		/// A floating-point value represent Z0 Max DepthValue of A Subtile
+		/// 
 		/// </summary>
 		M256F z0Max;
+
+		/// <summary>
+		/// Depth value of subtiles
+		/// 8 floating-point = SubTile Count ( 8 )
+		/// 
+		/// A floating-point value represent Z0 Max DepthValue of A Subtile
+		/// 
+		/// </summary>
 		M256F z1Max;
 
 		/// <summary>
-		/// Bitmask
-		/// Posion where depth value came from
-		/// if second bit is 1, Depth value came from second pixel of subtile
+		/// Posion where Current Z1 Depth MaxValue come from
+		/// 
+		/// 4 byte * 8 byte
+		/// 
+		/// 4 byte -> 32 bit * 4 -> ( 32 = 8 X 4 = SubTile PixelCount )
+		/// if first bit is 1, (0, 0) in subtile is position where Current Z1 Depth MaxValue come from
+		/// 
+		/// 8 byte -> Subtile Count in A Tile
+		/// 
 		/// </summary>
-		unsigned int depthPosition;
+		M256I depthPosition;
 	};
 	
 	/// <summary>
-	/// TriangleList
+	/// TriangleList, Bin
 	/// 
 	/// TwoDTriangle should be reserved after initialized!!!!
 	/// </summary>
 	struct TriangleList
 	{
-		const size_t mMaxTriangleCount = MAX_TRIANGLE_COUNT_PER_TILE;
-		size_t mCurrentTriangleIndex = 0;
 		/// <summary>
-		/// Screen Pixel Space Triangles
-		/// 
-		/// Dont' use std::unique_ptr
+		/// Binned screen sixel space Triangles
 		/// </summary>
-		TwoDTriangle* mTriangleList;
+		TwoDTriangle mTriangleList[BIN_TRIANGLE_CAPACITY_PER_TILE];
+
+		size_t mCurrentTriangleCount = 0;
 	};
 
+	/*
 	struct TileBin
 	{
 		TriangleList mBinnedTriangleList[TILE_WIDTH][TILE_HEIGHT];
 	};
+	*/
 
-	void InitializeTriangleBin(TileBin& triangleBin)
-	{
-		for (size_t y = 0; y < TILE_HEIGHT; y++)
-		{
-			for (size_t x = 0; x < TILE_WIDTH; x++)
-			{
-				//triangleBin.mBinnedTriangleList[x][y].mTriangleList = std::make_uniqe
-			}
-		}
-	}
+	//void InitializeTriangleBin(TileBin& triangleBin);
 
 	/// <summary>
-	/// AOS
+	/// 32 X 8 Tile
+	/// 
+	/// alignas(64) is for preventing false sharing
 	/// </summary>
-	struct SubTile
+	struct alignas(64) Tile
 	{
-		HizData* mHizDatas;
-		TileBin* mTriangleBins;
+		HizData mHizDatas;
+		TriangleList mBinnedTriangles;
 	};
 
-	struct alignas(64) Resolution
+	struct Resolution
 	{
 		const unsigned int mWidth;
 		const unsigned int mHeight;
@@ -96,11 +106,10 @@ namespace culling
 
 		const Resolution mResolution;
 
-		const unsigned int mBinCountInRow;
-		const unsigned int mBinCountInColumn;
-		const unsigned int mSubTileCount;
-
-		SubTile mSubTiles;
+		/// <summary>
+		/// 32 X 8 Tiles
+		/// </summary>
+		Tile* mTiles;
 
 		/// <summary>
 		/// 
@@ -108,5 +117,6 @@ namespace culling
 		/// <param name="width">Screen Width</param>
 		/// <param name="height">Scree Height</param>
 		SWDepthBuffer(unsigned int width, unsigned int height);
+		~SWDepthBuffer();
 	};
 }

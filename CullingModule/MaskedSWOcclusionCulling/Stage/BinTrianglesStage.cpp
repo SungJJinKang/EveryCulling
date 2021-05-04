@@ -259,3 +259,4 @@ void culling::BinTrianglesStage::BinTriangles(
 
 		currentIndiceIndex += triangleCountPerLoop * 3;
 	}
+}

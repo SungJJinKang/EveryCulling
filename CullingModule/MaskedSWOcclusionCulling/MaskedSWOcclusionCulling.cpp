@@ -1,5 +1,7 @@
 #include "MaskedSWOcclusionCulling.h"
 
+#include "Stage/BinTrianglesStage.h"
+#include "Stage/RasterizeTrianglesStage.h"
 
 culling::MaskedSWOcclusionCulling::MaskedSWOcclusionCulling
 (
@@ -8,7 +10,8 @@ culling::MaskedSWOcclusionCulling::MaskedSWOcclusionCulling
 	float* viewProjectionMatrix
 )
 	: mDepthBuffer{ width, height }, binCountInRow{ width / SUB_TILE_WIDTH }, binCountInColumn{ height / SUB_TILE_HEIGHT },
-	mNearClipPlaneDis{ nearClipPlaneDis }, mFarClipPlaneDis{ farClipPlaneDis }, mViewProjectionMatrix{ viewProjectionMatrix }
+	mNearClipPlaneDis{ nearClipPlaneDis }, mFarClipPlaneDis{ farClipPlaneDis }, mViewProjectionMatrix{ viewProjectionMatrix },
+	mBinTrianglesStage{*this}, mRasterizeTrianglesStage{*this}
 {
 	assert(width % TILE_WIDTH == 0);
 	assert(height % TILE_HEIGHT == 0);
