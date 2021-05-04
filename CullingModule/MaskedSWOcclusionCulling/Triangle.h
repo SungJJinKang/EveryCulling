@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <memory>
 
 #include "SIMD_Core.h"
 
@@ -31,17 +32,7 @@ namespace culling
 		Vector3 Point3;
 	};
 
-	/// <summary>
-	/// TriangleList
-	/// 
-	/// TwoDTriangle should be reserved after initialized!!!!
-	/// </summary>
-	struct TriangleList
-	{
-		size_t mMaxTriangleCount;
-		size_t mCurrentTriangleIndex;
-		TwoDTriangle* mTriangleList;
-	};
+	
 
 	/// <summary>
 	/// Sort TwoDTriangle Points y ascending.

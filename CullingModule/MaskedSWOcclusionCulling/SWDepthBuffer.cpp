@@ -20,5 +20,5 @@ culling::SWDepthBuffer::SWDepthBuffer(unsigned int width, unsigned int height)
 	assert(mResolution.mHeight% SUB_TILE_HEIGHT == 0, "DepthBuffer's size should be multiple of DEPTH_BUFFER_TITL_HEIGHT");
 
 	this->mSubTiles.mHizDatas = new HizData[static_cast<size_t>(mSubTileCount)];
-	//this->mSubTiles.mTriangleBins = std::aligned_alloc(64, sizeof(TriangleBin) * mSubTileCount);
+	//this->mSubTiles.mTriangleBins = std::aligned_alloc(64, sizeof(TileBin) * mSubTileCount);
 }

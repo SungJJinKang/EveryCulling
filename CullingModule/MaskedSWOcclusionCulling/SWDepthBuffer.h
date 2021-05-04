@@ -29,12 +29,39 @@ namespace culling
 		/// </summary>
 		unsigned int depthPosition;
 	};
-
-	struct TriangleBin
+	
+	/// <summary>
+	/// TriangleList
+	/// 
+	/// TwoDTriangle should be reserved after initialized!!!!
+	/// </summary>
+	struct TriangleList
 	{
-		TwoDTriangle mClipSpaceTriangles[TRIANGLE_BIN_CAPACITY_PER_TILE];
+		const size_t mMaxTriangleCount = MAX_TRIANGLE_COUNT_PER_TILE;
+		size_t mCurrentTriangleIndex = 0;
+		/// <summary>
+		/// Screen Pixel Space Triangles
+		/// 
+		/// Dont' use std::unique_ptr
+		/// </summary>
+		TwoDTriangle* mTriangleList;
 	};
 
+	struct TileBin
+	{
+		TriangleList mBinnedTriangleList[TILE_WIDTH][TILE_HEIGHT];
+	};
+
+	void InitializeTriangleBin(TileBin& triangleBin)
+	{
+		for (size_t y = 0; y < TILE_HEIGHT; y++)
+		{
+			for (size_t x = 0; x < TILE_WIDTH; x++)
+			{
+				//triangleBin.mBinnedTriangleList[x][y].mTriangleList = std::make_uniqe
+			}
+		}
+	}
 
 	/// <summary>
 	/// AOS
@@ -42,7 +69,7 @@ namespace culling
 	struct SubTile
 	{
 		HizData* mHizDatas;
-		TriangleBin* mTriangleBins;
+		TileBin* mTriangleBins;
 	};
 
 	struct alignas(64) Resolution
@@ -63,6 +90,7 @@ namespace culling
 	class SWDepthBuffer
 	{
 		friend class MaskedSWOcclusionCulling;
+		friend class BinTrianglesStage;
 
 	private:
 
