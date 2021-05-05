@@ -3,7 +3,7 @@
 #include <Vector2.h>
 
 #include "../CoverageMask.h"
-#include "../Triangle.h"
+#include "../../../DataType/Math/Triangle.h"
 
 #include "../../../SIMD_Core.h"
 

@@ -3,7 +3,8 @@
 #include <vector>
 #include <functional>
 
-#include <Matrix4x4.h>
+#include "../../DataType/Math/Matrix.h"
+#include "../../DataType/Math/Vector.h"
 
 #include "../CullingModule.h"
 
@@ -11,7 +12,7 @@ namespace culling
 {
 	struct alignas(64) SIMDFrustumPlanes // for cache hit, align to 64 byte
 	{
-		math::Vector4 mFrustumPlanes[8]; // first 4 planes will be on same cache line
+		Vector4 mFrustumPlanes[8]; // first 4 planes will be on same cache line
 	};
 
 	class FrotbiteCullingSystem;
@@ -30,7 +31,7 @@ namespace culling
 		}
 
 		virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, unsigned int entityCountInBlock, unsigned int blockIndex, unsigned int cameraIndex) final;
-		char CheckInFrustumSIMDWithTwoPoint(const math::Vector<4, float>* eightPlanes, const math::Vector<4, float>* twoPoint);
+		char CheckInFrustumSIMDWithTwoPoint(const Vector4* eightPlanes, const Vector4* twoPoint);
 
 	public:
 		/// <summary>
@@ -39,7 +40,7 @@ namespace culling
 		/// </summary>
 		/// <param name="frustumPlaneIndex"></param>
 		/// <param name="viewProjectionMatix"></param>
-		void UpdateFrustumPlane(unsigned int frustumPlaneIndex, const math::Matrix4x4& viewProjectionMatrix);
+		void UpdateFrustumPlane(unsigned int frustumPlaneIndex, const Matrix4X4& viewProjectionMatrix);
 		SIMDFrustumPlanes* GetSIMDPlanes();
 	};
 }

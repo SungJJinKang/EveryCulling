@@ -1,13 +1,12 @@
 #pragma once
 
-#include <Matrix4x4.h>
-
 #include "../../FrotbiteCullingSystemCore.h"
 #include "SIMD_Core.h"
 #include "SWDepthBuffer.h"
 
-#include "Triangle.h"
-#include "../../DataStructure/AABB.h"
+#include "../../DataType/Math/Triangle.h"
+#include "../../DataType/Math/AABB.h"
+#include "../../DataType/Math/Matrix.h"
 
 #include "Stage/BinTrianglesStage.h"
 #include "Stage/RasterizeTrianglesStage.h"

@@ -23,19 +23,6 @@ typedef __m256	M256F;
 typedef __m256d M256D;
 typedef __m256i M256I;
 
-/*
-#ifndef M128F
-#define M128F(VECTOR4FLOAT) *reinterpret_cast<M128F*>(&VECTOR4FLOAT)
-#endif
-
-#ifndef M128D
-#define M128D(VECTOR4DOUBLE) *reinterpret_cast<M128D*>(&VECTOR4DOUBLE)
-#endif
-
-#ifndef M128I
-#define M128I(VECTOR4INT) *reinterpret_cast<M128I*>(&VECTOR4INT)
-#endif
-*/
 
 //https://software.intel.com/sites/landingpage/IntrinsicsGuide/#expand=69,124,3928,5197&techs=SSE,SSE2,SSE3,SSSE3,SSE4_1,SSE4_2,AVX&text=_mm_shuffle_ps
 #define SHUFFLEMASK(A0,A1,B2,B3) ( (A0) | ((A1)<<2) | ((B2)<<4) | ((B3)<<6) )
@@ -51,8 +38,11 @@ typedef __m256i M256I;
 namespace culling
 {
 
-	inline M128F M128F_Zero{ _mm_castsi128_ps(_mm_set1_epi16(0)) };
-	inline M128F M128F_EVERY_BITS_ONE{ _mm_castsi128_ps(_mm_set1_epi16(-1)) };
+	inline M128F M128F_Zero{ _mm_castsi128_ps(_mm_set1_epi32(0)) };
+	inline M128F M128F_EVERY_BITS_ONE{ _mm_castsi128_ps(_mm_set1_epi32(-1)) };
+
+	inline M256F M256F_Zero{ _mm256_castsi256_ps(_mm256_set1_epi32(0)) };
+	inline M256F M256F_EVERY_BITS_ONE{ _mm256_castsi256_ps(_mm256_set1_epi32(-1)) };
 
 	FORCE_INLINE M128F M128F_ADD(const M128F& M128_A, const M128F& M128_B)
 	{

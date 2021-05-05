@@ -1,8 +1,8 @@
 #pragma once
 
 #include "FrotbiteCullingSystemCore.h"
-#include "DataStructure/EntityGridCell.h"
-#include "DataStructure/EntityBlockViewer.h"
+#include "DataType/EntityGridCell.h"
+#include "DataType/EntityBlockViewer.h"
 
 #include <array>
 #include <memory>
@@ -10,11 +10,6 @@
 #include <atomic>
 #include <functional>
 
-#include <mutex>
-#include <condition_variable>
-
-#include <Vector4.h>
-#include <Matrix4x4.h>
 
 #include "CullingModule/ViewFrustumCulling/ViewFrustumCulling.h"
 
@@ -24,10 +19,14 @@
 
 namespace culling
 {
-
-
 	/// <summary>
+	/// 
 	/// This is implementation of Data Oriented ViewFrustumCulling of Frostbite in 2011
+	///
+	/// [Slide Resource](https://www.ea.com/frostbite/news/culling-the-battlefield-data-oriented-design-in-practice)        
+	/// [GDC Talk Video](https://www.gdcvault.com/play/1014491/Culling-the-Battlefield-Data-Oriented)          
+	/// [한국어 블로그 글] (https ://sungjjinkang.github.io/doom/2021/04/02/viewfrustumculling.html)  
+	///
 	/// 
 	/// This culling use SIMD DotProduct, So Check LightMath_Cpp/Matrix4x4Float_Aligned.inl
 	///
@@ -39,50 +38,9 @@ namespace culling
 	/// 
 	/// this library require math library : https://github.com/SungJJinKang/LightMath_Cpp/blob/main/Matrix4x4Float_Aligned.inl
 	/// 
-	/// Example : 
-	/// 
-	/// FrotbiteCullingSystem mFrotbiteCullingSystem;
-	/// 
-	/// std::vector<Camera> CameraList = ~~~~;
-	// 	for (unsigned int i = 0; i < CameraList.size(); i++)
-	// 	{
-	// 		this->mFrotbiteCullingSystem.UpdateFrustumPlane(i, CameraList[i]->GetViewProjectionMatrix());
-	// 	}
-	//
-	//  this->mFrotbiteCullingSystem.SetCameraCount(CameraList.size());
-	// 	this->mFrotbiteCullingSystem.ResetCullJobState();S
-	// 	auto CullingBlockJobs = this->mFrotbiteCullingSystem.GetCullBlockEnityJobs();
-	//
-	//	//Put pushing job to jobpool at FORMOST OF REDNERING LOOP !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// 	JobSystem.PushBackJobChunkToJobPool(std::move(CullingBlockJobs));
-	//
-	//	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	//	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	//  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	//
-	// 	this->mFrotbiteCullingSystem.WaitToFinishCullJobs();
-	// 
-	//  for(unsigned int cameraIndex = 0 ; cameraIndex < MAX_CAMERA_COUNT ; cameraIndex++)
-	// 	{
-	// 		for (size_t i = 0; i < EntityCount; ++i)
-	// 		{
-	// 			if (Entity[i]->EntityBlockViewer.GetIsVisibleBitflag(cameraIndex) != 0) 
-	// 			{
-	// 				Entity[i]->Draw(); 
-	// 			}
-	// 		}
-	// 	}
-	// 	
-	/// 
-	/// 
-	/// 
-	/// 
-	/// 
 	/// references : 
 	/// https://www.gdcvault.com/play/1014491/Culling-the-Battlefield-Data-Oriented
 	/// https://www.slideshare.net/DICEStudio/culling-the-battlefield-data-oriented-design-in-practice
-	/// 
-	/// 
 	/// https://macton.smugmug.com/Other/2008-07-15-by-Eye-Fi/n-xmKDH/
 	/// 
 	/// </summary>
@@ -90,12 +48,13 @@ namespace culling
 	{
 		friend class ScreenSpaceAABBCulling;
 		friend class ViewFrustumCulling;
+		
 	private:
 
 		unsigned int mCameraCount;
 		
 		bool bmIsInitializedEntityBlockPool{ false };
-		//std::unique_ptr<EntityBlock[]> mEntityBlockPool;
+
 		std::vector<EntityBlock*> mFreeEntityBlockList{};
 		std::vector<EntityBlock*> mActiveEntityBlockList{};
 		std::vector<EntityBlock*> mAllocatedEntityBlockChunkList{};
@@ -107,14 +66,13 @@ namespace culling
 		/// </summary>
 		//std::atomic<unsigned int> mAtomicCurrentBlockIndex;
 		std::atomic<size_t> mFinishedCullJobBlockCount;
+
 		/// <summary>
 		/// Updating atomic variable is slow
-		/// just store finished cull job count in thread local variable and ReleaseThreadLocalFinishedCullJobBlockCount after finish
+		/// just store finished cull job count in thread local variable and ReleaseFinishedBlockCount after finish
 		/// </summary>
-		inline static thread_local size_t mThreadLocalFinishedCullJobBlockCount{ 0 };
-		std::function<void()> mCommitThreadLocalFinishedCullJobBlockCountStdFunction;
-		//std::mutex mCullJobMutex;
-		//std::condition_variable mCullJobConditionVaraible;
+		inline static thread_local size_t mCullFinishedBlockCount{ 0 };
+		std::function<void()> mCullJobCache;
 
 		std::array<std::vector<std::function<void()>>, MAX_CAMERA_COUNT> mCachedCullBlockEntityJobs{};
 
@@ -123,6 +81,7 @@ namespace culling
 		void RemoveEntityFromBlock(EntityBlock* ownerEntityBlock, unsigned int entityIndexInBlock);
 
 		void AllocateEntityBlockPool();
+
 		std::pair<culling::EntityBlock*, unsigned int*> AllocateNewEntityBlockFromPool();
 
 		/// <summary>
@@ -132,7 +91,7 @@ namespace culling
 		EntityBlock* GetNewEntityBlockFromPool();
 
 		void CacheCullBlockEntityJobs();
-		void ReleaseThreadLocalFinishedCullJobBlockCount();
+		void ReleaseFinishedBlockCount();
 		
 	public:
 
@@ -218,9 +177,9 @@ namespace culling
 		{
 			return this->mActiveEntityBlockList;
 		}
-		std::function<void()> GetCommitThreadLocalFinishedCullJobBlockCountStdFunction()
+		std::function<void()> GetCullJobs()
 		{
-			return this->mCommitThreadLocalFinishedCullJobBlockCountStdFunction;
+			return this->mCullJobCache;
 		}
 	};
 }

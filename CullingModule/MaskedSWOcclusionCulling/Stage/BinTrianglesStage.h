@@ -3,8 +3,8 @@
 #include "MaskedSWOcclusionCullingStage.h"
 
 #include "../../../SIMD_Core.h"
-#include "../Triangle.h"
-#include "../../../DataStructure/AABB.h"
+#include "../../../DataType/Math/AABB.h"
+#include "../../../DataType/Math/Triangle.h"
 
 #include "../SWDepthBuffer.h"
 
@@ -67,7 +67,7 @@ namespace culling
 		/// <param name="triangleCullMask"></param>
 		void CullBackfaces(const M256F* screenPixelX, const M256F* screenPixelY, unsigned int& triangleCullMask);
 
-		void PassTrianglesToTileBin(const M256F* screenPixelX, const M256F* screenPixelY, unsigned int& triangleCullMask, TileBin& tileBin, const M256F& outBinBoundingBoxMinX, const M256F& outBinBoundingBoxMinY, const M256F& outBinBoundingBoxMaxX, const M256F& outBinBoundingBoxMaxY);
+		void PassTrianglesToTileBin(const M256F* screenPixelX, const M256F* screenPixelY, unsigned int& triangleCullMask, TriangleList& tileBin, const M256F& outBinBoundingBoxMinX, const M256F& outBinBoundingBoxMinY, const M256F& outBinBoundingBoxMaxX, const M256F& outBinBoundingBoxMaxY);
 
 
 		/// <summary>

@@ -14,6 +14,13 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////////////
+//Math
+#define MAX(A, B) A > B ? A : B
+#define MAX3(A, B, C) MAX(A, MAX(B, C))
+#define MIN(A, B) A < B ? A : B
+#define MIN3(A, B) MIN(A, MIN(B, C))
+
+///////////////////////////////////////////////////////////////////////////////////////
 //Graphics API
 #define OPENGL
 //#define DIRECTX
@@ -24,17 +31,12 @@
 #define NDC_RANGE ZERO_TO_POSITIVE_ONE
 #endif
 
-///////////////////////////////////////////////////////////////////////////////////////
-//Math
-#define MAX(A, B) A > B ? A : B
-#define MAX3(A, B, C) MAX(A, MAX(B, C))
-#define MIN(A, B) A < B ? A : B
-#define MIN3(A, B) MIN(A, MIN(B, C))
+
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //EntityBlock
 #define INITIAL_ENTITY_BLOCK_COUNT 10
-#define MAX_ENTITY_BLOCK_COUNT 500
+#define MAX_ENTITY_BLOCK_COUNT 800
 
 #define MAX_CAMERA_COUNT 8
 
@@ -58,5 +60,3 @@
 
 // Screen Space AABB Culling
 //#define ENABLE_SCREEN_SAPCE_AABB_CULLING
-
-// Distance Culling

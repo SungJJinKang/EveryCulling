@@ -2,7 +2,7 @@
 
 #include <utility>
 
-#include "DataStructure/EntityBlock.h"
+#include "DataType/EntityBlock.h"
 #include <vector_erase_move_lastelement/vector_swap_erase.h>
 
 void culling::FrotbiteCullingSystem::FreeEntityBlock(EntityBlock* freedEntityBlock)
@@ -62,15 +62,15 @@ void culling::FrotbiteCullingSystem::CacheCullBlockEntityJobs()
 
 
 
-void culling::FrotbiteCullingSystem::ReleaseThreadLocalFinishedCullJobBlockCount()
+void culling::FrotbiteCullingSystem::ReleaseFinishedBlockCount()
 {
-	this->mFinishedCullJobBlockCount.fetch_add(this->mThreadLocalFinishedCullJobBlockCount, std::memory_order_release);
-	this->mThreadLocalFinishedCullJobBlockCount = 0;
+	this->mFinishedCullJobBlockCount.fetch_add(this->mCullFinishedBlockCount, std::memory_order_release);
+	this->mCullFinishedBlockCount = 0;
 }
 
 culling::FrotbiteCullingSystem::FrotbiteCullingSystem()
 	:
-	mCommitThreadLocalFinishedCullJobBlockCountStdFunction{ std::bind(&FrotbiteCullingSystem::ReleaseThreadLocalFinishedCullJobBlockCount, this) },
+	mCullJobCache{ std::bind(&FrotbiteCullingSystem::ReleaseFinishedBlockCount, this) },
 	mViewFrustumCulling{ this } 
 #ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
 	,mScreenSpaceAABBCulling{ this }
@@ -170,12 +170,6 @@ culling::EntityBlockViewer culling::FrotbiteCullingSystem::AllocateNewEntity(voi
 }
 
 
-
-// ////////////////////////////////////////
-
-
-
-
 void culling::FrotbiteCullingSystem::SetCameraCount(unsigned int cameraCount)
 {
 	this->mCameraCount = cameraCount;
@@ -203,7 +197,7 @@ void culling::FrotbiteCullingSystem::CullBlockEntityJob(unsigned int blockIndex,
 	this->mScreenSpaceAABBCulling.CullBlockEntityJob(currentEntityBlock, entityCountInBlock, blockIndex, cameraIndex);
 #endif
 
-	this->mThreadLocalFinishedCullJobBlockCount++;
+	this->mCullFinishedBlockCount++;
 }
 
 bool culling::FrotbiteCullingSystem::GetIsCullJobFinished()
@@ -214,11 +208,6 @@ bool culling::FrotbiteCullingSystem::GetIsCullJobFinished()
 
 void culling::FrotbiteCullingSystem::WaitToFinishCullJobs()
 {
-// 	{
-// 		std::unique_lock<std::mutex> lk(this->mCullJobMutex);
-// 		this->mCullJobConditionVaraible.wait(lk, [this] {return this->GetIsCullJobFinished(); });
-// 	}
-	
  	while (this->GetIsCullJobFinished() == false) // busy wait!
  	{
  
@@ -227,9 +216,10 @@ void culling::FrotbiteCullingSystem::WaitToFinishCullJobs()
 
 void culling::FrotbiteCullingSystem::SetAllOneIsVisibleFlag()
 {
+	//TODO : Use SIMD M256
 	for (auto entityBlock : this->mEntityGridCell.mEntityBlocks)
 	{
-		std::memset(entityBlock->mIsVisibleBitflag, 0xFF, sizeof(bool) * ENTITY_COUNT_IN_ENTITY_BLOCK);
+		std::memset(entityBlock->mIsVisibleBitflag, 0xFF, sizeof(char) * ENTITY_COUNT_IN_ENTITY_BLOCK);
 	}
 }
 

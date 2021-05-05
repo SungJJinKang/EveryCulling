@@ -1,8 +1,6 @@
 #pragma once
 
-#include <Quaternion.h>
-#include <Vector3.h>
-
+#include "Math/Vector.h"
 
 namespace culling
 {
@@ -14,9 +12,9 @@ namespace culling
 	/// </summary>
 	struct alignas(64) TransformData
 	{
-		math::Quaternion mRotation; // 16byte
-		math::Vector3 mMinAABBPoint; // 12 byte
-		math::Vector3 mMaxAABBPoint; // 12 byte
-		math::Vector3 mScale; // 12 byte
+		Quaternion mRotation; // 16byte
+		Vector3 mMinAABBPoint; // 12 byte
+		Vector3 mMaxAABBPoint; // 12 byte
+		Vector3 mScale; // 12 byte
 	};
 }

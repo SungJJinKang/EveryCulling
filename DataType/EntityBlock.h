@@ -1,44 +1,32 @@
 #pragma once
 
-#include <Vector4.h>
-
 #include "../FrotbiteCullingSystemCore.h"
 
-#include "AABB.h"
+#include "Math/AABB.h"
+#include "Math/Vector.h"
 #include "TransformData.h"
-#include "EntityHandle.h"
 
 
 
 namespace culling
 {
-	/// <summary>
-	/// 이거 하면 InFrustum256FSIMDWithTwoPoint도 가능
-	/// 다만 좀 많이 복잡해짐
-	/// </summary>
-// 		struct alignas(32) TwoPosition
-// 		{
-// 			Position TwoPosition[2];
-// 		};
 
-
+	//This code doesn't consider Memory alignment optimzation.
 #ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
 	inline static constexpr size_t ENTITY_COUNT_IN_ENTITY_BLOCK = (4096 - sizeof(unsigned int)) /
 		(
-			sizeof(math::Vector4) +
+			sizeof(Vector4) +
 			sizeof(char) +
 			sizeof(void*) +
-			sizeof(EntityHandle) +
 			sizeof(AABB)
 			) - 1;
 #else
 	inline static constexpr size_t ENTITY_COUNT_IN_ENTITY_BLOCK = (4096 - sizeof(unsigned int)) /
 		(
-			sizeof(math::Vector4) +
+			sizeof(Vector4) +
 			sizeof(char) +
-			sizeof(void*) +
-			sizeof(EntityHandle)
-			) - 3;
+			sizeof(void*) 
+			) - 3; //offset
 #endif
 		/// <summary>
 		/// EntityBlock size should be less 4KB(Page size) for Block data being allocated in a page
@@ -55,7 +43,7 @@ namespace culling
 		/// 
 		/// IMPORTANT : you should pass nagative value of radius!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		/// </summary>
-		math::Vector4 mPositions[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		Vector4 mPositions[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 #ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
 		/// <summary>
@@ -70,7 +58,7 @@ namespace culling
 		AABB mWorldAABB[ENTITY_COUNT_IN_ENTITY_BLOCK];
 #endif
 
-		//math::Vector4 is aligned to 16 byte and ENTITY_COUNT_IN_ENTITY_BLOCK is even number
+		//Vector4 is aligned to 16 byte and ENTITY_COUNT_IN_ENTITY_BLOCK is even number
 		//so maybe  bool mIsVisibleBitflag is at right next to mPositions
 		//
 		// first low bit have Is Visible from First Camera,
@@ -88,8 +76,7 @@ namespace culling
 		/// 
 		/// </summary>
 		alignas(32) void* mRenderer[ENTITY_COUNT_IN_ENTITY_BLOCK];
-		EntityHandle mHandles[ENTITY_COUNT_IN_ENTITY_BLOCK];
-		//TransformData mTransformDatas[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		//EntityHandle mHandles[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 		/// <summary>
 		/// this variable is only used to decide whether to free this EntityBlock
@@ -101,6 +88,7 @@ namespace culling
 	/// Size of Entity block should be less than 4kb(page size)
 	/// </summary>
 	static_assert(sizeof(EntityBlock) < 4096);
+
 	/// <summary>
 	/// ENTITY_COUNT_IN_ENTITY_BLOCK should be even number
 	/// </summary>

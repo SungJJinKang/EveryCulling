@@ -2,7 +2,7 @@
 
 #include "../FrotbiteCullingSystemCore.h"
 
-#include "../DataStructure/EntityBlock.h"
+#include "../DataType/EntityBlock.h"
 
 namespace culling
 {
@@ -23,10 +23,10 @@ namespace culling
 
 		}
 		virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, unsigned int entityCountInBlock, unsigned int blockIndex, unsigned int cameraIndex) = 0;
+	
 	public:
 
-		//static virtual void CullEntityBlockJob = 0;
-		//virtual void ResetCullState() = 0;
+
 	};
 
 }

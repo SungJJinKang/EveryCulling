@@ -30,15 +30,13 @@ void culling::BinTrianglesStage::ConvertNDCSpaceToScreenPixelSpace
 {
 	for (size_t i = 0; i < 3; i++)
 	{
-		M256F tmpScreenSpaceX, tmpScreenSpaceY;
-
 		//Convert NDC Space Coordinates To Screen Space Coordinates 
 #if NDC_RANGE == MINUS_ONE_TO_POSITIVE_ONE
-		tmpScreenSpaceX = culling::M256F_MUL_AND_ADD(ndcSpaceVertexX[i], this->mMaskedSWOcclusionCulling.mDepthBuffer.mResolution.mReplicatedScreenHalfWidth, this->mMaskedSWOcclusionCulling.mDepthBuffer.mResolution.mReplicatedScreenHalfWidth);
-		tmpScreenSpaceY = culling::M256F_MUL_AND_ADD(ndcSpaceVertexY[i], this->mMaskedSWOcclusionCulling.mDepthBuffer.mResolution.mReplicatedScreenHalfHeight, this->mMaskedSWOcclusionCulling.mDepthBuffer.mResolution.mReplicatedScreenHalfHeight);
+		const M256F tmpScreenSpaceX = culling::M256F_MUL_AND_ADD(ndcSpaceVertexX[i], this->mMaskedSWOcclusionCulling.mDepthBuffer.mResolution.mReplicatedScreenHalfWidth, this->mMaskedSWOcclusionCulling.mDepthBuffer.mResolution.mReplicatedScreenHalfWidth);
+		const M256F tmpScreenSpaceY = culling::M256F_MUL_AND_ADD(ndcSpaceVertexY[i], this->mMaskedSWOcclusionCulling.mDepthBuffer.mResolution.mReplicatedScreenHalfHeight, this->mMaskedSWOcclusionCulling.mDepthBuffer.mResolution.mReplicatedScreenHalfHeight);
 #elif NDC_RANGE == ZERO_TO_POSITIVE_ONE
-		tmpScreenSpaceX = culling::M256F_MUL(ndcSpaceVertexX[i], this->mDepthBuffer.mResolution.mReplicatedScreenWidth);
-		tmpScreenSpaceY = culling::M256F_MUL(ndcSpaceVertexY[i], this->mDepthBuffer.mResolution.mReplicatedScreenHeight);
+		const M256F tmpScreenSpaceX = culling::M256F_MUL(ndcSpaceVertexX[i], this->mDepthBuffer.mResolution.mReplicatedScreenWidth);
+		const M256F tmpScreenSpaceY = culling::M256F_MUL(ndcSpaceVertexY[i], this->mDepthBuffer.mResolution.mReplicatedScreenHeight);
 #else 
 		assert(0); //NEVER HAPPEN
 #endif
@@ -69,11 +67,9 @@ void culling::BinTrianglesStage::TransformVertexsToClipSpace
 		//TODO : Consider Trimask
 		for (size_t i = 0; i < 3; ++i)
 		{
-			M256F tmpX, tmpY, tmpW;
-
-			tmpX = culling::M256F_MUL_AND_ADD(outClipVertexX[i], _mm256_set1_ps(toClipspaceMatrix[0]), culling::M256F_MUL_AND_ADD(outClipVertexY[i], _mm256_set1_ps(toClipspaceMatrix[4]), culling::M256F_MUL_AND_ADD(outClipVertexW[i], _mm256_set1_ps(toClipspaceMatrix[8]), _mm256_set1_ps(toClipspaceMatrix[12]))));
-			tmpY = culling::M256F_MUL_AND_ADD(outClipVertexX[i], _mm256_set1_ps(toClipspaceMatrix[1]), culling::M256F_MUL_AND_ADD(outClipVertexY[i], _mm256_set1_ps(toClipspaceMatrix[5]), culling::M256F_MUL_AND_ADD(outClipVertexW[i], _mm256_set1_ps(toClipspaceMatrix[9]), _mm256_set1_ps(toClipspaceMatrix[13]))));
-			tmpW = culling::M256F_MUL_AND_ADD(outClipVertexX[i], _mm256_set1_ps(toClipspaceMatrix[3]), culling::M256F_MUL_AND_ADD(outClipVertexY[i], _mm256_set1_ps(toClipspaceMatrix[7]), culling::M256F_MUL_AND_ADD(outClipVertexW[i], _mm256_set1_ps(toClipspaceMatrix[11]), _mm256_set1_ps(toClipspaceMatrix[15]))));
+			const M256F tmpX = culling::M256F_MUL_AND_ADD(outClipVertexX[i], _mm256_set1_ps(toClipspaceMatrix[0]), culling::M256F_MUL_AND_ADD(outClipVertexY[i], _mm256_set1_ps(toClipspaceMatrix[4]), culling::M256F_MUL_AND_ADD(outClipVertexW[i], _mm256_set1_ps(toClipspaceMatrix[8]), _mm256_set1_ps(toClipspaceMatrix[12]))));
+			const M256F tmpY = culling::M256F_MUL_AND_ADD(outClipVertexX[i], _mm256_set1_ps(toClipspaceMatrix[1]), culling::M256F_MUL_AND_ADD(outClipVertexY[i], _mm256_set1_ps(toClipspaceMatrix[5]), culling::M256F_MUL_AND_ADD(outClipVertexW[i], _mm256_set1_ps(toClipspaceMatrix[9]), _mm256_set1_ps(toClipspaceMatrix[13]))));
+			const M256F tmpW = culling::M256F_MUL_AND_ADD(outClipVertexX[i], _mm256_set1_ps(toClipspaceMatrix[3]), culling::M256F_MUL_AND_ADD(outClipVertexY[i], _mm256_set1_ps(toClipspaceMatrix[7]), culling::M256F_MUL_AND_ADD(outClipVertexW[i], _mm256_set1_ps(toClipspaceMatrix[11]), _mm256_set1_ps(toClipspaceMatrix[15]))));
 
 			outClipVertexX[i] = tmpX;
 			outClipVertexY[i] = tmpY;
@@ -87,12 +83,12 @@ void culling::BinTrianglesStage::CullBackfaces(const M256F* screenPixelX, const 
 {
 	//I don't know How this Works.........
 		//https://stackoverflow.com/questions/67357115/i-found-back-face-culling-code-but-i-cant-know-how-this-works
-	M256F triArea1 = culling::M256F_MUL(culling::M256F_SUB(screenPixelX[1], screenPixelX[0]), culling::M256F_SUB(screenPixelY[2], screenPixelY[0]));
-	M256F triArea2 = culling::M256F_MUL(culling::M256F_SUB(screenPixelX[0], screenPixelX[2]), culling::M256F_SUB(screenPixelY[0], screenPixelY[1]));
-	M256F triArea = culling::M256F_SUB(triArea1, triArea2);
+	const M256F triArea1 = culling::M256F_MUL(culling::M256F_SUB(screenPixelX[1], screenPixelX[0]), culling::M256F_SUB(screenPixelY[2], screenPixelY[0]));
+	const M256F triArea2 = culling::M256F_MUL(culling::M256F_SUB(screenPixelX[0], screenPixelX[2]), culling::M256F_SUB(screenPixelY[0], screenPixelY[1]));
+	const M256F triArea = culling::M256F_SUB(triArea1, triArea2);
 
 	//_CMP_GT_OQ vs _CMP_GT_OQ : https://stackoverflow.com/questions/16988199/how-to-choose-avx-compare-predicate-variants
-	M256F ccwMask = _mm256_cmp_ps(triArea, _mm256_set1_ps(0.0f), _CMP_GT_OQ);
+	const M256F ccwMask = _mm256_cmp_ps(triArea, _mm256_set1_ps(0.0f), _CMP_GT_OQ);
 
 	//Set each bit of mask dst based on the most significant bit of the corresponding packed single-precision (32-bit) floating-point element in a.
 	//https://software.intel.com/sites/landingpage/IntrinsicsGuide/#techs=SSE,SSE2,SSE3,SSSE3,SSE4_1,SSE4_2,AVX&expand=2156,4979,4979,1731,4929,951,4979,3869&text=movemask
@@ -100,7 +96,7 @@ void culling::BinTrianglesStage::CullBackfaces(const M256F* screenPixelX, const 
 	triangleCullMask = *reinterpret_cast<unsigned int*>(_mm256_movemask_ps(ccwMask));
 }
 
-void culling::BinTrianglesStage::PassTrianglesToTileBin(const M256F* screenPixelX, const M256F* screenPixelY, unsigned int& triangleCullMask, TileBin& tileBin, const M256F& outBinBoundingBoxMinX, const M256F& outBinBoundingBoxMinY, const M256F& outBinBoundingBoxMaxX, const M256F& outBinBoundingBoxMaxY)
+void culling::BinTrianglesStage::PassTrianglesToTileBin(const M256F* screenPixelX, const M256F* screenPixelY, unsigned int& triangleCullMask, TriangleList& tileBin, const M256F& outBinBoundingBoxMinX, const M256F& outBinBoundingBoxMinY, const M256F& outBinBoundingBoxMaxX, const M256F& outBinBoundingBoxMaxY)
 {
 }
 

@@ -8,11 +8,12 @@ M256I culling::CoverageRasterizer::FillBottomFlatTriangle(CoverageMask& coverage
 
     //if invslope > 0, left facing edge
     //else, right facing edge
-    float invslope1 = (point2.x - point1.x) / (point2.y - point1.y);
-    float invslope2 = (point3.x - point1.x) / (point3.y - point1.y);
+    const float invslope1 = (point2.x - point1.x) / (point2.y - point1.y);
+    const float invslope2 = (point3.x - point1.x) / (point3.y - point1.y);
 
-    float curx = point1.x - LeftBottomPoint.x;
+    const float curx = point1.x - LeftBottomPoint.x;
 
+    //TODO : Ceil event values
     M256I rightEvent1 = _mm256_set_epi32(curx, curx + invslope1, curx + invslope1 * 2, curx + invslope1 * 3, curx + invslope1 * 4, curx + invslope1 * 5, curx + invslope1 * 6, curx + invslope1 * 7); // I will use this variable like 2byte integer, not 4byte
     rightEvent1 = _mm256_max_epi32(rightEvent1, *reinterpret_cast<M256I*>(&M128F_Zero));
     M256I rightEvent2 = _mm256_set_epi32(curx, curx + invslope2, curx + invslope2 * 2, curx + invslope2 * 3, curx + invslope2 * 4, curx + invslope2 * 5, curx + invslope2 * 6, curx + invslope2 * 7); // I will use this variable like 2byte integer, not 4byte
@@ -35,12 +36,13 @@ M256I culling::CoverageRasterizer::FillTopFlatTriangle(CoverageMask& coverageMas
     
     //if invslope < 0, left facing edge
     //else, right facing edge
-    float invslope1 = (point3.x - point1.x) / (point3.y - point1.y);
-    float invslope2 = (point3.x - point2.x) / (point3.y - point2.y);
+    const float invslope1 = (point3.x - point1.x) / (point3.y - point1.y);
+    const float invslope2 = (point3.x - point2.x) / (point3.y - point2.y);
 
-    float curx = point1.x - LeftBottomPoint.x;
+    const float curx = point1.x - LeftBottomPoint.x;
 
     //I will use this variable like 2 byte integer, not 4 byte
+    // TODO : Ceil event values
     M256I rightEvent1 = _mm256_set_epi32(curx, curx - invslope1, curx - invslope1 * 2, curx - invslope1 * 3, curx - invslope1 * 4, curx - invslope1 * 5, curx - invslope1 * 6, curx - invslope1 * 7); // I will use this variable like 2byte integer, not 4byte
     rightEvent1 = _mm256_max_epi32(rightEvent1, *reinterpret_cast<M256I*>(&M128F_Zero));
     M256I rightEvent2 = _mm256_set_epi32(curx, curx - invslope2, curx - invslope2 * 2, curx - invslope2 * 3, curx - invslope2 * 4, curx - invslope2 * 5, curx - invslope2 * 6, curx - invslope2 * 7); // I will use this variable like 2byte integer, not 4byte

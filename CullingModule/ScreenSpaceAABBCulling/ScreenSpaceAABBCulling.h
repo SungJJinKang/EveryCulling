@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Matrix4x4.h>
+#include "../../DataType/Math/Matrix.h"
 
 #include "../CullingModule.h"
 
@@ -21,7 +21,7 @@ namespace culling
 		//For Calculating ScreenSpace AABB Area
 		//AABB로 할지 아님 Sphere로 할지(https://stackoverflow.com/questions/21648630/radius-of-projected-sphere-in-screen-space)...
 		//
-		math::Matrix4x4 mViewProjectionMatrix;
+		Matrix4X4 mViewProjectionMatrix;
 
 		ScreenSpaceAABBCulling(FrotbiteCullingSystem* frotbiteCullingSystem)
 			:CullingModule{ frotbiteCullingSystem }
@@ -33,6 +33,6 @@ namespace culling
 
 	public:
 
-		void SetViewProjectionMatrix(const math::Matrix4x4& viewProjectionMatrix);
+		void SetViewProjectionMatrix(const Matrix4X4& viewProjectionMatrix);
 	};
 }

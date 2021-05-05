@@ -7,6 +7,7 @@ Masked SW Occlusion Culling is announced in 2016 by intel.
 [Slide Resource](https://www.ea.com/frostbite/news/culling-the-battlefield-data-oriented-design-in-practice)        
 [GDC Talk Video](https://www.gdcvault.com/play/1014491/Culling-the-Battlefield-Data-Oriented)          
 [한국어 블로그 글](https://sungjjinkang.github.io/doom/2021/04/02/viewfrustumculling.html)          
+
 [Masked Occlusion Culling 논문](https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf) 
 
 ## Core Feature 
@@ -24,6 +25,8 @@ This library is targeting Maximing SIMD, Cache hit, Multi Threading.
 
 #### In Develop
 - Masked SW Occlusion Culling ( https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf )
+
+
 - Distance Culling ( https://docs.unrealengine.com/en-US/RenderingAndGraphics/VisibilityCulling/CullDistanceVolume/index.html )  
 - Precomputed Visibility Volume ( https://docs.unrealengine.com/en-US/RenderingAndGraphics/VisibilityCulling/PrecomputedVisibilityVolume/index.html )
 - Support AVX1, AVX512

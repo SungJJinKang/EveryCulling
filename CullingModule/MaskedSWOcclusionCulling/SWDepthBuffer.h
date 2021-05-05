@@ -5,7 +5,7 @@
 #include <memory>
 
 #include "../../SIMD_Core.h"
-#include "Triangle.h"
+#include "../../DataType/Math/Triangle.h"
 
 namespace culling
 {
@@ -61,15 +61,6 @@ namespace culling
 
 		size_t mCurrentTriangleCount = 0;
 	};
-
-	/*
-	struct TileBin
-	{
-		TriangleList mBinnedTriangleList[TILE_WIDTH][TILE_HEIGHT];
-	};
-	*/
-
-	//void InitializeTriangleBin(TileBin& triangleBin);
 
 	/// <summary>
 	/// 32 X 8 Tile

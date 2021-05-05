@@ -7,8 +7,8 @@
 void culling::ScreenSpaceAABBCulling::CullBlockEntityJob(EntityBlock* currentEntityBlock, unsigned int entityCountInBlock, unsigned int blockIndex, unsigned int cameraIndex)
 {
 	alignas(32) char cullingMask[ENTITY_COUNT_IN_ENTITY_BLOCK] = { 0 };
-	math::Vector4 mScreenSpaceAABBMin;
-	math::Vector4 mScreenSpaceAABBMax;
+	Vector4 mScreenSpaceAABBMin;
+	Vector4 mScreenSpaceAABBMax;
 	float x, y, area;
 	for (unsigned int j = 0; j < entityCountInBlock; j++)
 	{
