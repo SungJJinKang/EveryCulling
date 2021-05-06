@@ -9,17 +9,17 @@
 /// <param name="triangle"></param>
 void culling::SortTriangle(TwoDTriangle& triangle)
 {
-	if (triangle.Point1.y < triangle.Point2.y)
+	if (triangle.Points[0].y < triangle.Points[1].y)
 	{
-		std::swap(triangle.Point1, triangle.Point2);
+		std::swap(triangle.Points[0], triangle.Points[1]);
 	}
-	if (triangle.Point1.y < triangle.Point3.y)
+	if (triangle.Points[0].y < triangle.Points[2].y)
 	{
-		std::swap(triangle.Point1, triangle.Point3);
+		std::swap(triangle.Points[0], triangle.Points[2]);
 	}
-	if (triangle.Point2.y < triangle.Point3.y)
+	if (triangle.Points[1].y < triangle.Points[2].y)
 	{
-		std::swap(triangle.Point2, triangle.Point3);
+		std::swap(triangle.Points[1], triangle.Points[2]);
 	}
 }
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <atomic>
+
 #include "../../FrotbiteCullingSystemCore.h"
 #include "SIMD_Core.h"
 #include "SWDepthBuffer.h"
@@ -29,6 +31,13 @@ namespace culling
 		friend class BinTrianglesStage;
 		friend class MaskedSWOcclusionCullingStage;
 
+		enum class eMaskedOcclusionCullingStage
+		{
+			BinTriangles,
+			DrawOccluder,
+
+		};
+
 	private:
 
 		BinTrianglesStage mBinTrianglesStage;
@@ -42,15 +51,9 @@ namespace culling
 
 		void ResetDepthBuffer();
 
-	public:
 
-		MaskedSWOcclusionCulling(unsigned int width, unsigned int height, float nearClipPlaneDis, float farClipPlaneDis, float* viewProjectionMatrix);
-	
-		void SetNearFarClipPlaneDistance(float nearClipPlaneDis, float farClipPlaneDis);
-		void SetViewProjectionMatrix(float* viewProjectionMatrix);
 
-		void ResetState();
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -64,9 +67,9 @@ namespace culling
 		/// --> vertexStride is 6 * 4(float)
 		/// </param>
 		/// <param name="modelToClipspaceMatrix"></param>
-		inline void DrawOccluderTriangles
+		FORCE_INLINE void DrawOccluderTriangles
 		(
-			const float* vertices, const unsigned int* vertexIndices, size_t indiceCount, bool vertexStrideByte, 
+			const float* vertices, const unsigned int* vertexIndices, size_t indiceCount, bool vertexStrideByte,
 			float* modelToClipspaceMatrix
 		)
 		{
@@ -80,7 +83,7 @@ namespace culling
 		/// Depth Test Multiple Occludees
 		/// </summary>
 		/// <param name="worldAABBs"></param>
-		inline void DepthTestOccludee(const AABB* worldAABBs, size_t aabbCount, char* visibleBitFlags)
+		FORCE_INLINE void DepthTestOccludee(const AABB* worldAABBs, size_t aabbCount, char* visibleBitFlags)
 		{
 			//Check Area of TwoDTriangle
 			//if Area is smaller than setting, Dont draw that occluder
@@ -104,11 +107,22 @@ namespace culling
 				// ComputeMinimumDepths
 			}
 
-		
+
 
 		}
 
-		inline void DrawOccluderTriangles()
+	public:
+
+		MaskedSWOcclusionCulling(unsigned int width, unsigned int height, float nearClipPlaneDis, float farClipPlaneDis, float* viewProjectionMatrix);
+	
+		void SetNearFarClipPlaneDistance(float nearClipPlaneDis, float farClipPlaneDis);
+		void SetViewProjectionMatrix(float* viewProjectionMatrix);
+
+		void ResetState();
+		
+		
+
+		FORCE_INLINE void MaskedSWOcclusionJob()
 		{
 			 
 		}

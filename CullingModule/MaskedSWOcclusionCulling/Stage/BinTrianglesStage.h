@@ -27,7 +27,7 @@ namespace culling
 		/// <param name="outClipVertexZ"></param>
 		/// <param name="outClipVertexW"></param>
 		void ConverClipSpaceToNDCSpace(
-			M256F* outClipVertexX, M256F* outClipVertexY, const M256F* oneDividedByW, unsigned int& triangleCullMask
+			M256F* outClipVertexX, M256F* outClipVertexY, M256F* outClipVertexZ, const M256F* oneDividedByW, unsigned int& triangleCullMask
 		);
 
 		/// <summary>
@@ -54,8 +54,8 @@ namespace culling
 		/// <param name="vertW">"W" !!!!!!!!! three M256F -> 12 floating-point value</param>
 		/// <param name="modelToClipspaceMatrix">column major 4x4 matrix</param>
 		void TransformVertexsToClipSpace(
-			M256F* outClipVertexX, M256F* outClipVertexY, M256F* outClipVertexW,
-			const float* toClipspaceMatrix, unsigned int& triangleCullMask
+			M256F* outClipVertexX, M256F* outClipVertexY, M256F* outClipVertexZ,
+			M256F* outClipVertexW, const float* toClipspaceMatrix, unsigned int& triangleCullMask
 		);
 
 		/// <summary>
@@ -127,11 +127,9 @@ namespace culling
 		/// <param name="outVerticesY"></param>
 		/// <param name="triangleCullMask"></param>
 		void GatherVertex(
-			const float* vertices, const unsigned int* vertexIndices, const size_t indiceCount, const size_t currentIndiceIndex,
-			const size_t vertexStrideByte,
-
-			const size_t fetchTriangleCount,
-			M256F* outVerticesX, M256F* outVerticesY, unsigned int& triangleCullMask
+			const float* vertices, const unsigned int* vertexIndices, const size_t indiceCount, 
+			const size_t currentIndiceIndex, const size_t vertexStrideByte, const size_t fetchTriangleCount,
+			M256F* outVerticesX, M256F* outVerticesY, M256F* outVerticesZ, unsigned int& triangleCullMask
 		);
 
 
@@ -149,7 +147,7 @@ namespace culling
 		/// --> vertexStride is 6 * 4(float)
 		/// </param>
 		/// <param name="modelToClipspaceMatrix"></param>
-		void BinTriangles(const float* vertices, const unsigned int* vertexIndices, size_t indiceCount, size_t vertexStrideByte, float* modelToClipspaceMatrix);
+		void BinTriangles(const float* vertices, const unsigned int* vertexIndices, const size_t indiceCount, const size_t vertexStrideByte, const float * modelToClipspaceMatrix);
 
 	public:
 

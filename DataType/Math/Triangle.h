@@ -8,16 +8,12 @@ namespace culling
 {
 	struct TwoDTriangle
 	{
-		Vector2 Point1;
-		Vector2 Point2;
-		Vector2 Point3;
+		Vector2 Points[3];
 	};
 
 	struct ThreeDTriangle
 	{
-		Vector3 Point1;
-		Vector3 Point2;
-		Vector3 Point3;
+		Vector3 Points[3];
 	};
 
 	

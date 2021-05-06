@@ -55,9 +55,9 @@ namespace culling
 	struct TriangleList
 	{
 		/// <summary>
-		/// Binned screen sixel space Triangles
+		/// Binned Screen Pixel Space Triangles
 		/// </summary>
-		TwoDTriangle mTriangleList[BIN_TRIANGLE_CAPACITY_PER_TILE];
+		ThreeDTriangle mTriangleList[BIN_TRIANGLE_CAPACITY_PER_TILE];
 
 		size_t mCurrentTriangleCount = 0;
 	};

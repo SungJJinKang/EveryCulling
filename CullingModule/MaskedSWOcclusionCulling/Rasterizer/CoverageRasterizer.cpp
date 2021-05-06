@@ -70,19 +70,19 @@ void culling::CoverageRasterizer::FillTriangle(CoverageMask& coverageMask, Vecto
 {
     SortTriangle(triangle);
 
-    if (triangle.Point2.y == triangle.Point3.y)
+    if (triangle.Points[1].y == triangle.Points[2].y)
     {
-        coverageMask.mBits = FillBottomFlatTriangle(coverageMask, LeftBottomPoint, triangle.Point1, triangle.Point2, triangle.Point3);
+        coverageMask.mBits = FillBottomFlatTriangle(coverageMask, LeftBottomPoint, triangle.Points[0], triangle.Points[1], triangle.Points[2]);
     }
     /* check for trivial case of top-flat triangle */
-    else if (triangle.Point1.y == triangle.Point2.y)
+    else if (triangle.Points[0].y == triangle.Points[1].y)
     {
-        coverageMask.mBits = FillTopFlatTriangle(coverageMask, LeftBottomPoint, triangle.Point1, triangle.Point2, triangle.Point3);
+        coverageMask.mBits = FillTopFlatTriangle(coverageMask, LeftBottomPoint, triangle.Points[0], triangle.Points[1], triangle.Points[2]);
     }
     else
     {
         /* general case - split the triangle in a topflat and bottom-flat one */
-        Vector2 point4{ triangle.Point1.x + ((float)(triangle.Point2.y - triangle.Point1.y) / (float)(triangle.Point3.y - triangle.Point1.y)) * (triangle.Point3.x - triangle.Point1.x), triangle.Point2.y };
+        Vector2 point4{ triangle.Points[0].x + ((float)(triangle.Points[1].y - triangle.Points[0].y) / (float)(triangle.Points[2].y - triangle.Points[0].y)) * (triangle.Points[2].x - triangle.Points[0].x), triangle.Points[1].y };
 
 #if TILE_WIDTH == 16
         M128I Result1, Result2;
@@ -90,8 +90,8 @@ void culling::CoverageRasterizer::FillTriangle(CoverageMask& coverageMask, Vecto
         M256I Result1, Result2;
 #endif	
 
-        Result1 = FillBottomFlatTriangle(coverageMask, LeftBottomPoint, triangle.Point1, triangle.Point2, point4);
-        Result2 = FillTopFlatTriangle(coverageMask, LeftBottomPoint, triangle.Point2, point4, triangle.Point3);
+        Result1 = FillBottomFlatTriangle(coverageMask, LeftBottomPoint, triangle.Points[0], triangle.Points[1], point4);
+        Result2 = FillTopFlatTriangle(coverageMask, LeftBottomPoint, triangle.Points[1], point4, triangle.Points[2]);
 
 #if TILE_WIDTH == 16
         coverageMask.mBits = _mm_or_si128(Result1, Result2);
