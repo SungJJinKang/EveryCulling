@@ -3,6 +3,21 @@
 #include "Stage/BinTrianglesStage.h"
 #include "Stage/RasterizeTrianglesStage.h"
 
+void culling::MaskedSWOcclusionCulling::ResetDepthBuffer()
+{
+	const size_t tileCount = static_cast<size_t>(this->mDepthBuffer.mResolution.mTileCountInARow) * static_cast<size_t>(this->mDepthBuffer.mResolution.mTileCountInAColumn);
+	Tile* tiles = this->mDepthBuffer.mTiles;
+	
+	for (size_t i = 0; i < tileCount; i++)
+	{
+		tiles[i].mBinnedTriangles.mCurrentTriangleCount = 0;
+		tiles[i].mHizDatas.depthPosition = _mm256_set1_epi32(0);
+		tiles[i].mHizDatas.z0Max = _mm256_set1_ps(1.0f);
+		tiles[i].mHizDatas.z1Max = _mm256_set1_ps(1.0f);
+	}
+	
+}
+
 culling::MaskedSWOcclusionCulling::MaskedSWOcclusionCulling
 (
 	unsigned int width, unsigned int height, 
@@ -26,6 +41,12 @@ void culling::MaskedSWOcclusionCulling::SetNearFarClipPlaneDistance(float nearCl
 void culling::MaskedSWOcclusionCulling::SetViewProjectionMatrix(float* viewProjectionMatrix)
 {
 	this->mViewProjectionMatrix = viewProjectionMatrix;
+}
+
+void culling::MaskedSWOcclusionCulling::ResetState()
+{
+	this->ResetDepthBuffer();
+
 }
 
 

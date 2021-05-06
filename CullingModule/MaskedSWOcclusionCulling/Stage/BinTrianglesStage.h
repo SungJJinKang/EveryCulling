@@ -67,9 +67,8 @@ namespace culling
 		/// <param name="triangleCullMask"></param>
 		void CullBackfaces(const M256F* screenPixelX, const M256F* screenPixelY, unsigned int& triangleCullMask);
 
-		void PassTrianglesToTileBin(const M256F* screenPixelX, const M256F* screenPixelY, unsigned int& triangleCullMask, TriangleList& tileBin, const M256F& outBinBoundingBoxMinX, const M256F& outBinBoundingBoxMinY, const M256F& outBinBoundingBoxMaxX, const M256F& outBinBoundingBoxMaxY);
-
-
+		
+		
 		/// <summary>
 		/// Compute BoudingBox intersecting with triangles
 		/// 
@@ -78,11 +77,12 @@ namespace culling
 		/// </summary>
 		/// <param name="screenPixelX"></param>
 		/// <param name="screenPixelY"></param>
-		/// <param name="outBinBoundingBoxMinX"></param>
-		/// <param name="outBinBoundingBoxMinY"></param>
-		/// <param name="outBinBoundingBoxMaxX"></param>
-		/// <param name="outBinBoundingBoxMaxY"></param>
-		void ComputeBinBoundingBox(const M256F* screenPixelX, const M256F* screenPixelY, M256F& outBinBoundingBoxMinX, M256F& outBinBoundingBoxMinY, M256F& outBinBoundingBoxMaxX, M256F& outBinBoundingBoxMaxY);
+		/// <param name="outBinBoundingBoxMinX">MinX of bounding box intersecting with 8 Triangles, Not Index. ex) 0, 32, 64, ..</param>
+		/// <param name="outBinBoundingBoxMinY">MinY of bounding box intersecting with 8 Triangles, Not Index. ex) 0, 32, 64, ..</param>
+		/// <param name="outBinBoundingBoxMaxX">MaxX of bounding box intersecting with 8 Triangles, Not Index. ex) 0, 32, 64, ..</param>
+		/// <param name="outBinBoundingBoxMaxY">MaxY of bounding box intersecting with 8 Triangles, Not Index. ex) 0, 32, 64, ..</param>
+		void ComputeBinBoundingBox(const M256F* screenPixelX, const M256F* screenPixelY, M256I& outBinBoundingBoxMinX, M256I& outBinBoundingBoxMinY, M256I& outBinBoundingBoxMaxX, M256I& outBinBoundingBoxMaxY);
+		void PassTrianglesToTileBin(const M256F* screenPixelX, const M256F* screenPixelY, unsigned int& triangleCullMask, TriangleList& tileBin, const M256F& outBinBoundingBoxMinX, const M256F& outBinBoundingBoxMinY, const M256F& outBinBoundingBoxMaxX, const M256F& outBinBoundingBoxMaxY);
 
 		inline float GetAreaOfTriangle(const TwoDTriangle& triangle)
 		{

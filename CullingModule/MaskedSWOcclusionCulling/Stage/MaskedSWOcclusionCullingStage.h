@@ -7,9 +7,9 @@ namespace culling
 	{
 
 	protected:
-		MaskedSWOcclusionCulling& mMaskedSWOcclusionCulling;
+		MaskedSWOcclusionCulling& mMaskedOcclusionCulling;
 		MaskedSWOcclusionCullingStage(MaskedSWOcclusionCulling& mOcclusionCulling)
-			: mMaskedSWOcclusionCulling{ mOcclusionCulling }
+			: mMaskedOcclusionCulling{ mOcclusionCulling }
 		{
 
 		}

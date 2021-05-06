@@ -40,17 +40,16 @@ namespace culling
 		float mNearClipPlaneDis, mFarClipPlaneDis;
 		float* mViewProjectionMatrix;
 
-	
-
-		
+		void ResetDepthBuffer();
 
 	public:
-
 
 		MaskedSWOcclusionCulling(unsigned int width, unsigned int height, float nearClipPlaneDis, float farClipPlaneDis, float* viewProjectionMatrix);
 	
 		void SetNearFarClipPlaneDistance(float nearClipPlaneDis, float farClipPlaneDis);
 		void SetViewProjectionMatrix(float* viewProjectionMatrix);
+
+		void ResetState();
 		
 		/// <summary>
 		/// 

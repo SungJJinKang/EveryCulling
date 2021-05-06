@@ -32,8 +32,8 @@ void culling::BinTrianglesStage::ConvertNDCSpaceToScreenPixelSpace
 	{
 		//Convert NDC Space Coordinates To Screen Space Coordinates 
 #if NDC_RANGE == MINUS_ONE_TO_POSITIVE_ONE
-		const M256F tmpScreenSpaceX = culling::M256F_MUL_AND_ADD(ndcSpaceVertexX[i], this->mMaskedSWOcclusionCulling.mDepthBuffer.mResolution.mReplicatedScreenHalfWidth, this->mMaskedSWOcclusionCulling.mDepthBuffer.mResolution.mReplicatedScreenHalfWidth);
-		const M256F tmpScreenSpaceY = culling::M256F_MUL_AND_ADD(ndcSpaceVertexY[i], this->mMaskedSWOcclusionCulling.mDepthBuffer.mResolution.mReplicatedScreenHalfHeight, this->mMaskedSWOcclusionCulling.mDepthBuffer.mResolution.mReplicatedScreenHalfHeight);
+		const M256F tmpScreenSpaceX = culling::M256F_MUL_AND_ADD(ndcSpaceVertexX[i], this->mMaskedOcclusionCulling.mDepthBuffer.mResolution.mReplicatedScreenHalfWidth, this->mMaskedOcclusionCulling.mDepthBuffer.mResolution.mReplicatedScreenHalfWidth);
+		const M256F tmpScreenSpaceY = culling::M256F_MUL_AND_ADD(ndcSpaceVertexY[i], this->mMaskedOcclusionCulling.mDepthBuffer.mResolution.mReplicatedScreenHalfHeight, this->mMaskedOcclusionCulling.mDepthBuffer.mResolution.mReplicatedScreenHalfHeight);
 #elif NDC_RANGE == ZERO_TO_POSITIVE_ONE
 		const M256F tmpScreenSpaceX = culling::M256F_MUL(ndcSpaceVertexX[i], this->mDepthBuffer.mResolution.mReplicatedScreenWidth);
 		const M256F tmpScreenSpaceY = culling::M256F_MUL(ndcSpaceVertexY[i], this->mDepthBuffer.mResolution.mReplicatedScreenHeight);
@@ -42,12 +42,14 @@ void culling::BinTrianglesStage::ConvertNDCSpaceToScreenPixelSpace
 #endif
 
 		//Snap Screen Space Coordinates To Integer Coordinate In ScreenBuffer(or DepthBuffer)
-		// 
-		// The rounding modes are set to match HW rasterization with OpenGL. In practice our samples are placed
-		// in the (1,0) corner of each pixel, while HW rasterizer uses (0.5, 0.5). We get (1,0) because of the 
-		// floor used when interpolating along triangle edges. The rounding modes match an offset of (0.5, -0.5)
-		outScreenPixelSpaceX[i] = _mm256_ceil_ps(tmpScreenSpaceX);
-		outScreenPixelSpaceY[i] = _mm256_floor_ps(tmpScreenSpaceY);
+		
+		//A grid square, including its (x, y) window coordinates, z (depth), and associated data which may be added by fragment shaders, is called a fragment. A
+		//fragment is located by its lower left corner, which lies on integer grid coordinates.
+		//Rasterization operations also refer to a fragment¡¯s center, which is offset by ( 1/2, 1/2 )
+		//from its lower left corner(and so lies on half - integer coordinates).
+
+		//outScreenPixelSpaceX[i] = _mm256_floor_ps(tmpScreenSpaceX);
+		//outScreenPixelSpaceY[i] = _mm256_floor_ps(tmpScreenSpaceY);
 
 
 	}
@@ -96,13 +98,47 @@ void culling::BinTrianglesStage::CullBackfaces(const M256F* screenPixelX, const 
 	triangleCullMask = *reinterpret_cast<unsigned int*>(_mm256_movemask_ps(ccwMask));
 }
 
+void culling::BinTrianglesStage::ComputeBinBoundingBox(const M256F* screenPixelX, const M256F* screenPixelY, M256I& outBinBoundingBoxMinX, M256I& outBinBoundingBoxMinY, M256I& outBinBoundingBoxMaxX, M256I& outBinBoundingBoxMaxY)
+{
+	M256I minScreenPixelX, minScreenPixelY, maxScreenPixelX, maxScreenPixelY;
+
+	//A grid square, including its (x, y) window coordinates, z (depth), and associated data which may be added by fragment shaders, is called a fragment. A
+	//fragment is located by its lower left corner, which lies on integer grid coordinates.
+	//Rasterization operations also refer to a fragment¡¯s center, which is offset by ( 1/2, 1/2 )
+	//from its lower left corner(and so lies on half - integer coordinates).
+
+	static const M256I WIDTH_MASK = _mm256_set1_epi32(~(TILE_WIDTH - 1));
+	static const M256I HEIGHT_MASK = _mm256_set1_epi32(~(TILE_HEIGHT - 1));
+
+	minScreenPixelX = _mm256_cvttps_epi32( _mm256_floor_ps(_mm256_min_ps(screenPixelX[0], _mm256_min_ps(screenPixelX[1], screenPixelX[2]))) );
+	minScreenPixelY = _mm256_cvttps_epi32( _mm256_floor_ps(_mm256_min_ps(screenPixelY[0], _mm256_min_ps(screenPixelY[1], screenPixelY[2]))) );
+	maxScreenPixelX = _mm256_cvttps_epi32( _mm256_floor_ps(_mm256_max_ps(screenPixelX[0], _mm256_max_ps(screenPixelX[1], screenPixelX[2]))) );
+	maxScreenPixelY = _mm256_cvttps_epi32( _mm256_floor_ps(_mm256_max_ps(screenPixelY[0], _mm256_max_ps(screenPixelY[1], screenPixelY[2]))) );
+
+	// How "and" works?
+	// 0000 0000 0110 0011 <- 96 = 32 * 3 + 3
+	//		   AND
+	// 1111 1111 1110 0000 <- WIDTH_MASK
+	//
+	// 0000 0000 0110 0000 <- 92 = 32 * 3
+	//		
+
+	outBinBoundingBoxMinX = _mm256_and_si256(minScreenPixelX, WIDTH_MASK);
+	outBinBoundingBoxMinY = _mm256_and_si256(minScreenPixelY, HEIGHT_MASK);
+	outBinBoundingBoxMaxX = _mm256_and_si256(_mm256_add_epi32(maxScreenPixelX, _mm256_set1_epi32(TILE_WIDTH)), WIDTH_MASK);
+	outBinBoundingBoxMaxY = _mm256_and_si256(_mm256_add_epi32(maxScreenPixelY, _mm256_set1_epi32(TILE_HEIGHT)), HEIGHT_MASK);
+
+	outBinBoundingBoxMinX = _mm256_max_epi32(outBinBoundingBoxMinX, _mm256_set1_epi32(this->mMaskedOcclusionCulling.mDepthBuffer.mResolution.mLeftBottomTileOrginX));
+	outBinBoundingBoxMinY = _mm256_max_epi32(outBinBoundingBoxMinY, _mm256_set1_epi32(this->mMaskedOcclusionCulling.mDepthBuffer.mResolution.mLeftBottomTileOrginY));
+	outBinBoundingBoxMaxX = _mm256_min_epi32(outBinBoundingBoxMaxX, _mm256_set1_epi32(this->mMaskedOcclusionCulling.mDepthBuffer.mResolution.mRightTopTileOrginX));
+	outBinBoundingBoxMaxY = _mm256_min_epi32(outBinBoundingBoxMaxY, _mm256_set1_epi32(this->mMaskedOcclusionCulling.mDepthBuffer.mResolution.mRightTopTileOrginY));
+}
+
+
 void culling::BinTrianglesStage::PassTrianglesToTileBin(const M256F* screenPixelX, const M256F* screenPixelY, unsigned int& triangleCullMask, TriangleList& tileBin, const M256F& outBinBoundingBoxMinX, const M256F& outBinBoundingBoxMinY, const M256F& outBinBoundingBoxMaxX, const M256F& outBinBoundingBoxMaxY)
 {
 }
 
-void culling::BinTrianglesStage::ComputeBinBoundingBox(const M256F* screenPixelX, const M256F* screenPixelY, M256F& outBinBoundingBoxMinX, M256F& outBinBoundingBoxMinY, M256F& outBinBoundingBoxMaxX, M256F& outBinBoundingBoxMaxY)
-{
-}
 
 
 
@@ -243,12 +279,37 @@ void culling::BinTrianglesStage::BinTriangles(
 			continue;
 		}
 
-		M256F outBinBoundingBoxMinX, outBinBoundingBoxMinY, outBinBoundingBoxMaxX, outBinBoundingBoxMaxY;
+		
+		
+
+		M256I outBinBoundingBoxMinX, outBinBoundingBoxMinY, outBinBoundingBoxMaxX, outBinBoundingBoxMaxY;
 		//Bin Triangles to tiles
 
 		//Compute Bin Bounding Box
 		//Get Intersecting Bin List
+		this->ComputeBinBoundingBox(screenPixelPosX, screenPixelPosY, outBinBoundingBoxMinX, outBinBoundingBoxMinY, outBinBoundingBoxMaxX, outBinBoundingBoxMaxY);
 
+		Tile* tiles = this->mMaskedOcclusionCulling.mDepthBuffer.mTiles;
+
+		for (size_t triangleIndex = 0; triangleIndex < triangleCountPerLoop; triangleIndex++)
+		{
+			const size_t intersectingMinBoxX = reinterpret_cast<int*>(&outBinBoundingBoxMinX)[triangleIndex];
+			const size_t intersectingMinBoxY = reinterpret_cast<int*>(&outBinBoundingBoxMinY)[triangleIndex];
+			const size_t intersectingMaxBoxX = reinterpret_cast<int*>(&outBinBoundingBoxMaxX)[triangleIndex];
+			const size_t intersectingMaxBoxY = reinterpret_cast<int*>(&outBinBoundingBoxMaxY)[triangleIndex];
+
+			for (size_t y = intersectingMinBoxY; y <= intersectingMaxBoxY; y++)
+			{
+				for (size_t x = intersectingMinBoxX; y <= intersectingMaxBoxX; y++)
+				{
+					Tile& targetTile = tiles[x + y * this->mMaskedOcclusionCulling.mDepthBuffer.mResolution.mTileCountInARow];
+
+					//targetTile.mBinnedTriangles.mCurrentTriangleCount
+
+				}
+			}
+
+		}
 
 
 		//this->ComputeBinBoundingBox

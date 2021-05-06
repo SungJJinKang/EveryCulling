@@ -1,11 +1,15 @@
 #include "SWDepthBuffer.h"
 #include <cstdio>
 #include <cstdlib>
-
 culling::SWDepthBuffer::SWDepthBuffer(unsigned int width, unsigned int height)
 	: 
 	mResolution{
 	width, height,
+	width / TILE_WIDTH, height / TILE_HEIGHT,
+	0, 0,
+	( (width % TILE_WIDTH) > 0 ? width + (width - width % TILE_WIDTH) : width ) - TILE_WIDTH,
+	( (height % TILE_HEIGHT) > 0 ? height + (height - height % TILE_HEIGHT) : height ) - TILE_HEIGHT,
+
 #if NDC_RANGE == MINUS_ONE_TO_POSITIVE_ONE
 	_mm256_set1_ps(static_cast<float>(width * 0.5f)),
 	_mm256_set1_ps(static_cast<float>(height * 0.5f))
@@ -18,15 +22,11 @@ culling::SWDepthBuffer::SWDepthBuffer(unsigned int width, unsigned int height)
 	assert(this->mResolution.mWidth % TILE_WIDTH == 0, "DepthBuffer's size should be multiple of TILE_WIDTH");
 	assert(this->mResolution.mHeight % TILE_HEIGHT == 0, "DepthBuffer's size should be multiple of TILE_HEIGHT");
 
-	//assert(mResolution.mWidth% SUB_TILE_WIDTH == 0, "DepthBuffer's size should be multiple of DEPTH_BUFFER_TITL_WIDTH");
-	//assert(mResolution.mHeight% SUB_TILE_HEIGHT == 0, "DepthBuffer's size should be multiple of DEPTH_BUFFER_TITL_HEIGHT");
 	
-	const size_t tileCountInARow = this->mResolution.mWidth / TILE_WIDTH;
-	const size_t tileCountInAColumn = this->mResolution.mHeight / TILE_HEIGHT;
 
 	// TODO : change to Aligned dynamic allocation ( aligned malloc ) 
 	// In current, Tile struct is allocated contiguously, It incur False Sharing!!!!!!!!! 
-	this->mTiles = new Tile[tileCountInARow * tileCountInAColumn];
+	this->mTiles = new Tile[static_cast<size_t>(this->mResolution.mTileCountInARow) * static_cast<size_t>(this->mResolution.mTileCountInAColumn)];
 }
 
 culling::SWDepthBuffer::~SWDepthBuffer()

@@ -8,6 +8,7 @@
 void culling::FrotbiteCullingSystem::FreeEntityBlock(EntityBlock* freedEntityBlock)
 {
 	assert(freedEntityBlock != nullptr);
+
 	size_t freedEntityBlockIndex;
 	const size_t entityBlockCount = this->mEntityGridCell.mEntityBlocks.size();
 	bool IsSuccessToFind = false;
@@ -22,6 +23,7 @@ void culling::FrotbiteCullingSystem::FreeEntityBlock(EntityBlock* freedEntityBlo
 			break;
 		}
 	}
+
 	assert(IsSuccessToFind == true);
 
 	//swap and pop back trick
@@ -111,7 +113,7 @@ void culling::FrotbiteCullingSystem::RemoveEntityFromBlock(EntityBlock* ownerEnt
 
 	//Do nothing......
 
-	//Never Decrease this->mEntityGridCell.AllocatedEntityCountInBlocks
+	//Don't decrement this->mEntityGridCell.AllocatedEntityCountInBlocks
 	//Entities Indexs in EntityBlock should not be swapped because already allocated EntityBlockViewer can't see it
 
 	ownerEntityBlock->mCurrentEntityCount--;
@@ -140,7 +142,7 @@ void culling::FrotbiteCullingSystem::RemoveEntityFromBlock(EntityBlockViewer& en
 
 	entityBlockViewer.bmIsActive = false;
 	this->RemoveEntityFromBlock(entityBlockViewer.mTargetEntityBlock, entityBlockViewer.mEntityIndexInBlock);
-	//Never Decrease this->mEntityGridCell.AllocatedEntityCountInBlocks
+	//Don't decrement this->mEntityGridCell.AllocatedEntityCountInBlocks
 	//Entities Indexs in EntityBlock should not be swapped because already allocated EntityBlockViewer can't see it
 }
 
@@ -202,21 +204,17 @@ void culling::FrotbiteCullingSystem::CullBlockEntityJob(unsigned int blockIndex,
 
 bool culling::FrotbiteCullingSystem::GetIsCullJobFinished()
 {
-	//assert(this->mFinishedCullJobBlockCount <= this->mEntityGridCell.mBlockCount);
 	return this->mFinishedCullJobBlockCount.load(std::memory_order_relaxed) == this->mEntityGridCell.mEntityBlocks.size();
 }
 
 void culling::FrotbiteCullingSystem::WaitToFinishCullJobs()
 {
- 	while (this->GetIsCullJobFinished() == false) // busy wait!
- 	{
- 
- 	}
+	while (this->GetIsCullJobFinished() == false) {} // busy wait!
 }
 
 void culling::FrotbiteCullingSystem::SetAllOneIsVisibleFlag()
 {
-	//TODO : Use SIMD M256
+	//TODO : Use SIMD M256 or Compiler can do that?(Check godbolt)
 	for (auto entityBlock : this->mEntityGridCell.mEntityBlocks)
 	{
 		std::memset(entityBlock->mIsVisibleBitflag, 0xFF, sizeof(char) * ENTITY_COUNT_IN_ENTITY_BLOCK);

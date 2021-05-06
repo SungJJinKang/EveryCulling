@@ -77,6 +77,32 @@ namespace culling
 	{
 		const unsigned int mWidth;
 		const unsigned int mHeight;
+		const unsigned int mTileCountInARow;
+		const unsigned int mTileCountInAColumn;
+
+		/// <summary>
+		/// 0
+		/// </summary>
+		const unsigned int mLeftBottomTileOrginX;
+		
+		/// <summary>
+		/// 0
+		/// </summary>
+		const unsigned int mLeftBottomTileOrginY;
+		
+		/// <summary>
+		/// Left Bottom PointX of Right Top Tile
+		/// if Buffer Width is 37 -> 32
+		/// if Buffer Width is 64 -> 32
+		/// </summary>
+		const unsigned int mRightTopTileOrginX;
+		
+		/// <summary>
+		/// Left Bottom PointY of Right Top Tile
+		/// if Buffer Width is 37 -> 32
+		/// if Buffer Width is 64 -> 32
+		/// </summary>
+		const unsigned int mRightTopTileOrginY;
 
 #if NDC_RANGE == MINUS_ONE_TO_POSITIVE_ONE
 		M256F mReplicatedScreenHalfWidth;
@@ -99,6 +125,8 @@ namespace culling
 
 		/// <summary>
 		/// 32 X 8 Tiles
+		/// 
+		/// Left Bottom is (0, 0)
 		/// </summary>
 		Tile* mTiles;
 
@@ -109,5 +137,6 @@ namespace culling
 		/// <param name="height">Scree Height</param>
 		SWDepthBuffer(unsigned int width, unsigned int height);
 		~SWDepthBuffer();
+
 	};
 }
