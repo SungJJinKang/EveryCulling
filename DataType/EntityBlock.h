@@ -33,6 +33,12 @@ namespace culling
 		/// </summary>
 	struct EntityBlock
 	{
+		/// <summary>
+		/// Why align to 32byte?
+		/// To set mIsVisibleBitflag, We use _m256
+		/// </summary>
+		alignas(32) char mIsVisibleBitflag[ENTITY_COUNT_IN_ENTITY_BLOCK];
+
 		//SoA (Structure of Array) !!!!!! for performance 
 
 		/// <summary>
@@ -42,8 +48,14 @@ namespace culling
 		/// This will be used for linearlly Frustum intersection check
 		/// 
 		/// IMPORTANT : you should pass nagative value of radius!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		/// 
+		/// Why align to 32byte?
+		/// To set mIsVisibleBitflag, We use _m256
+		/// 
+		/// If Size of mIsVisibleBitflag isn't multiples of 256bit,
+		/// Setting mIsVisibleBitflag will make mPositions value dirty
 		/// </summary>
-		Vector4 mPositions[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		alignas(32) Vector4 mPositions[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 #ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
 		/// <summary>
@@ -58,15 +70,7 @@ namespace culling
 		AABB mWorldAABB[ENTITY_COUNT_IN_ENTITY_BLOCK];
 #endif
 
-		//Vector4 is aligned to 16 byte and ENTITY_COUNT_IN_ENTITY_BLOCK is even number
-		//so maybe  bool mIsVisibleBitflag is at right next to mPositions
-		//
-		// first low bit have Is Visible from First Camera,
-		// second low bit have Is Visible from Second Camera
-		// ......
-		// This variable should be aligned to 32 byte.
-		// because In Viewfrustum Culling CullJob VisibleFlag is stored per 32byte(128bit * 2)
-		alignas(32) char mIsVisibleBitflag[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		
 		
 		/// <summary>
 		/// mIsVisibleBitflag is stored through two __m128
@@ -75,7 +79,7 @@ namespace culling
 		/// To prevent that sttoring mIsVisibleBitflag code set value to this variable
 		/// 
 		/// </summary>
-		alignas(32) void* mRenderer[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		void* mRenderer[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		//EntityHandle mHandles[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 		/// <summary>

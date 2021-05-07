@@ -10,7 +10,7 @@ namespace culling
 	/// 
 	/// 14 * 4 byte
 	/// </summary>
-	struct alignas(64) TransformData
+	struct TransformData
 	{
 		Quaternion mRotation; // 16byte
 		Vector3 mMinAABBPoint; // 12 byte

@@ -68,12 +68,10 @@ namespace culling
 		// Normalize the plane equations, if requested
 		if (normalize == true)
 		{
-			NormalizePlane(sixPlanes[0]);
-			NormalizePlane(sixPlanes[1]);
-			NormalizePlane(sixPlanes[2]);
-			NormalizePlane(sixPlanes[3]);
-			NormalizePlane(sixPlanes[4]);
-			NormalizePlane(sixPlanes[5]);
+			for (size_t i = 0; i < 6; i++)
+			{
+				NormalizePlane(sixPlanes[i]);
+			}
 		}
 	}
 

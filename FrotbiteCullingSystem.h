@@ -53,10 +53,20 @@ namespace culling
 
 		unsigned int mCameraCount;
 		
-		bool bmIsInitializedEntityBlockPool{ false };
+		bool bmIsEntityBlockPoolInitialized{ false };
 
+		/// <summary>
+		/// List of EntityBlock with no Entity ( maybe entity was destroyed)
+		/// </summary>
 		std::vector<EntityBlock*> mFreeEntityBlockList{};
+		/// <summary>
+		/// List of EntityBlock with Entities
+		/// </summary>
 		std::vector<EntityBlock*> mActiveEntityBlockList{};
+		/// <summary>
+		/// Allocated EntityBlock Arrays
+		/// This objects will be released at destructor
+		/// </summary>
 		std::vector<EntityBlock*> mAllocatedEntityBlockChunkList{};
 		EntityGridCell mEntityGridCell{};
 
@@ -65,25 +75,20 @@ namespace culling
 		/// will be used at CullBlockEntityJob
 		/// </summary>
 		//std::atomic<unsigned int> mAtomicCurrentBlockIndex;
-		std::atomic<size_t> mFinishedCullJobBlockCount;
+		std::atomic<size_t> mCullJobFinishedBlockCount;
 
 		/// <summary>
 		/// Updating atomic variable is slow
-		/// just store finished cull job count in thread local variable and ReleaseFinishedBlockCount after finish
+		/// Add this value to mCachedCullBlockEntityJobs after CullJob is finished
 		/// </summary>
-		inline static thread_local size_t mCullFinishedBlockCount{ 0 };
+		inline static thread_local size_t mThreadCullJobFinishedBlockCount{ 0 };
 		std::function<void()> mCullJobCache;
-
 		std::array<std::vector<std::function<void()>>, MAX_CAMERA_COUNT> mCachedCullBlockEntityJobs{};
 
-		void SetAllOneIsVisibleFlag();
-
-		void RemoveEntityFromBlock(EntityBlock* ownerEntityBlock, unsigned int entityIndexInBlock);
 
 		void AllocateEntityBlockPool();
-
 		std::pair<culling::EntityBlock*, unsigned int*> AllocateNewEntityBlockFromPool();
-
+		void RemoveEntityFromBlock(EntityBlock* ownerEntityBlock, unsigned int entityIndexInBlock);
 		/// <summary>
 		/// Block Swap removedblock with last block, and return swapped lastblock to pool
 		/// </summary>
@@ -91,16 +96,31 @@ namespace culling
 		EntityBlock* GetNewEntityBlockFromPool();
 
 		void CacheCullBlockEntityJobs();
+		/// <summary>
+		/// Release atomic variable
+		/// </summary>
 		void ReleaseFinishedBlockCount();
-		
+		/// <summary>
+		/// Reset VisibleFlag
+		/// </summary>
+		void SetAllOneIsVisibleFlag();
+
 	public:
 
 		ViewFrustumCulling mViewFrustumCulling;
 #ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
 		ScreenSpaceAABBCulling mScreenSpaceAABBCulling;
 #endif
+
 		FrotbiteCullingSystem();
 		~FrotbiteCullingSystem();
+		void SetCameraCount(unsigned int cameraCount);
+		unsigned int GetCameraCount() const;
+		/// <summary>
+		/// Get EntityBlock List with entities
+		/// </summary>
+		/// <returns></returns>
+		std::vector<EntityBlock*> GetActiveEntityBlockList() const;
 
 		/// <summary>
 		/// You should call this function on your Transform Component or In your game engine
@@ -131,7 +151,19 @@ namespace culling
 		/// CullBlockEntityJob never access to shared variable.
 		/// So CullBlockEntityJob is thread safe.
 		/// </summary>
-		void CullBlockEntityJob(unsigned int blockIndex, unsigned int cameraIndex);
+		FORCE_INLINE void CullBlockEntityJob(unsigned int blockIndex, unsigned int cameraIndex)
+		{
+			EntityBlock* currentEntityBlock = this->mEntityGridCell.mEntityBlocks[blockIndex];
+			unsigned int entityCountInBlock = this->mEntityGridCell.AllocatedEntityCountInBlocks[blockIndex]; // don't use mCurrentEntityCount
+
+			this->mViewFrustumCulling.CullBlockEntityJob(currentEntityBlock, entityCountInBlock, blockIndex, cameraIndex);
+
+#ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
+			this->mScreenSpaceAABBCulling.CullBlockEntityJob(currentEntityBlock, entityCountInBlock, blockIndex, cameraIndex);
+#endif
+
+			this->mThreadCullJobFinishedBlockCount++;
+		}
 
 		/// <summary>
 		/// Get Culling BlockEntity Jobs
@@ -144,43 +176,40 @@ namespace culling
 		/// 
 		/// </summary>
 		/// <returns></returns>
-		FORCE_INLINE std::vector<std::function<void()>> GetCullBlockEnityJobs(unsigned int cameraIndex)
-		{
-			std::vector<std::function<void()>> cullJobs{};
-			cullJobs.assign(this->mCachedCullBlockEntityJobs[cameraIndex].begin(), this->mCachedCullBlockEntityJobs[cameraIndex].begin() + this->mEntityGridCell.mEntityBlocks.size());
-			return cullJobs;
-		}
+		std::vector<std::function<void()>> GetCullBlockEnityJobs(unsigned int cameraIndex);
 
 		/// <summary>
 		/// Get Is All block's culling job is finished.
 		/// if true, you can check object's visibility(culled)
 		/// </summary>
 		/// <returns></returns>
-		bool GetIsCullJobFinished();
+		FORCE_INLINE bool GetIsCullJobFinished() const
+		{
+			return this->mCullJobFinishedBlockCount.load(std::memory_order_relaxed) == this->mEntityGridCell.mEntityBlocks.size();
+		}
 
 		/// <summary>
 		/// Caller thread will stall until cull job of all entity block is finished
 		/// </summary>
-		void WaitToFinishCullJobs();
-
+		FORCE_INLINE void WaitToFinishCullJobs() const
+		{
+			while (this->GetIsCullJobFinished() == false) {} // busy wait!
+		}
 
 		/// <summary>
 		/// Reset cull job state before pushing cull jobs to job pool
 		/// </summary>
-		void ResetCullJobState();
-
-		
-		void SetCameraCount(unsigned int cameraCount);
-		unsigned int GetCameraCount();
-
-		std::vector<EntityBlock*> GetActiveEntityBlockList() const
+		FORCE_INLINE void ResetCullJobState()
 		{
-			return this->mActiveEntityBlockList;
+			this->mCullJobFinishedBlockCount = 0;
+			this->SetAllOneIsVisibleFlag();
 		}
-		std::function<void()> GetCullJobs()
-		{
-			return this->mCullJobCache;
-		}
+
+		/// <summary>
+		/// Return Cached cull job std::function 
+		/// </summary>
+		/// <returns></returns>
+		std::function<void()> GetCullJobs() const;
 	};
 }
 
