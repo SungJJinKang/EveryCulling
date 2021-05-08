@@ -113,6 +113,37 @@ namespace culling
 	}
 
 
+	FORCE_INLINE void M256F_SWAP(M128F& M128_A, M128F& M128_B, const M128F& MASK)
+	{
+		M128F TEMP = M128_A;
+		M128_A = _mm_blendv_ps(M128_A, M128_B, MASK);
+		M128_B = _mm_blendv_ps(M128_B, TEMP, MASK);
+	}
+
+	/// <summary>
+	///
+	/// FOR j := 0 to 7
+	///		i: = j * 32
+	///		IF MASK[i + 31]
+	///			dst[i + 31:i] : = M256_B[i + 31:i]
+	///		ELSE
+	///			dst[i + 31:i] : = M256_A[i + 31:i]
+	///		FI
+	/// ENDFOR
+	/// dst[MAX:256] : = 0
+	/// 
+	/// </summary>
+	/// <param name="M256_A"></param>
+	/// <param name="M256_B"></param>
+	/// <param name="MASK"></param>
+	/// <returns></returns>
+	FORCE_INLINE void M256F_SWAP(M256F& M256_A, M256F& M256_B, const M256F& MASK)
+	{
+		M256F TEMP = M256_A;
+		M256_A = _mm256_blendv_ps(M256_A, M256_B, MASK);
+		M256_B = _mm256_blendv_ps(M256_B, TEMP, MASK);
+	}
+
 }
 
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SIMD_Core.h"
+#include "../../SIMD_Core.h"
 
 #include "Vector.h"
 
@@ -23,7 +23,27 @@ namespace culling
 	/// Point1 is TopMost Vector2
 	/// </summary>
 	/// <param name="triangle"></param>
-	void SortTriangle(TwoDTriangle& triangle);
+
+	/// <summary>
+	/// Sort TwoDTriangle Points y ascending.
+	/// Point1 is TopMost Vector2
+	/// </summary>
+	/// <param name="triangle"></param>
+	inline void SortTriangle(TwoDTriangle& triangle)
+	{
+		if (triangle.Points[0].y < triangle.Points[1].y)
+		{
+			std::swap(triangle.Points[0], triangle.Points[1]);
+		}
+		if (triangle.Points[0].y < triangle.Points[2].y)
+		{
+			std::swap(triangle.Points[0], triangle.Points[2]);
+		}
+		if (triangle.Points[1].y < triangle.Points[2].y)
+		{
+			std::swap(triangle.Points[1], triangle.Points[2]);
+		}
+	}
 
 	/// <summary>
 	/// 
@@ -39,7 +59,22 @@ namespace culling
 	/// </summary>
 	/// <param name="TriPointX"></param>
 	/// <param name="TriPointY"></param>
-	void Sort_8_2DTriangles(M256F* TriPointX, M256F* TriPointY);
+	inline void Sort_8_2DTriangles(M256F* TriPointX, M256F* TriPointY)
+	{
+		M256F MASK;
+
+		MASK = _mm256_cmp_ps(TriPointY[0], TriPointY[1], _CMP_LE_OQ);
+		culling::M256F_SWAP(TriPointX[0], TriPointX[1], MASK);
+		culling::M256F_SWAP(TriPointY[0], TriPointY[1], MASK);
+
+		MASK = _mm256_cmp_ps(TriPointY[0], TriPointY[2], _CMP_LE_OQ);
+		culling::M256F_SWAP(TriPointX[0], TriPointX[2], MASK);
+		culling::M256F_SWAP(TriPointY[0], TriPointY[2], MASK);
+
+		MASK = _mm256_cmp_ps(TriPointY[1], TriPointY[2], _CMP_LE_OQ);
+		culling::M256F_SWAP(TriPointX[1], TriPointX[2], MASK);
+		culling::M256F_SWAP(TriPointY[1], TriPointY[2], MASK);
+	}
 
 	/// <summary>
 	/// 
@@ -56,5 +91,24 @@ namespace culling
 	/// <param name="TriPointX">3 size array M256F</param>
 	/// <param name="TriPointY">3 size array M256F</param>
 	/// <param name="TriPointZ">3 size array M256F</param>
-	void Sort_8_3DTriangles(M256F* TriPointX, M256F* TriPointY, M256F* TriPointZ);
+	inline void Sort_8_3DTriangles(M256F* TriPointX, M256F* TriPointY, M256F* TriPointZ)
+	{
+		M256F MASK;
+
+		MASK = _mm256_cmp_ps(TriPointY[0], TriPointY[1], _CMP_LE_OQ);
+		culling::M256F_SWAP(TriPointX[0], TriPointX[1], MASK);
+		culling::M256F_SWAP(TriPointY[0], TriPointY[1], MASK);
+		culling::M256F_SWAP(TriPointZ[0], TriPointZ[1], MASK);
+
+		MASK = _mm256_cmp_ps(TriPointY[0], TriPointY[2], _CMP_LE_OQ);
+		culling::M256F_SWAP(TriPointX[0], TriPointX[2], MASK);
+		culling::M256F_SWAP(TriPointY[0], TriPointY[2], MASK);
+		culling::M256F_SWAP(TriPointZ[0], TriPointZ[2], MASK);
+
+		MASK = _mm256_cmp_ps(TriPointY[1], TriPointY[2], _CMP_LE_OQ);
+		culling::M256F_SWAP(TriPointX[1], TriPointX[2], MASK);
+		culling::M256F_SWAP(TriPointY[1], TriPointY[2], MASK);
+		culling::M256F_SWAP(TriPointZ[1], TriPointZ[2], MASK);
+	}
+
 }
