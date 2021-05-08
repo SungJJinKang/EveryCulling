@@ -36,8 +36,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 //EntityBlock
 #define INITIAL_ENTITY_BLOCK_COUNT 10
-#define MAX_ENTITY_BLOCK_COUNT 1000
-
+#define INITIAL_ENTITY_BLOCK_RESERVED_SIZE 100
 #define MAX_CAMERA_COUNT 3
 
 

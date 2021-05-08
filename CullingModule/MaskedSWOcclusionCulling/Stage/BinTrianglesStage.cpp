@@ -98,7 +98,7 @@ void culling::BinTrianglesStage::CullBackfaces(const M256F* screenPixelX, const 
 	//Set each bit of mask dst based on the most significant bit of the corresponding packed single-precision (32-bit) floating-point element in a.
 	//https://software.intel.com/sites/landingpage/IntrinsicsGuide/#techs=SSE,SSE2,SSE3,SSSE3,SSE4_1,SSE4_2,AVX&expand=2156,4979,4979,1731,4929,951,4979,3869&text=movemask
 	//if second triangle is front facing, low second bit of triangleCullMask is 1
-	triangleCullMask = *reinterpret_cast<unsigned int*>(_mm256_movemask_ps(ccwMask));
+	triangleCullMask = static_cast<unsigned int>(_mm256_movemask_ps(ccwMask));
 }
 
 void culling::BinTrianglesStage::ComputeBinBoundingBox(const M256F* screenPixelX, const M256F* screenPixelY, M256I& outBinBoundingBoxMinX, M256I& outBinBoundingBoxMinY, M256I& outBinBoundingBoxMaxX, M256I& outBinBoundingBoxMaxY)

@@ -152,7 +152,7 @@ namespace culling
 		/// CullBlockEntityJob never access to shared variable.
 		/// So CullBlockEntityJob is thread safe.
 		/// </summary>
-		FORCE_INLINE void CullBlockEntityJob(unsigned int blockIndex, unsigned int cameraIndex)
+		FORCE_INLINE void CullBlockEntityJob(size_t blockIndex, size_t cameraIndex)
 		{
 			EntityBlock* currentEntityBlock = this->mEntityGridCell.mEntityBlocks[blockIndex];
 			unsigned int entityCountInBlock = this->mEntityGridCell.AllocatedEntityCountInBlocks[blockIndex]; // don't use mCurrentEntityCount

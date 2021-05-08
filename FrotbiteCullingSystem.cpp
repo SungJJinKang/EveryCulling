@@ -57,7 +57,7 @@ culling::EntityBlock* culling::FrotbiteCullingSystem::GetNewEntityBlockFromPool(
 
 void culling::FrotbiteCullingSystem::CacheCullJob(size_t currentEntityBlockCount)
 {
-	for (unsigned int cameraIndex = 0; cameraIndex < MAX_CAMERA_COUNT; cameraIndex++)
+	for (size_t cameraIndex = 0; cameraIndex < MAX_CAMERA_COUNT; cameraIndex++)
 	{
 		while (const size_t blockCount = this->mCachedCullBlockEntityJobs[cameraIndex].size() < currentEntityBlockCount)
 		{
@@ -88,7 +88,7 @@ void culling::FrotbiteCullingSystem::ReleaseFinishedBlockCount()
 
 void culling::FrotbiteCullingSystem::SetAllOneIsVisibleFlag()
 {
-	//TODO : Use SIMD M256 or Compiler can do that?(Check godbolt)
+	//Maybe Compiler use SIMD or do faster than SIMD instruction
 	for (auto entityBlock : this->mEntityGridCell.mEntityBlocks)
 	{
 		std::memset(entityBlock->mIsVisibleBitflag, 0xFF, sizeof(char) * ENTITY_COUNT_IN_ENTITY_BLOCK);
@@ -192,9 +192,13 @@ culling::FrotbiteCullingSystem::FrotbiteCullingSystem()
 #endif
 {
 	//to protect 
-	this->mFreeEntityBlockList.reserve(100);
-	this->mEntityGridCell.mEntityBlocks.reserve(100);
-	this->mEntityGridCell.AllocatedEntityCountInBlocks.reserve(100);
+	this->mFreeEntityBlockList.reserve(INITIAL_ENTITY_BLOCK_RESERVED_SIZE);
+	this->mEntityGridCell.mEntityBlocks.reserve(INITIAL_ENTITY_BLOCK_RESERVED_SIZE);
+	this->mEntityGridCell.AllocatedEntityCountInBlocks.reserve(INITIAL_ENTITY_BLOCK_RESERVED_SIZE);
+	for (size_t i = 0; i < MAX_CAMERA_COUNT; i++)
+	{
+		this->mCachedCullBlockEntityJobs[i].reserve(INITIAL_ENTITY_BLOCK_RESERVED_SIZE);
+	}
 
 	this->AllocateEntityBlockPool();
 
