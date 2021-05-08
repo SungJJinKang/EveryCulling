@@ -195,14 +195,9 @@ namespace culling
 		/// if true, you can check object's visibility(culled)
 		/// </summary>
 		/// <returns></returns>
-		FORCE_INLINE bool GetIsCullJobFinished() const
+		FORCE_INLINE bool GetIsCullJobFinished(const std::atomic<unsigned int>& mFinishedCullEntityBlockCount, unsigned int entityBlockCount) const
 		{
-			const unsigned int entityBlockCount = static_cast<unsigned int>(this->mEntityGridCell.mEntityBlocks.size());
-			const size_t lastCameraIndex = this->mCameraCount - 1;
-			const size_t lastModuleIndex = this->mCullingModules.size() - 1;
-			const CullingModule* lastCullingModule = this->mCullingModules[lastModuleIndex];
-
-			return lastCullingModule->mFinishedCullEntityBlockCount[lastCameraIndex].load(std::memory_order_relaxed) >= entityBlockCount;
+			return mFinishedCullEntityBlockCount.load(std::memory_order_relaxed) >= entityBlockCount;
 		}
 
 		/// <summary>
@@ -210,7 +205,11 @@ namespace culling
 		/// </summary>
 		FORCE_INLINE void WaitToFinishCullJobs() const
 		{
-			while (this->GetIsCullJobFinished() == false) {} // busy wait!
+			const unsigned int entityBlockCount = static_cast<unsigned int>(this->mEntityGridCell.mEntityBlocks.size());
+			const size_t lastCameraIndex = this->mCameraCount - 1;
+			const size_t lastModuleIndex = this->mCullingModules.size() - 1;
+			const CullingModule* lastCullingModule = this->mCullingModules[lastModuleIndex];
+			while (this->GetIsCullJobFinished(lastCullingModule->mFinishedCullEntityBlockCount[lastCameraIndex], entityBlockCount) == false) {} // busy wait!
 		}
 
 		/// <summary>
@@ -219,6 +218,7 @@ namespace culling
 		FORCE_INLINE void ResetCullJobState()
 		{
 			this->SetAllOneIsVisibleFlag();
+			this->ResetCullJobStateVariable();
 		}
 
 		/// <summary>
