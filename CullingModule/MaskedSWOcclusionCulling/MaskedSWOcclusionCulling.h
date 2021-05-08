@@ -120,7 +120,7 @@ namespace culling
 
 		MaskedSWOcclusionCulling(
 			FrotbiteCullingSystem* frotbiteCullingSystemunsigned, 
-			unsigned int width, unsigned int height, float nearClipPlaneDis, float farClipPlaneDis, float* viewProjectionMatrix
+			unsigned int depthBufferWidth, unsigned int depthBufferheight
 		);
 	
 		void SetNearFarClipPlaneDistance(float nearClipPlaneDis, float farClipPlaneDis);
@@ -136,7 +136,7 @@ namespace culling
 		}
 
 		// Inherited via CullingModule
-		virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t blockIndex, size_t cameraIndex) override;
+		virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex) override;
 	};
 }
 

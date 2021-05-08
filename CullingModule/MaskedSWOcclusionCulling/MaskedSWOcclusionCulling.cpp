@@ -6,7 +6,7 @@
 void culling::MaskedSWOcclusionCulling::ResetDepthBuffer()
 {
 	const size_t tileCount = static_cast<size_t>(this->mDepthBuffer.mResolution.mTileCountInARow) * static_cast<size_t>(this->mDepthBuffer.mResolution.mTileCountInAColumn);
-	Tile* tiles = this->mDepthBuffer.mTiles;
+	std::shared_ptr<Tile[]> tiles = this->mDepthBuffer.mTiles;
 	
 	for (size_t i = 0; i < tileCount; i++)
 	{
@@ -18,22 +18,15 @@ void culling::MaskedSWOcclusionCulling::ResetDepthBuffer()
 	
 }
 
-culling::MaskedSWOcclusionCulling::MaskedSWOcclusionCulling
-(
-	FrotbiteCullingSystem* frotbiteCullingSystem,
-	unsigned int width, unsigned int height, 
-	float nearClipPlaneDis, float farClipPlaneDis, 
-	float* viewProjectionMatrix
-)
+culling::MaskedSWOcclusionCulling::MaskedSWOcclusionCulling(FrotbiteCullingSystem* frotbiteCullingSystem, unsigned int depthBufferWidth, unsigned int depthBufferheight)
 	: culling::CullingModule{frotbiteCullingSystem}, 
 	mDepthBuffer {
-	width, height
-}, binCountInRow{ width / SUB_TILE_WIDTH }, binCountInColumn{ height / SUB_TILE_HEIGHT },
-	mNearClipPlaneDis{ nearClipPlaneDis }, mFarClipPlaneDis{ farClipPlaneDis }, mViewProjectionMatrix{ viewProjectionMatrix },
+	depthBufferWidth, depthBufferheight
+}, binCountInRow{ depthBufferWidth / SUB_TILE_WIDTH }, binCountInColumn{ depthBufferheight / SUB_TILE_HEIGHT },
 	mBinTrianglesStage{*this}, mRasterizeTrianglesStage{*this}
 {
-	assert(width % TILE_WIDTH == 0);
-	assert(height % TILE_HEIGHT == 0);
+	assert(depthBufferWidth% TILE_WIDTH == 0);
+	assert(depthBufferheight% TILE_HEIGHT == 0);
 }
 
 void culling::MaskedSWOcclusionCulling::SetNearFarClipPlaneDistance(float nearClipPlaneDis, float farClipPlaneDis)
@@ -53,7 +46,7 @@ void culling::MaskedSWOcclusionCulling::ResetState()
 
 }
 
-void culling::MaskedSWOcclusionCulling::CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t blockIndex, size_t cameraIndex)
+void culling::MaskedSWOcclusionCulling::CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex)
 {
 }
 

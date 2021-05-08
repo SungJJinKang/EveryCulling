@@ -32,7 +32,7 @@ namespace culling
 
 		}
 
-		FORCE_INLINE virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t blockIndex, size_t cameraIndex) final
+		void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex)
 		{
 			alignas(64) char cullingMask[ENTITY_COUNT_IN_ENTITY_BLOCK] = { 0 };
 

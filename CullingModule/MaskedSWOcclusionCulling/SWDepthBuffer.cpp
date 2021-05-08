@@ -26,26 +26,9 @@ culling::SWDepthBuffer::SWDepthBuffer(unsigned int width, unsigned int height)
 
 	
 
-	// TODO : change to Aligned dynamic allocation ( aligned malloc ) 
-	// In current, Tile struct is allocated contiguously, It incur False Sharing!!!!!!!!! 
-	this->mTiles = new Tile[static_cast<size_t>(this->mResolution.mTileCountInARow) * static_cast<size_t>(this->mResolution.mTileCountInAColumn)];
+	//Why don't use std::make_unique
+	//std::make_unique do default initialization, so it reset Tile values
+	//That isn't needed to do
+	this->mTiles = std::shared_ptr<Tile[]>(new Tile[static_cast<size_t>(this->mResolution.mTileCountInARow) * static_cast<size_t>(this->mResolution.mTileCountInAColumn)]);
 }
 
-culling::SWDepthBuffer::~SWDepthBuffer()
-{
-	// TODO : change to Aligned dynamic deallocation
-	delete[] this->mTiles;
-}
-
-/*
-void culling::InitializeTriangleBin(TileBin& triangleBin)
-{
-	for (size_t y = 0; y < TILE_HEIGHT; y++)
-	{
-		for (size_t x = 0; x < TILE_WIDTH; x++)
-		{
-			triangleBin.mBinnedTriangleList[x][y].mTriangleList = std::unique_ptr<TwoDTriangle[]>(new TwoDTriangle[BIN_TRIANGLE_CAPACITY_PER_TILE]);
-		}
-	}
-}
-*/

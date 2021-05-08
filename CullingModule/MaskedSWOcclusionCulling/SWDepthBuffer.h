@@ -128,7 +128,7 @@ namespace culling
 		/// 
 		/// Left Bottom is (0, 0)
 		/// </summary>
-		Tile* mTiles;
+		std::shared_ptr<Tile[]> mTiles;
 
 		/// <summary>
 		/// 
@@ -136,7 +136,6 @@ namespace culling
 		/// <param name="width">Screen Width</param>
 		/// <param name="height">Scree Height</param>
 		SWDepthBuffer(unsigned int width, unsigned int height);
-		~SWDepthBuffer();
 
 	};
 }

@@ -293,7 +293,7 @@ void culling::BinTrianglesStage::BinTriangles(
 		//Get Intersecting Bin List
 		this->ComputeBinBoundingBox(screenPixelPosX, screenPixelPosY, outBinBoundingBoxMinX, outBinBoundingBoxMinY, outBinBoundingBoxMaxX, outBinBoundingBoxMaxY);
 
-		Tile* tiles = this->mMaskedOcclusionCulling.mDepthBuffer.mTiles;
+		std::shared_ptr<Tile[]> tiles = this->mMaskedOcclusionCulling.mDepthBuffer.mTiles;
 
 		for (size_t triangleIndex = 0; triangleIndex < triangleCountPerLoop && ( (triangleCullMask & (1 << triangleIndex) ) != 0x0); triangleIndex++)
 		{

@@ -5,11 +5,6 @@
 #include "DataType/EntityBlock.h"
 #include <vector_erase_move_lastelement/vector_swap_erase.h>
 
-#include <iostream>
-
-
-
-
 void culling::FrotbiteCullingSystem::FreeEntityBlock(EntityBlock* freedEntityBlock)
 {
 	assert(freedEntityBlock != nullptr);
@@ -55,36 +50,21 @@ culling::EntityBlock* culling::FrotbiteCullingSystem::GetNewEntityBlockFromPool(
 	return entityBlock;
 }
 
-void culling::FrotbiteCullingSystem::CacheCullJob(size_t currentEntityBlockCount)
+void culling::FrotbiteCullingSystem::ResetCullJobStateVariable()
 {
-	for (size_t cameraIndex = 0; cameraIndex < MAX_CAMERA_COUNT; cameraIndex++)
+	for (unsigned int cameraIndex = 0; cameraIndex < this->mCameraCount; cameraIndex++)
 	{
-		size_t blockCount;
-		while ((blockCount = this->mCachedCullBlockEntityJobs[cameraIndex].size()) < currentEntityBlockCount)
+		for (size_t moduleIndex = 0; moduleIndex < this->mCullingModules.size(); moduleIndex++)
 		{
-			this->mCachedCullBlockEntityJobs[cameraIndex].push_back(std::bind(&FrotbiteCullingSystem::CullBlockEntityJob, this, blockCount, cameraIndex));
+			CullingModule* cullingModule = this->mCullingModules[moduleIndex];
+			cullingModule->mCurrentCullEntityBlockIndex[cameraIndex].store(0, std::memory_order_relaxed);
+			cullingModule->mFinishedCullEntityBlockCount[cameraIndex].store(0, std::memory_order_relaxed);
 		}
 	}
-}
+	this->mIsCullJobFinished.store(false, std::memory_order_relaxed);
 
-/*
-void culling::FrotbiteCullingSystem::CacheCullBlockEntityJobs()
-{
-	for (unsigned int cameraIndex = 0; cameraIndex < MAX_CAMERA_COUNT; cameraIndex++)
-	{
-		this->mCachedCullBlockEntityJobs[cameraIndex].reserve(MAX_ENTITY_BLOCK_COUNT);
-		for (unsigned int entityBlockIndex = 0; entityBlockIndex < MAX_ENTITY_BLOCK_COUNT; entityBlockIndex++)
-		{
-			this->mCachedCullBlockEntityJobs[cameraIndex].push_back(std::bind(&FrotbiteCullingSystem::CullBlockEntityJob, this, entityBlockIndex, cameraIndex));
-		}
-	}
-}
-*/
-
-void culling::FrotbiteCullingSystem::ReleaseFinishedBlockCount()
-{
-	this->mCullJobFinishedBlockCount.fetch_add(this->mThreadCullJobFinishedBlockCount, std::memory_order_release);
-	this->mThreadCullJobFinishedBlockCount = 0;
+	//release!
+	std::atomic_thread_fence(std::memory_order_seq_cst);
 }
 
 void culling::FrotbiteCullingSystem::SetAllOneIsVisibleFlag()
@@ -147,7 +127,6 @@ culling::EntityBlockViewer culling::FrotbiteCullingSystem::AllocateNewEntity(voi
 	{
 		// if Any entityBlock isn't allocated yet
 		targetEntityBlock = this->AllocateNewEntityBlockFromPool();
-		this->CacheCullJob(this->mEntityGridCell.mEntityBlocks.size());
 	}
 	else
 	{//When Allocated entity block count is at least one
@@ -160,7 +139,6 @@ culling::EntityBlockViewer culling::FrotbiteCullingSystem::AllocateNewEntity(voi
 			//if last entityblock in active entities is full of entities
 			//alocate new entity block
 			targetEntityBlock = this->AllocateNewEntityBlockFromPool();
-			this->CacheCullJob(this->mEntityGridCell.mEntityBlocks.size());
 		}
 	}
 	
@@ -184,27 +162,24 @@ void culling::FrotbiteCullingSystem::RemoveEntityFromBlock(EntityBlockViewer& en
 	//Entities Indexs in EntityBlock should not be swapped because already allocated EntityBlockViewer can't see it
 }
 
-culling::FrotbiteCullingSystem::FrotbiteCullingSystem()
+culling::FrotbiteCullingSystem::FrotbiteCullingSystem(unsigned int resolutionWidth, unsigned int resolutionHeight)
 	:
-	mCullJobCache{ std::bind(&FrotbiteCullingSystem::ReleaseFinishedBlockCount, this) },
 	mViewFrustumCulling{ this }
 #ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
 	, mScreenSpaceAABBCulling{ this }
 #endif
+	, mMaskedSWOcclusionCulling{ this, resolutionWidth, resolutionHeight }
 {
 	//to protect 
 	this->mFreeEntityBlockList.reserve(INITIAL_ENTITY_BLOCK_RESERVED_SIZE);
 	this->mEntityGridCell.mEntityBlocks.reserve(INITIAL_ENTITY_BLOCK_RESERVED_SIZE);
 	this->mEntityGridCell.AllocatedEntityCountInBlocks.reserve(INITIAL_ENTITY_BLOCK_RESERVED_SIZE);
-	for (size_t i = 0; i < MAX_CAMERA_COUNT; i++)
-	{
-		this->mCachedCullBlockEntityJobs[i].reserve(INITIAL_ENTITY_BLOCK_RESERVED_SIZE);
-	}
 
 	this->AllocateEntityBlockPool();
 
 	//this->CacheCullBlockEntityJobs();
 	this->bmIsEntityBlockPoolInitialized = true;
+
 }
 
 culling::FrotbiteCullingSystem::~FrotbiteCullingSystem()
@@ -234,16 +209,9 @@ std::vector<culling::EntityBlock*> culling::FrotbiteCullingSystem::GetActiveEnti
 	return this->mActiveEntityBlockList;
 }
 
-std::vector<std::function<void()>> culling::FrotbiteCullingSystem::GetCullBlockEnityJobs(unsigned int cameraIndex)
+std::function<void()> culling::FrotbiteCullingSystem::GetCullJob()
 {
-	std::vector<std::function<void()>> cullJobs{};
-	cullJobs.assign(this->mCachedCullBlockEntityJobs[cameraIndex].begin(), this->mCachedCullBlockEntityJobs[cameraIndex].begin() + this->mEntityGridCell.mEntityBlocks.size());
-	return cullJobs;
-}
-
-std::function<void()> culling::FrotbiteCullingSystem::GetCullJobs() const
-{
-	return this->mCullJobCache;
+	return std::function<void()>(std::bind(&FrotbiteCullingSystem::CullBlockEntityJob, this));
 }
 
 

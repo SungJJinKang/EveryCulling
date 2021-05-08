@@ -4,7 +4,7 @@
 
 #include "ScreenSpaceAABBCulling.h"
 
-void culling::ScreenSpaceAABBCulling::CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t blockIndex, size_t cameraIndex)
+void culling::ScreenSpaceAABBCulling::CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex)
 {
 	alignas(32) char cullingMask[ENTITY_COUNT_IN_ENTITY_BLOCK] = { 0 };
 	Vector4 mScreenSpaceAABBMin;
