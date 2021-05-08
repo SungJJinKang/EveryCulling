@@ -59,7 +59,8 @@ void culling::FrotbiteCullingSystem::CacheCullJob(size_t currentEntityBlockCount
 {
 	for (size_t cameraIndex = 0; cameraIndex < MAX_CAMERA_COUNT; cameraIndex++)
 	{
-		while (const size_t blockCount = this->mCachedCullBlockEntityJobs[cameraIndex].size() < currentEntityBlockCount)
+		size_t blockCount;
+		while ((blockCount = this->mCachedCullBlockEntityJobs[cameraIndex].size()) < currentEntityBlockCount)
 		{
 			this->mCachedCullBlockEntityJobs[cameraIndex].push_back(std::bind(&FrotbiteCullingSystem::CullBlockEntityJob, this, blockCount, cameraIndex));
 		}
