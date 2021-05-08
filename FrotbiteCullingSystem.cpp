@@ -55,6 +55,18 @@ culling::EntityBlock* culling::FrotbiteCullingSystem::GetNewEntityBlockFromPool(
 	return entityBlock;
 }
 
+void culling::FrotbiteCullingSystem::CacheCullJob(size_t currentEntityBlockCount)
+{
+	for (unsigned int cameraIndex = 0; cameraIndex < MAX_CAMERA_COUNT; cameraIndex++)
+	{
+		while (const size_t blockCount = this->mCachedCullBlockEntityJobs[cameraIndex].size() < currentEntityBlockCount)
+		{
+			this->mCachedCullBlockEntityJobs[cameraIndex].push_back(std::bind(&FrotbiteCullingSystem::CullBlockEntityJob, this, blockCount, cameraIndex));
+		}
+	}
+}
+
+/*
 void culling::FrotbiteCullingSystem::CacheCullBlockEntityJobs()
 {
 	for (unsigned int cameraIndex = 0; cameraIndex < MAX_CAMERA_COUNT; cameraIndex++)
@@ -65,8 +77,8 @@ void culling::FrotbiteCullingSystem::CacheCullBlockEntityJobs()
 			this->mCachedCullBlockEntityJobs[cameraIndex].push_back(std::bind(&FrotbiteCullingSystem::CullBlockEntityJob, this, entityBlockIndex, cameraIndex));
 		}
 	}
-
 }
+*/
 
 void culling::FrotbiteCullingSystem::ReleaseFinishedBlockCount()
 {
@@ -132,15 +144,25 @@ culling::EntityBlockViewer culling::FrotbiteCullingSystem::AllocateNewEntity(voi
 	std::pair<culling::EntityBlock*, unsigned int*> targetEntityBlock;
 	if (this->mEntityGridCell.mEntityBlocks.size() == 0)
 	{
+		// if Any entityBlock isn't allocated yet
 		targetEntityBlock = this->AllocateNewEntityBlockFromPool();
+		this->CacheCullJob(this->mEntityGridCell.mEntityBlocks.size());
 	}
+	else
+	{//When Allocated entity block count is at least one
 
-	targetEntityBlock = { this->mEntityGridCell.mEntityBlocks.back(), &(this->mEntityGridCell.AllocatedEntityCountInBlocks.back()) };
+		//Get last entityblock in active entities
+		targetEntityBlock = { this->mEntityGridCell.mEntityBlocks.back(), &(this->mEntityGridCell.AllocatedEntityCountInBlocks.back()) };
 
-	if (*(targetEntityBlock.second) == ENTITY_COUNT_IN_ENTITY_BLOCK)
-	{
-		targetEntityBlock = this->AllocateNewEntityBlockFromPool();
+		if (*(targetEntityBlock.second) == ENTITY_COUNT_IN_ENTITY_BLOCK)
+		{
+			//if last entityblock in active entities is full of entities
+			//alocate new entity block
+			targetEntityBlock = this->AllocateNewEntityBlockFromPool();
+			this->CacheCullJob(this->mEntityGridCell.mEntityBlocks.size());
+		}
 	}
+	
 	
 	assert(*(targetEntityBlock.second) <= ENTITY_COUNT_IN_ENTITY_BLOCK); // something is weird........
 	
@@ -176,7 +198,7 @@ culling::FrotbiteCullingSystem::FrotbiteCullingSystem()
 
 	this->AllocateEntityBlockPool();
 
-	this->CacheCullBlockEntityJobs();
+	//this->CacheCullBlockEntityJobs();
 	this->bmIsEntityBlockPoolInitialized = true;
 }
 

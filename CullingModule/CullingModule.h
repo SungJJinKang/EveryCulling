@@ -22,7 +22,7 @@ namespace culling
 		{
 
 		}
-		virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, unsigned int entityCountInBlock, unsigned int blockIndex, unsigned int cameraIndex) = 0;
+		virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t blockIndex, size_t cameraIndex) = 0;
 	
 	public:
 

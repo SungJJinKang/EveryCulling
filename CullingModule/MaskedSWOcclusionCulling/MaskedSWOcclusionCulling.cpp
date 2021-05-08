@@ -20,11 +20,15 @@ void culling::MaskedSWOcclusionCulling::ResetDepthBuffer()
 
 culling::MaskedSWOcclusionCulling::MaskedSWOcclusionCulling
 (
+	FrotbiteCullingSystem* frotbiteCullingSystem,
 	unsigned int width, unsigned int height, 
 	float nearClipPlaneDis, float farClipPlaneDis, 
 	float* viewProjectionMatrix
 )
-	: mDepthBuffer{ width, height }, binCountInRow{ width / SUB_TILE_WIDTH }, binCountInColumn{ height / SUB_TILE_HEIGHT },
+	: culling::CullingModule{frotbiteCullingSystem}, 
+	mDepthBuffer {
+	width, height
+}, binCountInRow{ width / SUB_TILE_WIDTH }, binCountInColumn{ height / SUB_TILE_HEIGHT },
 	mNearClipPlaneDis{ nearClipPlaneDis }, mFarClipPlaneDis{ farClipPlaneDis }, mViewProjectionMatrix{ viewProjectionMatrix },
 	mBinTrianglesStage{*this}, mRasterizeTrianglesStage{*this}
 {
@@ -47,6 +51,10 @@ void culling::MaskedSWOcclusionCulling::ResetState()
 {
 	this->ResetDepthBuffer();
 
+}
+
+void culling::MaskedSWOcclusionCulling::CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t blockIndex, size_t cameraIndex)
+{
 }
 
 

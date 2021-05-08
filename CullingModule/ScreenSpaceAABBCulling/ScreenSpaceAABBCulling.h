@@ -29,7 +29,7 @@ namespace culling
 
 		}
 
-		void CullBlockEntityJob(EntityBlock* currentEntityBlock, unsigned int entityCountInBlock, unsigned int blockIndex, unsigned int cameraIndex) final;
+		void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t blockIndex, size_t cameraIndex) final;
 
 	public:
 

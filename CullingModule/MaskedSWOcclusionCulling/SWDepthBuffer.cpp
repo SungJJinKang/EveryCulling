@@ -19,8 +19,10 @@ culling::SWDepthBuffer::SWDepthBuffer(unsigned int width, unsigned int height)
 #endif
 	}
 {
-	assert(this->mResolution.mWidth % TILE_WIDTH == 0, "DepthBuffer's size should be multiple of TILE_WIDTH");
-	assert(this->mResolution.mHeight % TILE_HEIGHT == 0, "DepthBuffer's size should be multiple of TILE_HEIGHT");
+	//"DepthBuffer's size should be multiple of TILE_WIDTH"
+	assert(this->mResolution.mWidth % TILE_WIDTH == 0);
+	//"DepthBuffer's size should be multiple of TILE_HEIGHT"
+	assert(this->mResolution.mHeight % TILE_HEIGHT == 0);
 
 	
 

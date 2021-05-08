@@ -10,6 +10,8 @@
 #include "../../DataType/Math/AABB.h"
 #include "../../DataType/Math/Matrix.h"
 
+#include "../CullingModule.h"
+
 #include "Stage/BinTrianglesStage.h"
 #include "Stage/RasterizeTrianglesStage.h"
 
@@ -26,7 +28,7 @@ namespace culling
 	/// 
 	/// references : https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf
 	/// </summary>
-	class MaskedSWOcclusionCulling
+	class MaskedSWOcclusionCulling : public CullingModule
 	{
 		friend class BinTrianglesStage;
 		friend class MaskedSWOcclusionCullingStage;
@@ -101,6 +103,9 @@ namespace culling
 			M256F aabbVertexY[3];
 			M256F aabbVertexZ[3];
 
+			///Temporarily remove unused varaible warning
+			(void)aabbVertexX, (void)aabbVertexY, (void)aabbVertexZ;
+
 			// 3 AABB is checked per loop
 			for (size_t i = 0; i < aabbCount; i += 3)
 			{
@@ -113,7 +118,10 @@ namespace culling
 
 	public:
 
-		MaskedSWOcclusionCulling(unsigned int width, unsigned int height, float nearClipPlaneDis, float farClipPlaneDis, float* viewProjectionMatrix);
+		MaskedSWOcclusionCulling(
+			FrotbiteCullingSystem* frotbiteCullingSystemunsigned, 
+			unsigned int width, unsigned int height, float nearClipPlaneDis, float farClipPlaneDis, float* viewProjectionMatrix
+		);
 	
 		void SetNearFarClipPlaneDistance(float nearClipPlaneDis, float farClipPlaneDis);
 		void SetViewProjectionMatrix(float* viewProjectionMatrix);
@@ -126,6 +134,9 @@ namespace culling
 		{
 			 
 		}
+
+		// Inherited via CullingModule
+		virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t blockIndex, size_t cameraIndex) override;
 	};
 }
 

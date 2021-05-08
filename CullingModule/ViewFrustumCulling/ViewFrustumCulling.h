@@ -32,12 +32,12 @@ namespace culling
 
 		}
 
-		FORCE_INLINE virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, unsigned int entityCountInBlock, unsigned int blockIndex, unsigned int cameraIndex) final
+		FORCE_INLINE virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t blockIndex, size_t cameraIndex) final
 		{
 			alignas(64) char cullingMask[ENTITY_COUNT_IN_ENTITY_BLOCK] = { 0 };
 
 			const Vector4* frustumPlane = this->mSIMDFrustumPlanes[cameraIndex].mFrustumPlanes;
-			for (unsigned int j = 0; j < entityCountInBlock; j = j + 2)
+			for (size_t j = 0; j < entityCountInBlock; j = j + 2)
 			{
 				char result = this->CheckInFrustumSIMDWithTwoPoint(frustumPlane, currentEntityBlock->mPositions + j);
 				// if first low bit has 1 value, Pos A is In Frustum

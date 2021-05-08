@@ -8,6 +8,9 @@
 
 namespace culling
 {
+	/// <summary>
+	/// Used for storing specific EntityBlock pointer
+	/// </summary>
 	class EntityBlockViewer
 	{
 		friend class FrotbiteCullingSystem;
@@ -16,6 +19,9 @@ namespace culling
 
 		bool bmIsActive;
 		EntityBlock* mTargetEntityBlock;
+		/// <summary>
+		/// Entity Index in Entity Block
+		/// </summary>
 		unsigned int mEntityIndexInBlock;
 
 	public:

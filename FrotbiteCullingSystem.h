@@ -95,7 +95,8 @@ namespace culling
 		void FreeEntityBlock(EntityBlock* freedEntityBlock);
 		EntityBlock* GetNewEntityBlockFromPool();
 
-		void CacheCullBlockEntityJobs();
+		void CacheCullJob(size_t currentEntityBlockCount);
+		//void CacheCullBlockEntityJobs();
 		/// <summary>
 		/// Release atomic variable
 		/// </summary>
