@@ -9,7 +9,7 @@
 #include <vector>
 #include <atomic>
 #include <functional>
-
+#include <thread>
 
 #include "CullingModule/ViewFrustumCulling/ViewFrustumCulling.h"
 #ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
@@ -211,7 +211,10 @@ namespace culling
 			const size_t lastCameraIndex = this->mCameraCount - 1;
 			const size_t lastModuleIndex = this->mCullingModules.size() - 1;
 			const CullingModule* lastCullingModule = this->mCullingModules[lastModuleIndex];
-			while (this->GetIsCullJobFinished(lastCullingModule->mFinishedCullEntityBlockCount[lastCameraIndex], entityBlockCount) == false) {} // busy wait!
+			while (this->GetIsCullJobFinished(lastCullingModule->mFinishedCullEntityBlockCount[lastCameraIndex], entityBlockCount) == false) 
+			{
+				std::this_thread::yield();
+			} // busy wait!
 		}
 
 		/// <summary>
