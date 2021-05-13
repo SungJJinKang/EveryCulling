@@ -162,6 +162,11 @@ namespace culling
 				{
 					for (size_t moduleIndex = 0; moduleIndex < this->mCullingModules.size(); moduleIndex++)
 					{
+						// TODO : Don't use pointer, Just use specific object(3 module) 
+						// Why? : virtual funtion call should reference virtual function table,
+						// We need really fast computation at here, 
+						// referencing virtual function table make it slow
+
 						CullingModule* cullingModule = this->mCullingModules[moduleIndex];
 						//TODO : ON X64, X84, memory_order_relaxed also do acquire memory
 						//So This codes is too slow, FIX IT!!!!!!!!!!!
@@ -214,7 +219,7 @@ namespace culling
 			while (this->GetIsCullJobFinished(lastCullingModule->mFinishedCullEntityBlockCount[lastCameraIndex], entityBlockCount) == false) 
 			{
 				std::this_thread::yield();
-			} // busy wait!
+			} 
 		}
 
 		/// <summary>
