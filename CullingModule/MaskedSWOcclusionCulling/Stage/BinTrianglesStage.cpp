@@ -239,6 +239,8 @@ void culling::BinTrianglesStage::BinTriangles(
 		M256F ndcSpaceVertexX[3], ndcSpaceVertexY[3], ndcSpaceVertexZ[3], oneDividedByW[3];
 
 
+		//TODO : Why use 1/w for depth test, not z -> Check this : https://github.com/GameTechDev/MaskedOcclusionCulling/issues/23
+
 		//Gather Vertex with indice
 		//WE ARRIVE AT MODEL SPACE COORDINATE!
 		this->GatherVertex(vertices, vertexIndices, indiceCount, currentIndiceIndex, vertexStrideByte, fetchTriangleCount, ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, triangleCullMask);
