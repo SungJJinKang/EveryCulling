@@ -136,10 +136,6 @@ When Area Size of AABB projected to screen space is less than setting value, It 
 I don't recommend using this feature, because Objects will pop up and this is really distracting...       
 I will add Object fade out.    
 
-## Required dependency
-
-[LightMath_Cpp](https://github.com/SungJJinKang/LightMath_Cpp) ( You can make your own, but implement CheckInFrustumSIMDWithTwoPoint function yourself, https://github.com/SungJJinKang/LightMath_Cpp/blob/main/Matrix4x4Float_SIMD.inl )
-
 ## References
 
 - https://www.ea.com/frostbite/news/culling-the-battlefield-data-oriented-design-in-practice
