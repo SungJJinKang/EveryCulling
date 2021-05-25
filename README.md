@@ -1,6 +1,10 @@
-# Frostbite_CullingSystem
+# Paralle Culling
 
-This library is implementation of **Culling the Battlefield: Data Oriented Design in Practice Talk of EA DICE in 2011** And **Masked SW Occlusion Culling**            
+This library is implementation of        
+**Culling the Battlefield: Data Oriented Design in Practice Talk of EA DICE in 2011**      
+And       
+**Masked SW Occlusion Culling**        
+
 Frostbite used Plain SW Occlusion Culling, but I will implement Masked SW Occlusion Culling.         
 Masked SW Occlusion Culling is announced in 2016 by intel.          
 
@@ -8,7 +12,7 @@ Masked SW Occlusion Culling is announced in 2016 by intel.
 [GDC Talk Video](https://www.gdcvault.com/play/1014491/Culling-the-Battlefield-Data-Oriented)          
 [한국어 블로그 글](https://sungjjinkang.github.io/doom/2021/04/02/viewfrustumculling.html)          
 
-[Masked Occlusion Culling 논문](https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf) 
+[Masked Occlusion Culling Paper](https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf) 
 
 ## Core Feature 
 This library is targeting Maximing SIMD, Cache hit, Multi Threading.       
