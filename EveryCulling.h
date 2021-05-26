@@ -12,10 +12,16 @@
 #include <thread>
 
 #include "CullingModule/ViewFrustumCulling/ViewFrustumCulling.h"
+
 #ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
 #include "CullingModule/ScreenSpaceAABBCulling/ScreenSpaceAABBCulling.h"
 #endif
+
 #include "CullingModule/MaskedSWOcclusionCulling/MaskedSWOcclusionCulling.h"
+
+#ifdef ENABLE_QUERY_OCCLUSION
+#include "CullingModule/QueryOcclusionCulling/QueryOcclusionCulling.h"
+#endif
 
 namespace culling
 {
@@ -48,7 +54,8 @@ namespace culling
 	{
 		friend class ScreenSpaceAABBCulling;
 		friend class ViewFrustumCulling;
-		
+		friend class QueryOcclusionCulling;
+
 	private:
 
 		unsigned int mCameraCount;
@@ -72,6 +79,8 @@ namespace culling
 
 		std::atomic<bool> mIsCullJobFinished;
 
+		culling::Matrix4X4 mViewProjectionMatrix;
+
 		void AllocateEntityBlockPool();
 		std::pair<culling::EntityBlock*, unsigned int*> AllocateNewEntityBlockFromPool();
 		void RemoveEntityFromBlock(EntityBlock* ownerEntityBlock, unsigned int entityIndexInBlock);
@@ -94,6 +103,9 @@ namespace culling
 		ScreenSpaceAABBCulling mScreenSpaceAABBCulling;
 #endif
 		MaskedSWOcclusionCulling mMaskedSWOcclusionCulling;
+#ifdef ENABLE_QUERY_OCCLUSION
+		QueryOcclusionCulling mQueryOcclusionCulling;
+#endif
 
 	private:
 
@@ -103,11 +115,11 @@ namespace culling
 #else
 			2
 #endif
-		> mCullingModules
+		> mUpdatedCullingModules
 		{
 			&(this->mViewFrustumCulling),
 #ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
-			&(this->mScreenSpaceAABBCulling)
+			&(this->mScreenSpaceAABBCulling),
 #endif	
 			&(this->mMaskedSWOcclusionCulling)
 		};
@@ -117,6 +129,7 @@ namespace culling
 		EveryCulling(unsigned int resolutionWidth, unsigned int resolutionHeight);
 		~EveryCulling();
 		void SetCameraCount(unsigned int cameraCount);
+		void SetViewProjectionMatrix(const culling::Matrix4X4& viewProjectionMatrix);
 		unsigned int GetCameraCount() const;
 		/// <summary>
 		/// Get EntityBlock List with entities
@@ -160,14 +173,14 @@ namespace culling
 			{
 				for (unsigned int cameraIndex = 0; cameraIndex < this->mCameraCount; cameraIndex++)
 				{
-					for (size_t moduleIndex = 0; moduleIndex < this->mCullingModules.size(); moduleIndex++)
+					for (size_t moduleIndex = 0; moduleIndex < this->mUpdatedCullingModules.size(); moduleIndex++)
 					{
 						// TODO : Don't use pointer, Just use specific object(3 module) 
 						// Why? : virtual funtion call should reference virtual function table,
 						// We need really fast computation at here, 
 						// referencing virtual function table make it slow
 
-						CullingModule* cullingModule = this->mCullingModules[moduleIndex];
+						CullingModule* cullingModule = this->mUpdatedCullingModules[moduleIndex];
 						//TODO : ON X64, X84, memory_order_relaxed also do acquire memory
 						//So This codes is too slow, FIX IT!!!!!!!!!!!
 						//
@@ -219,8 +232,8 @@ namespace culling
 		{
 			const unsigned int entityBlockCount = static_cast<unsigned int>(this->mEntityGridCell.mEntityBlocks.size());
 			const size_t lastCameraIndex = this->mCameraCount - 1;
-			const size_t lastModuleIndex = this->mCullingModules.size() - 1;
-			const CullingModule* lastCullingModule = this->mCullingModules[lastModuleIndex];
+			const size_t lastModuleIndex = this->mUpdatedCullingModules.size() - 1;
+			const CullingModule* lastCullingModule = this->mUpdatedCullingModules[lastModuleIndex];
 			while (this->GetIsCullJobFinished(lastCullingModule->mFinishedCullEntityBlockCount[lastCameraIndex], entityBlockCount) == false) 
 			{
 				std::this_thread::yield();

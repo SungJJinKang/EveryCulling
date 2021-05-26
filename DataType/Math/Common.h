@@ -8,7 +8,7 @@
 
 namespace culling
 {
-	inline void NormalizePlane(Vector4& plane)
+	FORCE_INLINE void NormalizePlane(Vector4& plane) noexcept
 	{
 		float mag = std::sqrt(plane[0] * plane[0] + plane[1] * plane[1] + plane[2] * plane[2]);
 		assert(std::isnan(mag) == false);
@@ -33,7 +33,7 @@ namespace culling
 		/// https://www.gamedevs.org/uploads/fast-extraction-viewing-frustum-planes-from-world-view-projection-matrix.pdf
 		/// https://macton.smugmug.com/Other/2008-07-15-by-Eye-Fi/n-xmKDH/i-bJq8JqZ/A
 		/// </summary>
-	FORCE_INLINE void ExtractPlanesFromVIewProjectionMatrix(const Matrix4X4& viewProjectionMatrix, Vector4* sixPlanes, bool normalize) noexcept
+	FORCE_INLINE [[nodiscard]] void ExtractPlanesFromVIewProjectionMatrix(const Matrix4X4& viewProjectionMatrix, Vector4* sixPlanes, bool normalize) noexcept
 	{
 		sixPlanes[0][0] = viewProjectionMatrix[0][3] + viewProjectionMatrix[0][0];
 		sixPlanes[0][1] = viewProjectionMatrix[1][3] + viewProjectionMatrix[1][0];
@@ -75,7 +75,7 @@ namespace culling
 		}
 	}
 
-	FORCE_INLINE void ExtractSIMDPlanesFromViewProjectionMatrix(const Matrix4X4& viewProjectionMatrix, Vector4* eightPlanes, bool normalize) noexcept
+	FORCE_INLINE [[nodiscard]] void ExtractSIMDPlanesFromViewProjectionMatrix(const Matrix4X4& viewProjectionMatrix, Vector4* eightPlanes, bool normalize) noexcept
 	{
 
 		Vector4 sixPlane[6];
@@ -123,5 +123,17 @@ namespace culling
 		eightPlanes[7][3] = sixPlane[5][3];
 
 	}
+
+	FORCE_INLINE [[nodiscard]] Vector4 operator*(const culling::Matrix4X4& mat4, const culling::Vector3& vec3) noexcept
+	{
+		return Vector4
+		{
+				mat4[0][0] * vec3.x + mat4[1][0] * vec3.y + mat4[2][0] * vec3.z + mat4[3][0],
+				mat4[0][1] * vec3.x + mat4[1][1] * vec3.y + mat4[2][1] * vec3.z + mat4[3][1],
+				mat4[0][2] * vec3.x + mat4[1][2] * vec3.y + mat4[2][2] * vec3.z + mat4[3][2],
+				mat4[0][3] * vec3.x + mat4[1][3] * vec3.y + mat4[2][3] * vec3.z + mat4[3][3],
+		};
+	}
+
 
 }

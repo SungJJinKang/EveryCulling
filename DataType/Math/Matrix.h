@@ -9,7 +9,7 @@ namespace culling
 	/// </summary>
 	struct alignas(64) Matrix4X4
 	{
-		Vector4 mColumns[4];
+		culling::Vector4 mColumns[4];
 
 		FORCE_INLINE Vector4& operator[](size_t index)
 		{

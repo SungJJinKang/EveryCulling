@@ -4,30 +4,34 @@
 
 #include "Math/AABB.h"
 #include "Math/Vector.h"
+#include "Math/Matrix.h"
+
 #include "TransformData.h"
 
-
+#define MAKE_EVEN_NUMBER(X) (X - (X%2))
 
 namespace culling
 {
 
 	//This code doesn't consider Memory alignment optimzation.
-#ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
-	inline static constexpr size_t ENTITY_COUNT_IN_ENTITY_BLOCK = (4096 - sizeof(unsigned int)) /
+
+	inline static constexpr size_t ENTITY_COUNT_IN_ENTITY_BLOCK = 
+		MAKE_EVEN_NUMBER( (4096 - sizeof(unsigned int)) /
 		(
-			sizeof(Vector4) +
-			sizeof(char) +
-			sizeof(void*) +
-			sizeof(AABB)
-			) - 1;
-#else
-	inline static constexpr size_t ENTITY_COUNT_IN_ENTITY_BLOCK = (4096 - sizeof(unsigned int)) /
-		(
-			sizeof(Vector4) +
-			sizeof(char) +
-			sizeof(void*) 
-			) - 3; //offset
+			sizeof(Vector4)
+			+ sizeof(char)
+			+ sizeof(void*)
+#if defined(ENABLE_SCREEN_SAPCE_AABB_CULLING) || defined(ENABLE_QUERY_OCCLUSION)
+			+ sizeof(AABB)
 #endif
+
+#ifdef ENABLE_QUERY_OCCLUSION
+			+ sizeof(unsigned int)
+			+ sizeof(bool)
+#endif
+		)
+		) ;
+
 		/// <summary>
 		/// EntityBlock size should be less 4KB(Page size) for Block data being allocated in a page
 		/// </summary>
@@ -37,7 +41,7 @@ namespace culling
 		/// Why align to 32byte?
 		/// To set mIsVisibleBitflag, We use _m256
 		/// </summary>
-		alignas(32) char mIsVisibleBitflag[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		char mIsVisibleBitflag[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 		//SoA (Structure of Array) !!!!!! for performance 
 
@@ -57,7 +61,7 @@ namespace culling
 		/// </summary>
 		alignas(32) Vector4 mPositions[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
-#ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
+#if defined(ENABLE_SCREEN_SAPCE_AABB_CULLING) || defined(ENABLE_QUERY_OCCLUSION)
 		/// <summary>
 		/// Size of AABB is 32 byte.
 		/// 2 AABB is 64 byte.
@@ -70,7 +74,10 @@ namespace culling
 		AABB mWorldAABB[ENTITY_COUNT_IN_ENTITY_BLOCK];
 #endif
 
-		
+#ifdef ENABLE_QUERY_OCCLUSION
+		unsigned int mQueryID[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		bool mUseQuery[ENTITY_COUNT_IN_ENTITY_BLOCK];
+#endif
 		
 		/// <summary>
 		/// mIsVisibleBitflag is stored through two __m128

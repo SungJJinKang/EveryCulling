@@ -35,7 +35,8 @@ namespace culling
 
 		}
 		virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex) = 0;
-	
+		virtual void ClearEntityData(EntityBlock* currentEntityBlock, unsigned int entityIndex);
+
 	public:
 
 

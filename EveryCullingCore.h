@@ -31,6 +31,10 @@
 #define MIN3(A, B) MIN(A, MIN(B, C))
 #endif
 
+#ifndef ABS
+#define	ABS(x)			( ((x)<0)?-(x):(x) )
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////////////
 //Graphics API
 
@@ -108,7 +112,7 @@
 
 // Screen Space AABB Culling
 #ifndef ENABLE_SCREEN_SAPCE_AABB_CULLING
-//#define ENABLE_SCREEN_SAPCE_AABB_CULLING
+#define ENABLE_SCREEN_SAPCE_AABB_CULLING
 #endif
 
 

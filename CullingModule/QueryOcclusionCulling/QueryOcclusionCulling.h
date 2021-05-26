@@ -5,6 +5,8 @@
 #include "../../DataType/Math/Vector.h"
 #include "../../DataType/Math/Matrix.h"
 
+#include "../../DataType/EntityBlockViewer.h"
+
 #ifdef ENABLE_QUERY_OCCLUSION
 
 
@@ -12,6 +14,8 @@
 namespace culling
 {
 	/// <summary>
+	///
+	/// This module is executed on single thread
 	/// 
 	/// 1. Draw Occluder.        
 	/// 2. Draw AABB of Complicated Occludeee mesh. (AABB is much cheaper than complicated mesh)
@@ -24,14 +28,13 @@ namespace culling
 	{
 
 		friend class Graphics_Server;
+
 	private:
 
-		unsigned int mQueryID{ 0 };
+		unsigned int mOcclusionMaterialID{ 0 };
 
-		unsigned int mOcclusionMaterialID;
-
-		unsigned int mVertexBufferID;
-		unsigned int mVertexArrayObjectID;
+		unsigned int mVertexBufferID{ 0 };
+		unsigned int mVertexArrayObjectID{ 0 };
 
 		bool bmIsQueryOcclusionReady{ false };
 
@@ -47,19 +50,13 @@ namespace culling
 		/// </summary>
 		//std::unique_ptr<Material> mOccluderMaterial{};
 
+		unsigned int GenQuery();
 		/// <summary>
 		/// draw Simple bounding volume(Occluder) after this function call
 		/// TODO : Disable Pixel Shading, Texturing
 		/// </summary>
-		bool StartQuery();
-		void StopQuery();
-
-		static culling::AABBPoints GenAABBPointsFromWorldSpace(const culling::Vector3& minLocalSpace, const culling::Vector3& maxLocalSpace);
-		static culling::AABBPoints GenAABBPointsFromLocalSpace(const culling::Vector3& minLocalSpace, const culling::Vector3& maxLocalSpace, const culling::Matrix4X4& localToWorldMatrix);
-
-	public:
-
-		virtual ~QueryOcclusionCulling();
+		bool StartQuery(const unsigned int queryID);
+		void StopQuery(const unsigned int queryID);
 
 		/// <summary>
 		/// draw complex mesh after this function call
@@ -74,29 +71,46 @@ namespace culling
 		///  of non - dependent rendering between an occlusion query and the
 		///	 conditionally - rendered primitives that depend on the query result.
 		/// </summary>
-		bool StartConditionalRender();
+		bool StartConditionalRender(unsigned int queryID);
 		void StopConditionalRender();
 
 		//TODO : Check ScreenSpace AABB size of rendered mesh, If Size if smaller than setting, It's not valuable to use as Occluder
-		
+
 		/// <summary>
-		/// 
 		/// Start Query and Draw AABB of Occludee
 		/// You should pass World Space AABB Vertices
 		/// 
 		/// Quering AABB Data require a few times. 
 		/// So Don't Do ConditionalRender instantly after Call Query Data!!!!!!!!!!!!!!!!!!!!!!!!!!! 
-		/// Do other works between DrawOccludeeAABB and StartConditionalRender
+		/// Do other works between QueryOccludeeAABB and StartConditionalRender
 		/// 
 		/// </summary>
+		/// <param name="queryID"></param>
 		/// <param name="occlusionAABBWorldVertices"></param>
-		/// <param name="verticeCount"></param>
-		void DrawOccludeeAABB(const culling::Vector3* occlusionAABBWorldVertices, size_t verticeCount);
+		void QueryOccludeeAABB(const unsigned int queryID, const culling::Vector3* occlusionAABBWorldVertices);
 
-		// Not used
-		virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex) final { assert(0); }
-	
-	
+		static culling::AABBVertices GenAABBVerticesFromWorldSpace(const culling::Vector3& minLocalSpace, const culling::Vector3& maxLocalSpace);
+		static culling::AABBVertices GenAABBVerticesFromLocalSpace(const culling::Vector3& minLocalSpace, const culling::Vector3& maxLocalSpace, const culling::Matrix4X4& localToWorldMatrix);
+
+	public:
+
+		QueryOcclusionCulling(culling::EveryCulling* everyCulling);
+		virtual ~QueryOcclusionCulling();
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="currentEntityBlock"></param>
+		/// <param name="entityCountInBlock"></param>
+		/// <param name="cameraIndex"></param>
+		virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex) final;
+		void ClearEntityData(EntityBlock* currentEntityBlock, unsigned int entityIndex) override;
+
+		/// <summary>
+		/// This function should be executed on single thread
+		/// </summary>
+		void QueryOccludeeAABB();
+		void StartConditionalRenderingIfQueryActive(const EntityBlockViewer& entityBlockViewer);
 	};
 
 }

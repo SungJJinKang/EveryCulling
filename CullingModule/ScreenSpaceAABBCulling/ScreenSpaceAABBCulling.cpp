@@ -3,29 +3,47 @@
 #ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
 
 #include "ScreenSpaceAABBCulling.h"
+#include "../../DataType/Math/Common.h"
+
+#include "../../EveryCulling.h"
+
+culling::ScreenSpaceAABBCulling::ScreenSpaceAABBCulling(EveryCulling* everyCulling) 
+	: CullingModule{ everyCulling }
+{
+
+}
 
 void culling::ScreenSpaceAABBCulling::CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex)
 {
 	alignas(32) char cullingMask[ENTITY_COUNT_IN_ENTITY_BLOCK] = { 0 };
-	Vector4 mScreenSpaceAABBMin;
-	Vector4 mScreenSpaceAABBMax;
+	culling::Vector4 mScreenSpaceAABBMin;
+	culling::Vector4 mScreenSpaceAABBMax;
 	float x, y, area;
 	for (unsigned int j = 0; j < entityCountInBlock; j++)
 	{
 		//TODO : Think How to use SIMD
 
-		culling::AABB& entityAABB = currentEntityBlock->mWorldAABB[j];
+		const culling::AABB& entityAABB = currentEntityBlock->mWorldAABB[j];
 
-		mScreenSpaceAABBMin = this->mViewProjectionMatrix * entityAABB.mMin;
-		mScreenSpaceAABBMax = this->mViewProjectionMatrix * entityAABB.mMax;
+		// TODO : This is completly wrong, 
+		// 8 corner should be projected to screen space
+		mScreenSpaceAABBMin = this->mCullingSystem->mViewProjectionMatrix * entityAABB.mMin;
+		mScreenSpaceAABBMax = this->mCullingSystem->mViewProjectionMatrix * entityAABB.mMax;
 
-		mScreenSpaceAABBMin /= mScreenSpaceAABBMin.w;
-		mScreenSpaceAABBMax /= mScreenSpaceAABBMax.w;
+		mScreenSpaceAABBMin.values[0] /= mScreenSpaceAABBMin.values[3];
+		mScreenSpaceAABBMin.values[1] /= mScreenSpaceAABBMin.values[3];
+		mScreenSpaceAABBMin.values[2] /= mScreenSpaceAABBMin.values[3];
+		mScreenSpaceAABBMin.values[3] /= mScreenSpaceAABBMin.values[3];
+
+		mScreenSpaceAABBMax.values[0] /= mScreenSpaceAABBMax.values[3];
+		mScreenSpaceAABBMax.values[1] /= mScreenSpaceAABBMax.values[3];
+		mScreenSpaceAABBMax.values[2] /= mScreenSpaceAABBMax.values[3];
+		mScreenSpaceAABBMax.values[3] /= mScreenSpaceAABBMax.values[3];
 
 		//x = math::Max(mScreenSpaceAABBMin.x, mScreenSpaceAABBMax.x) - math::Min(mScreenSpaceAABBMin.x, mScreenSpaceAABBMax.x);
 		//y = math::Max(mScreenSpaceAABBMin.y, mScreenSpaceAABBMax.y) - math::Min(mScreenSpaceAABBMin.y, mScreenSpaceAABBMax.y);
-		x = math::abs(mScreenSpaceAABBMin.x - mScreenSpaceAABBMax.x);
-		y = math::abs(mScreenSpaceAABBMin.y - mScreenSpaceAABBMax.y);
+		x = ABS(mScreenSpaceAABBMin.values[0] - mScreenSpaceAABBMax.values[0]);
+		y = ABS(mScreenSpaceAABBMin.values[1] - mScreenSpaceAABBMax.values[1]);
 		
 		area = x * y;
 
@@ -42,7 +60,7 @@ void culling::ScreenSpaceAABBCulling::CullBlockEntityJob(EntityBlock* currentEnt
 
 
 
-	unsigned int m256_count_isvisible = 1 + ((currentEntityBlock->mCurrentEntityCount * sizeof(decltype(*EntityBlock::mIsVisibleBitflag)) - 1) / 32);
+	unsigned int m256_count_isvisible = 1 + ((currentEntityBlock->mCurrentEntityCount * sizeof(decltype(*EntityBlock::mIsVisibleBitflag)) - 1) / sizeof(M256F));
 
 	/// <summary>
 	/// M256 = 8bit(1byte = bool size) * 32 
@@ -55,9 +73,5 @@ void culling::ScreenSpaceAABBCulling::CullBlockEntityJob(EntityBlock* currentEnt
 	}
 }
 
-void culling::ScreenSpaceAABBCulling::SetViewProjectionMatrix(const math::Matrix4x4& viewProjectionMatrix)
-{
-	this->mViewProjectionMatrix = viewProjectionMatrix;
-}
 
 #endif

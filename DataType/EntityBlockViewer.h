@@ -8,12 +8,15 @@
 
 namespace culling
 {
+	class QueryOcclusionCulling;
+
 	/// <summary>
 	/// Used for storing specific EntityBlock pointer
 	/// </summary>
 	class EntityBlockViewer
 	{
 		friend class EveryCulling;
+		friend class QueryOcclusionCulling;
 
 	private:
 

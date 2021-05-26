@@ -12,27 +12,23 @@ namespace culling
 	/// </summary>
 	class ScreenSpaceAABBCulling : public CullingModule
 	{
-		friend class FrotbiteCullingSystem;
+		friend class EveryCulling;
 
 	private:
 
-		float mMinimumScreenSpaceAABBArea = 0.00015f;
+		float mMinimumScreenSpaceAABBArea = 0.000005f;
 
 		//For Calculating ScreenSpace AABB Area
 		//AABB로 할지 아님 Sphere로 할지(https://stackoverflow.com/questions/21648630/radius-of-projected-sphere-in-screen-space)...
 		//
-		Matrix4X4 mViewProjectionMatrix;
+	
 
-		ScreenSpaceAABBCulling(FrotbiteCullingSystem* frotbiteCullingSystem)
-			:CullingModule{ frotbiteCullingSystem }
-		{
-
-		}
+		ScreenSpaceAABBCulling(EveryCulling* everyCulling);
 
 		void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex);
 
 	public:
 
-		void SetViewProjectionMatrix(const Matrix4X4& viewProjectionMatrix);
+	
 	};
 }

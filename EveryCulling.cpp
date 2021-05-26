@@ -54,9 +54,9 @@ void culling::EveryCulling::ResetCullJobStateVariable()
 {
 	for (unsigned int cameraIndex = 0; cameraIndex < this->mCameraCount; cameraIndex++)
 	{
-		for (size_t moduleIndex = 0; moduleIndex < this->mCullingModules.size(); moduleIndex++)
+		for (size_t moduleIndex = 0; moduleIndex < this->mUpdatedCullingModules.size(); moduleIndex++)
 		{
-			CullingModule* cullingModule = this->mCullingModules[moduleIndex];
+			CullingModule* cullingModule = this->mUpdatedCullingModules[moduleIndex];
 			cullingModule->mCurrentCullEntityBlockIndex[cameraIndex].store(0, std::memory_order_relaxed);
 			cullingModule->mFinishedCullEntityBlockCount[cameraIndex].store(0, std::memory_order_relaxed);
 		}
@@ -91,7 +91,14 @@ void culling::EveryCulling::RemoveEntityFromBlock(EntityBlock* ownerEntityBlock,
 	assert(ownerEntityBlock != nullptr);
 	assert(entityIndexInBlock >= 0 && entityIndexInBlock < ENTITY_COUNT_IN_ENTITY_BLOCK);
 
-	//Do nothing......
+	this->mViewFrustumCulling.ClearEntityData(ownerEntityBlock, entityIndexInBlock);
+	this->mMaskedSWOcclusionCulling.ClearEntityData(ownerEntityBlock, entityIndexInBlock);
+#ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
+	this->mScreenSpaceAABBCulling.ClearEntityData(ownerEntityBlock, entityIndexInBlock);
+#endif
+#ifdef ENABLE_QUERY_OCCLUSION
+	this->mQueryOcclusionCulling.ClearEntityData(ownerEntityBlock, entityIndexInBlock);
+#endif
 
 	//Don't decrement this->mEntityGridCell.AllocatedEntityCountInBlocks
 	//Entities Indexs in EntityBlock should not be swapped because already allocated EntityBlockViewer can't see it
@@ -169,6 +176,7 @@ culling::EveryCulling::EveryCulling(unsigned int resolutionWidth, unsigned int r
 	, mScreenSpaceAABBCulling{ this }
 #endif
 	, mMaskedSWOcclusionCulling{ this, resolutionWidth, resolutionHeight }
+	, mQueryOcclusionCulling{ this }
 {
 	//to protect 
 	this->mFreeEntityBlockList.reserve(INITIAL_ENTITY_BLOCK_RESERVED_SIZE);
@@ -197,6 +205,11 @@ void culling::EveryCulling::SetCameraCount(unsigned int cameraCount)
 #ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
 	this->mScreenSpaceAABBCulling.mCameraCount = cameraCount;
 #endif
+}
+
+void culling::EveryCulling::SetViewProjectionMatrix(const culling::Matrix4X4& viewProjectionMatrix)
+{
+	this->mViewProjectionMatrix = viewProjectionMatrix;
 }
 
 unsigned int culling::EveryCulling::GetCameraCount() const
