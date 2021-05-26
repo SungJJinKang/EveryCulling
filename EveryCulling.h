@@ -173,6 +173,8 @@ namespace culling
 						//
 						//
 						//
+
+						//TODO : 그냥 각 스레드가 한 Enityty 블록 연산하게 바꾸자
 						while (cullingModule->mFinishedCullEntityBlockCount[cameraIndex].load(std::memory_order_relaxed) < entityBlockCount)
 						{
 							if (cullingModule->mCurrentCullEntityBlockIndex[cameraIndex].load(std::memory_order_relaxed) >= entityBlockCount)

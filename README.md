@@ -128,12 +128,18 @@ In My experiment, Waiting time is near to zero.
 
 references : https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf
 
+## Query Occlusion Culling
+
+Currently This feature is supported only on OpenGL.       
+
+
+
 ## Screen Space AABB Area Culling
 
 This is really easy to understand.    
 When Area Size of AABB projected to screen space is less than setting value, It will be culled.    
-I don't recommend using this feature, because Objects will pop up and this is really distracting...       
-I will add Object fade out.    
+I don't recommend using this feature, because The objects pops up and this is really distracting...       
+I will add Object fade out feature.    
 
 ## Distance Culling
 
@@ -141,7 +147,9 @@ This feature is referenced from Unreal Engine.
 You can see How this feature works from [here](https://docs.unrealengine.com/en-US/RenderingAndGraphics/VisibilityCulling/CullDistanceVolume/index.html)       
 Objects become invisible depending on distance between object and camera.          
 With this feature, You can make detailed object not to be rendered when it is far from camera.    
-According your setting, Objects do popping.            
+According your setting, Objects do popping.    
+
+
 
 ## References
 

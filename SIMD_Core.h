@@ -25,15 +25,25 @@ typedef __m256i M256I;
 
 
 //https://software.intel.com/sites/landingpage/IntrinsicsGuide/#expand=69,124,3928,5197&techs=SSE,SSE2,SSE3,SSSE3,SSE4_1,SSE4_2,AVX&text=_mm_shuffle_ps
+#ifndef SHUFFLEMASK
 #define SHUFFLEMASK(A0,A1,B2,B3) ( (A0) | ((A1)<<2) | ((B2)<<4) | ((B3)<<6) )
+#endif
 
+#ifndef M128F_REPLICATE
 #define M128F_REPLICATE(M128F, ElementIndex) _mm_permute_ps(M128F, SHUFFLEMASK(ElementIndex, ElementIndex, ElementIndex, ElementIndex)) 
+#endif
 
+#ifndef M128F_SWIZZLE
 #define M128F_SWIZZLE(M128F, X, Y, Z, W) _mm_permute_ps(M128F, SHUFFLEMASK(X, Y, Z, W)) 
+#endif
 
+#ifndef M256F_REPLICATE
 #define M256F_REPLICATE(M256F, ElementIndex) _mm256_permute_ps(M256F, SHUFFLEMASK(ElementIndex, ElementIndex, ElementIndex, ElementIndex)) 
+#endif
 
+#ifndef M256F_SWIZZLE
 #define M256F_SWIZZLE(M256F, X, Y, Z, W) _mm256_permute_ps(M256F, SHUFFLEMASK(X, Y, Z, W)) 
+#endif
 
 namespace culling
 {
