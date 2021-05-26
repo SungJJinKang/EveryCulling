@@ -28,9 +28,7 @@ This library is targeting Maximing SIMD, Cache hit, Multi Threading.
 - Support AVX2
 
 #### In Develop
-- Masked SW Occlusion Culling ( https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf )
-
-
+- Masked SW Occlusion Culling ( https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf )          
 - Distance Culling ( https://docs.unrealengine.com/en-US/RenderingAndGraphics/VisibilityCulling/CullDistanceVolume/index.html )  
 - Precomputed Visibility Volume ( https://docs.unrealengine.com/en-US/RenderingAndGraphics/VisibilityCulling/PrecomputedVisibilityVolume/index.html )
 - Support AVX1, AVX512
@@ -139,6 +137,14 @@ This is really easy to understand.
 When Area Size of AABB projected to screen space is less than setting value, It will be culled.    
 I don't recommend using this feature, because Objects will pop up and this is really distracting...       
 I will add Object fade out.    
+
+## Distance Culling
+
+This feature is referenced from Unreal Engine.     
+You can see How this feature works from [here](https://docs.unrealengine.com/en-US/RenderingAndGraphics/VisibilityCulling/CullDistanceVolume/index.html)       
+Objects become invisible depending on distance between object and camera.          
+With this feature, You can make detailed object not to be rendered when it is far from camera.    
+According your setting, Objects do popping.            
 
 ## References
 

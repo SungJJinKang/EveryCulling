@@ -170,6 +170,9 @@ namespace culling
 						CullingModule* cullingModule = this->mCullingModules[moduleIndex];
 						//TODO : ON X64, X84, memory_order_relaxed also do acquire memory
 						//So This codes is too slow, FIX IT!!!!!!!!!!!
+						//
+						//
+						//
 						while (cullingModule->mFinishedCullEntityBlockCount[cameraIndex].load(std::memory_order_relaxed) < entityBlockCount)
 						{
 							if (cullingModule->mCurrentCullEntityBlockIndex[cameraIndex].load(std::memory_order_relaxed) >= entityBlockCount)
