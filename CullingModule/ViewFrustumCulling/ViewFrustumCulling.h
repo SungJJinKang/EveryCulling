@@ -17,16 +17,16 @@ namespace culling
 		Vector4 mFrustumPlanes[8]; // first 4 planes will be on same cache line
 	};
 
-	class FrotbiteCullingSystem;
+	class EveryCulling;
 	class ViewFrustumCulling : CullingModule
 	{
-		friend class FrotbiteCullingSystem;
+		friend class EveryCulling;
 
 	private:
 
 		SIMDFrustumPlanes mSIMDFrustumPlanes[MAX_CAMERA_COUNT];
 
-		ViewFrustumCulling(FrotbiteCullingSystem* frotbiteCullingSystem)
+		ViewFrustumCulling(EveryCulling* frotbiteCullingSystem)
 			:CullingModule{ frotbiteCullingSystem }
 		{
 

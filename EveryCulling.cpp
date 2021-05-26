@@ -1,11 +1,11 @@
-#include "FrotbiteCullingSystem.h"
+#include "EveryCulling.h"
 
 #include <utility>
 
 #include "DataType/EntityBlock.h"
 #include <vector_erase_move_lastelement/vector_swap_erase.h>
 
-void culling::FrotbiteCullingSystem::FreeEntityBlock(EntityBlock* freedEntityBlock)
+void culling::EveryCulling::FreeEntityBlock(EntityBlock* freedEntityBlock)
 {
 	assert(freedEntityBlock != nullptr);
 
@@ -37,7 +37,7 @@ void culling::FrotbiteCullingSystem::FreeEntityBlock(EntityBlock* freedEntityBlo
 }
 
 
-culling::EntityBlock* culling::FrotbiteCullingSystem::GetNewEntityBlockFromPool()
+culling::EntityBlock* culling::EveryCulling::GetNewEntityBlockFromPool()
 {
 	if (this->mFreeEntityBlockList.size() == 0)
 	{
@@ -50,7 +50,7 @@ culling::EntityBlock* culling::FrotbiteCullingSystem::GetNewEntityBlockFromPool(
 	return entityBlock;
 }
 
-void culling::FrotbiteCullingSystem::ResetCullJobStateVariable()
+void culling::EveryCulling::ResetCullJobStateVariable()
 {
 	for (unsigned int cameraIndex = 0; cameraIndex < this->mCameraCount; cameraIndex++)
 	{
@@ -67,7 +67,7 @@ void culling::FrotbiteCullingSystem::ResetCullJobStateVariable()
 	std::atomic_thread_fence(std::memory_order_seq_cst);
 }
 
-void culling::FrotbiteCullingSystem::SetAllOneIsVisibleFlag()
+void culling::EveryCulling::SetAllOneIsVisibleFlag()
 {
 	//Maybe Compiler use SIMD or do faster than SIMD instruction
 	for (auto entityBlock : this->mEntityGridCell.mEntityBlocks)
@@ -76,7 +76,7 @@ void culling::FrotbiteCullingSystem::SetAllOneIsVisibleFlag()
 	}
 }
 
-void culling::FrotbiteCullingSystem::AllocateEntityBlockPool()
+void culling::EveryCulling::AllocateEntityBlockPool()
 {
 	EntityBlock* newEntityBlockChunk = new EntityBlock[INITIAL_ENTITY_BLOCK_COUNT];
 	for (unsigned int i = 0; i < INITIAL_ENTITY_BLOCK_COUNT; i++)
@@ -86,7 +86,7 @@ void culling::FrotbiteCullingSystem::AllocateEntityBlockPool()
 	this->mAllocatedEntityBlockChunkList.push_back(newEntityBlockChunk);
 }
 
-void culling::FrotbiteCullingSystem::RemoveEntityFromBlock(EntityBlock* ownerEntityBlock, unsigned int entityIndexInBlock)
+void culling::EveryCulling::RemoveEntityFromBlock(EntityBlock* ownerEntityBlock, unsigned int entityIndexInBlock)
 {
 	assert(ownerEntityBlock != nullptr);
 	assert(entityIndexInBlock >= 0 && entityIndexInBlock < ENTITY_COUNT_IN_ENTITY_BLOCK);
@@ -104,7 +104,7 @@ void culling::FrotbiteCullingSystem::RemoveEntityFromBlock(EntityBlock* ownerEnt
 	
 }
 
-std::pair<culling::EntityBlock*, unsigned int*> culling::FrotbiteCullingSystem::AllocateNewEntityBlockFromPool()
+std::pair<culling::EntityBlock*, unsigned int*> culling::EveryCulling::AllocateNewEntityBlockFromPool()
 {
 	EntityBlock* newEntityBlock = this->GetNewEntityBlockFromPool();
 	this->mEntityGridCell.mEntityBlocks.push_back(newEntityBlock); 
@@ -120,7 +120,7 @@ std::pair<culling::EntityBlock*, unsigned int*> culling::FrotbiteCullingSystem::
 
 
 
-culling::EntityBlockViewer culling::FrotbiteCullingSystem::AllocateNewEntity(void* renderer)
+culling::EntityBlockViewer culling::EveryCulling::AllocateNewEntity(void* renderer)
 {
 	std::pair<culling::EntityBlock*, unsigned int*> targetEntityBlock;
 	if (this->mEntityGridCell.mEntityBlocks.size() == 0)
@@ -152,7 +152,7 @@ culling::EntityBlockViewer culling::FrotbiteCullingSystem::AllocateNewEntity(voi
 	return EntityBlockViewer(targetEntityBlock.first, targetEntityBlock.first->mCurrentEntityCount - 1);
 }
 
-void culling::FrotbiteCullingSystem::RemoveEntityFromBlock(EntityBlockViewer& entityBlockViewer)
+void culling::EveryCulling::RemoveEntityFromBlock(EntityBlockViewer& entityBlockViewer)
 {
 	//Do nothing......
 
@@ -162,7 +162,7 @@ void culling::FrotbiteCullingSystem::RemoveEntityFromBlock(EntityBlockViewer& en
 	//Entities Indexs in EntityBlock should not be swapped because already allocated EntityBlockViewer can't see it
 }
 
-culling::FrotbiteCullingSystem::FrotbiteCullingSystem(unsigned int resolutionWidth, unsigned int resolutionHeight)
+culling::EveryCulling::EveryCulling(unsigned int resolutionWidth, unsigned int resolutionHeight)
 	:
 	mViewFrustumCulling{ this }
 #ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
@@ -182,7 +182,7 @@ culling::FrotbiteCullingSystem::FrotbiteCullingSystem(unsigned int resolutionWid
 
 }
 
-culling::FrotbiteCullingSystem::~FrotbiteCullingSystem()
+culling::EveryCulling::~EveryCulling()
 {
 	for (culling::EntityBlock* allocatedEntityBlockChunk : this->mAllocatedEntityBlockChunkList)
 	{
@@ -190,7 +190,7 @@ culling::FrotbiteCullingSystem::~FrotbiteCullingSystem()
 	}
 }
 
-void culling::FrotbiteCullingSystem::SetCameraCount(unsigned int cameraCount)
+void culling::EveryCulling::SetCameraCount(unsigned int cameraCount)
 {
 	this->mCameraCount = cameraCount;
 	this->mViewFrustumCulling.mCameraCount = cameraCount;
@@ -199,19 +199,19 @@ void culling::FrotbiteCullingSystem::SetCameraCount(unsigned int cameraCount)
 #endif
 }
 
-unsigned int culling::FrotbiteCullingSystem::GetCameraCount() const
+unsigned int culling::EveryCulling::GetCameraCount() const
 {
 	return this->mCameraCount;
 }
 
-std::vector<culling::EntityBlock*> culling::FrotbiteCullingSystem::GetActiveEntityBlockList() const
+std::vector<culling::EntityBlock*> culling::EveryCulling::GetActiveEntityBlockList() const
 {
 	return this->mActiveEntityBlockList;
 }
 
-std::function<void()> culling::FrotbiteCullingSystem::GetCullJob()
+std::function<void()> culling::EveryCulling::GetCullJob()
 {
-	return std::function<void()>(std::bind(&FrotbiteCullingSystem::CullBlockEntityJob, this));
+	return std::function<void()>(std::bind(&EveryCulling::CullBlockEntityJob, this));
 }
 
 

@@ -13,7 +13,7 @@ namespace culling
 	/// </summary>
 	class EntityBlockViewer
 	{
-		friend class FrotbiteCullingSystem;
+		friend class EveryCulling;
 
 	private:
 
@@ -45,7 +45,7 @@ namespace culling
 		/// <summary>
 		/// Get if entity is visible from Camera of parameter cameraIndex
 		/// </summary>
-		/// <param name="cameraIndex">0 <= cameraIndex < FrotbiteCullingSystem::mCameraCount</param>
+		/// <param name="cameraIndex">0 <= cameraIndex < EveryCulling::mCameraCount</param>
 		/// <returns></returns>
 		FORCE_INLINE char GetIsVisibleBitflag(unsigned int cameraIndex) const
 		{

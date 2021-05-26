@@ -2,7 +2,7 @@
 
 #include <bitset>
 
-#include "../../FrotbiteCullingSystemCore.h"
+#include "../../EveryCullingCore.h"
 #include "../../SIMD_Core.h"
 namespace culling
 {

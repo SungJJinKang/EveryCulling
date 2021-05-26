@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../FrotbiteCullingSystemCore.h"
+#include "../EveryCullingCore.h"
 
 #include <vector>
 

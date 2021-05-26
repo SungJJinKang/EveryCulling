@@ -2,7 +2,7 @@
 
 #include <atomic>
 
-#include "../../FrotbiteCullingSystemCore.h"
+#include "../../EveryCullingCore.h"
 #include "SIMD_Core.h"
 #include "SWDepthBuffer.h"
 
@@ -119,7 +119,7 @@ namespace culling
 	public:
 
 		MaskedSWOcclusionCulling(
-			FrotbiteCullingSystem* frotbiteCullingSystemunsigned, 
+			EveryCulling* frotbiteCullingSystemunsigned, 
 			unsigned int depthBufferWidth, unsigned int depthBufferheight
 		);
 	

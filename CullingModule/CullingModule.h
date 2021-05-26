@@ -3,21 +3,21 @@
 #include <array>
 #include <atomic>
 
-#include "../FrotbiteCullingSystemCore.h"
+#include "../EveryCullingCore.h"
 #include "../DataType/EntityBlock.h"
 
 namespace culling
 {
-	class FrotbiteCullingSystem;
+	class EveryCulling;
 	struct EntityBlock;
 
 	class CullingModule
 	{
-		friend class FrotbiteCullingSystem;
+		friend class EveryCulling;
 
 	protected:
 
-		FrotbiteCullingSystem* mCullingSystem;
+		EveryCulling* mCullingSystem;
 
 		//static inline constexpr unsigned int M256_COUNT_OF_VISIBLE_ARRAY = 1 + ( (ENTITY_COUNT_IN_ENTITY_BLOCK * sizeof(decltype(*EntityBlock::mIsVisibleBitflag)) - 1) / 32 );
 		/// <summary>
@@ -29,7 +29,7 @@ namespace culling
 		
 		unsigned int mCameraCount;
 
-		CullingModule(FrotbiteCullingSystem* frotbiteCullingSystem)
+		CullingModule(EveryCulling* frotbiteCullingSystem)
 			:mCullingSystem{ frotbiteCullingSystem }, mCameraCount{ 0 }
 		{
 

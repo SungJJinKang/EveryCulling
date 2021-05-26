@@ -18,7 +18,7 @@ void culling::MaskedSWOcclusionCulling::ResetDepthBuffer()
 	
 }
 
-culling::MaskedSWOcclusionCulling::MaskedSWOcclusionCulling(FrotbiteCullingSystem* frotbiteCullingSystem, unsigned int depthBufferWidth, unsigned int depthBufferheight)
+culling::MaskedSWOcclusionCulling::MaskedSWOcclusionCulling(EveryCulling* frotbiteCullingSystem, unsigned int depthBufferWidth, unsigned int depthBufferheight)
 	: culling::CullingModule{frotbiteCullingSystem}, 
 	mDepthBuffer {
 	depthBufferWidth, depthBufferheight

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FrotbiteCullingSystemCore.h"
+#include "EveryCullingCore.h"
 #include "DataType/EntityGridCell.h"
 #include "DataType/EntityBlockViewer.h"
 
@@ -44,7 +44,7 @@ namespace culling
 	/// https://macton.smugmug.com/Other/2008-07-15-by-Eye-Fi/n-xmKDH/
 	/// 
 	/// </summary>
-	class FrotbiteCullingSystem
+	class EveryCulling
 	{
 		friend class ScreenSpaceAABBCulling;
 		friend class ViewFrustumCulling;
@@ -114,8 +114,8 @@ namespace culling
 
 	public:
 
-		FrotbiteCullingSystem(unsigned int resolutionWidth, unsigned int resolutionHeight);
-		~FrotbiteCullingSystem();
+		EveryCulling(unsigned int resolutionWidth, unsigned int resolutionHeight);
+		~EveryCulling();
 		void SetCameraCount(unsigned int cameraCount);
 		unsigned int GetCameraCount() const;
 		/// <summary>

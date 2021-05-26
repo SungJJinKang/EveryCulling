@@ -1,4 +1,4 @@
-#include "../../FrotbiteCullingSystemCore.h"
+#include "../../EveryCullingCore.h"
 
 #ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
 

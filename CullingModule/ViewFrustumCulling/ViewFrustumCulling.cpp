@@ -3,7 +3,7 @@
 #include <cassert>
 
 #include "../../DataType/Math/Math.h"
-#include "../../FrotbiteCullingSystem.h"
+#include "../../EveryCulling.h"
 
 
 void culling::ViewFrustumCulling::UpdateFrustumPlane(unsigned int frustumPlaneIndex, const Matrix4X4& viewProjectionMatrix)
