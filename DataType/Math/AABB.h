@@ -11,5 +11,8 @@ namespace culling
 		Vector3 mMax;
 	};
 
-	
+	struct AABBPoints
+	{
+		Vector3 mPoints[8];
+	};
 }

@@ -2,6 +2,9 @@
 
 #include "../CullingModule.h"
 
+#include "../../DataType/Math/Vector.h"
+#include "../../DataType/Math/Matrix.h"
+
 #ifdef ENABLE_QUERY_OCCLUSION
 
 
@@ -40,7 +43,10 @@ namespace culling
 		/// TODO : Disable Pixel Shading, Texturing
 		/// </summary>
 		bool StartQuery();
-		bool StopQuery();
+		void StopQuery();
+
+		static culling::AABBPoints GenAABBPointsFromWorldSpace(const culling::Vector3& minLocalSpace, const culling::Vector3& maxLocalSpace);
+		static culling::AABBPoints GenAABBPointsFromLocalSpace(const culling::Vector3& minLocalSpace, const culling::Vector3& maxLocalSpace, const culling::Matrix4X4& localToWorldMatrix);
 
 	public:
 
@@ -59,16 +65,19 @@ namespace culling
 		///  of non - dependent rendering between an occlusion query and the
 		///	 conditionally - rendered primitives that depend on the query result.
 		/// </summary>
-		void StartConditionalRender();
+		bool StartConditionalRender();
 		void StopConditionalRender();
 
 		//TODO : Check ScreenSpace AABB size of rendered mesh, If Size if smaller than setting, It's not valuable to use as Occluder
 		
 		/// <summary>
 		/// 
-		/// Start Query and Draw Occluder
-		/// Quering Occluder Data require a few times. 
+		/// Start Query and Draw AABB Occluder
+		/// You should pass World Space AABB Vertices
+		/// Recommendation : Pass Huge AABB. Because if AABB is tiny, It can't occlude any objects.
+		/// Why AABB ? : Actually you can use complex mesh as occluder, But I don't recommend you wasting cpu time at QueryOcclusion
 		/// 
+		/// Quering Occluder Data require a few times. 
 		/// So Don't Do ConditionalRender instantly after Call Query Data!!!!!!!!!!!!!!!!!!!!!!!!!!! 
 		/// Do other works between DrawOccluderAABB and StartConditionalRender
 		/// 

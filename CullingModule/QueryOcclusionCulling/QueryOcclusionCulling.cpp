@@ -125,15 +125,23 @@ bool culling::QueryOcclusionCulling::StartQuery()
 #endif
 }
 
-bool culling::QueryOcclusionCulling::StopQuery()
+void culling::QueryOcclusionCulling::StopQuery()
 {
 #ifdef CULLING_OPENGL
 	glEndQuery(this->mQueryID);
-	return true;
 #elif CULLING_DIRECTX
-	return false;
 
 #endif
+}
+
+culling::AABBPoints culling::QueryOcclusionCulling::GenAABBPointsFromWorldSpace(const culling::Vector3& minLocalSpace, const culling::Vector3& maxLocalSpace)
+{
+	return culling::AABBPoints();
+}
+
+culling::AABBPoints culling::QueryOcclusionCulling::GenAABBPointsFromLocalSpace(const culling::Vector3& minLocalSpace, const culling::Vector3& maxLocalSpace, const culling::Matrix4X4& localToWorldMatrix)
+{
+	return culling::AABBPoints();
 }
 
 culling::QueryOcclusionCulling::~QueryOcclusionCulling()
@@ -147,7 +155,7 @@ culling::QueryOcclusionCulling::~QueryOcclusionCulling()
 }
 
 
-void culling::QueryOcclusionCulling::StartConditionalRender()
+bool culling::QueryOcclusionCulling::StartConditionalRender()
 {
 #ifdef CULLING_OPENGL
 	glBeginConditionalRender(this->mQueryID, GL_QUERY_NO_WAIT);
@@ -155,8 +163,10 @@ void culling::QueryOcclusionCulling::StartConditionalRender()
 	// 
 	// GL_QUERY_WAIT : If query isn't completed yet, Wait it
 	// GL_QUERY_NO_WAIT : Don't wait until query complete. if query isn't completed just draw it normally
+	return true;
 #elif CULLING_DIRECTX
 
+	return false;
 #endif
 }
 
@@ -178,7 +188,7 @@ void culling::QueryOcclusionCulling::DrawOccluderAABB(const culling::Vector3* oc
 
 	assert(this->bmIsQueryOcclusionReady == true);
 
-	if (this->StartQuery())
+	if (this->StartQuery() == false)
 	{
 		return;
 	}
@@ -196,6 +206,7 @@ void culling::QueryOcclusionCulling::DrawOccluderAABB(const culling::Vector3* oc
 	glDrawArrays(GL_TRIANGLES, 0, static_cast<unsigned int>(verticeCount / 3));
 
 	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 #elif CULLING_DIRECTX
 
 #endif

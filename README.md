@@ -132,7 +132,12 @@ references : https://software.intel.com/content/dam/develop/external/us/en/docum
 
 Currently This feature is supported only on OpenGL.       
 
+How Work? :
+1. Draw Occluder. Then Opengl will remember
 
+3. Draw Occludee.
+
+references : https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_occlusion_query.txt     
 
 ## Screen Space AABB Area Culling
 
