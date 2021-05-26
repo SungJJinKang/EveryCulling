@@ -179,7 +179,7 @@ void culling::QueryOcclusionCulling::StopConditionalRender()
 #endif
 }
 
-void culling::QueryOcclusionCulling::DrawOccluderAABB(const culling::Vector3* occlusionAABBWorldVertices, size_t verticeCount)
+void culling::QueryOcclusionCulling::DrawOccludeeAABB(const culling::Vector3* occlusionAABBWorldVertices, size_t verticeCount)
 {
 	if (this->bmIsQueryOcclusionReady == false)
 	{

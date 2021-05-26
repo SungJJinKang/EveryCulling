@@ -132,12 +132,14 @@ references : https://software.intel.com/content/dam/develop/external/us/en/docum
 
 Currently This feature is supported only on OpenGL.       
 
-How Work? :
-1. Draw Occluder. Then Opengl will remember
+How Work? :       
+1. Draw Occluder.        
+2. Draw AABB of Complicated Occludeee mesh. ( AABB is much cheaper than complicated mesh )           
+3. If Any fragment of AABB is drawed on buffer ( aabb passed depth, stencil test..! ), Draw Complicated Mesh!!!               
 
-3. Draw Occludee.
+In Opengl : Use QueryObject, Conditional Rendering         
 
-references : https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_occlusion_query.txt     
+references : https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_occlusion_query.txt , https://www.khronos.org/registry/OpenGL/extensions/NV/NV_conditional_render.txt       
 
 ## Screen Space AABB Area Culling
 

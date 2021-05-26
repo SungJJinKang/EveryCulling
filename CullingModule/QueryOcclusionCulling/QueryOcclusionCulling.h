@@ -11,6 +11,15 @@
 
 namespace culling
 {
+	/// <summary>
+	/// 
+	/// 1. Draw Occluder.        
+	/// 2. Draw AABB of Complicated Occludeee mesh. (AABB is much cheaper than complicated mesh)
+	///	3. If Any fragment of AABB is drawed on buffer(aabb passed depth, stencil test..!), Draw Complicated Mesh!!!
+	/// 
+	/// references : https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_occlusion_query.txt , https://www.khronos.org/registry/OpenGL/extensions/NV/NV_conditional_render.txt      
+	///
+	/// </summary>
 	class QueryOcclusionCulling : public CullingModule
 	{
 
@@ -72,19 +81,17 @@ namespace culling
 		
 		/// <summary>
 		/// 
-		/// Start Query and Draw AABB Occluder
+		/// Start Query and Draw AABB of Occludee
 		/// You should pass World Space AABB Vertices
-		/// Recommendation : Pass Huge AABB. Because if AABB is tiny, It can't occlude any objects.
-		/// Why AABB ? : Actually you can use complex mesh as occluder, But I don't recommend you wasting cpu time at QueryOcclusion
 		/// 
-		/// Quering Occluder Data require a few times. 
+		/// Quering AABB Data require a few times. 
 		/// So Don't Do ConditionalRender instantly after Call Query Data!!!!!!!!!!!!!!!!!!!!!!!!!!! 
-		/// Do other works between DrawOccluderAABB and StartConditionalRender
+		/// Do other works between DrawOccludeeAABB and StartConditionalRender
 		/// 
 		/// </summary>
 		/// <param name="occlusionAABBWorldVertices"></param>
 		/// <param name="verticeCount"></param>
-		void DrawOccluderAABB(const culling::Vector3* occlusionAABBWorldVertices, size_t verticeCount);
+		void DrawOccludeeAABB(const culling::Vector3* occlusionAABBWorldVertices, size_t verticeCount);
 
 		// Not used
 		virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex) final { assert(0); }
