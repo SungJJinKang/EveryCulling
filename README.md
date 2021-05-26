@@ -1,18 +1,11 @@
-# Parallel Culling
+# EveryCulling
 
-This library is implementation of        
-**Culling the Battlefield: Data Oriented Design in Practice Talk of EA DICE in 2011**      
-And       
-**Masked SW Occlusion Culling**        
+This library integrate Multiple Culling System into One System.      
 
-Frostbite used Plain SW Occlusion Culling, but I will implement Masked SW Occlusion Culling.         
-Masked SW Occlusion Culling is announced in 2016 by intel.          
+This System contain **Multithread ViewFrustumCulling**, **Masked SW Occlusion Culling**, **Distance Culling**, **Screen Space AABB Culling**.         
+Most of Systems in this project is actually used in popular game engines.       
 
-[Slide Resource](https://www.ea.com/frostbite/news/culling-the-battlefield-data-oriented-design-in-practice)        
-[GDC Talk Video](https://www.gdcvault.com/play/1014491/Culling-the-Battlefield-Data-Oriented)          
-[한국어 블로그 글](https://sungjjinkang.github.io/doom/2021/04/02/viewfrustumculling.html)          
-
-[Masked Occlusion Culling Paper](https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf) 
+This project tries to integrate them into one system and make them easy to use.      
 
 ## Core Feature 
 This library is targeting Maximing SIMD, Cache hit, Multi Threading.       
@@ -34,6 +27,10 @@ This library is targeting Maximing SIMD, Cache hit, Multi Threading.
 - Support AVX1, AVX512
 
 ## View Frustum Culling using SIMD, Multithreading
+
+[Slide Resource](https://www.ea.com/frostbite/news/culling-the-battlefield-data-oriented-design-in-practice)        
+[GDC Talk Video](https://www.gdcvault.com/play/1014491/Culling-the-Battlefield-Data-Oriented)   
+[한국어 블로그 글](https://sungjjinkang.github.io/doom/2021/04/02/viewfrustumculling.html)    
 
 #### Feature 1 : Transform Data of Entities is stored linearlly to maximize utilizing SIMD. ( **Data oriented Design** )       
 For Maximizing Cache Hitting, Data is allocated adjacently.     

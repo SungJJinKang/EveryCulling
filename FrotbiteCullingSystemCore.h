@@ -59,3 +59,8 @@
 
 // Screen Space AABB Culling
 //#define ENABLE_SCREEN_SAPCE_AABB_CULLING
+
+
+
+// Distance Culling
+#define ENABLE_DISTANCE_CULLING
