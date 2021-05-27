@@ -318,6 +318,12 @@ void culling::QueryOcclusionCulling::GenQueryObject(culling::EntityBlockViewer& 
 	this->GenQueryObject(entityBlockViewer.mTargetEntityBlock, entityBlockViewer.mEntityIndexInBlock, occlusionAABBLocalMinMax);
 }
 
+/// <summary>
+/// Use Query Result After a frame
+/// == Do ConditionalRendering on previous frame's query ( Maybe I need Two Query )
+/// http://tomcc.github.io/2014/08/31/visibility-1.html
+/// 
+/// </summary>
 void culling::QueryOcclusionCulling::QueryOccludeeAABB()
 {
 	if (this->mQueryObjects.empty() == true)

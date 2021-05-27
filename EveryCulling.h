@@ -189,6 +189,7 @@ namespace culling
 						//
 
 						//TODO : 그냥 각 스레드가 한 Enityty 블록 연산하게 바꾸자
+						// -> 이렇게 하면 Occlusion Culling 단계에서는 
 						while (cullingModule->mFinishedCullEntityBlockCount[cameraIndex].load(std::memory_order_relaxed) < entityBlockCount)
 						{
 							if (cullingModule->mCurrentCullEntityBlockIndex[cameraIndex].load(std::memory_order_relaxed) >= entityBlockCount)
