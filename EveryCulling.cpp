@@ -1,5 +1,6 @@
 #include "EveryCulling.h"
 
+#include <cstring>
 #include <utility>
 
 #include "DataType/EntityBlock.h"
@@ -86,6 +87,13 @@ void culling::EveryCulling::AllocateEntityBlockPool()
 	this->mAllocatedEntityBlockChunkList.push_back(newEntityBlockChunk);
 }
 
+void culling::EveryCulling::ResetEntityBlock(culling::EntityBlock* entityBlock)
+{
+	entityBlock->mCurrentEntityCount = 0;
+	std::memset(entityBlock->mQueryObjects, 0x00, sizeof(decltype(*(entityBlock->mQueryObjects))) * culling::ENTITY_COUNT_IN_ENTITY_BLOCK);
+	
+}
+
 void culling::EveryCulling::RemoveEntityFromBlock(EntityBlock* ownerEntityBlock, unsigned int entityIndexInBlock)
 {
 	assert(ownerEntityBlock != nullptr);
@@ -94,7 +102,7 @@ void culling::EveryCulling::RemoveEntityFromBlock(EntityBlock* ownerEntityBlock,
 	this->mViewFrustumCulling.ClearEntityData(ownerEntityBlock, entityIndexInBlock);
 	this->mMaskedSWOcclusionCulling.ClearEntityData(ownerEntityBlock, entityIndexInBlock);
 #ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
-	this->mScreenSpaceAABBCulling.ClearEntityData(ownerEntityBlock, entityIndexInBlock);
+	this->mScreenSpaceBoudingSphereCulling.ClearEntityData(ownerEntityBlock, entityIndexInBlock);
 #endif
 #ifdef ENABLE_QUERY_OCCLUSION
 	this->mQueryOcclusionCulling.ClearEntityData(ownerEntityBlock, entityIndexInBlock);
@@ -116,7 +124,7 @@ std::pair<culling::EntityBlock*, unsigned int*> culling::EveryCulling::AllocateN
 	EntityBlock* newEntityBlock = this->GetNewEntityBlockFromPool();
 	this->mEntityGridCell.mEntityBlocks.push_back(newEntityBlock); 
 	this->mEntityGridCell.AllocatedEntityCountInBlocks.push_back(0);
-	newEntityBlock->mCurrentEntityCount = 0;
+	this->ResetEntityBlock(newEntityBlock);
 
 	this->mActiveEntityBlockList.push_back(newEntityBlock);
 
@@ -173,7 +181,7 @@ culling::EveryCulling::EveryCulling(unsigned int resolutionWidth, unsigned int r
 	:
 	mViewFrustumCulling{ this }
 #ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
-	, mScreenSpaceAABBCulling{ this }
+	, mScreenSpaceBoudingSphereCulling{ this }
 #endif
 	, mMaskedSWOcclusionCulling{ this, resolutionWidth, resolutionHeight }
 	, mQueryOcclusionCulling{ this }
@@ -203,7 +211,7 @@ void culling::EveryCulling::SetCameraCount(unsigned int cameraCount)
 	this->mCameraCount = cameraCount;
 	this->mViewFrustumCulling.mCameraCount = cameraCount;
 #ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
-	this->mScreenSpaceAABBCulling.mCameraCount = cameraCount;
+	this->mScreenSpaceBoudingSphereCulling.mCameraCount = cameraCount;
 #endif
 }
 

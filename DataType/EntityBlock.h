@@ -6,6 +6,7 @@
 #include "Math/Vector.h"
 #include "Math/Matrix.h"
 
+#include "QueryObject.h"
 #include "TransformData.h"
 
 #define MAKE_EVEN_NUMBER(X) (X - (X%2))
@@ -15,22 +16,15 @@ namespace culling
 
 	//This code doesn't consider Memory alignment optimzation.
 
-	inline static constexpr size_t ENTITY_COUNT_IN_ENTITY_BLOCK = 
+	inline constexpr size_t ENTITY_COUNT_IN_ENTITY_BLOCK = 
 		MAKE_EVEN_NUMBER( (4096 - sizeof(unsigned int)) /
 		(
 			sizeof(Vector4)
 			+ sizeof(char)
 			+ sizeof(void*)
-#if defined(ENABLE_SCREEN_SAPCE_AABB_CULLING) || defined(ENABLE_QUERY_OCCLUSION)
-			+ sizeof(AABB)
-#endif
-
-#ifdef ENABLE_QUERY_OCCLUSION
-			+ sizeof(unsigned int)
-			+ sizeof(bool)
-#endif
+			+ sizeof(culling::QueryObject*)
 		)
-		) ;
+		) - 2;
 
 		/// <summary>
 		/// EntityBlock size should be less 4KB(Page size) for Block data being allocated in a page
@@ -59,26 +53,10 @@ namespace culling
 		/// If Size of mIsVisibleBitflag isn't multiples of 256bit,
 		/// Setting mIsVisibleBitflag will make mPositions value dirty
 		/// </summary>
-		alignas(32) Vector4 mPositions[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		alignas(32) culling::Vector4 mPositions[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
-#if defined(ENABLE_SCREEN_SAPCE_AABB_CULLING) || defined(ENABLE_QUERY_OCCLUSION)
-		/// <summary>
-		/// Size of AABB is 32 byte.
-		/// 2 AABB is 64 byte.
-		/// 
-		/// i recommend AABB's point type is Vector4
-		/// because when multiply Matrix4x4 with point for calculating ScreenSpace AABB, we can use SIMD if point is vector
-		/// 
-		/// It's cache friendlly!!
-		/// </summary>
-		AABB mWorldAABB[ENTITY_COUNT_IN_ENTITY_BLOCK];
-#endif
+		culling::QueryObject* mQueryObjects[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
-#ifdef ENABLE_QUERY_OCCLUSION
-		unsigned int mQueryID[ENTITY_COUNT_IN_ENTITY_BLOCK];
-		bool mUseQuery[ENTITY_COUNT_IN_ENTITY_BLOCK];
-#endif
-		
 		/// <summary>
 		/// mIsVisibleBitflag is stored through two __m128
 		/// 

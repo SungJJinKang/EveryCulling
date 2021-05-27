@@ -13,8 +13,8 @@
 
 #include "CullingModule/ViewFrustumCulling/ViewFrustumCulling.h"
 
-#ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
-#include "CullingModule/ScreenSpaceAABBCulling/ScreenSpaceAABBCulling.h"
+#ifdef ENABLE_SCREEN_SAPCE_BOUDING_SPHERE_CULLING
+#include "CullingModule/ScreenSpaceBoundingSphereCulling/ScreenSpaceBoundingSphereCulling.h"
 #endif
 
 #include "CullingModule/MaskedSWOcclusionCulling/MaskedSWOcclusionCulling.h"
@@ -52,7 +52,7 @@ namespace culling
 	/// </summary>
 	class EveryCulling
 	{
-		friend class ScreenSpaceAABBCulling;
+		friend class ScreenSpaceBoundingSphereCulling;
 		friend class ViewFrustumCulling;
 		friend class QueryOcclusionCulling;
 
@@ -82,6 +82,7 @@ namespace culling
 		culling::Matrix4X4 mViewProjectionMatrix;
 
 		void AllocateEntityBlockPool();
+		void ResetEntityBlock(culling::EntityBlock* entityBlock);
 		std::pair<culling::EntityBlock*, unsigned int*> AllocateNewEntityBlockFromPool();
 		void RemoveEntityFromBlock(EntityBlock* ownerEntityBlock, unsigned int entityIndexInBlock);
 		/// <summary>
@@ -99,8 +100,8 @@ namespace culling
 	public:
 
 		ViewFrustumCulling mViewFrustumCulling;
-#ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
-		ScreenSpaceAABBCulling mScreenSpaceAABBCulling;
+#ifdef ENABLE_SCREEN_SAPCE_BOUDING_SPHERE_CULLING
+		ScreenSpaceBoundingSphereCulling mScreenSpaceBoudingSphereCulling;
 #endif
 		MaskedSWOcclusionCulling mMaskedSWOcclusionCulling;
 #ifdef ENABLE_QUERY_OCCLUSION
@@ -110,7 +111,7 @@ namespace culling
 	private:
 
 		std::array<culling::CullingModule*, 
-#ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
+#ifdef ENABLE_SCREEN_SAPCE_BOUDING_SPHERE_CULLING
 			3
 #else
 			2
@@ -118,8 +119,8 @@ namespace culling
 		> mUpdatedCullingModules
 		{
 			&(this->mViewFrustumCulling),
-#ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
-			&(this->mScreenSpaceAABBCulling),
+#ifdef ENABLE_SCREEN_SAPCE_BOUDING_SPHERE_CULLING
+			&(this->mScreenSpaceBoudingSphereCulling),
 #endif	
 			&(this->mMaskedSWOcclusionCulling)
 		};

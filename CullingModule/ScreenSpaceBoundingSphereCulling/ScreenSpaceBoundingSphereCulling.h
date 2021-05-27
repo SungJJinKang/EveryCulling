@@ -10,7 +10,7 @@ namespace culling
 	/// Project Object's Bounding AABB to Screen Space(Actually NDC)
 	/// And Area of Projected AABB is less than setting value, It's culled
 	/// </summary>
-	class ScreenSpaceAABBCulling : public CullingModule
+	class ScreenSpaceBoundingSphereCulling : public CullingModule
 	{
 		friend class EveryCulling;
 
@@ -23,7 +23,7 @@ namespace culling
 		//
 	
 
-		ScreenSpaceAABBCulling(EveryCulling* everyCulling);
+		ScreenSpaceBoundingSphereCulling(EveryCulling* everyCulling);
 
 		void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex);
 

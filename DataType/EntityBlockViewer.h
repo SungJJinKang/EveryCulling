@@ -4,7 +4,7 @@
 
 #include "TransformData.h"
 #include "EntityBlock.h"
-
+#include "QueryObject.h"
 
 namespace culling
 {

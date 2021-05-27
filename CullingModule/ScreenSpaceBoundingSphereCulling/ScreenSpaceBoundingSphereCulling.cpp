@@ -1,19 +1,19 @@
 #include "../../EveryCullingCore.h"
 
-#ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
+#ifdef ENABLE_SCREEN_SAPCE_BOUDING_SPHERE_CULLING
 
-#include "ScreenSpaceAABBCulling.h"
+#include "ScreenSpaceBoundingSphereCulling.h"
 #include "../../DataType/Math/Common.h"
 
 #include "../../EveryCulling.h"
 
-culling::ScreenSpaceAABBCulling::ScreenSpaceAABBCulling(EveryCulling* everyCulling) 
+culling::ScreenSpaceBoundingSphereCulling::ScreenSpaceBoundingSphereCulling(EveryCulling* everyCulling) 
 	: CullingModule{ everyCulling }
 {
 
 }
 
-void culling::ScreenSpaceAABBCulling::CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex)
+void culling::ScreenSpaceBoundingSphereCulling::CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex)
 {
 	alignas(32) char cullingMask[ENTITY_COUNT_IN_ENTITY_BLOCK] = { 0 };
 	culling::Vector4 mScreenSpaceAABBMin;
@@ -23,6 +23,7 @@ void culling::ScreenSpaceAABBCulling::CullBlockEntityJob(EntityBlock* currentEnt
 	{
 		//TODO : Think How to use SIMD
 
+		/*
 		const culling::AABB& entityAABB = currentEntityBlock->mWorldAABB[j];
 
 		// TODO : This is completly wrong, 
@@ -51,6 +52,7 @@ void culling::ScreenSpaceAABBCulling::CullBlockEntityJob(EntityBlock* currentEnt
 		{
 			cullingMask[j] |= 1 << cameraIndex;
 		}
+		*/
 	}
 
 	//TODO : If CullingMask is True, Do Calculate ScreenSpace AABB Area And Check Is Culled

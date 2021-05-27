@@ -17,12 +17,13 @@ This library is targeting Maximing SIMD, Cache hit, Multi Threading.
 
 #### Currently Supported
 - View Frustum Culling using SIMD
-- Screen Space AABB Area Culling ( Project Entity's AABB bount to Screen Space, if Aread of Projected AABB is less than setting, Cull it )
+
 - Support AVX2
 
 #### In Develop
 - Masked SW Occlusion Culling ( https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf )          
 - Distance Culling ( https://docs.unrealengine.com/en-US/RenderingAndGraphics/VisibilityCulling/CullDistanceVolume/index.html )  
+- Screen Space Bouding Sphere Area Culling ( Project Entity's Bouding Sphere bound to Screen Space, if Aread of Projected Sphere is less than setting, Cull it )
 - Precomputed Visibility Volume ( https://docs.unrealengine.com/en-US/RenderingAndGraphics/VisibilityCulling/PrecomputedVisibilityVolume/index.html )
 - Support AVX1, AVX512
 
@@ -141,10 +142,10 @@ In Opengl : Use QueryObject, Conditional Rendering
 
 references : https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_occlusion_query.txt , https://www.khronos.org/registry/OpenGL/extensions/NV/NV_conditional_render.txt       
 
-## Screen Space AABB Area Culling
+## Screen Space Bouding Sphere Area Culling
 
 This is really easy to understand.    
-When Area Size of AABB projected to screen space is less than setting value, It will be culled.    
+When Area Size of Bouding Sphere projected to screen space is less than setting value, It will be culled.    
 I don't recommend using this feature, because The objects pops up and this is really distracting...       
 I will add Object fade out feature.    
 
