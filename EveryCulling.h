@@ -188,8 +188,25 @@ namespace culling
 						//
 						//
 
-						//TODO : 그냥 각 스레드가 한 Enityty 블록 연산하게 바꾸자
-						// -> 이렇게 하면 Occlusion Culling 단계에서는 
+						//TODO:
+						//HOW works? 
+						//
+						//Each module is executed after other module
+						//At each module, Every threads works on a EntityBlock
+						//
+						//EntityBlock a thread works on is decided by thread index
+						//If a thread finished all assigned blocks, it steal block from other unfinished thread
+						//
+						//Example : 5 Threads
+						//
+						//Thread 1 : EntityBlock 1, 6, 11
+						//Thread 2 : EntityBlock 2, 7, 12
+						//Thread 3 : EntityBlock 3, 8, 13
+						//Thread 4 : EntityBlock 4, 9, 14
+						//Thread 5 : EntityBlock 5, 10, 14
+						//
+						//
+
 						while (cullingModule->mFinishedCullEntityBlockCount[cameraIndex].load(std::memory_order_relaxed) < entityBlockCount)
 						{
 							if (cullingModule->mCurrentCullEntityBlockIndex[cameraIndex].load(std::memory_order_relaxed) >= entityBlockCount)
