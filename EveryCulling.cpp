@@ -217,6 +217,7 @@ void culling::EveryCulling::SetCameraCount(unsigned int cameraCount)
 
 void culling::EveryCulling::SetViewProjectionMatrix(const culling::Matrix4X4& viewProjectionMatrix)
 {
+	IS_ALIGNED_ASSERT(reinterpret_cast<size_t>(&viewProjectionMatrix), 32);
 	this->mViewProjectionMatrix = viewProjectionMatrix;
 }
 

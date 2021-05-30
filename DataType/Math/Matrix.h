@@ -7,7 +7,7 @@ namespace culling
 	/// <summary>
 	/// Column major Matrix 4X4
 	/// </summary>
-	struct alignas(64) Matrix4X4
+	struct alignas(32) Matrix4X4
 	{
 		culling::Vector4 mColumns[4];
 

@@ -23,6 +23,9 @@ typedef __m256	M256F;
 typedef __m256d M256D;
 typedef __m256i M256I;
 
+#ifndef IS_ALIGNED_ASSERT
+#define IS_ALIGNED_ASSERT(ADDRESS, ALIGNMENT) (assert(ADDRESS % ALIGNMENT == 0))
+#endif
 
 //https://software.intel.com/sites/landingpage/IntrinsicsGuide/#expand=69,124,3928,5197&techs=SSE,SSE2,SSE3,SSSE3,SSE4_1,SSE4_2,AVX&text=_mm_shuffle_ps
 #ifndef SHUFFLEMASK
