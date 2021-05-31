@@ -22,10 +22,10 @@ This library is targeting Maximing SIMD, Cache hit, Multi Threading.
 
 #### In Develop
 - Masked SW Occlusion Culling ( https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf )          
-- Distance Culling ( https://docs.unrealengine.com/en-US/RenderingAndGraphics/VisibilityCulling/CullDistanceVolume/index.html )  
-- Screen Space Bouding Sphere Area Culling ( Project Entity's Bouding Sphere bound to Screen Space, if Aread of Projected Sphere is less than setting, Cull it )
-- Precomputed Visibility Volume ( https://docs.unrealengine.com/en-US/RenderingAndGraphics/VisibilityCulling/PrecomputedVisibilityVolume/index.html )
-- Support AVX1, AVX512
+- Query Occlusion Culling ( https://www.khronos.org/registry/OpenGL/extensions/NV/NV_conditional_render.txt )       
+- Screen Space Bouding Sphere Area Culling ( Project Entity's Bouding Sphere bound to Screen Space, if Aread of Projected Sphere is less than setting, Cull it )    
+- Distance Culling ( https://docs.unrealengine.com/en-US/RenderingAndGraphics/VisibilityCulling/CullDistanceVolume/index.html )                      
+- Support AVX1, AVX2               
 
 ## View Frustum Culling using SIMD, Multithreading
 
