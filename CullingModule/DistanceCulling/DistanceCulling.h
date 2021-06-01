@@ -21,7 +21,7 @@ namespace culling
 
 	/// <summary>
 	/// https://docs.unrealengine.com/4.26/en-US/RenderingAndGraphics/VisibilityCulling/CullDistanceVolume/
-	/// 
+	/// Unreal Engine Source Code : https://github.com/EpicGames/UnrealEngine/blob/release/Engine/Source/Runtime/Engine/Private/CullDistanceVolume.cpp
 	/// Objects within the volume that have a size closest to CullDistanceVolume.mSize
 	/// will be culled from view 
 	/// when they are CullDistanceVolume.mCullDistance or more from the Camera.
