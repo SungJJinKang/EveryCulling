@@ -25,9 +25,10 @@ namespace culling
 	/// 
 	/// Supported SIMD Version : AVX2
 	/// 
+	/// How Wokrs ? : 
+	/// Please read "MaskedSWOcclusionCulling_HowWorks.md" file
 	/// 
 	/// references : 
-	/// https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf
 	/// https://www.slideshare.net/IntelSoftware/masked-software-occlusion-culling
 	/// https://www.slideshare.net/IntelSoftware/masked-occlusion-culling
 	/// </summary>
