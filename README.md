@@ -127,7 +127,8 @@ In My experiment, Waiting time is near to zero.
 
 ## Masked Software Occlusion Culling
 
-references : https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf
+Read This : [How does "Masked Software Occlusion Culling" Works?](https://github.com/SungJJinKang/EveryCulling/blob/main/CullingModule/MaskedSWOcclusionCulling/MaskedSWOcclusionCulling_HowWorks.md)           
+references : https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf         
 
 ## Query Occlusion Culling
 
