@@ -66,6 +66,8 @@ namespace culling
 			}
 
 		}
+		
+		//TODO : Add AVX2(__m256) version of this function
 		FORCE_INLINE char CheckInFrustumSIMDWithTwoPoint(const Vector4* eightPlanes, const Vector4* twoPoint)
 		{
 			//We can't use M256F. because two twoPoint isn't aligned to 32 byte
