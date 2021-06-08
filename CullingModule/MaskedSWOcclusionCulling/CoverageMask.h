@@ -39,7 +39,7 @@ namespace culling
 	/// 
 	///     64   ......   128   ......   192   .......  256    ......   320
 	///     CoverageMask1.CoverageMask2..CoverageMask3..CoverageMask4...
-	///		CachceLine1----------------->CachceLine2------------------->
+	///	CachceLine1----------------->CachceLine2------------------->
 	///     Thread1--------------------->Thread2----------------------->
 	/// 
 	/// </summary>
