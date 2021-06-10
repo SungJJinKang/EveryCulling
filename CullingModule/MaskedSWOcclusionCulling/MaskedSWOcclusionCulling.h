@@ -34,6 +34,7 @@ namespace culling
 	/// </summary>
 	class MaskedSWOcclusionCulling : public CullingModule
 	{
+		friend class EveryCulling;
 		friend class BinTrianglesStage;
 		friend class MaskedSWOcclusionCullingStage;
 
@@ -120,6 +121,14 @@ namespace culling
 
 		}
 
+		// Inherited via CullingModule
+		virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex) override;
+
+		void GetOccluderCandidates()
+		{
+
+		}
+
 	public:
 
 		MaskedSWOcclusionCulling(
@@ -141,8 +150,8 @@ namespace culling
 			//SECOND : Use EntityBlock::mPositions's x, y, z(Object's Position), If Object is close to camera, Use it Occluder
 		}
 
-		// Inherited via CullingModule
-		virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex) override;
+	
+
 	};
 }
 

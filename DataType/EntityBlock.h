@@ -6,8 +6,11 @@
 #include "Math/Vector.h"
 #include "Math/Matrix.h"
 
+#ifdef ENABLE_QUERY_OCCLUSION
 #include "QueryObject.h"
-#include "TransformData.h"
+#endif
+
+#include "VertexData.h"
 
 #define MAKE_EVEN_NUMBER(X) (X - (X%2))
 
@@ -16,13 +19,16 @@ namespace culling
 
 	//This code doesn't consider Memory alignment optimzation.
 
-	inline constexpr size_t ENTITY_COUNT_IN_ENTITY_BLOCK = 
-		MAKE_EVEN_NUMBER( (4096 - sizeof(unsigned int)) /
-		(
-			sizeof(Vector4)
-			+ sizeof(char)
-			+ sizeof(void*)
-			+ sizeof(culling::QueryObject*)
+	inline constexpr size_t ENTITY_COUNT_IN_ENTITY_BLOCK =
+		MAKE_EVEN_NUMBER((4096 - sizeof(unsigned int)) /
+			(
+				sizeof(Vector4)
+				+ sizeof(char)
+				+ sizeof(void*)
+#ifdef ENABLE_QUERY_OCCLUSION
+				+ sizeof(culling::QueryObject*)
+#endif
+				+ sizeof(VertexData)
 		)
 		) - 2;
 
@@ -54,12 +60,13 @@ namespace culling
 		/// To set mIsVisibleBitflag, We use _m256
 		/// 
 		/// If Size of mIsVisibleBitflag isn't multiples of 256bit,
-		/// Setting mIsVisibleBitflag will make mPositions value dirty
+		/// Setting mIsVisibleBitflag make mPositions value dirty
 		/// </summary>
 		alignas(32) culling::Vector4 mPositions[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
+#ifdef ENABLE_QUERY_OCCLUSION
 		culling::QueryObject* mQueryObjects[ENTITY_COUNT_IN_ENTITY_BLOCK];
-
+#endif
 		/// <summary>
 		/// mIsVisibleBitflag is stored through two __m128
 		/// 
@@ -68,6 +75,9 @@ namespace culling
 		/// 
 		/// </summary>
 		void* mRenderer[ENTITY_COUNT_IN_ENTITY_BLOCK];
+
+		VertexData mVertexDatas[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		
 		//EntityHandle mHandles[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 		/// <summary>
