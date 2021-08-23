@@ -31,7 +31,7 @@ namespace culling
 	///
 	/// [Slide Resource](https://www.ea.com/frostbite/news/culling-the-battlefield-data-oriented-design-in-practice)        
 	/// [GDC Talk Video](https://www.gdcvault.com/play/1014491/Culling-the-Battlefield-Data-Oriented)          
-	/// [ÇÑ±¹¾î ºí·Î±× ±Û] (https ://sungjjinkang.github.io/doom/2021/04/02/viewfrustumculling.html)  
+	/// [ï¿½Ñ±ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Î±ï¿½ ï¿½ï¿½] (https ://sungjjinkang.github.io/doom/2021/04/02/viewfrustumculling.html)  
 	///
 	/// 
 	/// This culling use SIMD DotProduct, So Check LightMath_Cpp/Matrix4x4Float_Aligned.inl
@@ -118,11 +118,11 @@ namespace culling
 #endif
 		> mUpdatedCullingModules
 		{
-			&(this->mViewFrustumCulling),
+			&(mViewFrustumCulling),
 #ifdef ENABLE_SCREEN_SAPCE_BOUDING_SPHERE_CULLING
-			&(this->mScreenSpaceBoudingSphereCulling),
+			&(mScreenSpaceBoudingSphereCulling),
 #endif	
-			&(this->mMaskedSWOcclusionCulling)
+			&(mMaskedSWOcclusionCulling)
 		};
 
 	public:
@@ -169,19 +169,19 @@ namespace culling
 		/// </summary>
 		FORCE_INLINE void CullBlockEntityJob()
 		{
-			const unsigned int entityBlockCount = static_cast<unsigned int>(this->mEntityGridCell.mEntityBlocks.size());
+			const unsigned int entityBlockCount = static_cast<unsigned int>(mEntityGridCell.mEntityBlocks.size());
 			if (entityBlockCount > 0)
 			{
-				for (unsigned int cameraIndex = 0; cameraIndex < this->mCameraCount; cameraIndex++)
+				for (unsigned int cameraIndex = 0; cameraIndex < mCameraCount; cameraIndex++)
 				{
-					for (size_t moduleIndex = 0; moduleIndex < this->mUpdatedCullingModules.size(); moduleIndex++)
+					for (size_t moduleIndex = 0; moduleIndex < mUpdatedCullingModules.size(); moduleIndex++)
 					{
 						// TODO : Don't use pointer, Just use specific object(3 module) 
 						// Why? : virtual funtion call should reference virtual function table,
 						// We need really fast computation at here, 
 						// referencing virtual function table make it slow
 
-						CullingModule* cullingModule = this->mUpdatedCullingModules[moduleIndex];
+						CullingModule* cullingModule = mUpdatedCullingModules[moduleIndex];
 						//TODO : ON X64, X84, memory_order_relaxed also do acquire memory
 						//So This codes is too slow, FIX IT!!!!!!!!!!!
 						//
@@ -219,8 +219,8 @@ namespace culling
 								continue;
 							}
 
-							EntityBlock* currentEntityBlock = this->mEntityGridCell.mEntityBlocks[currentEntityBlockIndex];
-							const unsigned int entityCountInBlock = this->mEntityGridCell.AllocatedEntityCountInBlocks[currentEntityBlockIndex]; // don't use mCurrentEntityCount
+							EntityBlock* currentEntityBlock = mEntityGridCell.mEntityBlocks[currentEntityBlockIndex];
+							const unsigned int entityCountInBlock = mEntityGridCell.AllocatedEntityCountInBlocks[currentEntityBlockIndex]; // don't use mCurrentEntityCount
 
 							cullingModule->CullBlockEntityJob(currentEntityBlock, entityCountInBlock, cameraIndex);
 
@@ -249,11 +249,11 @@ namespace culling
 		/// </summary>
 		FORCE_INLINE void WaitToFinishCullJobs() const
 		{
-			const unsigned int entityBlockCount = static_cast<unsigned int>(this->mEntityGridCell.mEntityBlocks.size());
-			const size_t lastCameraIndex = this->mCameraCount - 1;
-			const size_t lastModuleIndex = this->mUpdatedCullingModules.size() - 1;
-			const CullingModule* lastCullingModule = this->mUpdatedCullingModules[lastModuleIndex];
-			while (this->GetIsCullJobFinished(lastCullingModule->mFinishedCullEntityBlockCount[lastCameraIndex], entityBlockCount) == false) 
+			const unsigned int entityBlockCount = static_cast<unsigned int>(mEntityGridCell.mEntityBlocks.size());
+			const size_t lastCameraIndex = mCameraCount - 1;
+			const size_t lastModuleIndex = mUpdatedCullingModules.size() - 1;
+			const CullingModule* lastCullingModule = mUpdatedCullingModules[lastModuleIndex];
+			while (GetIsCullJobFinished(lastCullingModule->mFinishedCullEntityBlockCount[lastCameraIndex], entityBlockCount) == false) 
 			{
 				std::this_thread::yield();
 			} 
@@ -264,8 +264,8 @@ namespace culling
 		/// </summary>
 		FORCE_INLINE void ResetCullJobState()
 		{
-			this->SetAllOneIsVisibleFlag();
-			this->ResetCullJobStateVariable();
+			SetAllOneIsVisibleFlag();
+			ResetCullJobStateVariable();
 		}
 
 		/// <summary>

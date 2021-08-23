@@ -10,6 +10,6 @@ void culling::ViewFrustumCulling::UpdateFrustumPlane(unsigned int frustumPlaneIn
 {
 	assert(frustumPlaneIndex >= 0 && frustumPlaneIndex < MAX_CAMERA_COUNT);
 
-	ExtractSIMDPlanesFromViewProjectionMatrix(viewProjectionMatrix, this->mSIMDFrustumPlanes[frustumPlaneIndex].mFrustumPlanes, true);
+	ExtractSIMDPlanesFromViewProjectionMatrix(viewProjectionMatrix, mSIMDFrustumPlanes[frustumPlaneIndex].mFrustumPlanes, true);
 }
 

@@ -41,7 +41,7 @@ namespace culling
 		/// <returns></returns>
 		FORCE_INLINE char GetIsVisibleBitflag() const
 		{
-			assert(this->bmIsActive == true);
+			assert(bmIsActive == true);
 			return mTargetEntityBlock->mIsVisibleBitflag[mEntityIndexInBlock];
 		}
 
@@ -52,7 +52,7 @@ namespace culling
 		/// <returns></returns>
 		FORCE_INLINE char GetIsVisibleBitflag(unsigned int cameraIndex) const
 		{
-			assert(this->bmIsActive == true);
+			assert(bmIsActive == true);
 			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
 			return mTargetEntityBlock->mIsVisibleBitflag[mEntityIndexInBlock] & (1 << cameraIndex);
 		}
@@ -60,13 +60,13 @@ namespace culling
 
 		FORCE_INLINE void SetEntityPosition(const float* worldPosition)
 		{
-			assert(this->bmIsActive == true);
+			assert(bmIsActive == true);
 			std::memcpy((mTargetEntityBlock->mPositions + mEntityIndexInBlock), worldPosition, sizeof(Vector3));
 		}
 
 		FORCE_INLINE void SetSphereBoundRadius(float sphereRadius)
 		{
-			assert(this->bmIsActive == true);
+			assert(bmIsActive == true);
 			assert(sphereRadius >= 0.0f);
 
 			// WHY NEGATIVE??

@@ -5,8 +5,8 @@
 
 void culling::MaskedSWOcclusionCulling::ResetDepthBuffer()
 {
-	const size_t tileCount = static_cast<size_t>(this->mDepthBuffer.mResolution.mTileCountInARow) * static_cast<size_t>(this->mDepthBuffer.mResolution.mTileCountInAColumn);
-	std::shared_ptr<Tile[]> tiles = this->mDepthBuffer.mTiles;
+	const size_t tileCount = static_cast<size_t>(mDepthBuffer.mResolution.mTileCountInARow) * static_cast<size_t>(mDepthBuffer.mResolution.mTileCountInAColumn);
+	std::shared_ptr<Tile[]> tiles = mDepthBuffer.mTiles;
 	
 	for (size_t i = 0; i < tileCount; i++)
 	{
@@ -31,18 +31,18 @@ culling::MaskedSWOcclusionCulling::MaskedSWOcclusionCulling(EveryCulling* frotbi
 
 void culling::MaskedSWOcclusionCulling::SetNearFarClipPlaneDistance(float nearClipPlaneDis, float farClipPlaneDis)
 {
-	this->mNearClipPlaneDis = nearClipPlaneDis;
-	this->mFarClipPlaneDis = farClipPlaneDis;
+	mNearClipPlaneDis = nearClipPlaneDis;
+	mFarClipPlaneDis = farClipPlaneDis;
 }
 
 void culling::MaskedSWOcclusionCulling::SetViewProjectionMatrix(float* viewProjectionMatrix)
 {
-	this->mViewProjectionMatrix = viewProjectionMatrix;
+	mViewProjectionMatrix = viewProjectionMatrix;
 }
 
 void culling::MaskedSWOcclusionCulling::ResetState()
 {
-	this->ResetDepthBuffer();
+	ResetDepthBuffer();
 
 }
 

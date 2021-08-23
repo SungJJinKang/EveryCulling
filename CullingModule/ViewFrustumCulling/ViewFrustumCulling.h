@@ -36,10 +36,10 @@ namespace culling
 		{
 			alignas(64) char cullingMask[ENTITY_COUNT_IN_ENTITY_BLOCK] = { 0 };
 
-			const Vector4* frustumPlane = this->mSIMDFrustumPlanes[cameraIndex].mFrustumPlanes;
+			const Vector4* frustumPlane = mSIMDFrustumPlanes[cameraIndex].mFrustumPlanes;
 			for (size_t j = 0; j < entityCountInBlock; j = j + 2)
 			{
-				char result = this->CheckInFrustumSIMDWithTwoPoint(frustumPlane, currentEntityBlock->mPositions + j);
+				char result = CheckInFrustumSIMDWithTwoPoint(frustumPlane, currentEntityBlock->mPositions + j);
 				// if first low bit has 1 value, Pos A is In Frustum
 				// if second low bit has 1 value, Pos A is In Frustum
 
@@ -138,7 +138,7 @@ namespace culling
 		void UpdateFrustumPlane(unsigned int frustumPlaneIndex, const Matrix4X4& viewProjectionMatrix);
 		FORCE_INLINE culling::SIMDFrustumPlanes* GetSIMDPlanes()
 		{
-			return this->mSIMDFrustumPlanes;
+			return mSIMDFrustumPlanes;
 		}
 	};
 }

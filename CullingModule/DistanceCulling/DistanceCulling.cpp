@@ -4,8 +4,8 @@
 
 void culling::DistanceCulling::AddCullDistanceVolume(culling::CullDistanceVolume cullDistanceVolume)
 {
-	this->mCullDistanceVolumes.push_back(cullDistanceVolume);
-	std::sort(this->mCullDistanceVolumes.begin(), this->mCullDistanceVolumes.end(),
+	mCullDistanceVolumes.push_back(cullDistanceVolume);
+	std::sort(mCullDistanceVolumes.begin(), mCullDistanceVolumes.end(),
 		[](const culling::CullDistanceVolume& A, const culling::CullDistanceVolume& B)
 		{
 			return A.mSize < B.mSize;
@@ -15,10 +15,10 @@ void culling::DistanceCulling::AddCullDistanceVolume(culling::CullDistanceVolume
 
 void culling::DistanceCulling::DeleteCullDistanceVolume(size_t index)
 {
-	if (index >= this->mCullDistanceVolumes.size())
+	if (index >= mCullDistanceVolumes.size())
 	{
 		return;
 	}
 
-	this->mCullDistanceVolumes.erase(this->mCullDistanceVolumes.begin() + index);
+	mCullDistanceVolumes.erase(mCullDistanceVolumes.begin() + index);
 }

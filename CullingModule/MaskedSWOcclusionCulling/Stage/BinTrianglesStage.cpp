@@ -33,11 +33,11 @@ void culling::BinTrianglesStage::ConvertNDCSpaceToScreenPixelSpace
 	{
 		//Convert NDC Space Coordinates To Screen Space Coordinates 
 #if NDC_RANGE == MINUS_ONE_TO_POSITIVE_ONE
-		const M256F tmpScreenSpaceX = culling::M256F_MUL_AND_ADD(ndcSpaceVertexX[i], this->mMaskedOcclusionCulling.mDepthBuffer.mResolution.mReplicatedScreenHalfWidth, this->mMaskedOcclusionCulling.mDepthBuffer.mResolution.mReplicatedScreenHalfWidth);
-		const M256F tmpScreenSpaceY = culling::M256F_MUL_AND_ADD(ndcSpaceVertexY[i], this->mMaskedOcclusionCulling.mDepthBuffer.mResolution.mReplicatedScreenHalfHeight, this->mMaskedOcclusionCulling.mDepthBuffer.mResolution.mReplicatedScreenHalfHeight);
+		const M256F tmpScreenSpaceX = culling::M256F_MUL_AND_ADD(ndcSpaceVertexX[i], mMaskedOcclusionCulling.mDepthBuffer.mResolution.mReplicatedScreenHalfWidth, mMaskedOcclusionCulling.mDepthBuffer.mResolution.mReplicatedScreenHalfWidth);
+		const M256F tmpScreenSpaceY = culling::M256F_MUL_AND_ADD(ndcSpaceVertexY[i], mMaskedOcclusionCulling.mDepthBuffer.mResolution.mReplicatedScreenHalfHeight, mMaskedOcclusionCulling.mDepthBuffer.mResolution.mReplicatedScreenHalfHeight);
 #elif NDC_RANGE == ZERO_TO_POSITIVE_ONE
-		const M256F tmpScreenSpaceX = culling::M256F_MUL(ndcSpaceVertexX[i], this->mDepthBuffer.mResolution.mReplicatedScreenWidth);
-		const M256F tmpScreenSpaceY = culling::M256F_MUL(ndcSpaceVertexY[i], this->mDepthBuffer.mResolution.mReplicatedScreenHeight);
+		const M256F tmpScreenSpaceX = culling::M256F_MUL(ndcSpaceVertexX[i], mDepthBuffer.mResolution.mReplicatedScreenWidth);
+		const M256F tmpScreenSpaceY = culling::M256F_MUL(ndcSpaceVertexY[i], mDepthBuffer.mResolution.mReplicatedScreenHeight);
 #else 
 		assert(0); //NEVER HAPPEN
 #endif
@@ -46,7 +46,7 @@ void culling::BinTrianglesStage::ConvertNDCSpaceToScreenPixelSpace
 		
 		//A grid square, including its (x, y) window coordinates, z (depth), and associated data which may be added by fragment shaders, is called a fragment. A
 		//fragment is located by its lower left corner, which lies on integer grid coordinates.
-		//Rasterization operations also refer to a fragment¡¯s center, which is offset by ( 1/2, 1/2 )
+		//Rasterization operations also refer to a fragmentï¿½ï¿½s center, which is offset by ( 1/2, 1/2 )
 		//from its lower left corner(and so lies on half - integer coordinates).
 
 		//outScreenPixelSpaceX[i] = _mm256_floor_ps(tmpScreenSpaceX);
@@ -107,7 +107,7 @@ void culling::BinTrianglesStage::ComputeBinBoundingBox(const M256F* screenPixelX
 
 	//A grid square, including its (x, y) window coordinates, z (depth), and associated data which may be added by fragment shaders, is called a fragment. A
 	//fragment is located by its lower left corner, which lies on integer grid coordinates.
-	//Rasterization operations also refer to a fragment¡¯s center, which is offset by ( 1/2, 1/2 )
+	//Rasterization operations also refer to a fragmentï¿½ï¿½s center, which is offset by ( 1/2, 1/2 )
 	//from its lower left corner(and so lies on half - integer coordinates).
 
 	static const M256I WIDTH_MASK = _mm256_set1_epi32(~(TILE_WIDTH - 1));
@@ -131,10 +131,10 @@ void culling::BinTrianglesStage::ComputeBinBoundingBox(const M256F* screenPixelX
 	outBinBoundingBoxMaxX = _mm256_and_si256(_mm256_add_epi32(maxScreenPixelX, _mm256_set1_epi32(TILE_WIDTH)), WIDTH_MASK);
 	outBinBoundingBoxMaxY = _mm256_and_si256(_mm256_add_epi32(maxScreenPixelY, _mm256_set1_epi32(TILE_HEIGHT)), HEIGHT_MASK);
 
-	outBinBoundingBoxMinX = _mm256_max_epi32(outBinBoundingBoxMinX, _mm256_set1_epi32(this->mMaskedOcclusionCulling.mDepthBuffer.mResolution.mLeftBottomTileOrginX));
-	outBinBoundingBoxMinY = _mm256_max_epi32(outBinBoundingBoxMinY, _mm256_set1_epi32(this->mMaskedOcclusionCulling.mDepthBuffer.mResolution.mLeftBottomTileOrginY));
-	outBinBoundingBoxMaxX = _mm256_min_epi32(outBinBoundingBoxMaxX, _mm256_set1_epi32(this->mMaskedOcclusionCulling.mDepthBuffer.mResolution.mRightTopTileOrginX));
-	outBinBoundingBoxMaxY = _mm256_min_epi32(outBinBoundingBoxMaxY, _mm256_set1_epi32(this->mMaskedOcclusionCulling.mDepthBuffer.mResolution.mRightTopTileOrginY));
+	outBinBoundingBoxMinX = _mm256_max_epi32(outBinBoundingBoxMinX, _mm256_set1_epi32(mMaskedOcclusionCulling.mDepthBuffer.mResolution.mLeftBottomTileOrginX));
+	outBinBoundingBoxMinY = _mm256_max_epi32(outBinBoundingBoxMinY, _mm256_set1_epi32(mMaskedOcclusionCulling.mDepthBuffer.mResolution.mLeftBottomTileOrginY));
+	outBinBoundingBoxMaxX = _mm256_min_epi32(outBinBoundingBoxMaxX, _mm256_set1_epi32(mMaskedOcclusionCulling.mDepthBuffer.mResolution.mRightTopTileOrginX));
+	outBinBoundingBoxMaxY = _mm256_min_epi32(outBinBoundingBoxMaxY, _mm256_set1_epi32(mMaskedOcclusionCulling.mDepthBuffer.mResolution.mRightTopTileOrginY));
 }
 
 
@@ -243,7 +243,7 @@ void culling::BinTrianglesStage::BinTriangles(
 
 		//Gather Vertex with indice
 		//WE ARRIVE AT MODEL SPACE COORDINATE!
-		this->GatherVertex(vertices, vertexIndices, indiceCount, currentIndiceIndex, vertexStrideByte, fetchTriangleCount, ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, triangleCullMask);
+		GatherVertex(vertices, vertexIndices, indiceCount, currentIndiceIndex, vertexStrideByte, fetchTriangleCount, ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, triangleCullMask);
 
 		if (triangleCullMask == 0x0)
 		{
@@ -252,7 +252,7 @@ void culling::BinTrianglesStage::BinTriangles(
 
 		//Convert Model space Vertex To Clip space Vertex
 		//WE ARRIVE AT CLIP SPACE COORDINATE. W IS NOT 1
-		this->TransformVertexsToClipSpace(ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, oneDividedByW, modelToClipspaceMatrix, triangleCullMask);
+		TransformVertexsToClipSpace(ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, oneDividedByW, modelToClipspaceMatrix, triangleCullMask);
 
 		for (size_t i = 0; i < 3; i++)
 		{
@@ -264,16 +264,16 @@ void culling::BinTrianglesStage::BinTriangles(
 		//If you use Opengl, Vertexs have value from -1 to 1
 		//if you use DirectX, Vertexs have value from 0 to 1 
 		//W BECOME USELESS, IGNORE IT
-		this->ConverClipSpaceToNDCSpace(ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, oneDividedByW, triangleCullMask);
+		ConverClipSpaceToNDCSpace(ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, oneDividedByW, triangleCullMask);
 
-		//ScreenPixelPos : 0 ~ this->mDepthBuffer.Width, Height
+		//ScreenPixelPos : 0 ~ mDepthBuffer.Width, Height
 		M256F screenPixelPosX[3], screenPixelPosY[3];
-		this->ConvertNDCSpaceToScreenPixelSpace(ndcSpaceVertexX, ndcSpaceVertexY, screenPixelPosX, screenPixelPosY, triangleCullMask);
+		ConvertNDCSpaceToScreenPixelSpace(ndcSpaceVertexX, ndcSpaceVertexY, screenPixelPosX, screenPixelPosY, triangleCullMask);
 		//Clip Space Cull
 
 		//BackFace Cull
 		// 
-		this->CullBackfaces(screenPixelPosX, screenPixelPosY, triangleCullMask);
+		CullBackfaces(screenPixelPosX, screenPixelPosY, triangleCullMask);
 
 		//Do not Sort Triangle in binning stage
 		//because Culled triangles is also sorted
@@ -293,9 +293,9 @@ void culling::BinTrianglesStage::BinTriangles(
 
 		//Compute Bin Bounding Box
 		//Get Intersecting Bin List
-		this->ComputeBinBoundingBox(screenPixelPosX, screenPixelPosY, outBinBoundingBoxMinX, outBinBoundingBoxMinY, outBinBoundingBoxMaxX, outBinBoundingBoxMaxY);
+		ComputeBinBoundingBox(screenPixelPosX, screenPixelPosY, outBinBoundingBoxMinX, outBinBoundingBoxMinY, outBinBoundingBoxMaxX, outBinBoundingBoxMaxY);
 
-		std::shared_ptr<Tile[]> tiles = this->mMaskedOcclusionCulling.mDepthBuffer.mTiles;
+		std::shared_ptr<Tile[]> tiles = mMaskedOcclusionCulling.mDepthBuffer.mTiles;
 
 		for (size_t triangleIndex = 0; triangleIndex < triangleCountPerLoop && ( (triangleCullMask & (1 << triangleIndex) ) != 0x0); triangleIndex++)
 		{
@@ -308,7 +308,7 @@ void culling::BinTrianglesStage::BinTriangles(
 			{
 				for (size_t x = intersectingMinBoxX; y <= intersectingMaxBoxX; y++)
 				{
-					Tile& targetTile = tiles[x + y * this->mMaskedOcclusionCulling.mDepthBuffer.mResolution.mTileCountInARow];
+					Tile& targetTile = tiles[x + y * mMaskedOcclusionCulling.mDepthBuffer.mResolution.mTileCountInARow];
 
 					const size_t triListIndex = targetTile.mBinnedTriangles.mCurrentTriangleCount;
 					for (size_t pointIndex = 0; pointIndex < 3; pointIndex++)
@@ -326,7 +326,7 @@ void culling::BinTrianglesStage::BinTriangles(
 		}
 
 
-		//this->ComputeBinBoundingBox
+		//ComputeBinBoundingBox
 
 		currentIndiceIndex += triangleCountPerLoop * 3; 
 	}

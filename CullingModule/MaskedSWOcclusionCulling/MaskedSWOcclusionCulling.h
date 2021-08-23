@@ -80,9 +80,9 @@ namespace culling
 			float* modelToClipspaceMatrix
 		)
 		{
-			this->mBinTrianglesStage.BinTriangles(vertices, vertexIndices, indiceCount, vertexStrideByte, modelToClipspaceMatrix);
+			mBinTrianglesStage.BinTriangles(vertices, vertexIndices, indiceCount, vertexStrideByte, modelToClipspaceMatrix);
 
-			//this->mRasterizeTrianglesStage.RasterizeBinnedTriangles();
+			//mRasterizeTrianglesStage.RasterizeBinnedTriangles();
 		}
 
 

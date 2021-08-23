@@ -11,13 +11,13 @@ void culling::EveryCulling::FreeEntityBlock(EntityBlock* freedEntityBlock)
 	assert(freedEntityBlock != nullptr);
 
 	size_t freedEntityBlockIndex;
-	const size_t entityBlockCount = this->mEntityGridCell.mEntityBlocks.size();
+	const size_t entityBlockCount = mEntityGridCell.mEntityBlocks.size();
 	bool IsSuccessToFind = false;
 	for (size_t i = 0; i < entityBlockCount; i++)
 	{
 		//Freeing entity block happen barely
 		//So this looping is acceptable
-		if (this->mEntityGridCell.mEntityBlocks[i] == freedEntityBlock)
+		if (mEntityGridCell.mEntityBlocks[i] == freedEntityBlock)
 		{
 			freedEntityBlockIndex = i;
 			IsSuccessToFind = true;
@@ -28,41 +28,41 @@ void culling::EveryCulling::FreeEntityBlock(EntityBlock* freedEntityBlock)
 	assert(IsSuccessToFind == true);
 
 	//swap and pop back trick
-	std::vector_swap_popback(this->mEntityGridCell.mEntityBlocks, freedEntityBlockIndex);
-	std::vector_swap_popback(this->mEntityGridCell.AllocatedEntityCountInBlocks, freedEntityBlockIndex);
+	std::vector_swap_popback(mEntityGridCell.mEntityBlocks, freedEntityBlockIndex);
+	std::vector_swap_popback(mEntityGridCell.AllocatedEntityCountInBlocks, freedEntityBlockIndex);
 
 	freedEntityBlock->mCurrentEntityCount = 0;
 
-	this->mFreeEntityBlockList.push_back(freedEntityBlock);
-	std::vector_find_swap_popback(this->mActiveEntityBlockList, freedEntityBlock);
+	mFreeEntityBlockList.push_back(freedEntityBlock);
+	std::vector_find_swap_popback(mActiveEntityBlockList, freedEntityBlock);
 }
 
 
 culling::EntityBlock* culling::EveryCulling::GetNewEntityBlockFromPool()
 {
-	if (this->mFreeEntityBlockList.size() == 0)
+	if (mFreeEntityBlockList.size() == 0)
 	{
-		this->AllocateEntityBlockPool();
+		AllocateEntityBlockPool();
 	}
 
-	assert(this->mFreeEntityBlockList.size() != 0);
-	EntityBlock* entityBlock = this->mFreeEntityBlockList.back();
-	this->mFreeEntityBlockList.pop_back();
+	assert(mFreeEntityBlockList.size() != 0);
+	EntityBlock* entityBlock = mFreeEntityBlockList.back();
+	mFreeEntityBlockList.pop_back();
 	return entityBlock;
 }
 
 void culling::EveryCulling::ResetCullJobStateVariable()
 {
-	for (unsigned int cameraIndex = 0; cameraIndex < this->mCameraCount; cameraIndex++)
+	for (unsigned int cameraIndex = 0; cameraIndex < mCameraCount; cameraIndex++)
 	{
-		for (size_t moduleIndex = 0; moduleIndex < this->mUpdatedCullingModules.size(); moduleIndex++)
+		for (size_t moduleIndex = 0; moduleIndex < mUpdatedCullingModules.size(); moduleIndex++)
 		{
-			CullingModule* cullingModule = this->mUpdatedCullingModules[moduleIndex];
+			CullingModule* cullingModule = mUpdatedCullingModules[moduleIndex];
 			cullingModule->mCurrentCullEntityBlockIndex[cameraIndex].store(0, std::memory_order_relaxed);
 			cullingModule->mFinishedCullEntityBlockCount[cameraIndex].store(0, std::memory_order_relaxed);
 		}
 	}
-	this->mIsCullJobFinished.store(false, std::memory_order_relaxed);
+	mIsCullJobFinished.store(false, std::memory_order_relaxed);
 
 	//release!
 	std::atomic_thread_fence(std::memory_order_seq_cst);
@@ -71,7 +71,7 @@ void culling::EveryCulling::ResetCullJobStateVariable()
 void culling::EveryCulling::SetAllOneIsVisibleFlag()
 {
 	//Maybe Compiler use SIMD or do faster than SIMD instruction
-	for (auto entityBlock : this->mEntityGridCell.mEntityBlocks)
+	for (auto entityBlock : mEntityGridCell.mEntityBlocks)
 	{
 		std::memset(entityBlock->mIsVisibleBitflag, 0xFF, sizeof(char) * ENTITY_COUNT_IN_ENTITY_BLOCK);
 	}
@@ -82,9 +82,9 @@ void culling::EveryCulling::AllocateEntityBlockPool()
 	EntityBlock* newEntityBlockChunk = new EntityBlock[INITIAL_ENTITY_BLOCK_COUNT];
 	for (unsigned int i = 0; i < INITIAL_ENTITY_BLOCK_COUNT; i++)
 	{
-		this->mFreeEntityBlockList.push_back(newEntityBlockChunk + i);
+		mFreeEntityBlockList.push_back(newEntityBlockChunk + i);
 	}
-	this->mAllocatedEntityBlockChunkList.push_back(newEntityBlockChunk);
+	mAllocatedEntityBlockChunkList.push_back(newEntityBlockChunk);
 }
 
 void culling::EveryCulling::ResetEntityBlock(culling::EntityBlock* entityBlock)
@@ -99,36 +99,36 @@ void culling::EveryCulling::RemoveEntityFromBlock(EntityBlock* ownerEntityBlock,
 	assert(ownerEntityBlock != nullptr);
 	assert(entityIndexInBlock >= 0 && entityIndexInBlock < ENTITY_COUNT_IN_ENTITY_BLOCK);
 
-	this->mViewFrustumCulling.ClearEntityData(ownerEntityBlock, entityIndexInBlock);
-	this->mMaskedSWOcclusionCulling.ClearEntityData(ownerEntityBlock, entityIndexInBlock);
+	mViewFrustumCulling.ClearEntityData(ownerEntityBlock, entityIndexInBlock);
+	mMaskedSWOcclusionCulling.ClearEntityData(ownerEntityBlock, entityIndexInBlock);
 #ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
-	this->mScreenSpaceBoudingSphereCulling.ClearEntityData(ownerEntityBlock, entityIndexInBlock);
+	mScreenSpaceBoudingSphereCulling.ClearEntityData(ownerEntityBlock, entityIndexInBlock);
 #endif
 #ifdef ENABLE_QUERY_OCCLUSION
-	this->mQueryOcclusionCulling.ClearEntityData(ownerEntityBlock, entityIndexInBlock);
+	mQueryOcclusionCulling.ClearEntityData(ownerEntityBlock, entityIndexInBlock);
 #endif
 
-	//Don't decrement this->mEntityGridCell.AllocatedEntityCountInBlocks
+	//Don't decrement mEntityGridCell.AllocatedEntityCountInBlocks
 	//Entities Indexs in EntityBlock should not be swapped because already allocated EntityBlockViewer can't see it
 
 	ownerEntityBlock->mCurrentEntityCount--;
 	if (ownerEntityBlock->mCurrentEntityCount == 0)
 	{
-		this->FreeEntityBlock(ownerEntityBlock);
+		FreeEntityBlock(ownerEntityBlock);
 	}
 	
 }
 
 std::pair<culling::EntityBlock*, unsigned int*> culling::EveryCulling::AllocateNewEntityBlockFromPool()
 {
-	EntityBlock* newEntityBlock = this->GetNewEntityBlockFromPool();
-	this->mEntityGridCell.mEntityBlocks.push_back(newEntityBlock); 
-	this->mEntityGridCell.AllocatedEntityCountInBlocks.push_back(0);
-	this->ResetEntityBlock(newEntityBlock);
+	EntityBlock* newEntityBlock = GetNewEntityBlockFromPool();
+	mEntityGridCell.mEntityBlocks.push_back(newEntityBlock); 
+	mEntityGridCell.AllocatedEntityCountInBlocks.push_back(0);
+	ResetEntityBlock(newEntityBlock);
 
-	this->mActiveEntityBlockList.push_back(newEntityBlock);
+	mActiveEntityBlockList.push_back(newEntityBlock);
 
-	return { this->mEntityGridCell.mEntityBlocks.back(), &(this->mEntityGridCell.AllocatedEntityCountInBlocks.back()) };
+	return { mEntityGridCell.mEntityBlocks.back(), &(mEntityGridCell.AllocatedEntityCountInBlocks.back()) };
 }
 
 
@@ -138,22 +138,22 @@ std::pair<culling::EntityBlock*, unsigned int*> culling::EveryCulling::AllocateN
 culling::EntityBlockViewer culling::EveryCulling::AllocateNewEntity(void* renderer)
 {
 	std::pair<culling::EntityBlock*, unsigned int*> targetEntityBlock;
-	if (this->mEntityGridCell.mEntityBlocks.size() == 0)
+	if (mEntityGridCell.mEntityBlocks.size() == 0)
 	{
 		// if Any entityBlock isn't allocated yet
-		targetEntityBlock = this->AllocateNewEntityBlockFromPool();
+		targetEntityBlock = AllocateNewEntityBlockFromPool();
 	}
 	else
 	{//When Allocated entity block count is at least one
 
 		//Get last entityblock in active entities
-		targetEntityBlock = { this->mEntityGridCell.mEntityBlocks.back(), &(this->mEntityGridCell.AllocatedEntityCountInBlocks.back()) };
+		targetEntityBlock = { mEntityGridCell.mEntityBlocks.back(), &(mEntityGridCell.AllocatedEntityCountInBlocks.back()) };
 
 		if (*(targetEntityBlock.second) == ENTITY_COUNT_IN_ENTITY_BLOCK)
 		{
 			//if last entityblock in active entities is full of entities
 			//alocate new entity block
-			targetEntityBlock = this->AllocateNewEntityBlockFromPool();
+			targetEntityBlock = AllocateNewEntityBlockFromPool();
 		}
 	}
 	
@@ -172,8 +172,8 @@ void culling::EveryCulling::RemoveEntityFromBlock(EntityBlockViewer& entityBlock
 	//Do nothing......
 
 	entityBlockViewer.bmIsActive = false;
-	this->RemoveEntityFromBlock(entityBlockViewer.mTargetEntityBlock, entityBlockViewer.mEntityIndexInBlock);
-	//Don't decrement this->mEntityGridCell.AllocatedEntityCountInBlocks
+	RemoveEntityFromBlock(entityBlockViewer.mTargetEntityBlock, entityBlockViewer.mEntityIndexInBlock);
+	//Don't decrement mEntityGridCell.AllocatedEntityCountInBlocks
 	//Entities Indexs in EntityBlock should not be swapped because already allocated EntityBlockViewer can't see it
 }
 
@@ -187,20 +187,20 @@ culling::EveryCulling::EveryCulling(unsigned int resolutionWidth, unsigned int r
 	, mQueryOcclusionCulling{ this }
 {
 	//to protect 
-	this->mFreeEntityBlockList.reserve(INITIAL_ENTITY_BLOCK_RESERVED_SIZE);
-	this->mEntityGridCell.mEntityBlocks.reserve(INITIAL_ENTITY_BLOCK_RESERVED_SIZE);
-	this->mEntityGridCell.AllocatedEntityCountInBlocks.reserve(INITIAL_ENTITY_BLOCK_RESERVED_SIZE);
+	mFreeEntityBlockList.reserve(INITIAL_ENTITY_BLOCK_RESERVED_SIZE);
+	mEntityGridCell.mEntityBlocks.reserve(INITIAL_ENTITY_BLOCK_RESERVED_SIZE);
+	mEntityGridCell.AllocatedEntityCountInBlocks.reserve(INITIAL_ENTITY_BLOCK_RESERVED_SIZE);
 
-	this->AllocateEntityBlockPool();
+	AllocateEntityBlockPool();
 
-	//this->CacheCullBlockEntityJobs();
-	this->bmIsEntityBlockPoolInitialized = true;
+	//CacheCullBlockEntityJobs();
+	bmIsEntityBlockPoolInitialized = true;
 
 }
 
 culling::EveryCulling::~EveryCulling()
 {
-	for (culling::EntityBlock* allocatedEntityBlockChunk : this->mAllocatedEntityBlockChunkList)
+	for (culling::EntityBlock* allocatedEntityBlockChunk : mAllocatedEntityBlockChunkList)
 	{
 		delete[] allocatedEntityBlockChunk;
 	}
@@ -208,27 +208,27 @@ culling::EveryCulling::~EveryCulling()
 
 void culling::EveryCulling::SetCameraCount(unsigned int cameraCount)
 {
-	this->mCameraCount = cameraCount;
-	this->mViewFrustumCulling.mCameraCount = cameraCount;
+	mCameraCount = cameraCount;
+	mViewFrustumCulling.mCameraCount = cameraCount;
 #ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
-	this->mScreenSpaceBoudingSphereCulling.mCameraCount = cameraCount;
+	mScreenSpaceBoudingSphereCulling.mCameraCount = cameraCount;
 #endif
 }
 
 void culling::EveryCulling::SetViewProjectionMatrix(const culling::Matrix4X4& viewProjectionMatrix)
 {
 	IS_ALIGNED_ASSERT(reinterpret_cast<size_t>(&viewProjectionMatrix), 32);
-	this->mViewProjectionMatrix = viewProjectionMatrix;
+	mViewProjectionMatrix = viewProjectionMatrix;
 }
 
 unsigned int culling::EveryCulling::GetCameraCount() const
 {
-	return this->mCameraCount;
+	return mCameraCount;
 }
 
 std::vector<culling::EntityBlock*> culling::EveryCulling::GetActiveEntityBlockList() const
 {
-	return this->mActiveEntityBlockList;
+	return mActiveEntityBlockList;
 }
 
 std::function<void()> culling::EveryCulling::GetCullJob()

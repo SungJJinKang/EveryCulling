@@ -46,16 +46,16 @@ bool culling::QueryOcclusionCulling::CompileOccluderShader()
 	glCompileShader(vertex_shader_id);
 	glCompileShader(fragment_shader_id);
 
-	this->mOcclusionMaterialID = glCreateProgram();
+	mOcclusionMaterialID = glCreateProgram();
 
-	glAttachShader(this->mOcclusionMaterialID, vertex_shader_id);
-	glAttachShader(this->mOcclusionMaterialID, fragment_shader_id);
+	glAttachShader(mOcclusionMaterialID, vertex_shader_id);
+	glAttachShader(mOcclusionMaterialID, fragment_shader_id);
 
-	glLinkProgram(this->mOcclusionMaterialID);
+	glLinkProgram(mOcclusionMaterialID);
 
 
 	int isSuccess = 0;
-	glGetProgramiv(this->mOcclusionMaterialID, GL_LINK_STATUS, &isSuccess);
+	glGetProgramiv(mOcclusionMaterialID, GL_LINK_STATUS, &isSuccess);
 	assert(isSuccess != 0); // Shader Compiling is success???
 
 	glDeleteShader(vertex_shader_id);
@@ -76,8 +76,8 @@ bool culling::QueryOcclusionCulling::InitElementBufferObject()
 {
 #ifdef CULLING_OPENGL
 	
-	glGenBuffers(1, &(this->mElementBufferObjectID));
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->mElementBufferObjectID);
+	glGenBuffers(1, &(mElementBufferObjectID));
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mElementBufferObjectID);
 
 	const unsigned int AABB_INDEX_DATA[] = 
 	{
@@ -104,19 +104,19 @@ bool culling::QueryOcclusionCulling::InitElementBufferObject()
 void culling::QueryOcclusionCulling::InitQueryOcclusionCulling()
 {
 
-	if (this->CompileOccluderShader() == false)
+	if (CompileOccluderShader() == false)
 	{
 		return;
 	}
 
-	if (this->InitElementBufferObject() == false)
+	if (InitElementBufferObject() == false)
 	{
 		return;
 	}
-	this->mViewProjectionMatrixUnifromLocation = glGetUniformLocation(this->mOcclusionMaterialID, "viewProjectionMatrix");
+	mViewProjectionMatrixUnifromLocation = glGetUniformLocation(mOcclusionMaterialID, "viewProjectionMatrix");
 
 
-	this->bmIsQueryOcclusionReady = true;
+	bmIsQueryOcclusionReady = true;
 }
 
 
@@ -127,7 +127,7 @@ bool culling::QueryOcclusionCulling::StartQuery(const unsigned int queryID)
 #ifdef CULLING_OPENGL
 	glBeginQuery(GL_SAMPLES_PASSED, queryID);
 	glBeginQuery(GL_ANY_SAMPLES_PASSED, queryID);
-	//glBeginQuery(GL_ANY_SAMPLES_PASSED_CONSERVATIVE, this->mQueryID);
+	//glBeginQuery(GL_ANY_SAMPLES_PASSED_CONSERVATIVE, mQueryID);
 	return true;
 #elif CULLING_DIRECTX
 	return false;
@@ -186,16 +186,16 @@ void culling::QueryOcclusionCulling::QueryOccludeeAABB(const culling::QueryObjec
 {
 	
 
-	assert(this->bmIsQueryOcclusionReady == true);
+	assert(bmIsQueryOcclusionReady == true);
 
-	if (this->StartQuery(queryObject.mQueryID) == false)
+	if (StartQuery(queryObject.mQueryID) == false)
 	{
 		return;
 	}
 
 #ifdef CULLING_OPENGL
 
-	glUniformMatrix4fv(this->mViewProjectionMatrixUnifromLocation, 1, GL_FALSE, reinterpret_cast<const float*>(&(queryObject.mLocal2WorldMatrix)));
+	glUniformMatrix4fv(mViewProjectionMatrixUnifromLocation, 1, GL_FALSE, reinterpret_cast<const float*>(&(queryObject.mLocal2WorldMatrix)));
 
 	//Draw Occludee AABB
 	glBindVertexArray(queryObject.mVertexArrayObjectID);
@@ -207,7 +207,7 @@ void culling::QueryOcclusionCulling::QueryOccludeeAABB(const culling::QueryObjec
 
 #endif
 
-	this->StopQuery(queryObject.mQueryID);
+	StopQuery(queryObject.mQueryID);
 }
 
 culling::QueryOcclusionCulling::QueryOcclusionCulling(culling::EveryCulling* everyCulling)
@@ -218,12 +218,12 @@ culling::QueryOcclusionCulling::QueryOcclusionCulling(culling::EveryCulling* eve
 
 culling::QueryOcclusionCulling::~QueryOcclusionCulling()
 {
-	glDeleteProgram(this->mOcclusionMaterialID);
-	glDeleteBuffers(1, &(this->mElementBufferObjectID));
+	glDeleteProgram(mOcclusionMaterialID);
+	glDeleteBuffers(1, &(mElementBufferObjectID));
 
-	for (culling::QueryObject* queryObject : this->mQueryObjects)
+	for (culling::QueryObject* queryObject : mQueryObjects)
 	{
-		this->DestroyQueryObject(queryObject);
+		DestroyQueryObject(queryObject);
 	}
 }
 
@@ -255,9 +255,9 @@ void culling::QueryOcclusionCulling::ClearEntityData(EntityBlock* currentEntityB
 	culling::QueryObject* queryObject = currentEntityBlock->mQueryObjects[entityIndex];
 	if (queryObject != nullptr)
 	{
-		vector_swap_popback(this->mQueryObjects, queryObject);
+		vector_swap_popback(mQueryObjects, queryObject);
 		currentEntityBlock->mQueryObjects[entityIndex] = nullptr;
-		this->DestroyQueryObject(queryObject);
+		DestroyQueryObject(queryObject);
 	}
 }
 
@@ -268,9 +268,9 @@ void culling::QueryOcclusionCulling::GenQueryObject(EntityBlock* currentEntityBl
 {
 	assert(currentEntityBlock != nullptr);
 
-	if (this->bmIsQueryOcclusionReady == false)
+	if (bmIsQueryOcclusionReady == false)
 	{
-		this->InitQueryOcclusionCulling();
+		InitQueryOcclusionCulling();
 	}
 	
 	assert(currentEntityBlock->mQueryObjects[entityIndex] == nullptr);
@@ -304,7 +304,7 @@ void culling::QueryOcclusionCulling::GenQueryObject(EntityBlock* currentEntityBl
 	newQueryObject->mVertexArrayObjectID = newVertexArrayObjectID;
 
 	currentEntityBlock->mQueryObjects[entityIndex] = newQueryObject;
-	this->mQueryObjects.push_back(newQueryObject);
+	mQueryObjects.push_back(newQueryObject);
 
 #elif CULLING_DIRECTX
 	assert(0);
@@ -315,7 +315,7 @@ void culling::QueryOcclusionCulling::GenQueryObject(EntityBlock* currentEntityBl
 
 void culling::QueryOcclusionCulling::GenQueryObject(culling::EntityBlockViewer& entityBlockViewer, const culling::AABB& occlusionAABBLocalMinMax)
 {
-	this->GenQueryObject(entityBlockViewer.mTargetEntityBlock, entityBlockViewer.mEntityIndexInBlock, occlusionAABBLocalMinMax);
+	GenQueryObject(entityBlockViewer.mTargetEntityBlock, entityBlockViewer.mEntityIndexInBlock, occlusionAABBLocalMinMax);
 }
 
 /// <summary>
@@ -326,7 +326,7 @@ void culling::QueryOcclusionCulling::GenQueryObject(culling::EntityBlockViewer& 
 /// </summary>
 void culling::QueryOcclusionCulling::QueryOccludeeAABB()
 {
-	if (this->mQueryObjects.empty() == true)
+	if (mQueryObjects.empty() == true)
 	{
 		return;
 	}
@@ -334,11 +334,11 @@ void culling::QueryOcclusionCulling::QueryOccludeeAABB()
 	glDisable(GL_CULL_FACE);
 	glDepthMask(GL_FALSE);
 	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->mElementBufferObjectID);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mElementBufferObjectID);
 
-	for (const culling::QueryObject* queryObject : this->mQueryObjects)
+	for (const culling::QueryObject* queryObject : mQueryObjects)
 	{
-		this->QueryOccludeeAABB(*queryObject);
+		QueryOccludeeAABB(*queryObject);
 	}
 
 	glBindVertexArray(0);
@@ -353,12 +353,12 @@ void culling::QueryOcclusionCulling::QueryOccludeeAABB()
 
 //reference : https://github.com/progschj/OpenGL-Examples/blob/master/10queries_conditional_render.cpp
 //
-// Screen Space AABB¿Í ´Þ¸® Query OcclusionÀº ¸î¸î ¿ÀºêÁ§Æ®¸¸ Query ±â´ÉÀ» »ç¿ëÇÏ°í, ½Ì±Û½º·¹µå¿¡¼­¸¸ ÀÛµ¿ÇÔ
+// Screen Space AABBï¿½ï¿½ ï¿½Þ¸ï¿½ Query Occlusionï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ Query ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ï°ï¿½, ï¿½Ì±Û½ï¿½ï¿½ï¿½ï¿½å¿¡ï¿½ï¿½ï¿½ï¿½ ï¿½Ûµï¿½ï¿½ï¿½
 // 
-// Query »ç¿ëÇÒ ¿ÀºêÁ§Æ®µéÀº ¸ðµÎ °¢°¢ÀÇ LocalAABB¿Í QueryID, MeshBuffer, MeshArrayBuffer, ElementBuffer¸¦ °¢ÀÚ ÇÏ³ª¾¿ °¡Á®¾ßÇÔ
-// ÇÊ¿äÇÑ µ¥ÀÌÅÍ°¡ Å©±â EntityBlock°ú´Â º°°³·Î ÇÒ´çÀ» ¹Þ¾Æ¾ßÇÑ´Ù. 
+// Query ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ LocalAABBï¿½ï¿½ QueryID, MeshBuffer, MeshArrayBuffer, ElementBufferï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ï³ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+// ï¿½Ê¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í°ï¿½ Å©ï¿½ï¿½ EntityBlockï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ò´ï¿½ï¿½ï¿½ ï¿½Þ¾Æ¾ï¿½ï¿½Ñ´ï¿½. 
 // 
-// ±×¸®°í ·»´õ¸µ Àü StartConditionalRenderingIfQueryActive·Î QueryÀÏ °æ¿ì¿¡¸¸ Conditional Rendering Ä¿Áö°Ô ¸¸µéÀÚ
+// ï¿½×¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ StartConditionalRenderingIfQueryActiveï¿½ï¿½ Queryï¿½ï¿½ ï¿½ï¿½ì¿¡ï¿½ï¿½ Conditional Rendering Ä¿ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 //
 //
 
