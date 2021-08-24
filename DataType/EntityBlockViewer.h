@@ -1,13 +1,10 @@
 #pragma once
 
-#include <cassert>
 
-#include "TransformData.h"
-#include "EntityBlock.h"
-#include "QueryObject.h"
 
 namespace culling
 {
+	struct EntityBlock;
 	class QueryOcclusionCulling;
 
 	/// <summary>
@@ -39,41 +36,18 @@ namespace culling
 		/// return true when all camera can see this entity ( not culled )
 		/// </summary>
 		/// <returns></returns>
-		FORCE_INLINE char GetIsVisibleBitflag() const
-		{
-			assert(bmIsActive == true);
-			return mTargetEntityBlock->mIsVisibleBitflag[mEntityIndexInBlock];
-		}
+		char GetIsVisibleBitflag() const;
 
 		/// <summary>
 		/// Get if entity is visible from Camera of parameter cameraIndex
 		/// </summary>
 		/// <param name="cameraIndex">0 <= cameraIndex < EveryCulling::mCameraCount</param>
 		/// <returns></returns>
-		FORCE_INLINE char GetIsVisibleBitflag(unsigned int cameraIndex) const
-		{
-			assert(bmIsActive == true);
-			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
-			return mTargetEntityBlock->mIsVisibleBitflag[mEntityIndexInBlock] & (1 << cameraIndex);
-		}
+		char GetIsVisibleBitflag(unsigned int cameraIndex) const;
 
 
-		FORCE_INLINE void SetEntityPosition(const float* worldPosition)
-		{
-			assert(bmIsActive == true);
-			std::memcpy((mTargetEntityBlock->mPositions + mEntityIndexInBlock), worldPosition, sizeof(Vector3));
-		}
+		void SetEntityPosition(const float* worldPosition);
 
-		FORCE_INLINE void SetSphereBoundRadius(float sphereRadius)
-		{
-			assert(bmIsActive == true);
-			assert(sphereRadius >= 0.0f);
-
-			// WHY NEGATIVE??
-			// Think Sphere is on(!!) frustum plane. But it still should be drawd
-			// Distance from plane to EntityPoint is negative.
-			// If Distance from plane to EntityPoint is larget than negative radius, it should be drawed
-			mTargetEntityBlock->mPositions[mEntityIndexInBlock].values[3] = -(sphereRadius + BOUNDING_SPHRE_RADIUS_MARGIN);
-		}
+		void SetSphereBoundRadius(float sphereRadius);
 	};
 }

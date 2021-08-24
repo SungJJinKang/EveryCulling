@@ -119,6 +119,95 @@ void culling::EveryCulling::RemoveEntityFromBlock(EntityBlock* ownerEntityBlock,
 	
 }
 
+void culling::EveryCulling::CullBlockEntityJob()
+{
+	const unsigned int entityBlockCount = static_cast<unsigned int>(mEntityGridCell.mEntityBlocks.size());
+	if (entityBlockCount > 0)
+	{
+		for (unsigned int cameraIndex = 0; cameraIndex < mCameraCount; cameraIndex++)
+		{
+			for (size_t moduleIndex = 0; moduleIndex < mUpdatedCullingModules.size(); moduleIndex++)
+			{
+				// TODO : Don't use pointer, Just use specific object(3 module) 
+				// Why? : virtual funtion call should reference virtual function table,
+				// We need really fast computation at here, 
+				// referencing virtual function table make it slow
+
+				CullingModule* cullingModule = mUpdatedCullingModules[moduleIndex];
+				//TODO : ON X64, X84, memory_order_relaxed also do acquire memory
+				//So This codes is too slow, FIX IT!!!!!!!!!!!
+				//
+				//
+				//
+
+				//TODO:
+				//HOW works? 
+				//
+				//Each module is executed after other module
+				//At each module, Every threads works on a EntityBlock
+				//
+				//EntityBlock a thread works on is decided by thread index
+				//If a thread finished all assigned blocks, it steal block from other unfinished thread
+				//
+				//Example : 5 Threads
+				//
+				//Thread 1 : EntityBlock 1, 6, 11
+				//Thread 2 : EntityBlock 2, 7, 12
+				//Thread 3 : EntityBlock 3, 8, 13
+				//Thread 4 : EntityBlock 4, 9, 14
+				//Thread 5 : EntityBlock 5, 10, 14
+				//
+				//
+
+				while (cullingModule->mFinishedCullEntityBlockCount[cameraIndex].load(std::memory_order_relaxed) < entityBlockCount)
+				{
+					if (cullingModule->mCurrentCullEntityBlockIndex[cameraIndex].load(std::memory_order_relaxed) >= entityBlockCount)
+					{
+						continue;
+					}
+					const unsigned int currentEntityBlockIndex = cullingModule->mCurrentCullEntityBlockIndex[cameraIndex].fetch_add(1, std::memory_order_release);
+					if (currentEntityBlockIndex >= entityBlockCount)
+					{
+						continue;
+					}
+
+					EntityBlock* currentEntityBlock = mEntityGridCell.mEntityBlocks[currentEntityBlockIndex];
+					const unsigned int entityCountInBlock = mEntityGridCell.AllocatedEntityCountInBlocks[currentEntityBlockIndex]; // don't use mCurrentEntityCount
+
+					cullingModule->CullBlockEntityJob(currentEntityBlock, entityCountInBlock, cameraIndex);
+
+					cullingModule->mFinishedCullEntityBlockCount[cameraIndex].fetch_add(1, std::memory_order_release);
+				}
+
+			}
+		}
+
+	}
+}
+
+bool culling::EveryCulling::GetIsCullJobFinished(const std::atomic<unsigned int>& mFinishedCullEntityBlockCount, unsigned int entityBlockCount) const
+{
+	return mFinishedCullEntityBlockCount.load(std::memory_order_relaxed) >= entityBlockCount;
+}
+
+void culling::EveryCulling::WaitToFinishCullJobs() const
+{
+	const unsigned int entityBlockCount = static_cast<unsigned int>(mEntityGridCell.mEntityBlocks.size());
+	const size_t lastCameraIndex = mCameraCount - 1;
+	const size_t lastModuleIndex = mUpdatedCullingModules.size() - 1;
+	const CullingModule* lastCullingModule = mUpdatedCullingModules[lastModuleIndex];
+	while (GetIsCullJobFinished(lastCullingModule->mFinishedCullEntityBlockCount[lastCameraIndex], entityBlockCount) == false)
+	{
+		std::this_thread::yield();
+	}
+}
+
+void culling::EveryCulling::ResetCullJobState()
+{
+	SetAllOneIsVisibleFlag();
+	ResetCullJobStateVariable();
+}
+
 std::pair<culling::EntityBlock*, unsigned int*> culling::EveryCulling::AllocateNewEntityBlockFromPool()
 {
 	EntityBlock* newEntityBlock = GetNewEntityBlockFromPool();
