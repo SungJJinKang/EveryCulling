@@ -8,7 +8,14 @@
 
 #ifdef ENABLE_QUERY_OCCLUSION
 #include "QueryObject.h"
+
+#define QUERY_OBJECT_PTR_SIZE sizeof(culling::QueryObject*)
+
+#elif
+#define QUERY_OBJECT_PTR_SIZE 0
+
 #endif
+
 
 #include "VertexData.h"
 
@@ -18,19 +25,17 @@ namespace culling
 {
 
 	//This code doesn't consider Memory alignment optimzation.
-
 	inline constexpr size_t ENTITY_COUNT_IN_ENTITY_BLOCK =
-		MAKE_EVEN_NUMBER((4096 - sizeof(unsigned int)) /
+		MAKE_EVEN_NUMBER(
+			(4096 - sizeof(unsigned int)) /
 			(
 				sizeof(Vector4)
 				+ sizeof(char)
 				+ sizeof(void*)
-#ifdef ENABLE_QUERY_OCCLUSION
-				+ sizeof(culling::QueryObject*)
-#endif
-				+ sizeof(VertexData)
-		)
-		) - 2;
+				+ QUERY_OBJECT_PTR_SIZE
+				+ sizeof(culling::VertexData)
+		)) 
+		- 2;
 
 		/// <summary>
 		/// EntityBlock size should be less 4KB(Page size) for Block data being allocated in a page
@@ -45,7 +50,7 @@ namespace culling
 		/// void* mRenderer[ENTITY_COUNT_IN_ENTITY_BLOCK] and mCurrentEntityCount isn't read during CullJob
 		/// </summary>
 		char mIsVisibleBitflag[ENTITY_COUNT_IN_ENTITY_BLOCK];
-
+	
 		//SoA (Structure of Array) !!!!!! for performance 
 
 		/// <summary>

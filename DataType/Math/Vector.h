@@ -21,7 +21,7 @@ namespace culling
 	{
 		float values[4];
 
-		FORCE_INLINE float operator[](size_t index)
+		FORCE_INLINE float& operator[](size_t index)
 		{
 			return values[index];
 		}
@@ -36,7 +36,7 @@ namespace culling
 	{
 		float values[4];
 
-		FORCE_INLINE float operator[](size_t index)
+		FORCE_INLINE float& operator[](size_t index)
 		{
 			return values[index];
 		}
