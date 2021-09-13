@@ -6,10 +6,12 @@
 #include "../../EveryCulling.h"
 
 
-void culling::ViewFrustumCulling::UpdateFrustumPlane(unsigned int frustumPlaneIndex, const Matrix4X4& viewProjectionMatrix)
+void culling::ViewFrustumCulling::SetViewProjectionMatrix(const unsigned int cameraIndex, const Matrix4X4& viewProjectionMatrix)
 {
-	assert(frustumPlaneIndex >= 0 && frustumPlaneIndex < MAX_CAMERA_COUNT);
+	culling::CullingModule::SetViewProjectionMatrix(cameraIndex, viewProjectionMatrix);
 
-	ExtractSIMDPlanesFromViewProjectionMatrix(viewProjectionMatrix, mSIMDFrustumPlanes[frustumPlaneIndex].mFrustumPlanes, true);
+	assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
+
+	ExtractSIMDPlanesFromViewProjectionMatrix(viewProjectionMatrix, mSIMDFrustumPlanes[cameraIndex].mFrustumPlanes, true);
 }
 

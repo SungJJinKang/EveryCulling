@@ -79,8 +79,6 @@ namespace culling
 
 		std::atomic<bool> mIsCullJobFinished;
 
-		culling::Matrix4X4 mViewProjectionMatrix;
-
 		void AllocateEntityBlockPool();
 		void ResetEntityBlock(culling::EntityBlock* entityBlock);
 		std::pair<culling::EntityBlock*, unsigned int*> AllocateNewEntityBlockFromPool();
@@ -130,7 +128,7 @@ namespace culling
 		EveryCulling(unsigned int resolutionWidth, unsigned int resolutionHeight);
 		~EveryCulling();
 		void SetCameraCount(unsigned int cameraCount);
-		void SetViewProjectionMatrix(const culling::Matrix4X4& viewProjectionMatrix);
+		void SetViewProjectionMatrix(const unsigned int cameraIndex, const culling::Matrix4X4& viewProjectionMatrix);
 		unsigned int GetCameraCount() const;
 		/// <summary>
 		/// Get EntityBlock List with entities

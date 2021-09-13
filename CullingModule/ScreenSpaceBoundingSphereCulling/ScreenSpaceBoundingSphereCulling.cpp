@@ -28,8 +28,8 @@ void culling::ScreenSpaceBoundingSphereCulling::CullBlockEntityJob(EntityBlock* 
 
 		// TODO : This is completly wrong, 
 		// 8 corner should be projected to screen space
-		mScreenSpaceAABBMin = mCullingSystem->mViewProjectionMatrix * entityAABB.mMin;
-		mScreenSpaceAABBMax = mCullingSystem->mViewProjectionMatrix * entityAABB.mMax;
+		mScreenSpaceAABBMin = mCameraViewProjectionMatrixs[cameraIndex] * entityAABB.mMin;
+		mScreenSpaceAABBMax = mCameraViewProjectionMatrixs[cameraIndex] * entityAABB.mMax;
 
 		mScreenSpaceAABBMin.values[0] /= mScreenSpaceAABBMin.values[3];
 		mScreenSpaceAABBMin.values[1] /= mScreenSpaceAABBMin.values[3];

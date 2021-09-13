@@ -130,16 +130,20 @@ namespace culling
 		}
 
 	public:
+
 		/// <summary>
 		/// before Start solving culling, Update Every Camera's frustum plane
 		/// Do this at main thread
 		/// </summary>
-		/// <param name="frustumPlaneIndex"></param>
+		/// <param name="cameraIndex"></param>
 		/// <param name="viewProjectionMatix"></param>
-		void UpdateFrustumPlane(unsigned int frustumPlaneIndex, const Matrix4X4& viewProjectionMatrix);
+		virtual void SetViewProjectionMatrix(const unsigned int cameraIndex, const Matrix4X4& viewProjectionMatrix) final;
+
 		FORCE_INLINE culling::SIMDFrustumPlanes* GetSIMDPlanes()
 		{
 			return mSIMDFrustumPlanes;
 		}
+
+
 	};
 }

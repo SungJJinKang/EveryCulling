@@ -28,6 +28,7 @@ namespace culling
 		std::array<std::atomic<unsigned int>, MAX_CAMERA_COUNT> mFinishedCullEntityBlockCount;
 		
 		unsigned int mCameraCount;
+		std::array<culling::Matrix4X4, MAX_CAMERA_COUNT> mCameraViewProjectionMatrixs;
 
 		CullingModule(EveryCulling* frotbiteCullingSystem)
 			:mCullingSystem{ frotbiteCullingSystem }, mCameraCount{ 0 }
@@ -39,6 +40,7 @@ namespace culling
 
 	public:
 
+		virtual void SetViewProjectionMatrix(const unsigned int cameraIndex, const Matrix4X4& viewProjectionMatrix);
 
 	};
 

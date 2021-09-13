@@ -304,10 +304,19 @@ void culling::EveryCulling::SetCameraCount(unsigned int cameraCount)
 #endif
 }
 
-void culling::EveryCulling::SetViewProjectionMatrix(const culling::Matrix4X4& viewProjectionMatrix)
+void culling::EveryCulling::SetViewProjectionMatrix(const unsigned int cameraIndex, const culling::Matrix4X4& viewProjectionMatrix)
 {
+	assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
+
 	IS_ALIGNED_ASSERT(reinterpret_cast<size_t>(&viewProjectionMatrix), 32);
-	mViewProjectionMatrix = viewProjectionMatrix;
+
+	if (cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT)
+	{
+		for (auto updatedCullingModule : mUpdatedCullingModules)
+		{
+			updatedCullingModule->SetViewProjectionMatrix(cameraIndex, viewProjectionMatrix);
+		}
+	}
 }
 
 unsigned int culling::EveryCulling::GetCameraCount() const
