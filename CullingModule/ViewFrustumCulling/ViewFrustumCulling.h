@@ -5,6 +5,7 @@
 
 #include "../../DataType/Math/Matrix.h"
 #include "../../DataType/Math/Vector.h"
+#include "../../DataType/Position_BoundingSphereRadius.h"
 
 #include "../CullingModule.h"
 
@@ -68,12 +69,12 @@ namespace culling
 		}
 		
 		//TODO : Add AVX2(__m256) version of this function
-		FORCE_INLINE char CheckInFrustumSIMDWithTwoPoint(const Vector4* eightPlanes, const Vector4* twoPoint)
+		FORCE_INLINE char CheckInFrustumSIMDWithTwoPoint(const Vector4* eightPlanes, const Position_BoundingSphereRadius* twoPoint)
 		{
 			//We can't use M256F. because two twoPoint isn't aligned to 32 byte
 
-			const M128F* m128f_eightPlanes = reinterpret_cast<const M128F*>(eightPlanes); // x of plane 0, 1, 2, 3  and y of plane 0, 1, 2, 3 
-			const M128F* m128f_2Point = reinterpret_cast<const M128F*>(twoPoint);
+			const M128F* const m128f_eightPlanes = reinterpret_cast<const M128F*>(eightPlanes); // x of plane 0, 1, 2, 3  and y of plane 0, 1, 2, 3 
+			const M128F* const m128f_2Point = reinterpret_cast<const M128F*>(twoPoint);
 
 			const M128F posA_xxxx = M128F_REPLICATE(m128f_2Point[0], 0); // xxxx of first twoPoint and xxxx of second twoPoint
 			const M128F posA_yyyy = M128F_REPLICATE(m128f_2Point[0], 1); // yyyy of first twoPoint and yyyy of second twoPoint
@@ -95,7 +96,7 @@ namespace culling
 			dotPosB = culling::M128F_MUL_AND_ADD(posB_yyyy, m128f_eightPlanes[1], dotPosB);
 			dotPosB = culling::M128F_MUL_AND_ADD(posB_xxxx, m128f_eightPlanes[0], dotPosB); // dot Pos B with Plane 0, dot Pos B with Plane 1, dot Pos B with Plane 2, dot Pos B with Plane 3
 
-																				   //https://software.intel.com/sites/landingpage/IntrinsicsGuide/#expand=69,124,4167,4167,447,447,3148,3148&techs=SSE,SSE2,SSE3,SSSE3,SSE4_1,SSE4_2,AVX&text=insert
+			//https://software.intel.com/sites/landingpage/IntrinsicsGuide/#expand=69,124,4167,4167,447,447,3148,3148&techs=SSE,SSE2,SSE3,SSSE3,SSE4_1,SSE4_2,AVX&text=insert
 			const M128F posAB_xxxx = _mm_shuffle_ps(m128f_2Point[0], m128f_2Point[1], SHUFFLEMASK(0, 0, 0, 0)); // x of twoPoint[0] , x of twoPoint[0], x of twoPoint[1] , x of twoPoint[1]
 			const M128F posAB_yyyy = _mm_shuffle_ps(m128f_2Point[0], m128f_2Point[1], SHUFFLEMASK(1, 1, 1, 1)); // y of twoPoint[0] , y of twoPoint[0], y of twoPoint[1] , y of twoPoint[1]
 			const M128F posAB_zzzz = _mm_shuffle_ps(m128f_2Point[0], m128f_2Point[1], SHUFFLEMASK(2, 2, 2, 2)); // z of twoPoint[0] , z of twoPoint[0], z of twoPoint[1] , z of twoPoint[1]

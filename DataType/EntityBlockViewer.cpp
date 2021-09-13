@@ -34,6 +34,6 @@ void culling::EntityBlockViewer::SetSphereBoundRadius(float sphereRadius)
 	// Think Sphere is on(!!) frustum plane. But it still should be drawd
 	// Distance from plane to EntityPoint is negative.
 	// If Distance from plane to EntityPoint is larget than negative radius, it should be drawed
-	mTargetEntityBlock->mPositions[mEntityIndexInBlock].values[3] = -(sphereRadius + BOUNDING_SPHRE_RADIUS_MARGIN);
+	mTargetEntityBlock->mPositions[mEntityIndexInBlock].SetBoundingSphereRadius(sphereRadius);
 }
 

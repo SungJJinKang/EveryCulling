@@ -5,6 +5,7 @@
 #include "Math/AABB.h"
 #include "Math/Vector.h"
 #include "Math/Matrix.h"
+#include "Position_BoundingSphereRadius.h"
 
 #ifdef ENABLE_QUERY_OCCLUSION
 #include "QueryObject.h"
@@ -67,7 +68,7 @@ namespace culling
 		/// If Size of mIsVisibleBitflag isn't multiples of 256bit,
 		/// Setting mIsVisibleBitflag make mPositions value dirty
 		/// </summary>
-		alignas(32) culling::Vector4 mPositions[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		alignas(32) culling::Position_BoundingSphereRadius mPositions[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 #ifdef ENABLE_QUERY_OCCLUSION
 		culling::QueryObject* mQueryObjects[ENTITY_COUNT_IN_ENTITY_BLOCK];

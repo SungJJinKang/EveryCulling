@@ -7,10 +7,14 @@
 #  define COMPILER_GCC
 #endif
 
+#ifndef FORCE_INLINE
+
 #if defined(COMPILER_GCC)
 #  define FORCE_INLINE inline __attribute__ ((always_inline))
 #elif defined(COMPILER_MSVC)
 #  define FORCE_INLINE __forceinline
+#endif
+
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////////////
