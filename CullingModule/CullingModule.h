@@ -24,7 +24,7 @@ namespace culling
 		/// will be used at CullBlockEntityJob
 		/// </summary>
 		//std::atomic<unsigned int> mAtomicCurrentBlockIndex;
-		std::array<std::atomic<unsigned int>, MAX_CAMERA_COUNT> mCurrentCullEntityBlockIndex;
+		std::array<std::atomic<unsigned int>, MAX_CAMERA_COUNT> mCurrentCulledEntityBlockIndex;
 		std::array<std::atomic<unsigned int>, MAX_CAMERA_COUNT> mFinishedCullEntityBlockCount;
 		
 		unsigned int mCameraCount;

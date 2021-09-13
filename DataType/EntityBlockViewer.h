@@ -31,19 +31,13 @@ namespace culling
 			: mTargetEntityBlock{ entityBlock }, mEntityIndexInBlock{ entityIndexInBlock }, bmIsActive{ true }
 		{}
 
-		/// <summary>
-		/// Get if entity is visible from all camera
-		/// return true when all camera can see this entity ( not culled )
-		/// </summary>
-		/// <returns></returns>
-		char GetIsVisibleBitflag() const;
 
 		/// <summary>
 		/// Get if entity is visible from Camera of parameter cameraIndex
 		/// </summary>
 		/// <param name="cameraIndex">0 <= cameraIndex < EveryCulling::mCameraCount</param>
 		/// <returns></returns>
-		char GetIsVisibleBitflag(unsigned int cameraIndex) const;
+		bool GetIsCulled(const unsigned int cameraIndex) const;
 
 
 		void SetEntityPosition(const float* worldPosition);

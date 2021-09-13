@@ -90,6 +90,11 @@ namespace culling
 		/// this variable is only used to decide whether to free this EntityBlock
 		/// </summary>
 		unsigned int mCurrentEntityCount;
+
+		FORCE_INLINE bool GetIsCulled(const size_t entityIndex, const unsigned int cameraIndex) const
+		{
+			return ( mIsVisibleBitflag[entityIndex] & (1 << cameraIndex) ) == 0;
+		}
 	};
 
 	/// <summary>

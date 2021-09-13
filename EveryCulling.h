@@ -134,7 +134,7 @@ namespace culling
 		/// Get EntityBlock List with entities
 		/// </summary>
 		/// <returns></returns>
-		std::vector<EntityBlock*> GetActiveEntityBlockList() const;
+		const std::vector<EntityBlock*>& GetActiveEntityBlockList() const;
 
 		/// <summary>
 		/// You should call this function on your Transform Component or In your game engine

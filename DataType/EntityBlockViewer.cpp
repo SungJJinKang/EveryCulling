@@ -5,19 +5,13 @@
 
 #include "EntityBlock.h"
 
-char culling::EntityBlockViewer::GetIsVisibleBitflag(unsigned int cameraIndex) const
+bool culling::EntityBlockViewer::GetIsCulled(const unsigned int cameraIndex) const
 {
 	assert(bmIsActive == true);
 	assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
-	return mTargetEntityBlock->mIsVisibleBitflag[mEntityIndexInBlock] & (1 << cameraIndex);
+	return mTargetEntityBlock->GetIsCulled(mEntityIndexInBlock, cameraIndex);
 }
 
-
-char culling::EntityBlockViewer::GetIsVisibleBitflag() const
-{
-	assert(bmIsActive == true);
-	return mTargetEntityBlock->mIsVisibleBitflag[mEntityIndexInBlock];
-}
 
 void culling::EntityBlockViewer::SetEntityPosition(const float* worldPosition)
 {

@@ -53,15 +53,21 @@ culling::EntityBlock* culling::EveryCulling::GetNewEntityBlockFromPool()
 
 void culling::EveryCulling::ResetCullJobStateVariable()
 {
-	for (unsigned int cameraIndex = 0; cameraIndex < mCameraCount; cameraIndex++)
+	for (size_t moduleIndex = 0; moduleIndex < mUpdatedCullingModules.size(); moduleIndex++)
 	{
-		for (size_t moduleIndex = 0; moduleIndex < mUpdatedCullingModules.size(); moduleIndex++)
+		CullingModule* const cullingModule = mUpdatedCullingModules[moduleIndex];
+
+		for (std::atomic<unsigned int>& atomicVal : cullingModule->mCurrentCulledEntityBlockIndex)
 		{
-			CullingModule* cullingModule = mUpdatedCullingModules[moduleIndex];
-			cullingModule->mCurrentCullEntityBlockIndex[cameraIndex].store(0, std::memory_order_relaxed);
-			cullingModule->mFinishedCullEntityBlockCount[cameraIndex].store(0, std::memory_order_relaxed);
+			atomicVal.store(0, std::memory_order_relaxed);
+		}
+
+		for (std::atomic<unsigned int>& atomicVal : cullingModule->mFinishedCullEntityBlockCount)
+		{
+			atomicVal.store(0, std::memory_order_relaxed);
 		}
 	}
+
 	mIsCullJobFinished.store(false, std::memory_order_relaxed);
 
 	//release!
@@ -161,11 +167,11 @@ void culling::EveryCulling::CullBlockEntityJob()
 
 				while (cullingModule->mFinishedCullEntityBlockCount[cameraIndex].load(std::memory_order_relaxed) < entityBlockCount)
 				{
-					if (cullingModule->mCurrentCullEntityBlockIndex[cameraIndex].load(std::memory_order_relaxed) >= entityBlockCount)
+					if (cullingModule->mCurrentCulledEntityBlockIndex[cameraIndex].load(std::memory_order_relaxed) >= entityBlockCount)
 					{
 						continue;
 					}
-					const unsigned int currentEntityBlockIndex = cullingModule->mCurrentCullEntityBlockIndex[cameraIndex].fetch_add(1, std::memory_order_release);
+					const unsigned int currentEntityBlockIndex = cullingModule->mCurrentCulledEntityBlockIndex[cameraIndex].fetch_add(1, std::memory_order_release);
 					if (currentEntityBlockIndex >= entityBlockCount)
 					{
 						continue;
@@ -324,7 +330,7 @@ unsigned int culling::EveryCulling::GetCameraCount() const
 	return mCameraCount;
 }
 
-std::vector<culling::EntityBlock*> culling::EveryCulling::GetActiveEntityBlockList() const
+const std::vector<culling::EntityBlock*>& culling::EveryCulling::GetActiveEntityBlockList() const
 {
 	return mActiveEntityBlockList;
 }
