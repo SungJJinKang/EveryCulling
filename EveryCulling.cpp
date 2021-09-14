@@ -196,15 +196,23 @@ bool culling::EveryCulling::GetIsCullJobFinished(const std::atomic<unsigned int>
 	return mFinishedCullEntityBlockCount.load(std::memory_order_relaxed) >= entityBlockCount;
 }
 
-void culling::EveryCulling::WaitToFinishCullJobs() const
+void culling::EveryCulling::WaitToFinishCullJob(const unsigned int cameraIndex) const
 {
 	const unsigned int entityBlockCount = static_cast<unsigned int>(mEntityGridCell.mEntityBlocks.size());
-	const size_t lastCameraIndex = mCameraCount - 1;
+
 	const size_t lastModuleIndex = mUpdatedCullingModules.size() - 1;
 	const CullingModule* lastCullingModule = mUpdatedCullingModules[lastModuleIndex];
-	while (GetIsCullJobFinished(lastCullingModule->mFinishedCullEntityBlockCount[lastCameraIndex], entityBlockCount) == false)
+	while (GetIsCullJobFinished(lastCullingModule->mFinishedCullEntityBlockCount[cameraIndex], entityBlockCount) == false)
 	{
 		std::this_thread::yield();
+	}
+}
+
+void culling::EveryCulling::WaitToFinishCullJobOfAllCameras() const
+{
+	for (unsigned int cameraIndex = 0; cameraIndex < mCameraCount; cameraIndex++)
+	{
+		WaitToFinishCullJob(cameraIndex);
 	}
 }
 

@@ -177,7 +177,8 @@ namespace culling
 		/// <summary>
 		/// Caller thread will stall until cull job of all entity block is finished
 		/// </summary>
-		void WaitToFinishCullJobs() const;
+		void WaitToFinishCullJob(const unsigned int cameraIndex) const;
+		void WaitToFinishCullJobOfAllCameras() const;
 
 		/// <summary>
 		/// Reset cull job state before pushing cull jobs to job pool
