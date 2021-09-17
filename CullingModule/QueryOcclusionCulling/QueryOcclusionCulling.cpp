@@ -145,37 +145,37 @@ void culling::QueryOcclusionCulling::StopQuery(const unsigned int queryID)
 
 static void GenAABB8VerticesFromLocalAABB(const culling::AABB& localAABB, culling::Vector3 * aabb8Vercies)
 {
-	aabb8Vercies[0].x = localAABB.mMin.x;
-	aabb8Vercies[0].y = localAABB.mMax.y;
-	aabb8Vercies[0].z = localAABB.mMin.z;
+	aabb8Vercies[0].x = localAABB.mMin[0];
+	aabb8Vercies[0].y = localAABB.mMax[1];
+	aabb8Vercies[0].z = localAABB.mMin[2];
 	
-	aabb8Vercies[1].x = localAABB.mMin.x;
-	aabb8Vercies[1].y = localAABB.mMin.y;
-	aabb8Vercies[1].z = localAABB.mMin.z;
+	aabb8Vercies[1].x = localAABB.mMin[0];
+	aabb8Vercies[1].y = localAABB.mMin[1];
+	aabb8Vercies[1].z = localAABB.mMin[2];
 
-	aabb8Vercies[2].x = localAABB.mMax.x;
-	aabb8Vercies[2].y = localAABB.mMin.y;
-	aabb8Vercies[2].z = localAABB.mMin.z;
+	aabb8Vercies[2].x = localAABB.mMax[0];
+	aabb8Vercies[2].y = localAABB.mMin[1];
+	aabb8Vercies[2].z = localAABB.mMin[2];
 
-	aabb8Vercies[3].x = localAABB.mMax.x;
-	aabb8Vercies[3].y = localAABB.mMax.y;
-	aabb8Vercies[3].z = localAABB.mMin.z;
+	aabb8Vercies[3].x = localAABB.mMax[0];
+	aabb8Vercies[3].y = localAABB.mMax[1];
+	aabb8Vercies[3].z = localAABB.mMin[2];
 
-	aabb8Vercies[4].x = localAABB.mMax.x;
-	aabb8Vercies[4].y = localAABB.mMin.y;
-	aabb8Vercies[4].z = localAABB.mMax.z;
+	aabb8Vercies[4].x = localAABB.mMax[0];
+	aabb8Vercies[4].y = localAABB.mMin[1];
+	aabb8Vercies[4].z = localAABB.mMax[2];
 
-	aabb8Vercies[5].x = localAABB.mMax.x;
-	aabb8Vercies[5].y = localAABB.mMax.y;
-	aabb8Vercies[5].z = localAABB.mMax.z;
+	aabb8Vercies[5].x = localAABB.mMax[0];
+	aabb8Vercies[5].y = localAABB.mMax[1];
+	aabb8Vercies[5].z = localAABB.mMax[2];
 
-	aabb8Vercies[6].x = localAABB.mMin.x;
-	aabb8Vercies[6].y = localAABB.mMin.y;
-	aabb8Vercies[6].z = localAABB.mMax.z;
+	aabb8Vercies[6].x = localAABB.mMin[0];
+	aabb8Vercies[6].y = localAABB.mMin[1];
+	aabb8Vercies[6].z = localAABB.mMax[2];
 
-	aabb8Vercies[7].x = localAABB.mMin.x;
-	aabb8Vercies[7].y = localAABB.mMax.y;
-	aabb8Vercies[7].z = localAABB.mMax.z;
+	aabb8Vercies[7].x = localAABB.mMin[0];
+	aabb8Vercies[7].y = localAABB.mMax[1];
+	aabb8Vercies[7].z = localAABB.mMax[2];
 
 }
 
