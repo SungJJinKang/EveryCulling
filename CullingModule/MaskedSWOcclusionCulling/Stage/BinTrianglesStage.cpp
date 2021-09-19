@@ -87,7 +87,7 @@ void culling::BinTrianglesStage::TransformVertexsToClipSpace
 void culling::BinTrianglesStage::CullBackfaces(const M256F* screenPixelX, const M256F* screenPixelY, unsigned int& triangleCullMask)
 {
 	//I don't know How this Works.........
-		//https://stackoverflow.com/questions/67357115/i-found-back-face-culling-code-but-i-cant-know-how-this-works
+	//https://stackoverflow.com/questions/67357115/i-found-back-face-culling-code-but-i-cant-know-how-this-works
 	const M256F triArea1 = culling::M256F_MUL(culling::M256F_SUB(screenPixelX[1], screenPixelX[0]), culling::M256F_SUB(screenPixelY[2], screenPixelY[0]));
 	const M256F triArea2 = culling::M256F_MUL(culling::M256F_SUB(screenPixelX[0], screenPixelX[2]), culling::M256F_SUB(screenPixelY[0], screenPixelY[1]));
 	const M256F triArea = culling::M256F_SUB(triArea1, triArea2);

@@ -20,6 +20,8 @@
 
 #include "VertexData.h"
 
+#define CACHE_LINE_SIZE 64
+
 #define MAKE_EVEN_NUMBER(X) (X - (X%2))
 
 namespace culling
@@ -38,10 +40,10 @@ namespace culling
 		)) 
 		- 2;
 
-		/// <summary>
-		/// EntityBlock size should be less 4KB(Page size) for Block data being allocated in a page
-		/// </summary>
-	struct EntityBlock
+	/// <summary>
+	/// EntityBlock size should be less 4KB(Page size) for Block data being allocated in a page
+	/// </summary>
+	struct alignas(CACHE_LINE_SIZE) EntityBlock
 	{
 		/// <summary>
 		/// Why align to 32byte?
@@ -59,8 +61,6 @@ namespace culling
 		/// w : component is radius of entity's sphere bound, should be negative!!!!!!!!!!!!!!
 		/// 
 		/// This will be used for linearlly Frustum intersection check
-		/// 
-		/// IMPORTANT : you should pass nagative value of radius!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		/// 
 		/// Why align to 32byte?
 		/// To set mIsVisibleBitflag, We use _m256
