@@ -45,8 +45,10 @@ namespace culling
 		}
 	}
 
-	inline bool IsFrontFace(const ThreeDTriangle& triangle)
+	inline bool IsFrontFaceOfProjectSpaceTriangle(const TwoDTriangle& triangle)
 	{
+		return PerpDot(triangle.Points[1] - triangle.Points[0], triangle.Points[2] - triangle.Points[0]) > 0;
+		/*
 		//triangle should be in projection space
 		(v1x - v0x)(v2y - v0y) - (v1y - v0y)(v2x - v0x)
 		==
@@ -56,7 +58,43 @@ namespace culling
 		__mw triArea2 = _mmw_mul_ps(_mmw_sub_ps(pVtxX[0], pVtxX[2]), _mmw_sub_ps(pVtxY[0], pVtxY[1]));
 		__mw triArea = _mmw_sub_ps(triArea1, triArea2);
 		__mw ccwMask = _mmw_cmpgt_ps(triArea, _mmw_setzero_ps());
+		*/
 	}
+
+
+	/// <summary>
+	/// 
+	/// verticesX[3]
+	/// verticesX[0] : Triangle1_Vertex1_X Triangle2_Vertex1_X Triangle3_Vertex1_X Triangle4_Vertex1_X
+	/// verticesX[1] : Triangle1_Vertex2_X Triangle2_Vertex2_X Triangle3_Vertex2_X Triangle4_Vertex2_X
+	/// verticesX[2] : Triangle1_Vertex3_X Triangle2_Vertex3_X Triangle3_Vertex3_X Triangle4_Vertex3_X
+	///
+	/// verticesY[3]
+	/// verticesY[0] : Triangle1_Vertex1_Y Triangle2_Vertex1_Y Triangle3_Vertex1_Y Triangle4_Vertex1_Y
+	/// verticesY[1] : Triangle1_Vertex2_Y Triangle2_Vertex2_Y Triangle3_Vertex2_Y Triangle4_Vertex2_Y
+	/// verticesY[2] : Triangle1_Vertex3_Y Triangle2_Vertex3_Y Triangle3_Vertex3_Y Triangle4_Vertex3_Y
+	/// 
+	/// </summary>
+	/// <param name="vertexX"></param>
+	/// <param name="vertexY"></param>
+	/// <returns></returns>
+	inline M128F IsFrontFaceOfProjectSpaceTrianglesSIMD(const M128F* verticesX, const M128F* verticesY)
+	{
+		/*
+		//triangle should be in projection space
+		(v1x - v0x)(v2y - v0y) - (v1y - v0y)(v2x - v0x)
+		==
+		(v1x - v0x) * (v2y - v0y) - (v0x - v2x) * (v0y - v1y)
+		// Perform backface test.
+		*/
+		const M128F triArea1 = culling::M128F_MUL(culling::M128F_SUB(verticesX[1], verticesX[0]), culling::M128F_SUB(verticesY[2], verticesY[0]));
+		const M128F triArea2 = culling::M128F_MUL(culling::M128F_SUB(verticesX[0], verticesX[2]), culling::M128F_SUB(verticesY[0], verticesY[1]));
+		const M128F triArea = culling::M128F_SUB(triArea1, triArea2);
+		const M128F ccwMask = _mm_cmpgt_ps(triArea, culling::M128F_Zero);
+		return ccwMask;
+	}
+
+	
 
 	/// <summary>
 	/// 
