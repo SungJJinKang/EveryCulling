@@ -45,6 +45,19 @@ namespace culling
 		}
 	}
 
+	inline bool IsFrontFace(const ThreeDTriangle& triangle)
+	{
+		//triangle should be in projection space
+		(v1x - v0x)(v2y - v0y) - (v1y - v0y)(v2x - v0x)
+		==
+		(v1x - v0x) * (v2y - v0y) - (v0x - v2x) * (v0y - v1y)
+			// Perform backface test. 
+		__mw triArea1 = _mmw_mul_ps(_mmw_sub_ps(pVtxX[1], pVtxX[0]), _mmw_sub_ps(pVtxY[2], pVtxY[0]));
+		__mw triArea2 = _mmw_mul_ps(_mmw_sub_ps(pVtxX[0], pVtxX[2]), _mmw_sub_ps(pVtxY[0], pVtxY[1]));
+		__mw triArea = _mmw_sub_ps(triArea1, triArea2);
+		__mw ccwMask = _mmw_cmpgt_ps(triArea, _mmw_setzero_ps());
+	}
+
 	/// <summary>
 	/// 
 	/// Sort TwoDTriangle Points y ascending.
