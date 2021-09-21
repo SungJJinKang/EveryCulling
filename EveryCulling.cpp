@@ -117,6 +117,9 @@ void culling::EveryCulling::RemoveEntityFromBlock(EntityBlock* ownerEntityBlock,
 	//Don't decrement mEntityGridCell.AllocatedEntityCountInBlocks
 	//Entities Indexs in EntityBlock should not be swapped because already allocated EntityBlockViewer can't see it
 
+	//임시로 이렇게 해둠, 나중에 free된 엔티티들 목록도 따로 모아서 재할당 해주어야한다.
+	ownerEntityBlock->mRenderer[entityIndexInBlock] = nullptr;
+
 	ownerEntityBlock->mCurrentEntityCount--;
 	if (ownerEntityBlock->mCurrentEntityCount == 0)
 	{

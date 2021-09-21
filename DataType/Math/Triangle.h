@@ -78,7 +78,7 @@ namespace culling
 	/// <param name="vertexX"></param>
 	/// <param name="vertexY"></param>
 	/// <returns></returns>
-	inline M128F IsFrontFaceOfProjectSpaceTrianglesSIMD(const M128F* verticesX, const M128F* verticesY)
+	inline M128F IsFrontFaceOfPerspectiveSpaceTrianglesSIMD(const M128F* verticesX, const M128F* verticesY)
 	{
 		/*
 		//triangle should be in projection space
