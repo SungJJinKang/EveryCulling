@@ -23,6 +23,7 @@ namespace culling
 	/// 1. Draw Occluder.        
 	/// 2. Draw AABB of Complicated Occludeee mesh. (AABB is much cheaper than complicated mesh)
 	///	3. If Any fragment of AABB is drawed on buffer(aabb passed depth, stencil test..!), Draw Complicated Mesh!!!
+	/// 4. But we use Previous Frame's Query Data, because ReadBack from GPU to CPU is slow.
 	/// 
 	/// references : https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_occlusion_query.txt , https://www.khronos.org/registry/OpenGL/extensions/NV/NV_conditional_render.txt      
 	///
@@ -92,6 +93,7 @@ namespace culling
 		void GenQueryObject(EntityBlock* currentEntityBlock, unsigned int entityIndex, const culling::AABB & occlusionAABBLocalMinMax);
 		void GenQueryObject(culling::EntityBlockViewer& entityBlockViewer, const culling::AABB & occlusionAABBLocalMinMax);
 		
+		/*
 		/// <summary>
 		/// draw complex mesh after this function call
 		/// 
@@ -128,6 +130,7 @@ namespace culling
 
 #endif
 		}
+		*/
 	};
 
 }
