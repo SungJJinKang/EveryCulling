@@ -1,6 +1,7 @@
 #pragma once
 
-
+#include <cassert>
+#include "EntityBlock.h"
 
 namespace culling
 {
@@ -37,7 +38,12 @@ namespace culling
 		/// </summary>
 		/// <param name="cameraIndex">0 <= cameraIndex < EveryCulling::mCameraCount</param>
 		/// <returns></returns>
-		bool GetIsCulled(const unsigned int cameraIndex) const;
+		FORCE_INLINE bool GetIsCulled(const unsigned int cameraIndex) const
+		{
+			assert(bmIsActive == true);
+			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
+			return mTargetEntityBlock->GetIsCulled(mEntityIndexInBlock, cameraIndex);
+		}
 
 
 		void SetEntityPosition(const float* worldPosition);

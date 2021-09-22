@@ -3,14 +3,6 @@
 #include <cassert>
 #include <cstring>
 
-#include "EntityBlock.h"
-
-bool culling::EntityBlockViewer::GetIsCulled(const unsigned int cameraIndex) const
-{
-	assert(bmIsActive == true);
-	assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
-	return mTargetEntityBlock->GetIsCulled(mEntityIndexInBlock, cameraIndex);
-}
 
 
 void culling::EntityBlockViewer::SetEntityPosition(const float* worldPosition)
