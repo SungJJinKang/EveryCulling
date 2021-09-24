@@ -189,7 +189,14 @@ namespace culling
 		/// Return Cached cull job std::function 
 		/// </summary>
 		/// <returns></returns>
-		std::function<void()> GetCullJob();
+		std::function<void()> GetCullJobInSTDFunction();
+		auto GetCullJobInLambda()
+		{
+			return [this]() 
+			{
+				this->CullBlockEntityJob();
+			};
+		}
 	};
 }
 

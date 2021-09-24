@@ -346,7 +346,7 @@ const std::vector<culling::EntityBlock*>& culling::EveryCulling::GetActiveEntity
 	return mActiveEntityBlockList;
 }
 
-std::function<void()> culling::EveryCulling::GetCullJob()
+std::function<void()> culling::EveryCulling::GetCullJobInSTDFunction()
 {
 	return std::function<void()>(std::bind(&EveryCulling::CullBlockEntityJob, this));
 }
