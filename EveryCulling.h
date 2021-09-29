@@ -190,7 +190,7 @@ namespace culling
 		/// </summary>
 		/// <returns></returns>
 		std::function<void()> GetCullJobInSTDFunction();
-		auto GetCullJobInLambda()
+		constexpr auto GetCullJobInLambda()
 		{
 			return [this]() 
 			{
