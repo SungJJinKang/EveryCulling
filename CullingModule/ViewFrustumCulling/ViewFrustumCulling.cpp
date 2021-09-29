@@ -12,7 +12,7 @@ void culling::ViewFrustumCulling::CullBlockEntityJob(EntityBlock* currentEntityB
 	alignas(64) char cullingMask[ENTITY_COUNT_IN_ENTITY_BLOCK] = { 0 };
 
 	const Vector4* frustumPlane = mSIMDFrustumPlanes[cameraIndex].mFrustumPlanes;
-	for (size_t entityIndex = 0; entityIndex < entityCountInBlock; entityIndex = entityIndex + 2)
+	for (size_t entityIndex = 0; entityIndex < entityCountInBlock; entityIndex++)
 	{
 		doom::Renderer* renderer = static_cast<doom::Renderer*>(currentEntityBlock->mRenderer[entityIndex]);
 
@@ -23,6 +23,10 @@ void culling::ViewFrustumCulling::CullBlockEntityJob(EntityBlock* currentEntityB
 		currentEntityBlock->mPositions[entityIndex].SetPosition(reinterpret_cast<const void*>(&renderedObjectPos));
 		currentEntityBlock->mPositions[entityIndex].SetBoundingSphereRadius(worldRadius);
 
+	}
+
+	for (size_t entityIndex = 0; entityIndex < entityCountInBlock; entityIndex = entityIndex + 2)
+	{
 		char result = CheckInFrustumSIMDWithTwoPoint(frustumPlane, currentEntityBlock->mPositions + entityIndex);
 		// if first low bit has 1 value, Pos A is In Frustum
 		// if second low bit has 1 value, Pos A is In Frustum

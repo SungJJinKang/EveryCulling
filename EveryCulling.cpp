@@ -2,8 +2,6 @@
 
 #include <cstring>
 #include <utility>
-//#include <iostream>
-//#include <thread>
 
 #include "DataType/EntityBlock.h"
 #include <vector_erase_move_lastelement/vector_swap_popback.h>
@@ -170,11 +168,12 @@ void culling::EveryCulling::CullBlockEntityJob()
 				//
 				//
 
-				while (const unsigned int currentEntityBlockIndex = cullingModule->mFinishedCullEntityBlockCount[cameraIndex].fetch_add(1, std::memory_order_release) < entityBlockCount)
+				while (true)
 				{
+					const unsigned int currentEntityBlockIndex = cullingModule->mFinishedCullEntityBlockCount[cameraIndex].fetch_add(1, std::memory_order_release);
 					if (currentEntityBlockIndex >= entityBlockCount)
 					{
-						continue;
+						break;
 					}
 
 					EntityBlock* currentEntityBlock = mEntityGridCell.mEntityBlocks[currentEntityBlockIndex];
@@ -182,8 +181,7 @@ void culling::EveryCulling::CullBlockEntityJob()
 
 					cullingModule->CullBlockEntityJob(currentEntityBlock, entityCountInBlock, cameraIndex);
 
-					//std::cout << "thread id : " << std::this_thread::get_id() << ", module index : " << moduleIndex << ", entityIndex : " << currentEntityBlockIndex << '\n';
-
+					
 				}
 
 			}
@@ -210,7 +208,7 @@ void culling::EveryCulling::WaitToFinishCullJob(const unsigned int cameraIndex) 
 	const CullingModule* lastCullingModule = mUpdatedCullingModules[lastModuleIndex];
 	while (GetIsCullJobFinished(lastCullingModule->mFinishedCullEntityBlockCount[cameraIndex], entityBlockCount) == false)
 	{
-		//std::this_thread::yield();
+		std::this_thread::yield();
 	}
 }
 
