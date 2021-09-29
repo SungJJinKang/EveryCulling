@@ -2,6 +2,8 @@
 
 #include <cstring>
 #include <utility>
+#include <iostream>
+#include <thread>
 
 #include "DataType/EntityBlock.h"
 #include <vector_erase_move_lastelement/vector_swap_popback.h>
@@ -185,6 +187,8 @@ void culling::EveryCulling::CullBlockEntityJob()
 
 					cullingModule->CullBlockEntityJob(currentEntityBlock, entityCountInBlock, cameraIndex);
 
+					//std::cout << "thread id : " << std::this_thread::get_id() << ", module index : " << moduleIndex << ", entityIndex : " << currentEntityBlockIndex << '\n';
+
 					cullingModule->mFinishedCullEntityBlockCount[cameraIndex].fetch_add(1, std::memory_order_release);
 				}
 
@@ -346,7 +350,7 @@ const std::vector<culling::EntityBlock*>& culling::EveryCulling::GetActiveEntity
 	return mActiveEntityBlockList;
 }
 
-std::function<void()> culling::EveryCulling::GetCullJob()
+std::function<void()> culling::EveryCulling::GetCullJobInSTDFunction()
 {
 	return std::function<void()>(std::bind(&EveryCulling::CullBlockEntityJob, this));
 }
