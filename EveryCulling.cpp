@@ -170,13 +170,8 @@ void culling::EveryCulling::CullBlockEntityJob()
 				//
 				//
 
-				while (cullingModule->mFinishedCullEntityBlockCount[cameraIndex].load(std::memory_order_relaxed) < entityBlockCount)
+				while (const unsigned int currentEntityBlockIndex = cullingModule->mFinishedCullEntityBlockCount[cameraIndex].fetch_add(1, std::memory_order_release) < entityBlockCount)
 				{
-					if (cullingModule->mCurrentCulledEntityBlockIndex[cameraIndex].load(std::memory_order_relaxed) >= entityBlockCount)
-					{
-						continue;
-					}
-					const unsigned int currentEntityBlockIndex = cullingModule->mCurrentCulledEntityBlockIndex[cameraIndex].fetch_add(1, std::memory_order_release);
 					if (currentEntityBlockIndex >= entityBlockCount)
 					{
 						continue;
@@ -189,7 +184,6 @@ void culling::EveryCulling::CullBlockEntityJob()
 
 					//std::cout << "thread id : " << std::this_thread::get_id() << ", module index : " << moduleIndex << ", entityIndex : " << currentEntityBlockIndex << '\n';
 
-					cullingModule->mFinishedCullEntityBlockCount[cameraIndex].fetch_add(1, std::memory_order_release);
 				}
 
 			}
@@ -197,6 +191,11 @@ void culling::EveryCulling::CullBlockEntityJob()
 
 	}
 }
+
+//void culling::EveryCulling::CullBlockEntityJob(const unsigned int threadIndex, const unsigned int threadCount)
+//{
+//
+//}
 
 bool culling::EveryCulling::GetIsCullJobFinished(const std::atomic<unsigned int>& mFinishedCullEntityBlockCount, unsigned int entityBlockCount) const
 {

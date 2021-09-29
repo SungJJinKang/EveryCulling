@@ -2,6 +2,7 @@
 
 #include "../EveryCullingCore.h"
 #include "Math/Vector.h"
+#include <cstring>
 
 namespace culling
 {
@@ -18,6 +19,11 @@ namespace culling
 		FORCE_INLINE void SetPosition(const culling::Vector3& _position)
 		{
 			Position = _position;
+		}
+
+		FORCE_INLINE void SetPosition(const void* vec4)
+		{
+			std::memcpy(&Position, vec4, 16);
 		}
 
 		FORCE_INLINE void SetBoundingSphereRadius(const float _boundingSphereRadius)

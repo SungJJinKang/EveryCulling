@@ -166,6 +166,7 @@ namespace culling
 		/// So CullBlockEntityJob is thread safe.
 		/// </summary>
 		void CullBlockEntityJob();
+		//void CullBlockEntityJob(const unsigned int threadIndex, const unsigned int threadCount);
 
 		/// <summary>
 		/// Get Is All block's culling job is finished.
