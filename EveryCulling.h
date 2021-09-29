@@ -112,7 +112,7 @@ namespace culling
 #ifdef ENABLE_SCREEN_SAPCE_BOUDING_SPHERE_CULLING
 			3
 #else
-			2
+			1
 #endif
 		> mUpdatedCullingModules
 		{
@@ -120,7 +120,7 @@ namespace culling
 #ifdef ENABLE_SCREEN_SAPCE_BOUDING_SPHERE_CULLING
 			&(mScreenSpaceBoudingSphereCulling),
 #endif	
-			&(mMaskedSWOcclusionCulling)
+			//&(mMaskedSWOcclusionCulling)
 		};
 
 	public:

@@ -207,7 +207,7 @@ void culling::EveryCulling::WaitToFinishCullJob(const unsigned int cameraIndex) 
 	const CullingModule* lastCullingModule = mUpdatedCullingModules[lastModuleIndex];
 	while (GetIsCullJobFinished(lastCullingModule->mFinishedCullEntityBlockCount[cameraIndex], entityBlockCount) == false)
 	{
-		std::this_thread::yield();
+		//std::this_thread::yield();
 	}
 }
 
