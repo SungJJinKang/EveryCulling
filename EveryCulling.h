@@ -144,7 +144,7 @@ namespace culling
 		/// 
 		/// Allocating New Entity isn't thread safe
 		/// </summary>
-		EntityBlockViewer AllocateNewEntity(void* renderer);
+		EntityBlockViewer AllocateNewEntity(void* renderer, void* transform);
 
 		/// <summary>
 		/// You should call this function on your Transform Component or In your game engine

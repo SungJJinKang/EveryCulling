@@ -35,6 +35,7 @@ namespace culling
 				sizeof(Vector4)
 				+ sizeof(char)
 				+ sizeof(void*)
+				+ sizeof(void*)
 				+ QUERY_OBJECT_PTR_SIZE
 				+ sizeof(culling::VertexData)
 		)) 
@@ -81,6 +82,7 @@ namespace culling
 		/// 
 		/// </summary>
 		void* mRenderer[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		void* mTransform[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 		VertexData mVertexDatas[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		

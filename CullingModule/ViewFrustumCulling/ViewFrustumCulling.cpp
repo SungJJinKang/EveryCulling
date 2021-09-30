@@ -6,6 +6,8 @@
 #include "../../EveryCulling.h"
 
 #include <Rendering/Renderer/Renderer.h>
+#include <Transform.h>
+#include <cstring>
 
 void culling::ViewFrustumCulling::CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex)
 {
@@ -14,13 +16,14 @@ void culling::ViewFrustumCulling::CullBlockEntityJob(EntityBlock* currentEntityB
 	const Vector4* frustumPlane = mSIMDFrustumPlanes[cameraIndex].mFrustumPlanes;
 	for (size_t entityIndex = 0; entityIndex < entityCountInBlock; entityIndex++)
 	{
-		doom::Renderer* renderer = static_cast<doom::Renderer*>(currentEntityBlock->mRenderer[entityIndex]);
+		doom::Renderer* const renderer = reinterpret_cast<doom::Renderer*>(currentEntityBlock->mRenderer[entityIndex]);
+		doom::Transform* const transform = reinterpret_cast<doom::Transform*>(currentEntityBlock->mTransform[entityIndex]);
 
 		const float worldRadius = renderer->doom::ColliderUpdater<doom::physics::Sphere>::GetWorldCollider()->mRadius;
 
-		const math::Vector3& renderedObjectPos = renderer->GetTransform()->GetPosition();
-
-		currentEntityBlock->mPositions[entityIndex].SetPosition(reinterpret_cast<const void*>(&renderedObjectPos));
+		
+		std::memcpy(currentEntityBlock->mPositions + entityIndex, &(transform->GetPosition()), 16);
+		//currentEntityBlock->mPositions[entityIndex].SetPosition(reinterpret_cast<const void*>(&renderer->GetTransform()->GetPosition()));
 		currentEntityBlock->mPositions[entityIndex].SetBoundingSphereRadius(worldRadius);
 
 	}

@@ -119,6 +119,7 @@ void culling::EveryCulling::RemoveEntityFromBlock(EntityBlock* ownerEntityBlock,
 
 	//임시로 이렇게 해둠, 나중에 free된 엔티티들 목록도 따로 모아서 재할당 해주어야한다.
 	ownerEntityBlock->mRenderer[entityIndexInBlock] = nullptr;
+	ownerEntityBlock->mTransform[entityIndexInBlock] = nullptr;
 
 	ownerEntityBlock->mCurrentEntityCount--;
 	if (ownerEntityBlock->mCurrentEntityCount == 0)
@@ -242,7 +243,7 @@ std::pair<culling::EntityBlock*, unsigned int*> culling::EveryCulling::AllocateN
 
 
 
-culling::EntityBlockViewer culling::EveryCulling::AllocateNewEntity(void* renderer)
+culling::EntityBlockViewer culling::EveryCulling::AllocateNewEntity(void* renderer, void* transform)
 {
 	std::pair<culling::EntityBlock*, unsigned int*> targetEntityBlock;
 	if (mEntityGridCell.mEntityBlocks.size() == 0)
@@ -271,6 +272,8 @@ culling::EntityBlockViewer culling::EveryCulling::AllocateNewEntity(void* render
 	(*(targetEntityBlock.second))++;
 
 	targetEntityBlock.first->mRenderer[targetEntityBlock.first->mCurrentEntityCount - 1] = renderer;
+	targetEntityBlock.first->mTransform[targetEntityBlock.first->mCurrentEntityCount - 1] = transform;
+
 	return EntityBlockViewer(targetEntityBlock.first, targetEntityBlock.first->mCurrentEntityCount - 1);
 }
 
