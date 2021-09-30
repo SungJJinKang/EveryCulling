@@ -11,22 +11,27 @@
 
 void culling::ViewFrustumCulling::CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex)
 {
-	alignas(64) char cullingMask[ENTITY_COUNT_IN_ENTITY_BLOCK] = { 0 };
 
-	const Vector4* frustumPlane = mSIMDFrustumPlanes[cameraIndex].mFrustumPlanes;
+
+
+
 	for (size_t entityIndex = 0; entityIndex < entityCountInBlock; entityIndex++)
 	{
-		doom::Renderer* const renderer = reinterpret_cast<doom::Renderer*>(currentEntityBlock->mRenderer[entityIndex]);
 		doom::Transform* const transform = reinterpret_cast<doom::Transform*>(currentEntityBlock->mTransform[entityIndex]);
+		doom::Renderer* const renderer = reinterpret_cast<doom::Renderer*>(currentEntityBlock->mRenderer[entityIndex]);
 
 		const float worldRadius = renderer->doom::ColliderUpdater<doom::physics::Sphere>::GetWorldCollider()->mRadius;
 
-		
-		std::memcpy(currentEntityBlock->mPositions + entityIndex, &(transform->GetPosition()), 16);
-		//currentEntityBlock->mPositions[entityIndex].SetPosition(reinterpret_cast<const void*>(&renderer->GetTransform()->GetPosition()));
+		std::memcpy(currentEntityBlock->mPositions + entityIndex, &(transform->GetPosition()), 12);
 		currentEntityBlock->mPositions[entityIndex].SetBoundingSphereRadius(worldRadius);
 
+		
 	}
+
+
+	alignas(64) char cullingMask[ENTITY_COUNT_IN_ENTITY_BLOCK] = { 0 };
+
+	const Vector4* frustumPlane = mSIMDFrustumPlanes[cameraIndex].mFrustumPlanes;
 
 	for (size_t entityIndex = 0; entityIndex < entityCountInBlock; entityIndex = entityIndex + 2)
 	{
