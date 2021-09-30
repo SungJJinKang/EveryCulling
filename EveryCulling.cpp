@@ -170,7 +170,7 @@ void culling::EveryCulling::CullBlockEntityJob()
 
 				while (true)
 				{
-					const unsigned int currentEntityBlockIndex = cullingModule->mFinishedCullEntityBlockCount[cameraIndex].fetch_add(1, std::memory_order_release);
+					const unsigned int currentEntityBlockIndex = cullingModule->mFinishedCullEntityBlockCount[cameraIndex].fetch_add(1, std::memory_order_seq_cst);
 					if (currentEntityBlockIndex >= entityBlockCount)
 					{
 						break;
@@ -208,7 +208,7 @@ void culling::EveryCulling::WaitToFinishCullJob(const unsigned int cameraIndex) 
 	const CullingModule* lastCullingModule = mUpdatedCullingModules[lastModuleIndex];
 	while (GetIsCullJobFinished(lastCullingModule->mFinishedCullEntityBlockCount[cameraIndex], entityBlockCount) == false)
 	{
-		std::this_thread::yield();
+		//std::this_thread::yield();
 	}
 }
 
