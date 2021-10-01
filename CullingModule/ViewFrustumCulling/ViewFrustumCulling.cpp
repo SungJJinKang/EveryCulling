@@ -18,14 +18,14 @@ void culling::ViewFrustumCulling::CullBlockEntityJob(EntityBlock* currentEntityB
 	for (size_t entityIndex = 0; entityIndex < entityCountInBlock; entityIndex++)
 	{
 		doom::Transform* const transform = reinterpret_cast<doom::Transform*>(currentEntityBlock->mTransform[entityIndex]);
-		doom::Renderer* const renderer = reinterpret_cast<doom::Renderer*>(currentEntityBlock->mRenderer[entityIndex]);
-
-		const float worldRadius = renderer->doom::ColliderUpdater<doom::physics::Sphere>::GetWorldCollider()->mRadius;
-
 		std::memcpy(currentEntityBlock->mPositions + entityIndex, &(transform->GetPosition()), 12);
-		currentEntityBlock->mPositions[entityIndex].SetBoundingSphereRadius(worldRadius);
+	}
 
-		
+	for (size_t entityIndex = 0; entityIndex < entityCountInBlock; entityIndex++)
+	{
+		doom::Renderer* const renderer = reinterpret_cast<doom::Renderer*>(currentEntityBlock->mRenderer[entityIndex]);
+		const float worldRadius = renderer->doom::ColliderUpdater<doom::physics::Sphere>::GetWorldCollider()->mRadius;
+		currentEntityBlock->mPositions[entityIndex].SetBoundingSphereRadius(worldRadius);
 	}
 
 
