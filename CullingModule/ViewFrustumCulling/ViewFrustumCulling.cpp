@@ -29,7 +29,7 @@ void culling::ViewFrustumCulling::CullBlockEntityJob(EntityBlock* currentEntityB
 	}
 
 
-	alignas(64) char cullingMask[ENTITY_COUNT_IN_ENTITY_BLOCK] = { 0 };
+	char cullingMask[ENTITY_COUNT_IN_ENTITY_BLOCK] = { 0 };
 
 	const Vector4* frustumPlane = mSIMDFrustumPlanes[cameraIndex].mFrustumPlanes;
 
