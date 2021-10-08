@@ -7,7 +7,6 @@
 
 #include <Rendering/Renderer/Renderer.h>
 #include <Transform.h>
-#include <cstring>
 
 void culling::ViewFrustumCulling::CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex)
 {

@@ -6,15 +6,12 @@
 
 namespace culling
 {
-	class Position_BoundingSphereRadius
+	struct alignas(16) Position_BoundingSphereRadius
 	{
-
-	private:
 
 		culling::Vector3 Position;
 		float BoundingSphereRadius;
 
-	public:
 
 		FORCE_INLINE void SetPosition(const culling::Vector3& _position)
 		{
