@@ -2,7 +2,10 @@
 
 #include "../../SIMD_Core.h"
 
+#include "Common.h"
 #include "Vector.h"
+
+
 
 namespace culling
 {
@@ -16,7 +19,6 @@ namespace culling
 		Vector3 Points[3];
 	};
 
-	
 
 	/// <summary>
 	/// Sort TwoDTriangle Points y ascending.
@@ -33,15 +35,15 @@ namespace culling
 	{
 		if (triangle.Points[0].y < triangle.Points[1].y)
 		{
-			std::swap(triangle.Points[0], triangle.Points[1]);
+			culling::SWAP(triangle.Points[0], triangle.Points[1]);
 		}
 		if (triangle.Points[0].y < triangle.Points[2].y)
 		{
-			std::swap(triangle.Points[0], triangle.Points[2]);
+			culling::SWAP(triangle.Points[0], triangle.Points[2]);
 		}
 		if (triangle.Points[1].y < triangle.Points[2].y)
 		{
-			std::swap(triangle.Points[1], triangle.Points[2]);
+			culling::SWAP(triangle.Points[1], triangle.Points[2]);
 		}
 	}
 
