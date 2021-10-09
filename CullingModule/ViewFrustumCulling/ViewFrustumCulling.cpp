@@ -18,7 +18,7 @@ void culling::ViewFrustumCulling::CullBlockEntityJob(EntityBlock* currentEntityB
 	{
 		doom::Transform* const transform = reinterpret_cast<doom::Transform*>(currentEntityBlock->mTransform[entityIndex]);
 	
-		*reinterpret_cast<M128F*>(currentEntityBlock->mPositions + entityIndex) = *reinterpret_cast<const M128F*>(&(transform->GetPosition()));
+		*reinterpret_cast<__m128i*>(currentEntityBlock->mPositions + entityIndex) = _mm_stream_load_si128(reinterpret_cast<const __m128i*>(&(transform->GetPosition())));
 	}
 
 	for (size_t entityIndex = 0; entityIndex < entityCountInBlock; entityIndex++)
