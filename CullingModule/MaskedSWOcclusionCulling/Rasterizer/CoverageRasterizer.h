@@ -13,7 +13,7 @@ static_assert(TILE_WIDTH * TILE_HEIGHT == 128 || TILE_WIDTH * TILE_HEIGHT == 256
 
 namespace culling
 {
-	class CoverageRasterizer
+	class DOOM_API CoverageRasterizer
 	{
 	private:
 

@@ -26,7 +26,7 @@ namespace culling
 	/// will be culled from view 
 	/// when they are CullDistanceVolume.mCullDistance or more from the Camera.
 	/// </summary>
-	class DistanceCulling : CullingModule
+	class DOOM_API DistanceCulling : CullingModule
 	{
 
 	private:

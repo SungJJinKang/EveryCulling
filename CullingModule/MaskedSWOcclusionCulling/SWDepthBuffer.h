@@ -114,7 +114,7 @@ namespace culling
 		
 	};
 
-	class SWDepthBuffer
+	class DOOM_API SWDepthBuffer
 	{
 		friend class MaskedSWOcclusionCulling;
 		friend class BinTrianglesStage;

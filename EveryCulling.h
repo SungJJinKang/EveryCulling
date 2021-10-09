@@ -50,7 +50,7 @@ namespace culling
 	/// https://macton.smugmug.com/Other/2008-07-15-by-Eye-Fi/n-xmKDH/
 	/// 
 	/// </summary>
-	class EveryCulling
+	class DOOM_API EveryCulling
 	{
 		friend class ScreenSpaceBoundingSphereCulling;
 		friend class ViewFrustumCulling;

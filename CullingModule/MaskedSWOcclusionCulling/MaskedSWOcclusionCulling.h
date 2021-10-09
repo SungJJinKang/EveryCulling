@@ -32,7 +32,7 @@ namespace culling
 	/// https://www.slideshare.net/IntelSoftware/masked-software-occlusion-culling
 	/// https://www.slideshare.net/IntelSoftware/masked-occlusion-culling
 	/// </summary>
-	class MaskedSWOcclusionCulling : public CullingModule
+	class DOOM_API MaskedSWOcclusionCulling : public CullingModule
 	{
 		friend class EveryCulling;
 		friend class BinTrianglesStage;

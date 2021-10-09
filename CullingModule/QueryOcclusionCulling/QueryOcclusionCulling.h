@@ -28,7 +28,7 @@ namespace culling
 	/// references : https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_occlusion_query.txt , https://www.khronos.org/registry/OpenGL/extensions/NV/NV_conditional_render.txt      
 	///
 	/// </summary>
-	class QueryOcclusionCulling : public CullingModule
+	class DOOM_API QueryOcclusionCulling : public CullingModule
 	{
 
 		friend class Graphics_Server;
