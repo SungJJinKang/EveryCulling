@@ -1,27 +1,25 @@
-#pragma once
-
-#include "../../EveryCullingCore.h"
+#pragma once	
 
 namespace culling
 {
-	struct Vector2
+	struct Vec2
 	{
 		float x, y;
 
-		FORCE_INLINE Vector2() {};
-		FORCE_INLINE Vector2(const float _x, const float _y)
+		inline Vec2() {}
+		inline Vec2(const float _x, const float _y)
 			:x(_x), y(_y)
 		{
 
 		}
 	};
 
-	struct Vector3
+	struct Vec3
 	{
 		float x, y, z;
 
-		FORCE_INLINE Vector3() {};
-		FORCE_INLINE Vector3(const float _x, const float _y, const float _z)
+		inline Vec3() {}
+		inline Vec3(const float _x, const float _y, const float _z)
 			:x(_x), y(_y), z(_z)
 		{
 
@@ -30,45 +28,45 @@ namespace culling
 		
 	};
 
-	FORCE_INLINE culling::Vector2 operator+(const culling::Vector2& a, const culling::Vector2& b)
+	inline culling::Vec2 operator+(const culling::Vec2& a, const culling::Vec2& b)
 	{
-		return culling::Vector2(a.x + b.x, a.y + b.y);
+		return culling::Vec2(a.x + b.x, a.y + b.y);
 	}
 
-	FORCE_INLINE culling::Vector2 operator-(const culling::Vector2& a, const culling::Vector2& b)
+	inline culling::Vec2 operator-(const culling::Vec2& a, const culling::Vec2& b)
 	{
-		return culling::Vector2(a.x - b.x, a.y - b.y);
+		return culling::Vec2(a.x - b.x, a.y - b.y);
 
 	}
 
-	FORCE_INLINE culling::Vector3 operator+(const culling::Vector3& a, const culling::Vector3& b)
+	inline culling::Vec3 operator+(const culling::Vec3& a, const culling::Vec3& b)
 	{
-		return culling::Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
+		return culling::Vec3(a.x + b.x, a.y + b.y, a.z + b.z);
 	}
 
-	FORCE_INLINE culling::Vector3 operator-(const culling::Vector3& a, const culling::Vector3& b)
+	inline culling::Vec3 operator-(const culling::Vec3& a, const culling::Vec3& b)
 	{
-		return culling::Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
+		return culling::Vec3(a.x - b.x, a.y - b.y, a.z - b.z);
 	}
 
-	FORCE_INLINE float Dot(const culling::Vector2& a, const culling::Vector2& b)
+	inline float Dot(const culling::Vec2& a, const culling::Vec2& b)
 	{
 		return a.x * b.x + a.y * b.y;
 	}
 
-	FORCE_INLINE float Dot(const culling::Vector3& a, const culling::Vector3& b)
+	inline float Dot(const culling::Vec3& a, const culling::Vec3& b)
 	{
 		return a.x * b.x + a.y * b.y + a.z * b.z;
 	}
 
-	FORCE_INLINE float PerpDot(const culling::Vector2& lhs, const culling::Vector2& rhs)
+	inline float PerpDot(const culling::Vec2& lhs, const culling::Vec2& rhs)
 	{
 		return lhs.x * rhs.y - lhs.y * rhs.x;
 	}
 
-	FORCE_INLINE culling::Vector3 Cross(const culling::Vector3& lhs, const culling::Vector3& rhs)
+	inline culling::Vec3 Cross(const culling::Vec3& lhs, const culling::Vec3& rhs)
 	{
-		return culling::Vector3(
+		return culling::Vec3(
 			lhs.y * rhs.z - rhs.y * lhs.z,
 			lhs.z * rhs.x - rhs.z * lhs.x,
 			lhs.x * rhs.y - rhs.x * lhs.y);
@@ -78,31 +76,31 @@ namespace culling
 	/// <summary>
 	/// Why alignas(16)? : FOR SIMD!!
 	/// </summary>
-	struct alignas(16) Vector4
+	struct alignas(16) Vec4
 	{
 		float values[4];
 
-		FORCE_INLINE float& operator[](size_t index)
+		inline float& operator[](size_t index)
 		{
 			return values[index];
 		}
 
-		FORCE_INLINE float operator[](size_t index) const
+		inline float operator[](size_t index) const
 		{
 			return values[index];
 		}
 	};
 
-	struct alignas(16) Quaternion
+	struct alignas(16) Quat
 	{
 		float values[4];
 
-		FORCE_INLINE float& operator[](size_t index)
+		inline float& operator[](size_t index)
 		{
 			return values[index];
 		}
 
-		FORCE_INLINE float operator[](size_t index) const
+		inline float operator[](size_t index) const
 		{
 			return values[index];
 		}

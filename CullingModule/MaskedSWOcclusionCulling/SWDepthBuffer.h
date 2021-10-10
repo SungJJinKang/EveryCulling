@@ -4,7 +4,6 @@
 
 #include <memory>
 
-#include "../../SIMD_Core.h"
 #include "../../DataType/Math/Triangle.h"
 
 namespace culling

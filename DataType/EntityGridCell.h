@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../EveryCullingCore.h"
-
 #include <vector>
 
 namespace culling

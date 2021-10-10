@@ -1,8 +1,6 @@
 #include "CoverageRasterizer.h"
 
-#include <algorithm>
-
-M256I culling::CoverageRasterizer::FillBottomFlatTriangle(CoverageMask& coverageMask, const Vector2& LeftBottomPoint, const Vector2& point1, const Vector2& point2, const Vector2& point3)
+M256I culling::CoverageRasterizer::FillBottomFlatTriangle(CoverageMask& coverageMask, const Vec2& LeftBottomPoint, const Vec2& point1, const Vec2& point2, const Vec2& point3)
 {
     //Assume Triangle is sorted
 
@@ -34,7 +32,7 @@ M256I culling::CoverageRasterizer::FillBottomFlatTriangle(CoverageMask& coverage
     return Result;
 }
 
-M256I culling::CoverageRasterizer::FillTopFlatTriangle(CoverageMask& coverageMask, const Vector2& LeftBottomPoint, const Vector2& point1, const Vector2& point2, const Vector2& point3)
+M256I culling::CoverageRasterizer::FillTopFlatTriangle(CoverageMask& coverageMask, const Vec2& LeftBottomPoint, const Vec2& point1, const Vec2& point2, const Vec2& point3)
 {
     //Assume Triangle is sorted
     
@@ -71,7 +69,7 @@ M256I culling::CoverageRasterizer::FillTopFlatTriangle(CoverageMask& coverageMas
 /// <param name="coverageMask"></param>
 /// <param name="LeftBottomPoint"></param>
 /// <param name="triangle"></param>
-void culling::CoverageRasterizer::FillTriangle(CoverageMask& coverageMask, Vector2 LeftBottomPoint, TwoDTriangle& triangle)
+void culling::CoverageRasterizer::FillTriangle(CoverageMask& coverageMask, Vec2 LeftBottomPoint, TwoDTriangle& triangle)
 {
     SortTriangle(triangle);
 
@@ -87,7 +85,7 @@ void culling::CoverageRasterizer::FillTriangle(CoverageMask& coverageMask, Vecto
     else
     {
         /* general case - split the triangle in a topflat and bottom-flat one */
-        Vector2 point4{ triangle.Points[0].x + ((float)(triangle.Points[1].y - triangle.Points[0].y) / (float)(triangle.Points[2].y - triangle.Points[0].y)) * (triangle.Points[2].x - triangle.Points[0].x), triangle.Points[1].y };
+        Vec2 point4{ triangle.Points[0].x + ((float)(triangle.Points[1].y - triangle.Points[0].y) / (float)(triangle.Points[2].y - triangle.Points[0].y)) * (triangle.Points[2].x - triangle.Points[0].x), triangle.Points[1].y };
 
 #if TILE_WIDTH == 16
         M128I Result1, Result2;

@@ -4,11 +4,9 @@
 
 #include "../CullingModule.h"
 
-#include "../../DataType/Math/Vector.h"
-#include "../../DataType/Math/Matrix.h"
-
 #include "../../DataType/QueryObject.h"
 #include "../../DataType/EntityBlockViewer.h"
+#include "../../DataType/Math/AABB.h"
 
 #ifdef ENABLE_QUERY_OCCLUSION
 

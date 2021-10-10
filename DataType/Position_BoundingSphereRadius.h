@@ -9,11 +9,11 @@ namespace culling
 	struct alignas(16) Position_BoundingSphereRadius
 	{
 
-		culling::Vector3 Position;
+		culling::Vec3 Position;
 		float BoundingSphereRadius;
 
 
-		FORCE_INLINE void SetPosition(const culling::Vector3& _position)
+		FORCE_INLINE void SetPosition(const culling::Vec3& _position)
 		{
 			Position = _position;
 		}

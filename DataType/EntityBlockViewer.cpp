@@ -8,7 +8,7 @@
 void culling::EntityBlockViewer::SetEntityPosition(const float* worldPosition)
 {
 	assert(bmIsActive == true);
-	std::memcpy((mTargetEntityBlock->mPositions + mEntityIndexInBlock), worldPosition, sizeof(Vector3));
+	std::memcpy((mTargetEntityBlock->mPositions + mEntityIndexInBlock), worldPosition, sizeof(Vec3));
 }
 
 void culling::EntityBlockViewer::SetSphereBoundRadius(float sphereRadius)

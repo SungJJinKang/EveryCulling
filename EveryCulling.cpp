@@ -325,7 +325,7 @@ void culling::EveryCulling::SetCameraCount(unsigned int cameraCount)
 #endif
 }
 
-void culling::EveryCulling::SetViewProjectionMatrix(const unsigned int cameraIndex, const culling::Matrix4X4& viewProjectionMatrix)
+void culling::EveryCulling::SetViewProjectionMatrix(const unsigned int cameraIndex, const culling::Mat4x4& viewProjectionMatrix)
 {
 	assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
 

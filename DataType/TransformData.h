@@ -12,9 +12,9 @@ namespace culling
 	/// </summary>
 	struct TransformData
 	{
-		Quaternion mRotation; // 16byte
-		Vector3 mMinAABBPoint; // 12 byte
-		Vector3 mMaxAABBPoint; // 12 byte
-		Vector3 mScale; // 12 byte
+		Quat mRotation; // 16byte
+		Vec3 mMinAABBPoint; // 12 byte
+		Vec3 mMaxAABBPoint; // 12 byte
+		Vec3 mScale; // 12 byte
 	};
 }

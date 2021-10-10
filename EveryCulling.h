@@ -34,7 +34,7 @@ namespace culling
 	/// [�ѱ��� ���α� ��] (https ://sungjjinkang.github.io/doom/2021/04/02/viewfrustumculling.html)  
 	///
 	/// 
-	/// This culling use SIMD DotProduct, So Check LightMath_Cpp/Matrix4x4Float_Aligned.inl
+	/// This culling use SIMD DotProduct, So Check LightMath_Cpp/Mat4x4Float_Aligned.inl
 	///
 	/// Feature :
 	/// 1. Linear arrays scale great. All entity's position data is stored linearlly.
@@ -42,7 +42,7 @@ namespace culling
 	/// 3. Frustum vs Sphere intersections check per loop
 	/// 3. Threads solve intersections(blocks) parrallily
 	/// 
-	/// this library require math library : https://github.com/SungJJinKang/LightMath_Cpp/blob/main/Matrix4x4Float_Aligned.inl
+	/// this library require math library : https://github.com/SungJJinKang/LightMath_Cpp/blob/main/Mat4x4Float_Aligned.inl
 	/// 
 	/// references : 
 	/// https://www.gdcvault.com/play/1014491/Culling-the-Battlefield-Data-Oriented
@@ -128,7 +128,7 @@ namespace culling
 		EveryCulling(unsigned int resolutionWidth, unsigned int resolutionHeight);
 		~EveryCulling();
 		void SetCameraCount(unsigned int cameraCount);
-		void SetViewProjectionMatrix(const unsigned int cameraIndex, const culling::Matrix4X4& viewProjectionMatrix);
+		void SetViewProjectionMatrix(const unsigned int cameraIndex, const culling::Mat4x4& viewProjectionMatrix);
 		unsigned int GetCameraCount() const;
 		/// <summary>
 		/// Get EntityBlock List with entities

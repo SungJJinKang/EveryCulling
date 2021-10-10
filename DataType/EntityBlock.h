@@ -2,9 +2,7 @@
 
 #include "../EveryCullingCore.h"
 
-#include "Math/AABB.h"
 #include "Math/Vector.h"
-#include "Math/Matrix.h"
 #include "Position_BoundingSphereRadius.h"
 
 #ifdef ENABLE_QUERY_OCCLUSION
@@ -32,7 +30,7 @@ namespace culling
 		MAKE_EVEN_NUMBER(
 			(4096 - sizeof(unsigned int)) /
 			(
-				sizeof(Vector4)
+				sizeof(Vec4)
 				+ sizeof(char)
 				+ sizeof(void*)
 				+ sizeof(void*)

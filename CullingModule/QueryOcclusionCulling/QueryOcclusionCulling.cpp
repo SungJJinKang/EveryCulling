@@ -3,7 +3,6 @@
 #ifdef ENABLE_QUERY_OCCLUSION
 
 #include "../../EveryCulling.h"
-#include "../../DataType/EntityGridCell.h"
 
 #ifdef CULLING_OPENGL
 
@@ -143,7 +142,7 @@ void culling::QueryOcclusionCulling::StopQuery(const unsigned int queryID)
 #endif
 }
 
-static void GenAABB8VerticesFromLocalAABB(const culling::AABB& localAABB, culling::Vector3 * aabb8Vercies)
+static void GenAABB8VerticesFromLocalAABB(const culling::AABB& localAABB, culling::Vec3 * aabb8Vercies)
 {
 	aabb8Vercies[0].x = localAABB.mMin[0];
 	aabb8Vercies[0].y = localAABB.mMax[1];
@@ -290,7 +289,7 @@ void culling::QueryOcclusionCulling::GenQueryObject(EntityBlock* currentEntityBl
 	glBindVertexArray(newVertexArrayObjectID);
 	glBindBuffer(GL_ARRAY_BUFFER, newVertexBufferID);
 
-	culling::Vector3 aabbLocalPoints[8];
+	culling::Vec3 aabbLocalPoints[8];
 	GenAABB8VerticesFromLocalAABB(occlusionAABBLocalMinMax, aabbLocalPoints);
 
 	//8 vertexs, 3 components

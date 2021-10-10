@@ -1,5 +1,3 @@
-#include "../../EveryCullingCore.h"
-
 #ifdef ENABLE_SCREEN_SAPCE_BOUDING_SPHERE_CULLING
 
 #include "ScreenSpaceBoundingSphereCulling.h"

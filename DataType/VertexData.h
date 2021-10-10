@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Math/Vector.h"
-
 namespace culling
 {
 	struct VertexData

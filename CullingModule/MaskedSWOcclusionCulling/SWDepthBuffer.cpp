@@ -1,6 +1,5 @@
 #include "SWDepthBuffer.h"
-#include <cstdio>
-#include <cstdlib>
+
 culling::SWDepthBuffer::SWDepthBuffer(unsigned int width, unsigned int height)
 	: 
 	mResolution{

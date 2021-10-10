@@ -1,34 +1,32 @@
 #pragma once
 
-#include "../../SIMD_Core.h"
-
 #include "Common.h"
 #include "Vector.h"
-
+#include "../../SIMD_Core.h"
 
 
 namespace culling
 {
 	struct TwoDTriangle
 	{
-		Vector2 Points[3];
+		Vec2 Points[3];
 	};
 
 	struct ThreeDTriangle
 	{
-		Vector3 Points[3];
+		Vec3 Points[3];
 	};
 
 
 	/// <summary>
 	/// Sort TwoDTriangle Points y ascending.
-	/// Point1 is TopMost Vector2
+	/// Point1 is TopMost Vec2
 	/// </summary>
 	/// <param name="triangle"></param>
 
 	/// <summary>
 	/// Sort TwoDTriangle Points y ascending.
-	/// Point1 is TopMost Vector2
+	/// Point1 is TopMost Vec2
 	/// </summary>
 	/// <param name="triangle"></param>
 	inline void SortTriangle(TwoDTriangle& triangle)

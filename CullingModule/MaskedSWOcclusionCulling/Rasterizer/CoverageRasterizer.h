@@ -1,11 +1,9 @@
 #pragma once
 
-#include <Vector2.h>
-
 #include "../CoverageMask.h"
-#include "../../../DataType/Math/Triangle.h"
 
-#include "../../../SIMD_Core.h"
+#include "../../../DataType/Math/Vector.h"
+#include "../../../DataType/Math/Triangle.h"
 
 static_assert(TILE_WIDTH % 16 == 0);
 static_assert(TILE_HEIGHT % 8 == 0);
@@ -22,14 +20,14 @@ namespace culling
 		/// </summary>
 		/// <param name="coverageMask"></param>
 		/// <param name="triangle"></param>
-		M256I FillBottomFlatTriangle(CoverageMask& coverageMask, const Vector2& LeftBottomPoint, const Vector2& point1, const Vector2& point2, const Vector2& point3);
+		M256I FillBottomFlatTriangle(CoverageMask& coverageMask, const Vec2& LeftBottomPoint, const Vec2& point1, const Vec2& point2, const Vec2& point3);
 		
 		/// <summary>
 		/// Assume TwoDTriangle intersect with mask
 		/// </summary>
 		/// <param name="coverageMask"></param>
 		/// <param name="triangle"></param>
-		M256I FillTopFlatTriangle(CoverageMask& coverageMask, const Vector2& LeftBottomPoint, const Vector2& point1, const Vector2& point2, const Vector2& point3);
+		M256I FillTopFlatTriangle(CoverageMask& coverageMask, const Vec2& LeftBottomPoint, const Vec2& point1, const Vec2& point2, const Vec2& point3);
 		
 		
 
@@ -41,7 +39,7 @@ namespace culling
 		/// 
 		/// 
 		/// </summary>
-		void FillTriangle(CoverageMask& coverageMask, Vector2 LeftBottomPoint, TwoDTriangle& triangle);
+		void FillTriangle(CoverageMask& coverageMask, Vec2 LeftBottomPoint, TwoDTriangle& triangle);
 
 	};
 }

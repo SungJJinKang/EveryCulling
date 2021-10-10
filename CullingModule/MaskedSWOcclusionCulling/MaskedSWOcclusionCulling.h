@@ -2,13 +2,10 @@
 
 #include <atomic>
 
-#include "../../EveryCullingCore.h"
 #include "SIMD_Core.h"
 #include "SWDepthBuffer.h"
 
-#include "../../DataType/Math/Triangle.h"
 #include "../../DataType/Math/AABB.h"
-#include "../../DataType/Math/Matrix.h"
 
 #include "../CullingModule.h"
 

@@ -7,13 +7,13 @@ namespace culling
 
 	struct AABB
 	{
-		Vector4 mMin;
-		Vector4 mMax;
+		Vec4 mMin;
+		Vec4 mMax;
 	};
 
 	struct Face
 	{
-		Vector3 Vertices[4];
+		Vec3 Vertices[4];
 	};
 
 	struct AABBVertices
