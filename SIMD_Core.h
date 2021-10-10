@@ -7,11 +7,7 @@
 // Unreal Engine Source Code  
 //
 
-#include "SIMD.h"
-
-#ifdef SIMD_ENABLED
-
-
+#ifdef __AVX__
 
 #include <immintrin.h>
 
