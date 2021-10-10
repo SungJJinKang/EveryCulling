@@ -5,7 +5,7 @@
 
 namespace culling
 {
-	class RasterizeTrianglesStage : public MaskedSWOcclusionCullingStage
+	class DOOM_API RasterizeTrianglesStage : public MaskedSWOcclusionCullingStage
 	{
 
 	private:

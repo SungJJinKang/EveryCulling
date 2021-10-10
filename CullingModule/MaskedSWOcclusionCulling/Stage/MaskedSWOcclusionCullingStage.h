@@ -1,9 +1,11 @@
 #pragma once
 
+#include "../../../EveryCullingCore.h"
+
 namespace culling
 {
 	class MaskedSWOcclusionCulling;
-	class MaskedSWOcclusionCullingStage
+	class DOOM_API MaskedSWOcclusionCullingStage
 	{
 
 	protected:

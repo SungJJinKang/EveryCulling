@@ -8,7 +8,7 @@ namespace culling
 	/// Project Object's Bounding AABB to Screen Space(Actually NDC)
 	/// And Area of Projected AABB is less than setting value, It's culled
 	/// </summary>
-	class ScreenSpaceBoundingSphereCulling : public CullingModule
+	class DOOM_API ScreenSpaceBoundingSphereCulling : public CullingModule
 	{
 		friend class EveryCulling;
 

@@ -20,7 +20,7 @@ namespace culling
 	};
 
 	class EveryCulling;
-	class ViewFrustumCulling : CullingModule
+	class DOOM_API ViewFrustumCulling : CullingModule
 	{
 		friend class EveryCulling;
 

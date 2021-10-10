@@ -11,7 +11,7 @@ namespace culling
 	/// <summary>
 	/// Used for storing specific EntityBlock pointer
 	/// </summary>
-	class EntityBlockViewer
+	class DOOM_API EntityBlockViewer
 	{
 		friend class EveryCulling;
 		friend class QueryOcclusionCulling;

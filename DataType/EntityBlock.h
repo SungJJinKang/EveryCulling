@@ -42,7 +42,7 @@ namespace culling
 	/// <summary>
 	/// EntityBlock size should be less 4KB(Page size) for Block data being allocated in a page
 	/// </summary>
-	struct alignas(CACHE_LINE_SIZE) EntityBlock
+	struct DOOM_API alignas(CACHE_LINE_SIZE) EntityBlock
 	{
 		/// <summary>
 		/// Why align to 32byte?

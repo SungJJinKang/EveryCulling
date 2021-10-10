@@ -11,7 +11,7 @@ namespace culling
 	class EveryCulling;
 	struct EntityBlock;
 
-	class CullingModule
+	class DOOM_API CullingModule
 	{
 		friend class EveryCulling;
 

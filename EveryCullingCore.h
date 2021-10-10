@@ -1,6 +1,8 @@
 #pragma once
 #include <assert.h>
 
+#include <Core.h>
+
 #if defined(_MSC_VER)
 #  define COMPILER_MSVC
 #elif defined(__GNUC__)

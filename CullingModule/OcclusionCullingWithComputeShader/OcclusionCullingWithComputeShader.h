@@ -10,7 +10,7 @@ namespace culling
 	/// https://frostbite-wp-prd.s3.amazonaws.com/wp-content/uploads/2016/03/29204330/GDC_2016_Compute.pdf
 	/// 6page https://www.slideshare.net/dgtman/sw-occlusion-culling
 	/// </summary>
-	class OcclusionCullingWithComputeShader : public CullingModule
+	class DOOM_API OcclusionCullingWithComputeShader : public CullingModule
 	{
 	private:
 

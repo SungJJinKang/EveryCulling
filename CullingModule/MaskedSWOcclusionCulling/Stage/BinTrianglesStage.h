@@ -10,7 +10,7 @@
 namespace culling
 {
 	
-	class BinTrianglesStage : public MaskedSWOcclusionCullingStage
+	class DOOM_API BinTrianglesStage : public MaskedSWOcclusionCullingStage
 	{
 		friend class MaskedSWOcclusionCulling;
 
