@@ -14,7 +14,7 @@ void culling::ViewFrustumCulling::CullBlockEntityJob(EntityBlock* currentEntityB
 {
 
 
-
+	const math::Vector3* const cameraPos = reinterpret_cast<const math::Vector3*>(&mCullingSystem->GetCameraPosition(cameraIndex));
 
 	for (size_t entityIndex = 0; entityIndex < entityCountInBlock; entityIndex++)
 	{
@@ -30,7 +30,7 @@ void culling::ViewFrustumCulling::CullBlockEntityJob(EntityBlock* currentEntityB
 
 		if(doom::graphics::Graphics_Setting::IsSortObjectFrontToBack)
 		{
-			renderer->CacheDistanceToCamera(cameraIndex, *reinterpret_cast<const math::Vector3*>(&mCullingSystem->GetCameraPosition(cameraIndex)));
+			renderer->CacheDistanceToCamera(cameraIndex, *cameraPos);
 		}
 		
 	}
