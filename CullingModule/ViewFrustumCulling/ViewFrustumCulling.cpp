@@ -20,25 +20,21 @@ void culling::ViewFrustumCulling::CullBlockEntityJob(EntityBlock* currentEntityB
 	{
 		doom::Transform* const transform = reinterpret_cast<doom::Transform*>(currentEntityBlock->mTransform[entityIndex]);
 		doom::Renderer* const renderer = reinterpret_cast<doom::Renderer*>(currentEntityBlock->mRenderer[entityIndex]);
+		Position_BoundingSphereRadius* const posBoundingSphereRadius = currentEntityBlock->mPositions + entityIndex;
+
+		const float worldRadius = renderer->doom::ColliderUpdater<doom::physics::Sphere>::GetWorldCollider()->mRadius;
 
 		const culling::Vec3* const entityPos = reinterpret_cast<const culling::Vec3*>(&transform->GetPosition());
-		*reinterpret_cast<M128F*>(currentEntityBlock->mPositions + entityIndex) = *reinterpret_cast<const M128F*>(entityPos);
+		*reinterpret_cast<M128F*>(posBoundingSphereRadius) = *reinterpret_cast<const M128F*>(entityPos);
+		posBoundingSphereRadius->SetBoundingSphereRadius(worldRadius);
 
 		if(doom::graphics::Graphics_Setting::IsSortObjectFrontToBack)
 		{
 			renderer->CacheDistanceToCamera(cameraIndex, *reinterpret_cast<const math::Vector3*>(&mCullingSystem->GetCameraPosition(cameraIndex)));
 		}
+		
+	}
 	
-	}
-
-	for (size_t entityIndex = 0; entityIndex < entityCountInBlock; entityIndex++)
-	{
-		doom::Renderer* const renderer = reinterpret_cast<doom::Renderer*>(currentEntityBlock->mRenderer[entityIndex]);
-		const float worldRadius = renderer->doom::ColliderUpdater<doom::physics::Sphere>::GetWorldCollider()->mRadius;
-		currentEntityBlock->mPositions[entityIndex].SetBoundingSphereRadius(worldRadius);
-	}
-
-
 	char cullingMask[ENTITY_COUNT_IN_ENTITY_BLOCK] = { 0 };
 
 	const Vec4* frustumPlane = mSIMDFrustumPlanes[cameraIndex].mFrustumPlanes;
