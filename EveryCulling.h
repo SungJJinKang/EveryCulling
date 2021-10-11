@@ -5,7 +5,6 @@
 #include "DataType/EntityBlockViewer.h"
 
 #include <array>
-#include <memory>
 #include <vector>
 #include <atomic>
 #include <functional>
@@ -59,7 +58,8 @@ namespace culling
 	private:
 
 		unsigned int mCameraCount;
-		
+		std::array<culling::Vec3, MAX_CAMERA_COUNT> mCameraPositions;
+
 		bool bmIsEntityBlockPoolInitialized{ false };
 
 		/// <summary>
@@ -128,8 +128,16 @@ namespace culling
 		EveryCulling(unsigned int resolutionWidth, unsigned int resolutionHeight);
 		~EveryCulling();
 		void SetCameraCount(unsigned int cameraCount);
+		void SetCameraPosition(const size_t cameraIndex, const culling::Vec3& cameraPosition);
+
 		void SetViewProjectionMatrix(const unsigned int cameraIndex, const culling::Mat4x4& viewProjectionMatrix);
 		unsigned int GetCameraCount() const;
+		inline const culling::Vec3& GetCameraPosition(const size_t cameraIndex) const
+		{
+			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
+			return mCameraPositions[cameraIndex];
+		}
+
 		/// <summary>
 		/// Get EntityBlock List with entities
 		/// </summary>
@@ -166,6 +174,7 @@ namespace culling
 		/// So CullBlockEntityJob is thread safe.
 		/// </summary>
 		void CullBlockEntityJob();
+		void CullBlockEntityJob(const size_t cameraIndex);
 		//void CullBlockEntityJob(const unsigned int threadIndex, const unsigned int threadCount);
 
 		/// <summary>
@@ -190,12 +199,19 @@ namespace culling
 		/// Return Cached cull job std::function 
 		/// </summary>
 		/// <returns></returns>
-		std::function<void()> GetCullJobInSTDFunction();
 		constexpr auto GetCullJobInLambda()
 		{
 			return [this]() 
 			{
 				this->CullBlockEntityJob();
+			};
+		}
+
+		constexpr auto GetCullJobInLambda(const size_t cameraIndex)
+		{
+			return [this, cameraIndex]()
+			{
+				this->CullBlockEntityJob(cameraIndex);
 			};
 		}
 	};

@@ -136,57 +136,68 @@ void culling::EveryCulling::CullBlockEntityJob()
 	{
 		for (unsigned int cameraIndex = 0; cameraIndex < mCameraCount; cameraIndex++)
 		{
-			for (size_t moduleIndex = 0; moduleIndex < mUpdatedCullingModules.size(); moduleIndex++)
+			CullBlockEntityJob(cameraIndex);
+		}
+
+	}
+}
+
+void culling::EveryCulling::CullBlockEntityJob(const size_t cameraIndex)
+{
+	const unsigned int entityBlockCount = static_cast<unsigned int>(mEntityGridCell.mEntityBlocks.size());
+	if (entityBlockCount > 0)
+	{
+		for (size_t moduleIndex = 0; moduleIndex < mUpdatedCullingModules.size(); moduleIndex++)
+		{
+			// TODO : Don't use pointer, Just use specific object(3 module) 
+			// Why? : virtual funtion call should reference virtual function table,
+			// We need really fast computation at here, 
+			// referencing virtual function table make it slow
+
+			CullingModule* cullingModule = mUpdatedCullingModules[moduleIndex];
+			//TODO : ON X64, X84, memory_order_relaxed also do acquire memory
+			//So This codes is too slow, FIX IT!!!!!!!!!!!
+			//
+			//
+			//
+
+			//TODO:
+			//HOW works? 
+			//
+			//Each module is executed after other module
+			//At each module, Every threads works on a EntityBlock
+			//
+			//EntityBlock a thread works on is decided by thread index
+			//If a thread finished all assigned blocks, it steal block from other unfinished thread
+			//
+			//Example : 5 Threads
+			//
+			//Thread 1 : EntityBlock 1, 6, 11
+			//Thread 2 : EntityBlock 2, 7, 12
+			//Thread 3 : EntityBlock 3, 8, 13
+			//Thread 4 : EntityBlock 4, 9, 14
+			//Thread 5 : EntityBlock 5, 10, 14
+			//
+			//
+
+			while (true)
 			{
-				// TODO : Don't use pointer, Just use specific object(3 module) 
-				// Why? : virtual funtion call should reference virtual function table,
-				// We need really fast computation at here, 
-				// referencing virtual function table make it slow
-
-				CullingModule* cullingModule = mUpdatedCullingModules[moduleIndex];
-				//TODO : ON X64, X84, memory_order_relaxed also do acquire memory
-				//So This codes is too slow, FIX IT!!!!!!!!!!!
-				//
-				//
-				//
-
-				//TODO:
-				//HOW works? 
-				//
-				//Each module is executed after other module
-				//At each module, Every threads works on a EntityBlock
-				//
-				//EntityBlock a thread works on is decided by thread index
-				//If a thread finished all assigned blocks, it steal block from other unfinished thread
-				//
-				//Example : 5 Threads
-				//
-				//Thread 1 : EntityBlock 1, 6, 11
-				//Thread 2 : EntityBlock 2, 7, 12
-				//Thread 3 : EntityBlock 3, 8, 13
-				//Thread 4 : EntityBlock 4, 9, 14
-				//Thread 5 : EntityBlock 5, 10, 14
-				//
-				//
-
-				while (true)
+				const unsigned int currentEntityBlockIndex = cullingModule->mFinishedCullEntityBlockCount[cameraIndex].fetch_add(1, std::memory_order_seq_cst);
+				if (currentEntityBlockIndex >= entityBlockCount)
 				{
-					const unsigned int currentEntityBlockIndex = cullingModule->mFinishedCullEntityBlockCount[cameraIndex].fetch_add(1, std::memory_order_seq_cst);
-					if (currentEntityBlockIndex >= entityBlockCount)
-					{
-						break;
-					}
-
-					EntityBlock* currentEntityBlock = mEntityGridCell.mEntityBlocks[currentEntityBlockIndex];
-					const unsigned int entityCountInBlock = mEntityGridCell.AllocatedEntityCountInBlocks[currentEntityBlockIndex]; // don't use mCurrentEntityCount
-
-					cullingModule->CullBlockEntityJob(currentEntityBlock, entityCountInBlock, cameraIndex);
-
-					
+					break;
 				}
 
+				EntityBlock* currentEntityBlock = mEntityGridCell.mEntityBlocks[currentEntityBlockIndex];
+				const unsigned int entityCountInBlock = mEntityGridCell.AllocatedEntityCountInBlocks[currentEntityBlockIndex]; // don't use mCurrentEntityCount
+
+				cullingModule->CullBlockEntityJob(currentEntityBlock, entityCountInBlock, cameraIndex);
+
+
 			}
+
 		}
+
 
 	}
 }
@@ -325,6 +336,17 @@ void culling::EveryCulling::SetCameraCount(unsigned int cameraCount)
 #endif
 }
 
+void culling::EveryCulling::SetCameraPosition(const size_t cameraIndex, const culling::Vec3& cameraPosition)
+{
+	assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
+
+	if(cameraIndex < MAX_CAMERA_COUNT)
+	{
+		mCameraPositions[cameraIndex] = cameraPosition;
+	}
+	
+}
+
 void culling::EveryCulling::SetViewProjectionMatrix(const unsigned int cameraIndex, const culling::Mat4x4& viewProjectionMatrix)
 {
 	assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
@@ -348,11 +370,6 @@ unsigned int culling::EveryCulling::GetCameraCount() const
 const std::vector<culling::EntityBlock*>& culling::EveryCulling::GetActiveEntityBlockList() const
 {
 	return mActiveEntityBlockList;
-}
-
-std::function<void()> culling::EveryCulling::GetCullJobInSTDFunction()
-{
-	return std::function<void()>(std::bind(&EveryCulling::CullBlockEntityJob, this));
 }
 
 
