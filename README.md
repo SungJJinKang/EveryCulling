@@ -34,6 +34,8 @@ This library is targeting Maximing SIMD, Cache hit, Multi Threading.
 [GDC Talk Video](https://www.gdcvault.com/play/1014491/Culling-the-Battlefield-Data-Oriented)   
 [한국어 블로그 글](https://sungjjinkang.github.io/doom/2021/04/02/viewfrustumculling.html)    
 
+MultiThreaded View Frustum Culling is 8ms faster than SingleThreaded View Frustum Culling ( in Stress Test )
+
 #### Feature 1 : Transform Data of Entities is stored linearlly to maximize utilizing SIMD. ( **Data oriented Design** )       
 For Maximizing Cache Hitting, Data is allocated adjacently.     
 
