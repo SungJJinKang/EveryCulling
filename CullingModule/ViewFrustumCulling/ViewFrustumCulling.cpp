@@ -28,7 +28,7 @@ void culling::ViewFrustumCulling::CullBlockEntityJob(EntityBlock* currentEntityB
 		*reinterpret_cast<M128F*>(posBoundingSphereRadius) = *reinterpret_cast<const M128F*>(entityPos);
 		posBoundingSphereRadius->SetBoundingSphereRadius(worldRadius);
 
-		if(doom::graphics::Graphics_Setting::IsSortObjectFrontToBack)
+		if(doom::graphics::Graphics_Setting::IsSortObjectFrontToBack == true)
 		{
 			renderer->CacheDistanceToCamera(cameraIndex, *cameraPos);
 		}
