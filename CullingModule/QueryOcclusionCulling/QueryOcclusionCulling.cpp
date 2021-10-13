@@ -1,4 +1,4 @@
-#include "QueryOcclusionCulling.h"
+﻿#include "QueryOcclusionCulling.h"
 
 #ifdef ENABLE_QUERY_OCCLUSION
 
