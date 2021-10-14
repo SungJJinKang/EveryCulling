@@ -5,10 +5,10 @@
 
 void culling::MaskedSWOcclusionCulling::ResetDepthBuffer()
 {
-	const size_t tileCount = static_cast<size_t>(mDepthBuffer.mResolution.mTileCountInARow) * static_cast<size_t>(mDepthBuffer.mResolution.mTileCountInAColumn);
+	const SIZE_T tileCount = static_cast<SIZE_T>(mDepthBuffer.mResolution.mTileCountInARow) * static_cast<SIZE_T>(mDepthBuffer.mResolution.mTileCountInAColumn);
 	std::shared_ptr<Tile[]> tiles = mDepthBuffer.mTiles;
 	
-	for (size_t i = 0; i < tileCount; i++)
+	for (SIZE_T i = 0; i < tileCount; i++)
 	{
 		tiles[i].mBinnedTriangles.mCurrentTriangleCount = 0;
 		tiles[i].mHizDatas.depthPosition = _mm256_set1_epi32(0);
@@ -18,7 +18,7 @@ void culling::MaskedSWOcclusionCulling::ResetDepthBuffer()
 	
 }
 
-culling::MaskedSWOcclusionCulling::MaskedSWOcclusionCulling(EveryCulling* frotbiteCullingSystem, unsigned int depthBufferWidth, unsigned int depthBufferheight)
+culling::MaskedSWOcclusionCulling::MaskedSWOcclusionCulling(EveryCulling* frotbiteCullingSystem, UINT32 depthBufferWidth, UINT32 depthBufferheight)
 	: culling::CullingModule{frotbiteCullingSystem}, 
 	mDepthBuffer {
 	depthBufferWidth, depthBufferheight
@@ -29,13 +29,13 @@ culling::MaskedSWOcclusionCulling::MaskedSWOcclusionCulling(EveryCulling* frotbi
 	assert(depthBufferheight% TILE_HEIGHT == 0);
 }
 
-void culling::MaskedSWOcclusionCulling::SetNearFarClipPlaneDistance(float nearClipPlaneDis, float farClipPlaneDis)
+void culling::MaskedSWOcclusionCulling::SetNearFarClipPlaneDistance(FLOAT32 nearClipPlaneDis, FLOAT32 farClipPlaneDis)
 {
 	mNearClipPlaneDis = nearClipPlaneDis;
 	mFarClipPlaneDis = farClipPlaneDis;
 }
 
-void culling::MaskedSWOcclusionCulling::SetViewProjectionMatrix(float* viewProjectionMatrix)
+void culling::MaskedSWOcclusionCulling::SetViewProjectionMatrix(FLOAT32* viewProjectionMatrix)
 {
 	mViewProjectionMatrix = viewProjectionMatrix;
 }
@@ -46,7 +46,7 @@ void culling::MaskedSWOcclusionCulling::ResetState()
 
 }
 
-void culling::MaskedSWOcclusionCulling::CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex)
+void culling::MaskedSWOcclusionCulling::CullBlockEntityJob(EntityBlock* currentEntityBlock, SIZE_T entityCountInBlock, SIZE_T cameraIndex)
 {
 }
 

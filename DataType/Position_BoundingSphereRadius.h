@@ -10,7 +10,7 @@ namespace culling
 	{
 
 		culling::Vec3 Position;
-		float BoundingSphereRadius;
+		FLOAT32 BoundingSphereRadius;
 
 
 		FORCE_INLINE void SetPosition(const culling::Vec3& _position)
@@ -23,7 +23,7 @@ namespace culling
 			std::memcpy(&Position, vec4, 16);
 		}
 
-		FORCE_INLINE void SetBoundingSphereRadius(const float _boundingSphereRadius)
+		FORCE_INLINE void SetBoundingSphereRadius(const FLOAT32 _boundingSphereRadius)
 		{
 			// why minus?
 			// Calculated distance between frustum plane and object is positive when object is in frustum

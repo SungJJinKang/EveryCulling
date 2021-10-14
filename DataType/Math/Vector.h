@@ -4,10 +4,10 @@ namespace culling
 {
 	struct Vec2
 	{
-		float x, y;
+		FLOAT32 x, y;
 
 		inline Vec2() {}
-		inline Vec2(const float _x, const float _y)
+		inline Vec2(const FLOAT32 _x, const FLOAT32 _y)
 			:x(_x), y(_y)
 		{
 
@@ -16,10 +16,10 @@ namespace culling
 
 	struct Vec3
 	{
-		float x, y, z;
+		FLOAT32 x, y, z;
 
 		inline Vec3() {}
-		inline Vec3(const float _x, const float _y, const float _z)
+		inline Vec3(const FLOAT32 _x, const FLOAT32 _y, const FLOAT32 _z)
 			:x(_x), y(_y), z(_z)
 		{
 
@@ -49,17 +49,17 @@ namespace culling
 		return culling::Vec3(a.x - b.x, a.y - b.y, a.z - b.z);
 	}
 
-	inline float Dot(const culling::Vec2& a, const culling::Vec2& b)
+	inline FLOAT32 Dot(const culling::Vec2& a, const culling::Vec2& b)
 	{
 		return a.x * b.x + a.y * b.y;
 	}
 
-	inline float Dot(const culling::Vec3& a, const culling::Vec3& b)
+	inline FLOAT32 Dot(const culling::Vec3& a, const culling::Vec3& b)
 	{
 		return a.x * b.x + a.y * b.y + a.z * b.z;
 	}
 
-	inline float PerpDot(const culling::Vec2& lhs, const culling::Vec2& rhs)
+	inline FLOAT32 PerpDot(const culling::Vec2& lhs, const culling::Vec2& rhs)
 	{
 		return lhs.x * rhs.y - lhs.y * rhs.x;
 	}
@@ -78,14 +78,14 @@ namespace culling
 	/// </summary>
 	struct alignas(16) Vec4
 	{
-		float values[4];
+		FLOAT32 values[4];
 
-		inline float& operator[](size_t index)
+		inline FLOAT32& operator[](SIZE_T index)
 		{
 			return values[index];
 		}
 
-		inline float operator[](size_t index) const
+		inline FLOAT32 operator[](SIZE_T index) const
 		{
 			return values[index];
 		}
@@ -93,14 +93,14 @@ namespace culling
 
 	struct alignas(16) Quat
 	{
-		float values[4];
+		FLOAT32 values[4];
 
-		inline float& operator[](size_t index)
+		inline FLOAT32& operator[](SIZE_T index)
 		{
 			return values[index];
 		}
 
-		inline float operator[](size_t index) const
+		inline FLOAT32 operator[](SIZE_T index) const
 		{
 			return values[index];
 		}

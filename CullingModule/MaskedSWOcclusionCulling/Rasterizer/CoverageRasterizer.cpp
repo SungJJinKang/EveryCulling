@@ -6,10 +6,10 @@ M256I culling::CoverageRasterizer::FillBottomFlatTriangle(CoverageMask& coverage
 
     //if invslope > 0, left facing edge
     //else, right facing edge
-    const float invslope1 = (point2.x - point1.x) / (point2.y - point1.y);
-    const float invslope2 = (point3.x - point1.x) / (point3.y - point1.y);
+    const FLOAT32 invslope1 = (point2.x - point1.x) / (point2.y - point1.y);
+    const FLOAT32 invslope2 = (point3.x - point1.x) / (point3.y - point1.y);
 
-    const float curx = point1.x - LeftBottomPoint.x; 
+    const FLOAT32 curx = point1.x - LeftBottomPoint.x; 
 
     //Ceil event values and Cast to integer
     const M256F rightEvent1Floating = _mm256_set_ps(curx, curx + invslope1, curx + invslope1 * 2, curx + invslope1 * 3, curx + invslope1 * 4, curx + invslope1 * 5, curx + invslope1 * 6, curx + invslope1 * 7);
@@ -38,10 +38,10 @@ M256I culling::CoverageRasterizer::FillTopFlatTriangle(CoverageMask& coverageMas
     
     //if invslope < 0, left facing edge
     //else, right facing edge
-    const float invslope1 = (point3.x - point1.x) / (point3.y - point1.y);
-    const float invslope2 = (point3.x - point2.x) / (point3.y - point2.y);
+    const FLOAT32 invslope1 = (point3.x - point1.x) / (point3.y - point1.y);
+    const FLOAT32 invslope2 = (point3.x - point2.x) / (point3.y - point2.y);
 
-    const float curx = point1.x - LeftBottomPoint.x;
+    const FLOAT32 curx = point1.x - LeftBottomPoint.x;
 
     const M256F rightEvent1Floating = _mm256_set_ps(curx, curx - invslope1, curx - invslope1 * 2, curx - invslope1 * 3, curx - invslope1 * 4, curx - invslope1 * 5, curx - invslope1 * 6, curx - invslope1 * 7);
     M256I rightEvent1 = _mm256_cvtps_epi32(_mm256_ceil_ps(rightEvent1Floating)); 
@@ -85,7 +85,7 @@ void culling::CoverageRasterizer::FillTriangle(CoverageMask& coverageMask, Vec2 
     else
     {
         /* general case - split the triangle in a topflat and bottom-flat one */
-        Vec2 point4{ triangle.Points[0].x + ((float)(triangle.Points[1].y - triangle.Points[0].y) / (float)(triangle.Points[2].y - triangle.Points[0].y)) * (triangle.Points[2].x - triangle.Points[0].x), triangle.Points[1].y };
+        Vec2 point4{ triangle.Points[0].x + ((FLOAT32)(triangle.Points[1].y - triangle.Points[0].y) / (FLOAT32)(triangle.Points[2].y - triangle.Points[0].y)) * (triangle.Points[2].x - triangle.Points[0].x), triangle.Points[1].y };
 
 #if TILE_WIDTH == 16
         M128I Result1, Result2;

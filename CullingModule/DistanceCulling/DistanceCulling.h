@@ -11,12 +11,12 @@ namespace culling
 		/// <summary>
 		/// Volume size
 		/// </summary>
-		float mSize;
+		FLOAT32 mSize;
 
 		/// <summary>
 		/// 
 		/// </summary>
-		float mCullDistance;
+		FLOAT32 mCullDistance;
 	};
 
 	/// <summary>
@@ -37,7 +37,7 @@ namespace culling
 
 		// TODO : EntityBlock의 mPositions 이거 그냥 사용하면된다.
 		// 거리 비교할 때 sqrt하지말고 그냥 mCullDistance * mCullDistance로 비교하자
-		virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex) final
+		virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, SIZE_T entityCountInBlock, SIZE_T cameraIndex) final
 		{
 			if (mCullDistanceVolumes.size() == 0)
 			{
@@ -48,7 +48,7 @@ namespace culling
 		}
 
 		void AddCullDistanceVolume(culling::CullDistanceVolume cullDistanceVolume);
-		void DeleteCullDistanceVolume(size_t index);
+		void DeleteCullDistanceVolume(SIZE_T index);
 
 	};
 }

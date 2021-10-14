@@ -14,7 +14,7 @@ namespace culling
 
 	private:
 
-		float mMinimumScreenSpaceAABBArea = 0.000005f;
+		FLOAT32 mMinimumScreenSpaceAABBArea = 0.000005f;
 
 		//For Calculating ScreenSpace AABB Area
 		//AABB로 할지 아님 Sphere로 할지(https://stackoverflow.com/questions/21648630/radius-of-projected-sphere-in-screen-space)...
@@ -23,7 +23,7 @@ namespace culling
 
 		ScreenSpaceBoundingSphereCulling(EveryCulling* everyCulling);
 
-		void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex);
+		void CullBlockEntityJob(EntityBlock* currentEntityBlock, SIZE_T entityCountInBlock, SIZE_T cameraIndex);
 
 	public:
 

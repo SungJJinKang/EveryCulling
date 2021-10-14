@@ -49,9 +49,9 @@ namespace culling
 
 		SWDepthBuffer mDepthBuffer;
 		
-		const unsigned int binCountInRow, binCountInColumn;
-		float mNearClipPlaneDis, mFarClipPlaneDis;
-		float* mViewProjectionMatrix;
+		const UINT32 binCountInRow, binCountInColumn;
+		FLOAT32 mNearClipPlaneDis, mFarClipPlaneDis;
+		FLOAT32* mViewProjectionMatrix;
 
 		void ResetDepthBuffer();
 
@@ -68,13 +68,13 @@ namespace culling
 		/// how far next vertex point is from current vertex point 
 		/// ex) 
 		/// 1.0f(Point1_X), 2.0f(Point2_Y), 0.0f(Point3_Z), 3.0f(Normal_X), 3.0f(Normal_Y), 3.0f(Normal_Z),  1.0f(Point1_X), 2.0f(Point2_Y), 0.0f(Point3_Z)
-		/// --> vertexStride is 6 * 4(float)
+		/// --> vertexStride is 6 * 4(FLOAT32)
 		/// </param>
 		/// <param name="modelToClipspaceMatrix"></param>
 		FORCE_INLINE void DrawOccluderTriangles
 		(
-			const float* vertices, const unsigned int* vertexIndices, size_t indiceCount, bool vertexStrideByte,
-			float* modelToClipspaceMatrix
+			const FLOAT32* vertices, const UINT32* vertexIndices, SIZE_T indiceCount, bool vertexStrideByte,
+			FLOAT32* modelToClipspaceMatrix
 		)
 		{
 			mBinTrianglesStage.BinTriangles(vertices, vertexIndices, indiceCount, vertexStrideByte, modelToClipspaceMatrix);
@@ -87,7 +87,7 @@ namespace culling
 		/// Depth Test Multiple Occludees
 		/// </summary>
 		/// <param name="worldAABBs"></param>
-		FORCE_INLINE void DepthTestOccludee(const AABB* worldAABBs, size_t aabbCount, char* visibleBitFlags)
+		FORCE_INLINE void DepthTestOccludee(const AABB* worldAABBs, SIZE_T aabbCount, char* visibleBitFlags)
 		{
 			//Check Area of TwoDTriangle
 			//if Area is smaller than setting, Dont draw that occluder
@@ -109,7 +109,7 @@ namespace culling
 			(void)aabbVertexX, (void)aabbVertexY, (void)aabbVertexZ;
 
 			// 3 AABB is checked per loop
-			for (size_t i = 0; i < aabbCount; i += 3)
+			for (SIZE_T i = 0; i < aabbCount; i += 3)
 			{
 				// ComputeMinimumDepths
 			}
@@ -119,7 +119,7 @@ namespace culling
 		}
 
 		// Inherited via CullingModule
-		virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex) override;
+		virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, SIZE_T entityCountInBlock, SIZE_T cameraIndex) override;
 
 		void GetOccluderCandidates()
 		{
@@ -130,11 +130,11 @@ namespace culling
 
 		MaskedSWOcclusionCulling(
 			EveryCulling* frotbiteCullingSystemunsigned, 
-			unsigned int depthBufferWidth, unsigned int depthBufferheight
+			UINT32 depthBufferWidth, UINT32 depthBufferheight
 		);
 	
-		void SetNearFarClipPlaneDistance(float nearClipPlaneDis, float farClipPlaneDis);
-		void SetViewProjectionMatrix(float* viewProjectionMatrix);
+		void SetNearFarClipPlaneDistance(FLOAT32 nearClipPlaneDis, FLOAT32 farClipPlaneDis);
+		void SetViewProjectionMatrix(FLOAT32* viewProjectionMatrix);
 
 		void ResetState();
 		

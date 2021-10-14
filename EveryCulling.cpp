@@ -10,10 +10,10 @@ void culling::EveryCulling::FreeEntityBlock(EntityBlock* freedEntityBlock)
 {
 	assert(freedEntityBlock != nullptr);
 
-	size_t freedEntityBlockIndex;
-	const size_t entityBlockCount = mEntityGridCell.mEntityBlocks.size();
+	SIZE_T freedEntityBlockIndex;
+	const SIZE_T entityBlockCount = mEntityGridCell.mEntityBlocks.size();
 	bool IsSuccessToFind = false;
-	for (size_t i = 0; i < entityBlockCount; i++)
+	for (SIZE_T i = 0; i < entityBlockCount; i++)
 	{
 		//Freeing entity block happen barely
 		//So this looping is acceptable
@@ -53,16 +53,16 @@ culling::EntityBlock* culling::EveryCulling::GetNewEntityBlockFromPool()
 
 void culling::EveryCulling::ResetCullJobStateVariable()
 {
-	for (size_t moduleIndex = 0; moduleIndex < mUpdatedCullingModules.size(); moduleIndex++)
+	for (SIZE_T moduleIndex = 0; moduleIndex < mUpdatedCullingModules.size(); moduleIndex++)
 	{
 		CullingModule* const cullingModule = mUpdatedCullingModules[moduleIndex];
 
-		for (std::atomic<unsigned int>& atomicVal : cullingModule->mCurrentCulledEntityBlockIndex)
+		for (std::atomic<UINT32>& atomicVal : cullingModule->mCurrentCulledEntityBlockIndex)
 		{
 			atomicVal.store(0, std::memory_order_relaxed);
 		}
 
-		for (std::atomic<unsigned int>& atomicVal : cullingModule->mFinishedCullEntityBlockCount)
+		for (std::atomic<UINT32>& atomicVal : cullingModule->mFinishedCullEntityBlockCount)
 		{
 			atomicVal.store(0, std::memory_order_relaxed);
 		}
@@ -86,7 +86,7 @@ void culling::EveryCulling::SetAllOneIsVisibleFlag()
 void culling::EveryCulling::AllocateEntityBlockPool()
 {
 	EntityBlock* newEntityBlockChunk = new EntityBlock[INITIAL_ENTITY_BLOCK_COUNT];
-	for (unsigned int i = 0; i < INITIAL_ENTITY_BLOCK_COUNT; i++)
+	for (UINT32 i = 0; i < INITIAL_ENTITY_BLOCK_COUNT; i++)
 	{
 		mFreeEntityBlockList.push_back(newEntityBlockChunk + i);
 	}
@@ -100,7 +100,7 @@ void culling::EveryCulling::ResetEntityBlock(culling::EntityBlock* entityBlock)
 	
 }
 
-void culling::EveryCulling::RemoveEntityFromBlock(EntityBlock* ownerEntityBlock, unsigned int entityIndexInBlock)
+void culling::EveryCulling::RemoveEntityFromBlock(EntityBlock* ownerEntityBlock, UINT32 entityIndexInBlock)
 {
 	assert(ownerEntityBlock != nullptr);
 	assert(entityIndexInBlock >= 0 && entityIndexInBlock < ENTITY_COUNT_IN_ENTITY_BLOCK);
@@ -131,10 +131,10 @@ void culling::EveryCulling::RemoveEntityFromBlock(EntityBlock* ownerEntityBlock,
 
 void culling::EveryCulling::CullBlockEntityJob()
 {
-	const unsigned int entityBlockCount = static_cast<unsigned int>(mEntityGridCell.mEntityBlocks.size());
+	const UINT32 entityBlockCount = static_cast<UINT32>(mEntityGridCell.mEntityBlocks.size());
 	if (entityBlockCount > 0)
 	{
-		for (unsigned int cameraIndex = 0; cameraIndex < mCameraCount; cameraIndex++)
+		for (UINT32 cameraIndex = 0; cameraIndex < mCameraCount; cameraIndex++)
 		{
 			CullBlockEntityJob(cameraIndex);
 		}
@@ -142,12 +142,12 @@ void culling::EveryCulling::CullBlockEntityJob()
 	}
 }
 
-void culling::EveryCulling::CullBlockEntityJob(const size_t cameraIndex)
+void culling::EveryCulling::CullBlockEntityJob(const SIZE_T cameraIndex)
 {
-	const unsigned int entityBlockCount = static_cast<unsigned int>(mEntityGridCell.mEntityBlocks.size());
+	const UINT32 entityBlockCount = static_cast<UINT32>(mEntityGridCell.mEntityBlocks.size());
 	if (entityBlockCount > 0)
 	{
-		for (size_t moduleIndex = 0; moduleIndex < mUpdatedCullingModules.size(); moduleIndex++)
+		for (SIZE_T moduleIndex = 0; moduleIndex < mUpdatedCullingModules.size(); moduleIndex++)
 		{
 			// TODO : Don't use pointer, Just use specific object(3 module) 
 			// Why? : virtual funtion call should reference virtual function table,
@@ -182,14 +182,14 @@ void culling::EveryCulling::CullBlockEntityJob(const size_t cameraIndex)
 
 			while (true)
 			{
-				const unsigned int currentEntityBlockIndex = cullingModule->mCurrentCulledEntityBlockIndex[cameraIndex].fetch_add(1, std::memory_order_seq_cst);
+				const UINT32 currentEntityBlockIndex = cullingModule->mCurrentCulledEntityBlockIndex[cameraIndex].fetch_add(1, std::memory_order_seq_cst);
 				if (currentEntityBlockIndex >= entityBlockCount)
 				{
 					break;
 				}
 
 				EntityBlock* currentEntityBlock = mEntityGridCell.mEntityBlocks[currentEntityBlockIndex];
-				const unsigned int entityCountInBlock = mEntityGridCell.AllocatedEntityCountInBlocks[currentEntityBlockIndex]; // don't use mCurrentEntityCount
+				const UINT32 entityCountInBlock = mEntityGridCell.AllocatedEntityCountInBlocks[currentEntityBlockIndex]; // don't use mCurrentEntityCount
 
 				cullingModule->CullBlockEntityJob(currentEntityBlock, entityCountInBlock, cameraIndex);
 
@@ -202,21 +202,21 @@ void culling::EveryCulling::CullBlockEntityJob(const size_t cameraIndex)
 	}
 }
 
-//void culling::EveryCulling::CullBlockEntityJob(const unsigned int threadIndex, const unsigned int threadCount)
+//void culling::EveryCulling::CullBlockEntityJob(const UINT32 threadIndex, const UINT32 threadCount)
 //{
 //
 //}
 
-bool culling::EveryCulling::GetIsCullJobFinished(const std::atomic<unsigned int>& mFinishedCullEntityBlockCount, unsigned int entityBlockCount) const
+bool culling::EveryCulling::GetIsCullJobFinished(const std::atomic<UINT32>& mFinishedCullEntityBlockCount, UINT32 entityBlockCount) const
 {
 	return mFinishedCullEntityBlockCount.load(std::memory_order_relaxed) >= entityBlockCount;
 }
 
-void culling::EveryCulling::WaitToFinishCullJob(const unsigned int cameraIndex) const
+void culling::EveryCulling::WaitToFinishCullJob(const UINT32 cameraIndex) const
 {
-	const unsigned int entityBlockCount = static_cast<unsigned int>(mEntityGridCell.mEntityBlocks.size());
+	const UINT32 entityBlockCount = static_cast<UINT32>(mEntityGridCell.mEntityBlocks.size());
 
-	const size_t lastModuleIndex = mUpdatedCullingModules.size() - 1;
+	const SIZE_T lastModuleIndex = mUpdatedCullingModules.size() - 1;
 	const CullingModule* lastCullingModule = mUpdatedCullingModules[lastModuleIndex];
 	while (GetIsCullJobFinished(lastCullingModule->mFinishedCullEntityBlockCount[cameraIndex], entityBlockCount) == false)
 	{
@@ -226,7 +226,7 @@ void culling::EveryCulling::WaitToFinishCullJob(const unsigned int cameraIndex) 
 
 void culling::EveryCulling::WaitToFinishCullJobOfAllCameras() const
 {
-	for (unsigned int cameraIndex = 0; cameraIndex < mCameraCount; cameraIndex++)
+	for (UINT32 cameraIndex = 0; cameraIndex < mCameraCount; cameraIndex++)
 	{
 		WaitToFinishCullJob(cameraIndex);
 	}
@@ -238,7 +238,7 @@ void culling::EveryCulling::ResetCullJobState()
 	ResetCullJobStateVariable();
 }
 
-std::pair<culling::EntityBlock*, unsigned int*> culling::EveryCulling::AllocateNewEntityBlockFromPool()
+std::pair<culling::EntityBlock*, UINT32*> culling::EveryCulling::AllocateNewEntityBlockFromPool()
 {
 	EntityBlock* newEntityBlock = GetNewEntityBlockFromPool();
 	mEntityGridCell.mEntityBlocks.push_back(newEntityBlock); 
@@ -256,7 +256,7 @@ std::pair<culling::EntityBlock*, unsigned int*> culling::EveryCulling::AllocateN
 
 culling::EntityBlockViewer culling::EveryCulling::AllocateNewEntity(void* renderer, void* transform)
 {
-	std::pair<culling::EntityBlock*, unsigned int*> targetEntityBlock;
+	std::pair<culling::EntityBlock*, UINT32*> targetEntityBlock;
 	if (mEntityGridCell.mEntityBlocks.size() == 0)
 	{
 		// if Any entityBlock isn't allocated yet
@@ -298,7 +298,7 @@ void culling::EveryCulling::RemoveEntityFromBlock(EntityBlockViewer& entityBlock
 	//Entities Indexs in EntityBlock should not be swapped because already allocated EntityBlockViewer can't see it
 }
 
-culling::EveryCulling::EveryCulling(unsigned int resolutionWidth, unsigned int resolutionHeight)
+culling::EveryCulling::EveryCulling(UINT32 resolutionWidth, UINT32 resolutionHeight)
 	:
 	mViewFrustumCulling{ this }
 #ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
@@ -327,7 +327,7 @@ culling::EveryCulling::~EveryCulling()
 	}
 }
 
-void culling::EveryCulling::SetCameraCount(unsigned int cameraCount)
+void culling::EveryCulling::SetCameraCount(UINT32 cameraCount)
 {
 	mCameraCount = cameraCount;
 	mViewFrustumCulling.mCameraCount = cameraCount;
@@ -336,7 +336,7 @@ void culling::EveryCulling::SetCameraCount(unsigned int cameraCount)
 #endif
 }
 
-void culling::EveryCulling::SetCameraPosition(const size_t cameraIndex, const culling::Vec3& cameraPosition)
+void culling::EveryCulling::SetCameraPosition(const SIZE_T cameraIndex, const culling::Vec3& cameraPosition)
 {
 	assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
 
@@ -347,11 +347,11 @@ void culling::EveryCulling::SetCameraPosition(const size_t cameraIndex, const cu
 	
 }
 
-void culling::EveryCulling::SetViewProjectionMatrix(const unsigned int cameraIndex, const culling::Mat4x4& viewProjectionMatrix)
+void culling::EveryCulling::SetViewProjectionMatrix(const UINT32 cameraIndex, const culling::Mat4x4& viewProjectionMatrix)
 {
 	assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
 
-	IS_ALIGNED_ASSERT(reinterpret_cast<size_t>(&viewProjectionMatrix), 32);
+	IS_ALIGNED_ASSERT(reinterpret_cast<SIZE_T>(&viewProjectionMatrix), 32);
 
 	if (cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT)
 	{
@@ -362,7 +362,7 @@ void culling::EveryCulling::SetViewProjectionMatrix(const unsigned int cameraInd
 	}
 }
 
-unsigned int culling::EveryCulling::GetCameraCount() const
+UINT32 culling::EveryCulling::GetCameraCount() const
 {
 	return mCameraCount;
 }

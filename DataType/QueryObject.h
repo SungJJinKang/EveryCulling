@@ -7,9 +7,9 @@ namespace culling
 	struct QueryObject
 	{
 		culling::Mat4x4 mLocal2WorldMatrix;
-		unsigned int mQueryID;
-		unsigned int mBufferID;
-		unsigned int mVertexArrayObjectID;
+		UINT32 mQueryID;
+		UINT32 mBufferID;
+		UINT32 mVertexArrayObjectID;
 	};
 
 }

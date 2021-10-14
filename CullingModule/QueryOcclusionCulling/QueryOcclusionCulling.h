@@ -33,9 +33,9 @@ namespace culling
 
 	private:
 
-		unsigned int mOcclusionMaterialID{ 0 };
-		unsigned int mElementBufferObjectID{ 0 };
-		unsigned int mViewProjectionMatrixUnifromLocation;
+		UINT32 mOcclusionMaterialID{ 0 };
+		UINT32 mElementBufferObjectID{ 0 };
+		UINT32 mViewProjectionMatrixUnifromLocation;
 
 		bool bmIsQueryOcclusionReady{ false };
 
@@ -58,8 +58,8 @@ namespace culling
 		/// draw Simple bounding volume(Occluder) after this function call
 		/// TODO : Disable Pixel Shading, Texturing
 		/// </summary>
-		bool StartQuery(const unsigned int queryID);
-		void StopQuery(const unsigned int queryID);
+		bool StartQuery(const UINT32 queryID);
+		void StopQuery(const UINT32 queryID);
 
 		/// <summary>
 		/// Start Query and Draw AABB of Occludee
@@ -84,11 +84,11 @@ namespace culling
 		/// <param name="entityCountInBlock"></param>
 		/// <param name="cameraIndex"></param>
 		void DestroyQueryObject(culling::QueryObject* queryObject);
-		void ClearEntityData(EntityBlock* currentEntityBlock, unsigned int entityIndex) override;
+		void ClearEntityData(EntityBlock* currentEntityBlock, UINT32 entityIndex) override;
 
 		void QueryOccludeeAABB();
 	
-		void GenQueryObject(EntityBlock* currentEntityBlock, unsigned int entityIndex, const culling::AABB & occlusionAABBLocalMinMax);
+		void GenQueryObject(EntityBlock* currentEntityBlock, UINT32 entityIndex, const culling::AABB & occlusionAABBLocalMinMax);
 		void GenQueryObject(culling::EntityBlockViewer& entityBlockViewer, const culling::AABB & occlusionAABBLocalMinMax);
 		
 		/*
@@ -105,7 +105,7 @@ namespace culling
 		///  of non - dependent rendering between an occlusion query and the
 		///	 conditionally - rendered primitives that depend on the query result.
 		/// </summary>
-		FORCE_INLINE static void StartConditionalRender(unsigned int queryID)
+		FORCE_INLINE static void StartConditionalRender(UINT32 queryID)
 		{
 #ifdef CULLING_OPENGL
 			assert(queryID > 0);

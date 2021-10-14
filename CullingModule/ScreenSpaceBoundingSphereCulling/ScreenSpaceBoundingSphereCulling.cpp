@@ -11,13 +11,13 @@ culling::ScreenSpaceBoundingSphereCulling::ScreenSpaceBoundingSphereCulling(Ever
 
 }
 
-void culling::ScreenSpaceBoundingSphereCulling::CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex)
+void culling::ScreenSpaceBoundingSphereCulling::CullBlockEntityJob(EntityBlock* currentEntityBlock, SIZE_T entityCountInBlock, SIZE_T cameraIndex)
 {
 	alignas(32) char cullingMask[ENTITY_COUNT_IN_ENTITY_BLOCK] = { 0 };
 	culling::Vector4 mScreenSpaceAABBMin;
 	culling::Vector4 mScreenSpaceAABBMax;
-	float x, y, area;
-	for (unsigned int j = 0; j < entityCountInBlock; j++)
+	FLOAT32 x, y, area;
+	for (UINT32 j = 0; j < entityCountInBlock; j++)
 	{
 		//TODO : Think How to use SIMD
 
@@ -60,14 +60,14 @@ void culling::ScreenSpaceBoundingSphereCulling::CullBlockEntityJob(EntityBlock* 
 
 
 
-	unsigned int m256_count_isvisible = 1 + ((currentEntityBlock->mCurrentEntityCount * sizeof(decltype(*EntityBlock::mIsVisibleBitflag)) - 1) / sizeof(M256F));
+	UINT32 m256_count_isvisible = 1 + ((currentEntityBlock->mCurrentEntityCount * sizeof(decltype(*EntityBlock::mIsVisibleBitflag)) - 1) / sizeof(M256F));
 
 	/// <summary>
 	/// M256 = 8bit(1byte = bool size) * 32 
 	/// 
 	/// And operation with result culling mask and entityblock's visible bitflag
 	/// </summary>
-	for (unsigned int i = 0; i < m256_count_isvisible; i++)
+	for (UINT32 i = 0; i < m256_count_isvisible; i++)
 	{
 		m256f_isVisible[i] = _mm256_and_ps(m256f_isVisible[i], m256f_cullingMask[i]);
 	}

@@ -36,8 +36,8 @@ void main()\
 bool culling::QueryOcclusionCulling::CompileOccluderShader()
 {
 #ifdef CULLING_OPENGL
-	unsigned int vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
-	unsigned int fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
+	UINT32 vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
+	UINT32 fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
 
 	glShaderSource(vertex_shader_id, 1, &OCCLUSION_VERTEX_SHADER, NULL);
 	glShaderSource(fragment_shader_id, 1, &OCCLUSION_FRAGMENT_SHADER, NULL);
@@ -53,7 +53,7 @@ bool culling::QueryOcclusionCulling::CompileOccluderShader()
 	glLinkProgram(mOcclusionMaterialID);
 
 
-	int isSuccess = 0;
+	INT32 isSuccess = 0;
 	glGetProgramiv(mOcclusionMaterialID, GL_LINK_STATUS, &isSuccess);
 	assert(isSuccess != 0); // Shader Compiling is success???
 
@@ -78,7 +78,7 @@ bool culling::QueryOcclusionCulling::InitElementBufferObject()
 	glGenBuffers(1, &(mElementBufferObjectID));
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mElementBufferObjectID);
 
-	const unsigned int AABB_INDEX_DATA[] = 
+	const UINT32 AABB_INDEX_DATA[] = 
 	{
 			0, 1, 2, 2, 3, 0, 
 			3, 2, 4, 4, 5, 3, 
@@ -119,7 +119,7 @@ void culling::QueryOcclusionCulling::InitQueryOcclusionCulling()
 }
 
 
-bool culling::QueryOcclusionCulling::StartQuery(const unsigned int queryID)
+bool culling::QueryOcclusionCulling::StartQuery(const UINT32 queryID)
 {
 	assert(queryID != 0);
 
@@ -133,7 +133,7 @@ bool culling::QueryOcclusionCulling::StartQuery(const unsigned int queryID)
 #endif
 }
 
-void culling::QueryOcclusionCulling::StopQuery(const unsigned int queryID)
+void culling::QueryOcclusionCulling::StopQuery(const UINT32 queryID)
 {
 #ifdef CULLING_OPENGL
 	glEndQuery(queryID);
@@ -194,7 +194,7 @@ void culling::QueryOcclusionCulling::QueryOccludeeAABB(const culling::QueryObjec
 
 #ifdef CULLING_OPENGL
 
-	glUniformMatrix4fv(mViewProjectionMatrixUnifromLocation, 1, GL_FALSE, reinterpret_cast<const float*>(&(queryObject.mLocal2WorldMatrix)));
+	glUniformMatrix4fv(mViewProjectionMatrixUnifromLocation, 1, GL_FALSE, reinterpret_cast<const FLOAT32*>(&(queryObject.mLocal2WorldMatrix)));
 
 	//Draw Occludee AABB
 	glBindVertexArray(queryObject.mVertexArrayObjectID);
@@ -229,7 +229,7 @@ culling::QueryOcclusionCulling::~QueryOcclusionCulling()
 
 static void vector_swap_popback(std::vector<culling::QueryObject*>& vec, culling::QueryObject* erasedQueryObject)
 {
-	for (size_t i = 0; i < vec.size(); i++)
+	for (SIZE_T i = 0; i < vec.size(); i++)
 	{
 		if (vec[i] == erasedQueryObject)
 		{
@@ -249,7 +249,7 @@ void culling::QueryOcclusionCulling::DestroyQueryObject(culling::QueryObject* qu
 }
 
 
-void culling::QueryOcclusionCulling::ClearEntityData(EntityBlock* currentEntityBlock, unsigned int entityIndex)
+void culling::QueryOcclusionCulling::ClearEntityData(EntityBlock* currentEntityBlock, UINT32 entityIndex)
 {
 	culling::QueryObject* queryObject = currentEntityBlock->mQueryObjects[entityIndex];
 	if (queryObject != nullptr)
@@ -263,7 +263,7 @@ void culling::QueryOcclusionCulling::ClearEntityData(EntityBlock* currentEntityB
 
 
 
-void culling::QueryOcclusionCulling::GenQueryObject(EntityBlock* currentEntityBlock, unsigned int entityIndex, const culling::AABB& occlusionAABBLocalMinMax)
+void culling::QueryOcclusionCulling::GenQueryObject(EntityBlock* currentEntityBlock, UINT32 entityIndex, const culling::AABB& occlusionAABBLocalMinMax)
 {
 	assert(currentEntityBlock != nullptr);
 
@@ -276,9 +276,9 @@ void culling::QueryOcclusionCulling::GenQueryObject(EntityBlock* currentEntityBl
 
 	//TODO : Make quey pool
 	culling::QueryObject* newQueryObject = new culling::QueryObject;
-	unsigned int newQuery;
-	unsigned int newVertexBufferID;
-	unsigned int newVertexArrayObjectID;
+	UINT32 newQuery;
+	UINT32 newVertexBufferID;
+	UINT32 newVertexArrayObjectID;
 
 #ifdef CULLING_OPENGL
 	glGenQueries(1, &newQuery);
@@ -293,10 +293,10 @@ void culling::QueryOcclusionCulling::GenQueryObject(EntityBlock* currentEntityBl
 	GenAABB8VerticesFromLocalAABB(occlusionAABBLocalMinMax, aabbLocalPoints);
 
 	//8 vertexs, 3 components
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 8 * 3, aabbLocalPoints, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(FLOAT32) * 8 * 3, aabbLocalPoints, GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(FLOAT32), 0);
 
 	newQueryObject->mQueryID = newQuery;
 	newQueryObject->mBufferID = newVertexBufferID;

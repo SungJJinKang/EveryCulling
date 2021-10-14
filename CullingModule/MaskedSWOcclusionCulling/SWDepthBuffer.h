@@ -58,7 +58,7 @@ namespace culling
 		/// </summary>
 		ThreeDTriangle mTriangleList[BIN_TRIANGLE_CAPACITY_PER_TILE];
 
-		size_t mCurrentTriangleCount = 0;
+		SIZE_T mCurrentTriangleCount = 0;
 	};
 
 	/// <summary>
@@ -74,34 +74,34 @@ namespace culling
 
 	struct Resolution
 	{
-		const unsigned int mWidth;
-		const unsigned int mHeight;
-		const unsigned int mTileCountInARow;
-		const unsigned int mTileCountInAColumn;
+		const UINT32 mWidth;
+		const UINT32 mHeight;
+		const UINT32 mTileCountInARow;
+		const UINT32 mTileCountInAColumn;
 
 		/// <summary>
 		/// 0
 		/// </summary>
-		const unsigned int mLeftBottomTileOrginX;
+		const UINT32 mLeftBottomTileOrginX;
 		
 		/// <summary>
 		/// 0
 		/// </summary>
-		const unsigned int mLeftBottomTileOrginY;
+		const UINT32 mLeftBottomTileOrginY;
 		
 		/// <summary>
 		/// Left Bottom PointX of Right Top Tile
 		/// if Buffer Width is 37 -> 32
 		/// if Buffer Width is 64 -> 32
 		/// </summary>
-		const unsigned int mRightTopTileOrginX;
+		const UINT32 mRightTopTileOrginX;
 		
 		/// <summary>
 		/// Left Bottom PointY of Right Top Tile
 		/// if Buffer Width is 37 -> 32
 		/// if Buffer Width is 64 -> 32
 		/// </summary>
-		const unsigned int mRightTopTileOrginY;
+		const UINT32 mRightTopTileOrginY;
 
 #if NDC_RANGE == MINUS_ONE_TO_POSITIVE_ONE
 		M256F mReplicatedScreenHalfWidth;
@@ -134,7 +134,7 @@ namespace culling
 		/// </summary>
 		/// <param name="width">Screen Width</param>
 		/// <param name="height">Scree Height</param>
-		SWDepthBuffer(unsigned int width, unsigned int height);
+		SWDepthBuffer(UINT32 width, UINT32 height);
 
 	};
 }

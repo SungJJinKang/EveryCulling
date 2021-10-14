@@ -11,12 +11,12 @@ namespace culling
 	{
 		culling::Vec4 mColumns[4];
 
-		inline Vec4& operator[](size_t index)
+		inline Vec4& operator[](SIZE_T index)
 		{
 			return mColumns[index];
 		}
 
-		inline const Vec4& operator[](size_t index) const
+		inline const Vec4& operator[](SIZE_T index) const
 		{
 			return mColumns[index];
 		}

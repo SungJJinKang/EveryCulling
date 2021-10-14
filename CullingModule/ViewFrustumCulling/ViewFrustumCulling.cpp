@@ -10,19 +10,19 @@
 #include <Transform.h>
 
 
-void culling::ViewFrustumCulling::CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex)
+void culling::ViewFrustumCulling::CullBlockEntityJob(EntityBlock* currentEntityBlock, SIZE_T entityCountInBlock, SIZE_T cameraIndex)
 {
 
 
 	const math::Vector3* const cameraPos = reinterpret_cast<const math::Vector3*>(&mCullingSystem->GetCameraPosition(cameraIndex));
 
-	for (size_t entityIndex = 0; entityIndex < entityCountInBlock; entityIndex++)
+	for (SIZE_T entityIndex = 0; entityIndex < entityCountInBlock; entityIndex++)
 	{
 		doom::Transform* const transform = reinterpret_cast<doom::Transform*>(currentEntityBlock->mTransform[entityIndex]);
 		doom::Renderer* const renderer = reinterpret_cast<doom::Renderer*>(currentEntityBlock->mRenderer[entityIndex]);
 		Position_BoundingSphereRadius* const posBoundingSphereRadius = currentEntityBlock->mPositions + entityIndex;
 
-		const float worldRadius = renderer->doom::ColliderUpdater<doom::physics::Sphere>::GetWorldCollider()->mRadius;
+		const FLOAT32 worldRadius = renderer->doom::ColliderUpdater<doom::physics::Sphere>::GetWorldCollider()->mRadius;
 
 		const culling::Vec3* const entityPos = reinterpret_cast<const culling::Vec3*>(&transform->GetPosition());
 		*reinterpret_cast<M128F*>(posBoundingSphereRadius) = *reinterpret_cast<const M128F*>(entityPos);
@@ -39,7 +39,7 @@ void culling::ViewFrustumCulling::CullBlockEntityJob(EntityBlock* currentEntityB
 
 	const Vec4* frustumPlane = mSIMDFrustumPlanes[cameraIndex].mFrustumPlanes;
 
-	for (size_t entityIndex = 0; entityIndex < entityCountInBlock; entityIndex = entityIndex + 2)
+	for (SIZE_T entityIndex = 0; entityIndex < entityCountInBlock; entityIndex = entityIndex + 2)
 	{
 		char result = CheckInFrustumSIMDWithTwoPoint(frustumPlane, currentEntityBlock->mPositions + entityIndex);
 		// if first low bit has 1 value, Pos A is In Frustum
@@ -55,14 +55,14 @@ void culling::ViewFrustumCulling::CullBlockEntityJob(EntityBlock* currentEntityB
 	// use mCulledScreenSpaceAABBArea
 	M256F* m256f_isVisible = reinterpret_cast<M256F*>(currentEntityBlock->mIsVisibleBitflag);
 	const M256F* m256f_cullingMask = reinterpret_cast<const M256F*>(cullingMask);
-	const unsigned int m256_count_isvisible = 1 + ((currentEntityBlock->mCurrentEntityCount * sizeof(decltype(*EntityBlock::mIsVisibleBitflag)) - 1) / sizeof(M256F));
+	const UINT32 m256_count_isvisible = 1 + ((currentEntityBlock->mCurrentEntityCount * sizeof(decltype(*EntityBlock::mIsVisibleBitflag)) - 1) / sizeof(M256F));
 
 	/// <summary>
 	/// M256 = 8bit(1byte = bool size) * 32 
 	/// 
 	/// And operation with result culling mask and entityblock's visible bitflag
 	/// </summary>
-	for (unsigned int i = 0; i < m256_count_isvisible; i++)
+	for (UINT32 i = 0; i < m256_count_isvisible; i++)
 	{
 		m256f_isVisible[i] = _mm256_and_ps(m256f_isVisible[i], m256f_cullingMask[i]);
 	}
@@ -122,14 +122,14 @@ FORCE_INLINE char culling::ViewFrustumCulling::CheckInFrustumSIMDWithTwoPoint(co
 	M128F RMaskA = _mm_and_ps(dotPosA, dotPosA45); //when everty bits is 1, PointA is in frustum
 	M128F RMaskB = _mm_and_ps(dotPosB, dotPosB45);//when everty bits is 1, PointB is in frustum
 
-	int IsPointAInFrustum = _mm_test_all_ones(*reinterpret_cast<M128I*>(&RMaskA)); // value is 1, Point in in frustum
-	int IsPointBInFrustum = _mm_test_all_ones(*reinterpret_cast<M128I*>(&RMaskB));
+	INT32 IsPointAInFrustum = _mm_test_all_ones(*reinterpret_cast<M128I*>(&RMaskA)); // value is 1, Point in in frustum
+	INT32 IsPointBInFrustum = _mm_test_all_ones(*reinterpret_cast<M128I*>(&RMaskB));
 
 	char IsPointABInFrustum = IsPointAInFrustum | (IsPointBInFrustum << 1);
 	return IsPointABInFrustum;
 }
 
-void culling::ViewFrustumCulling::SetViewProjectionMatrix(const unsigned int cameraIndex, const Mat4x4& viewProjectionMatrix)
+void culling::ViewFrustumCulling::SetViewProjectionMatrix(const UINT32 cameraIndex, const Mat4x4& viewProjectionMatrix)
 {
 	culling::CullingModule::SetViewProjectionMatrix(cameraIndex, viewProjectionMatrix);
 

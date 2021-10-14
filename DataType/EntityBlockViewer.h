@@ -23,12 +23,12 @@ namespace culling
 		/// <summary>
 		/// Entity Index in Entity Block
 		/// </summary>
-		unsigned int mEntityIndexInBlock;
+		UINT32 mEntityIndexInBlock;
 
 	public:
 
 		EntityBlockViewer() = default;
-		EntityBlockViewer(EntityBlock* entityBlock, unsigned int entityIndexInBlock)
+		EntityBlockViewer(EntityBlock* entityBlock, UINT32 entityIndexInBlock)
 			: mTargetEntityBlock{ entityBlock }, mEntityIndexInBlock{ entityIndexInBlock }, bmIsActive{ true }
 		{}
 
@@ -38,7 +38,7 @@ namespace culling
 		/// </summary>
 		/// <param name="cameraIndex">0 <= cameraIndex < EveryCulling::mCameraCount</param>
 		/// <returns></returns>
-		FORCE_INLINE bool GetIsCulled(const unsigned int cameraIndex) const
+		FORCE_INLINE bool GetIsCulled(const UINT32 cameraIndex) const
 		{
 			assert(bmIsActive == true);
 			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
@@ -46,8 +46,8 @@ namespace culling
 		}
 
 
-		void SetEntityPosition(const float* worldPosition);
+		void SetEntityPosition(const FLOAT32* worldPosition);
 
-		void SetSphereBoundRadius(float sphereRadius);
+		void SetSphereBoundRadius(FLOAT32 sphereRadius);
 	};
 }

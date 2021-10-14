@@ -19,15 +19,15 @@ namespace culling
 
 		EveryCulling* mCullingSystem;
 
-		//static inline constexpr unsigned int M256_COUNT_OF_VISIBLE_ARRAY = 1 + ( (ENTITY_COUNT_IN_ENTITY_BLOCK * sizeof(decltype(*EntityBlock::mIsVisibleBitflag)) - 1) / 32 );
+		//static inline constexpr UINT32 M256_COUNT_OF_VISIBLE_ARRAY = 1 + ( (ENTITY_COUNT_IN_ENTITY_BLOCK * sizeof(decltype(*EntityBlock::mIsVisibleBitflag)) - 1) / 32 );
 		/// <summary>
 		/// will be used at CullBlockEntityJob
 		/// </summary>
-		//std::atomic<unsigned int> mAtomicCurrentBlockIndex;
-		std::array<std::atomic<unsigned int>, MAX_CAMERA_COUNT> mCurrentCulledEntityBlockIndex;
-		std::array<std::atomic<unsigned int>, MAX_CAMERA_COUNT> mFinishedCullEntityBlockCount;
+		//std::atomic<UINT32> mAtomicCurrentBlockIndex;
+		std::array<std::atomic<UINT32>, MAX_CAMERA_COUNT> mCurrentCulledEntityBlockIndex;
+		std::array<std::atomic<UINT32>, MAX_CAMERA_COUNT> mFinishedCullEntityBlockCount;
 		
-		unsigned int mCameraCount;
+		UINT32 mCameraCount;
 		std::array<culling::Mat4x4, MAX_CAMERA_COUNT> mCameraViewProjectionMatrixs;
 
 		CullingModule(EveryCulling* frotbiteCullingSystem)
@@ -35,12 +35,12 @@ namespace culling
 		{
 
 		}
-		virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex) {}
-		virtual void ClearEntityData(EntityBlock* currentEntityBlock, unsigned int entityIndex) {};
+		virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, SIZE_T entityCountInBlock, SIZE_T cameraIndex) {}
+		virtual void ClearEntityData(EntityBlock* currentEntityBlock, UINT32 entityIndex) {};
 
 	public:
 
-		virtual void SetViewProjectionMatrix(const unsigned int cameraIndex, const Mat4x4& viewProjectionMatrix);
+		virtual void SetViewProjectionMatrix(const UINT32 cameraIndex, const Mat4x4& viewProjectionMatrix);
 
 	};
 

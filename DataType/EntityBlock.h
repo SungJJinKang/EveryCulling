@@ -26,9 +26,9 @@ namespace culling
 {
 
 	//This code doesn't consider Memory alignment optimzation.
-	inline constexpr size_t ENTITY_COUNT_IN_ENTITY_BLOCK =
+	inline constexpr SIZE_T ENTITY_COUNT_IN_ENTITY_BLOCK =
 		MAKE_EVEN_NUMBER(
-			(4096 - sizeof(unsigned int)) /
+			(4096 - sizeof(UINT32)) /
 			(
 				sizeof(Vec4)
 				+ sizeof(char)
@@ -89,9 +89,9 @@ namespace culling
 		/// <summary>
 		/// this variable is only used to decide whether to free this EntityBlock
 		/// </summary>
-		unsigned int mCurrentEntityCount;
+		UINT32 mCurrentEntityCount;
 
-		FORCE_INLINE bool GetIsCulled(const size_t entityIndex, const unsigned int cameraIndex) const
+		FORCE_INLINE bool GetIsCulled(const SIZE_T entityIndex, const UINT32 cameraIndex) const
 		{
 			return ( mIsVisibleBitflag[entityIndex] & (1 << cameraIndex) ) == 0;
 		}

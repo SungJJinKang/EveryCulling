@@ -57,7 +57,7 @@ namespace culling
 
 	private:
 
-		unsigned int mCameraCount;
+		UINT32 mCameraCount;
 		std::array<culling::Vec3, MAX_CAMERA_COUNT> mCameraPositions;
 
 		bool bmIsEntityBlockPoolInitialized{ false };
@@ -81,8 +81,8 @@ namespace culling
 
 		void AllocateEntityBlockPool();
 		void ResetEntityBlock(culling::EntityBlock* entityBlock);
-		std::pair<culling::EntityBlock*, unsigned int*> AllocateNewEntityBlockFromPool();
-		void RemoveEntityFromBlock(EntityBlock* ownerEntityBlock, unsigned int entityIndexInBlock);
+		std::pair<culling::EntityBlock*, UINT32*> AllocateNewEntityBlockFromPool();
+		void RemoveEntityFromBlock(EntityBlock* ownerEntityBlock, UINT32 entityIndexInBlock);
 		/// <summary>
 		/// Block Swap removedblock with last block, and return swapped lastblock to pool
 		/// </summary>
@@ -125,14 +125,14 @@ namespace culling
 
 	public:
 
-		EveryCulling(unsigned int resolutionWidth, unsigned int resolutionHeight);
+		EveryCulling(UINT32 resolutionWidth, UINT32 resolutionHeight);
 		~EveryCulling();
-		void SetCameraCount(unsigned int cameraCount);
-		void SetCameraPosition(const size_t cameraIndex, const culling::Vec3& cameraPosition);
+		void SetCameraCount(UINT32 cameraCount);
+		void SetCameraPosition(const SIZE_T cameraIndex, const culling::Vec3& cameraPosition);
 
-		void SetViewProjectionMatrix(const unsigned int cameraIndex, const culling::Mat4x4& viewProjectionMatrix);
-		unsigned int GetCameraCount() const;
-		inline const culling::Vec3& GetCameraPosition(const size_t cameraIndex) const
+		void SetViewProjectionMatrix(const UINT32 cameraIndex, const culling::Mat4x4& viewProjectionMatrix);
+		UINT32 GetCameraCount() const;
+		inline const culling::Vec3& GetCameraPosition(const SIZE_T cameraIndex) const
 		{
 			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
 			return mCameraPositions[cameraIndex];
@@ -174,20 +174,20 @@ namespace culling
 		/// So CullBlockEntityJob is thread safe.
 		/// </summary>
 		void CullBlockEntityJob();
-		void CullBlockEntityJob(const size_t cameraIndex);
-		//void CullBlockEntityJob(const unsigned int threadIndex, const unsigned int threadCount);
+		void CullBlockEntityJob(const SIZE_T cameraIndex);
+		//void CullBlockEntityJob(const UINT32 threadIndex, const UINT32 threadCount);
 
 		/// <summary>
 		/// Get Is All block's culling job is finished.
 		/// if true, you can check object's visibility(culled)
 		/// </summary>
 		/// <returns></returns>
-		bool GetIsCullJobFinished(const std::atomic<unsigned int>& mFinishedCullEntityBlockCount, unsigned int entityBlockCount) const;
+		bool GetIsCullJobFinished(const std::atomic<UINT32>& mFinishedCullEntityBlockCount, UINT32 entityBlockCount) const;
 
 		/// <summary>
 		/// Caller thread will stall until cull job of all entity block is finished
 		/// </summary>
-		void WaitToFinishCullJob(const unsigned int cameraIndex) const;
+		void WaitToFinishCullJob(const UINT32 cameraIndex) const;
 		void WaitToFinishCullJobOfAllCameras() const;
 
 		/// <summary>
@@ -207,7 +207,7 @@ namespace culling
 			};
 		}
 
-		constexpr auto GetCullJobInLambda(const size_t cameraIndex)
+		constexpr auto GetCullJobInLambda(const SIZE_T cameraIndex)
 		{
 			return [this, cameraIndex]()
 			{

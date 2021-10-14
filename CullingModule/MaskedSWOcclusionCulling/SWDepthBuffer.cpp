@@ -1,6 +1,6 @@
 #include "SWDepthBuffer.h"
 
-culling::SWDepthBuffer::SWDepthBuffer(unsigned int width, unsigned int height)
+culling::SWDepthBuffer::SWDepthBuffer(UINT32 width, UINT32 height)
 	: 
 	mResolution{
 	width, height,
@@ -10,11 +10,11 @@ culling::SWDepthBuffer::SWDepthBuffer(unsigned int width, unsigned int height)
 	( (height % TILE_HEIGHT) > 0 ? height + (height - height % TILE_HEIGHT) : height ) - TILE_HEIGHT,
 
 #if NDC_RANGE == MINUS_ONE_TO_POSITIVE_ONE
-	_mm256_set1_ps(static_cast<float>(width * 0.5f)),
-	_mm256_set1_ps(static_cast<float>(height * 0.5f))
+	_mm256_set1_ps(static_cast<FLOAT32>(width * 0.5f)),
+	_mm256_set1_ps(static_cast<FLOAT32>(height * 0.5f))
 #elif NDC_RANGE == ZERO_TO_POSITIVE_ONE
-	_mm256_set1_ps(static_cast<float>(width)),
-	_mm256_set1_ps(static_cast<float>(height))
+	_mm256_set1_ps(static_cast<FLOAT32>(width)),
+	_mm256_set1_ps(static_cast<FLOAT32>(height))
 #endif
 	}
 {
@@ -28,6 +28,6 @@ culling::SWDepthBuffer::SWDepthBuffer(unsigned int width, unsigned int height)
 	//Why don't use std::make_unique
 	//std::make_unique do default initialization, so it reset Tile values
 	//That isn't needed to do
-	mTiles = std::shared_ptr<Tile[]>(new Tile[static_cast<size_t>(mResolution.mTileCountInARow) * static_cast<size_t>(mResolution.mTileCountInAColumn)]);
+	mTiles = std::shared_ptr<Tile[]>(new Tile[static_cast<SIZE_T>(mResolution.mTileCountInARow) * static_cast<SIZE_T>(mResolution.mTileCountInAColumn)]);
 }
 
