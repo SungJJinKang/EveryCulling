@@ -4,7 +4,7 @@
 
 #include "../../DataType/Math/Common.h"
 #include "../../EveryCulling.h"
-#include "../../SIMD_Core.h"
+#include <SIMD_Core.h>
 
 #include <Rendering/Renderer/Renderer.h>
 #include <Transform.h>
@@ -82,9 +82,9 @@ FORCE_INLINE char culling::ViewFrustumCulling::CheckInFrustumSIMDWithTwoPoint(co
 
 	const M128F posA_rrrr = M128F_REPLICATE(m128f_2Point[0], 3); // rrrr of first twoPoint and rrrr of second twoPoint
 
-	M128F dotPosA = culling::M128F_MUL_AND_ADD(posA_zzzz, m128f_eightPlanes[2], m128f_eightPlanes[3]);
-	dotPosA = culling::M128F_MUL_AND_ADD(posA_yyyy, m128f_eightPlanes[1], dotPosA);
-	dotPosA = culling::M128F_MUL_AND_ADD(posA_xxxx, m128f_eightPlanes[0], dotPosA); // dot Pos A with Plane 0, dot Pos A with Plane 1, dot Pos A with Plane 2, dot Pos A with Plane 3
+	M128F dotPosA = M128F_MUL_AND_ADD(posA_zzzz, m128f_eightPlanes[2], m128f_eightPlanes[3]);
+	dotPosA = M128F_MUL_AND_ADD(posA_yyyy, m128f_eightPlanes[1], dotPosA);
+	dotPosA = M128F_MUL_AND_ADD(posA_xxxx, m128f_eightPlanes[0], dotPosA); // dot Pos A with Plane 0, dot Pos A with Plane 1, dot Pos A with Plane 2, dot Pos A with Plane 3
 
 	const M128F posB_xxxx = M128F_REPLICATE(m128f_2Point[1], 0); // xxxx of first twoPoint and xxxx of second twoPoint
 	const M128F posB_yyyy = M128F_REPLICATE(m128f_2Point[1], 1); // yyyy of first twoPoint and yyyy of second twoPoint
@@ -92,9 +92,9 @@ FORCE_INLINE char culling::ViewFrustumCulling::CheckInFrustumSIMDWithTwoPoint(co
 
 	const M128F posB_rrrr = M128F_REPLICATE(m128f_2Point[1], 3); // rrrr of first twoPoint and rrrr of second twoPoint
 
-	M128F dotPosB = culling::M128F_MUL_AND_ADD(posB_zzzz, m128f_eightPlanes[2], m128f_eightPlanes[3]);
-	dotPosB = culling::M128F_MUL_AND_ADD(posB_yyyy, m128f_eightPlanes[1], dotPosB);
-	dotPosB = culling::M128F_MUL_AND_ADD(posB_xxxx, m128f_eightPlanes[0], dotPosB); // dot Pos B with Plane 0, dot Pos B with Plane 1, dot Pos B with Plane 2, dot Pos B with Plane 3
+	M128F dotPosB = M128F_MUL_AND_ADD(posB_zzzz, m128f_eightPlanes[2], m128f_eightPlanes[3]);
+	dotPosB = M128F_MUL_AND_ADD(posB_yyyy, m128f_eightPlanes[1], dotPosB);
+	dotPosB = M128F_MUL_AND_ADD(posB_xxxx, m128f_eightPlanes[0], dotPosB); // dot Pos B with Plane 0, dot Pos B with Plane 1, dot Pos B with Plane 2, dot Pos B with Plane 3
 
 	//https://software.intel.com/sites/landingpage/IntrinsicsGuide/#expand=69,124,4167,4167,447,447,3148,3148&techs=SSE,SSE2,SSE3,SSSE3,SSE4_1,SSE4_2,AVX&text=insert
 	const M128F posAB_xxxx = _mm_shuffle_ps(m128f_2Point[0], m128f_2Point[1], SHUFFLEMASK(0, 0, 0, 0)); // x of twoPoint[0] , x of twoPoint[0], x of twoPoint[1] , x of twoPoint[1]
@@ -103,9 +103,9 @@ FORCE_INLINE char culling::ViewFrustumCulling::CheckInFrustumSIMDWithTwoPoint(co
 
 	const M128F posAB_rrrr = _mm_shuffle_ps(m128f_2Point[0], m128f_2Point[1], SHUFFLEMASK(3, 3, 3, 3)); // r of twoPoint[0] , r of twoPoint[1], w of twoPoint[1] , w of twoPoint[1]
 
-	M128F dotPosAB45 = culling::M128F_MUL_AND_ADD(posAB_zzzz, m128f_eightPlanes[6], m128f_eightPlanes[7]);
-	dotPosAB45 = culling::M128F_MUL_AND_ADD(posAB_yyyy, m128f_eightPlanes[5], dotPosAB45);
-	dotPosAB45 = culling::M128F_MUL_AND_ADD(posAB_xxxx, m128f_eightPlanes[4], dotPosAB45);
+	M128F dotPosAB45 = M128F_MUL_AND_ADD(posAB_zzzz, m128f_eightPlanes[6], m128f_eightPlanes[7]);
+	dotPosAB45 = M128F_MUL_AND_ADD(posAB_yyyy, m128f_eightPlanes[5], dotPosAB45);
+	dotPosAB45 = M128F_MUL_AND_ADD(posAB_xxxx, m128f_eightPlanes[4], dotPosAB45);
 
 	dotPosA = _mm_cmpgt_ps(dotPosA, posA_rrrr); // if elemenet[i] have value 1, Pos A is in frustum Plane[i] ( 0 <= i < 4 )
 	dotPosB = _mm_cmpgt_ps(dotPosB, posB_rrrr); // if elemenet[i] have value 1, Pos B is in frustum Plane[i] ( 0 <= i < 4 )

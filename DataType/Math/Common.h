@@ -26,7 +26,7 @@ namespace culling
 
 	[[nodiscard]] void ExtractSIMDPlanesFromViewProjectionMatrix(const Mat4x4& viewProjectionMatrix, Vec4* eightPlanes, bool normalize) noexcept;
 
-	FORCE_INLINE [[nodiscard]] Vec4 operator*(const culling::Mat4x4& mat4, const culling::Vec3& vec3) noexcept
+	[[nodiscard]] FORCE_INLINE Vec4 operator*(const culling::Mat4x4& mat4, const culling::Vec3& vec3) noexcept
 	{
 		return Vec4
 		{

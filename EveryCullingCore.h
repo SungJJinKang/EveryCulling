@@ -3,20 +3,17 @@
 
 #include <Core.h>
 
-#if defined(_MSC_VER)
-#  define COMPILER_MSVC
-#elif defined(__GNUC__)
-#  define COMPILER_GCC
-#endif
 
-#ifndef FORCE_INLINE
-
-#if defined(COMPILER_GCC)
+#if defined(__GNUC__)  || defined( __clang__)
 #  define FORCE_INLINE inline __attribute__ ((always_inline))
-#elif defined(COMPILER_MSVC)
+#  define NEVER_INLINE __attribute__ ((noinline))
+#  define RESTRICT __restrict
+#  define VLA_ARRAY_ON_STACK(type__, varname__, size__) type__ varname__[size__];
+#elif defined(_MSC_VER))
 #  define FORCE_INLINE __forceinline
-#endif
-
+#  define NEVER_INLINE __declspec(noinline)
+#  define RESTRICT __restrict
+#  define VLA_ARRAY_ON_STACK(type__, varname__, size__) type__ *varname__ = (type__*)_alloca(size__ * sizeof(type__))
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -130,4 +127,9 @@
 // Query Occlusion
 #if !defined(ENABLE_QUERY_OCCLUSION) && defined(CULLING_OPENGL)
 #define ENABLE_QUERY_OCCLUSION
+#endif
+
+
+#ifndef IS_ALIGNED_ASSERT
+#define IS_ALIGNED_ASSERT(ADDRESS, ALIGNMENT) (assert(ADDRESS % ALIGNMENT == 0))
 #endif

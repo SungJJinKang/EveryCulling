@@ -14,18 +14,18 @@ M256I culling::CoverageRasterizer::FillBottomFlatTriangle(CoverageMask& coverage
     //Ceil event values and Cast to integer
     const M256F rightEvent1Floating = _mm256_set_ps(curx, curx + invslope1, curx + invslope1 * 2, curx + invslope1 * 3, curx + invslope1 * 4, curx + invslope1 * 5, curx + invslope1 * 6, curx + invslope1 * 7);
     M256I rightEvent1 = _mm256_cvtps_epi32(_mm256_ceil_ps(rightEvent1Floating));
-    rightEvent1 = _mm256_max_epi32(rightEvent1, *reinterpret_cast<M256I*>(&M128F_Zero));
+    rightEvent1 = _mm256_max_epi32(rightEvent1, *reinterpret_cast<const M256I*>(&M128F_Zero));
     
     //Ceil event values and Cast to integer
     const M256F rightEvent2Floating = _mm256_set_ps(curx, curx + invslope1, curx + invslope1 * 2, curx + invslope1 * 3, curx + invslope1 * 4, curx + invslope1 * 5, curx + invslope1 * 6, curx + invslope1 * 7);
     M256I rightEvent2 = _mm256_cvtps_epi32(_mm256_ceil_ps(rightEvent2Floating));
-    rightEvent2 = _mm256_max_epi32(rightEvent2, *reinterpret_cast<M256I*>(&M128F_Zero));
+    rightEvent2 = _mm256_max_epi32(rightEvent2, *reinterpret_cast<const M256I*>(&M128F_Zero));
 
-    M256I Mask1 = _mm256_srlv_epi32(*reinterpret_cast<M256I*>(&M128F_EVERY_BITS_ONE), rightEvent1);
-    M256I Mask2 = _mm256_srlv_epi32(*reinterpret_cast<M256I*>(&M128F_EVERY_BITS_ONE), rightEvent2);
+    M256I Mask1 = _mm256_srlv_epi32(*reinterpret_cast<const M256I*>(&M128F_EVERY_BITS_ONE), rightEvent1);
+    M256I Mask2 = _mm256_srlv_epi32(*reinterpret_cast<const M256I*>(&M128F_EVERY_BITS_ONE), rightEvent2);
 
-    Mask1 = _mm256_xor_si256(Mask1, *reinterpret_cast<M256I*>(&((invslope1 > 0.0f) ? M128F_Zero : M128F_EVERY_BITS_ONE)));
-    Mask2 = _mm256_xor_si256(Mask2, *reinterpret_cast<M256I*>(&((invslope2 > 0.0f) ? M128F_Zero : M128F_EVERY_BITS_ONE)));
+    Mask1 = _mm256_xor_si256(Mask1, *reinterpret_cast<const M256I*>(&((invslope1 > 0.0f) ? M128F_Zero : M128F_EVERY_BITS_ONE)));
+    Mask2 = _mm256_xor_si256(Mask2, *reinterpret_cast<const M256I*>(&((invslope2 > 0.0f) ? M128F_Zero : M128F_EVERY_BITS_ONE)));
 
     M256I Result = _mm256_and_si256(Mask1, Mask2);
 
@@ -45,17 +45,17 @@ M256I culling::CoverageRasterizer::FillTopFlatTriangle(CoverageMask& coverageMas
 
     const M256F rightEvent1Floating = _mm256_set_ps(curx, curx - invslope1, curx - invslope1 * 2, curx - invslope1 * 3, curx - invslope1 * 4, curx - invslope1 * 5, curx - invslope1 * 6, curx - invslope1 * 7);
     M256I rightEvent1 = _mm256_cvtps_epi32(_mm256_ceil_ps(rightEvent1Floating)); 
-    rightEvent1 = _mm256_max_epi32(rightEvent1, *reinterpret_cast<M256I*>(&M128F_Zero));
+    rightEvent1 = _mm256_max_epi32(rightEvent1, *reinterpret_cast<const M256I*>(&M128F_Zero));
 
     const M256F rightEvent2Floating = _mm256_set_ps(curx, curx - invslope2, curx - invslope2 * 2, curx - invslope2 * 3, curx - invslope2 * 4, curx - invslope2 * 5, curx - invslope2 * 6, curx - invslope2 * 7);
     M256I rightEvent2 = _mm256_cvtps_epi32(_mm256_ceil_ps(rightEvent2Floating)); // I will use this variable like 2byte integer, not 4byte
-    rightEvent2 = _mm256_max_epi32(rightEvent2, *reinterpret_cast<M256I*>(&M128F_Zero));
+    rightEvent2 = _mm256_max_epi32(rightEvent2, *reinterpret_cast<const M256I*>(&M128F_Zero));
 
-    M256I Mask1 = _mm256_srlv_epi32(*reinterpret_cast<M256I*>(&M128F_EVERY_BITS_ONE), rightEvent1);
-    M256I Mask2 = _mm256_srlv_epi32(*reinterpret_cast<M256I*>(&M128F_EVERY_BITS_ONE), rightEvent2);
+    M256I Mask1 = _mm256_srlv_epi32(*reinterpret_cast<const M256I*>(&M128F_EVERY_BITS_ONE), rightEvent1);
+    M256I Mask2 = _mm256_srlv_epi32(*reinterpret_cast<const M256I*>(&M128F_EVERY_BITS_ONE), rightEvent2);
 
-    Mask1 = _mm256_xor_si256(Mask1, *reinterpret_cast<M256I*>(&((invslope1 < 0.0f) ? M128F_Zero : M128F_EVERY_BITS_ONE)));
-    Mask2 = _mm256_xor_si256(Mask2, *reinterpret_cast<M256I*>(&((invslope2 < 0.0f) ? M128F_Zero : M128F_EVERY_BITS_ONE)));
+    Mask1 = _mm256_xor_si256(Mask1, *reinterpret_cast<const M256I*>(&((invslope1 < 0.0f) ? M128F_Zero : M128F_EVERY_BITS_ONE)));
+    Mask2 = _mm256_xor_si256(Mask2, *reinterpret_cast<const M256I*>(&((invslope2 < 0.0f) ? M128F_Zero : M128F_EVERY_BITS_ONE)));
 
     M256I Result = _mm256_and_si256(Mask1, Mask2);
 

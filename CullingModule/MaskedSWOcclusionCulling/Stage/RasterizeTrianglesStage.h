@@ -1,7 +1,7 @@
 #pragma once
 
 #include "MaskedSWOcclusionCullingStage.h"
-#include "../../../SIMD_Core.h"
+#include <SIMD_Core.h>
 
 namespace culling
 {

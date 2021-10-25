@@ -3,7 +3,8 @@
 #include <bitset>
 
 #include "../../EveryCullingCore.h"
-#include "../../SIMD_Core.h"
+#include <SIMD_Core.h>
+
 namespace culling
 {
 	/// <summary>

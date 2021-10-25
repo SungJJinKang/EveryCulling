@@ -2,7 +2,7 @@
 
 #include "Common.h"
 #include "Vector.h"
-#include "../../SIMD_Core.h"
+#include <SIMD_Core.h>
 
 
 namespace culling
@@ -87,10 +87,10 @@ namespace culling
 		(v1x - v0x) * (v2y - v0y) - (v0x - v2x) * (v0y - v1y)
 		// Perform backface test.
 		*/
-		const M128F triArea1 = culling::M128F_MUL(culling::M128F_SUB(verticesX[1], verticesX[0]), culling::M128F_SUB(verticesY[2], verticesY[0]));
-		const M128F triArea2 = culling::M128F_MUL(culling::M128F_SUB(verticesX[0], verticesX[2]), culling::M128F_SUB(verticesY[0], verticesY[1]));
-		const M128F triArea = culling::M128F_SUB(triArea1, triArea2);
-		const M128F ccwMask = _mm_cmpgt_ps(triArea, culling::M128F_Zero);
+		const M128F triArea1 = M128F_MUL(M128F_SUB(verticesX[1], verticesX[0]), M128F_SUB(verticesY[2], verticesY[0]));
+		const M128F triArea2 = M128F_MUL(M128F_SUB(verticesX[0], verticesX[2]), M128F_SUB(verticesY[0], verticesY[1]));
+		const M128F triArea = M128F_SUB(triArea1, triArea2);
+		const M128F ccwMask = _mm_cmpgt_ps(triArea, M128F_Zero);
 		return ccwMask;
 	}
 
@@ -115,16 +115,16 @@ namespace culling
 		M256F MASK;
 
 		MASK = _mm256_cmp_ps(TriPointY[0], TriPointY[1], _CMP_LE_OQ);
-		culling::M256F_SWAP(TriPointX[0], TriPointX[1], MASK);
-		culling::M256F_SWAP(TriPointY[0], TriPointY[1], MASK);
+		M256F_SWAP(TriPointX[0], TriPointX[1], MASK);
+		M256F_SWAP(TriPointY[0], TriPointY[1], MASK);
 
 		MASK = _mm256_cmp_ps(TriPointY[0], TriPointY[2], _CMP_LE_OQ);
-		culling::M256F_SWAP(TriPointX[0], TriPointX[2], MASK);
-		culling::M256F_SWAP(TriPointY[0], TriPointY[2], MASK);
+		M256F_SWAP(TriPointX[0], TriPointX[2], MASK);
+		M256F_SWAP(TriPointY[0], TriPointY[2], MASK);
 
 		MASK = _mm256_cmp_ps(TriPointY[1], TriPointY[2], _CMP_LE_OQ);
-		culling::M256F_SWAP(TriPointX[1], TriPointX[2], MASK);
-		culling::M256F_SWAP(TriPointY[1], TriPointY[2], MASK);
+		M256F_SWAP(TriPointX[1], TriPointX[2], MASK);
+		M256F_SWAP(TriPointY[1], TriPointY[2], MASK);
 	}
 
 	/// <summary>
@@ -147,19 +147,19 @@ namespace culling
 		M256F MASK;
 
 		MASK = _mm256_cmp_ps(TriPointY[0], TriPointY[1], _CMP_LE_OQ);
-		culling::M256F_SWAP(TriPointX[0], TriPointX[1], MASK);
-		culling::M256F_SWAP(TriPointY[0], TriPointY[1], MASK);
-		culling::M256F_SWAP(TriPointZ[0], TriPointZ[1], MASK);
+		M256F_SWAP(TriPointX[0], TriPointX[1], MASK);
+		M256F_SWAP(TriPointY[0], TriPointY[1], MASK);
+		M256F_SWAP(TriPointZ[0], TriPointZ[1], MASK);
 
 		MASK = _mm256_cmp_ps(TriPointY[0], TriPointY[2], _CMP_LE_OQ);
-		culling::M256F_SWAP(TriPointX[0], TriPointX[2], MASK);
-		culling::M256F_SWAP(TriPointY[0], TriPointY[2], MASK);
-		culling::M256F_SWAP(TriPointZ[0], TriPointZ[2], MASK);
+		M256F_SWAP(TriPointX[0], TriPointX[2], MASK);
+		M256F_SWAP(TriPointY[0], TriPointY[2], MASK);
+		M256F_SWAP(TriPointZ[0], TriPointZ[2], MASK);
 
 		MASK = _mm256_cmp_ps(TriPointY[1], TriPointY[2], _CMP_LE_OQ);
-		culling::M256F_SWAP(TriPointX[1], TriPointX[2], MASK);
-		culling::M256F_SWAP(TriPointY[1], TriPointY[2], MASK);
-		culling::M256F_SWAP(TriPointZ[1], TriPointZ[2], MASK);
+		M256F_SWAP(TriPointX[1], TriPointX[2], MASK);
+		M256F_SWAP(TriPointY[1], TriPointY[2], MASK);
+		M256F_SWAP(TriPointZ[1], TriPointZ[2], MASK);
 	}
 
 }
