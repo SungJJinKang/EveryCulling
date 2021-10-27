@@ -31,7 +31,7 @@ namespace culling
 		FORCE_INLINE __M128F(const __m128& _raw) : raw{ _raw } {}
 	};
 
-	typedef __M128F M128F;
+	using M128F = __M128F;
 
 	union __M128D {
 		__m128d raw;    // SSE 4 x float vector
@@ -44,7 +44,7 @@ namespace culling
 		FORCE_INLINE __M128D(const __m128d& _raw) : raw{ _raw } {}
 	};
 
-	typedef __M128D M128D;
+	using M128D = __M128D;
 
 	union __M128I {
 		__m128i raw;    // SSE 4 x float vector
@@ -57,7 +57,7 @@ namespace culling
 		FORCE_INLINE __M128I(const __m128i& _raw) : raw{ _raw } {}
 	};
 
-	typedef __M128I M128I;
+	using M128I = __M128I;
 
 	union __M256F {
 		__m256 raw;    // SSE 4 x float vector
@@ -70,7 +70,7 @@ namespace culling
 		FORCE_INLINE __M256F(const __m256& _raw) : raw{ _raw } {}
 	};
 
-	typedef __M256F M256F;
+	using M256F = __M256F;
 
 	union __M256D {
 		__m256d raw;    // SSE 4 x float vector
@@ -83,7 +83,7 @@ namespace culling
 		FORCE_INLINE __M256D(const __m256d& _raw) : raw{ _raw } {}
 	};
 
-	typedef __M256D M256D;
+	using M256D = __M256D;
 
 	union __M256I {
 		__m256i raw;    // SSE 4 x float vector
@@ -96,20 +96,20 @@ namespace culling
 		FORCE_INLINE __M256I(const __m256i& _raw) : raw{ _raw } {}
 	};
 
-	typedef __M256I M256I;
+	using M256I = __M256I;
 
-
+	
 #elif defined(_MSC_VER))
 
-	typedef __m128	M128F;
-	typedef __m128d M128D;
-	typedef __m128i M128I;
+	using M128F = __m128;
+	using M128D = __m128d;
+	using M128I = __m128i;
 
 
 
-	typedef __m256	M256F;
-	typedef __m256d M256D;
-	typedef __m256i M256I;
+	using M256F =__m256;
+	using M256D = __m256d;
+	using M256I= __m256i;
 
 #endif
 
@@ -205,9 +205,9 @@ namespace culling
 		return M256F_ADD(M256F_MUL(M256_A, M256_B), M256_C);
 	}
 
-	FORCE_INLINE culling::M128F M128F_CROSS(const culling::M128F& M128_A, const culling::M128F& M128_B)
+	/*FORCE_INLINE culling::M128F M128F_CROSS(const culling::M128F& M128_A, const culling::M128F& M128_B)
 	{
-		culling::M128F A_YZXW = _mm_shuffle_ps(M128_A, M128_A, SHUFFLEMASK(1, 2, 0, 3));
+		culling::M128F A_YZXW = _mm_shuffle_ps(M128_A.raw, M128_A.raw, SHUFFLEMASK(1, 2, 0, 3));
 		culling::M128F B_ZXYW = _mm_shuffle_ps(M128_B, M128_B, SHUFFLEMASK(2, 0, 1, 3));
 		culling::M128F A_ZXYW = _mm_shuffle_ps(M128_A, M128_A, SHUFFLEMASK(2, 0, 1, 3));
 		culling::M128F B_YZXW = _mm_shuffle_ps(M128_B, M128_B, SHUFFLEMASK(1, 2, 0, 3));
@@ -221,14 +221,14 @@ namespace culling
 		culling::M256F A_ZXYW = _mm256_shuffle_ps(M256_A, M256_A, SHUFFLEMASK(2, 0, 1, 3));
 		culling::M256F B_YZXW = _mm256_shuffle_ps(M256_B, M256_B, SHUFFLEMASK(1, 2, 0, 3));
 		return M256F_SUB(M256F_MUL(A_YZXW, B_ZXYW), M256F_MUL(A_ZXYW, B_YZXW));
-	}
+	}*/
 
 
 	FORCE_INLINE void M256F_SWAP(culling::M128F& M128_A, culling::M128F& M128_B, const culling::M128F& MASK)
 	{
-		culling::M128F TEMP = M128_A;
-		M128_A = _mm_blendv_ps(M128_A, M128_B, MASK);
-		M128_B = _mm_blendv_ps(M128_B, TEMP, MASK);
+		const culling::M128F TEMP = M128_A.raw;
+		M128_A = _mm_blendv_ps(M128_A.raw, M128_B.raw, MASK.raw);
+		M128_B = _mm_blendv_ps(M128_B.raw, TEMP.raw, MASK.raw);
 	}
 
 	/// <summary>
