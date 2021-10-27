@@ -1,14 +1,16 @@
 #pragma once
 
+#include "../EveryCullingCore.h"
+
 namespace culling
 {
 	struct VertexData
 	{
-		FLOAT32* mVertices;
-		SIZE_T mVerticeCount;
+		float* mVertices;
+		size_t mVerticeCount;
 
-		UINT32* mIndices;
-		SIZE_T mIndiceCount;
+		std::uint32_t* mIndices;
+		size_t mIndiceCount;
 	};
 
 }

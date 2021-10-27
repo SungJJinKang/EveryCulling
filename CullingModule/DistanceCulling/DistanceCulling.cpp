@@ -13,7 +13,7 @@ void culling::DistanceCulling::AddCullDistanceVolume(culling::CullDistanceVolume
 	);
 }
 
-void culling::DistanceCulling::DeleteCullDistanceVolume(SIZE_T index)
+void culling::DistanceCulling::DeleteCullDistanceVolume(size_t index)
 {
 	if (index >= mCullDistanceVolumes.size())
 	{

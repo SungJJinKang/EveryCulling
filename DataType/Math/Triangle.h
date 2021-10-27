@@ -2,7 +2,6 @@
 
 #include "Common.h"
 #include "Vector.h"
-#include <SIMD_Core.h>
 
 
 namespace culling
@@ -78,7 +77,7 @@ namespace culling
 	/// <param name="vertexX"></param>
 	/// <param name="vertexY"></param>
 	/// <returns></returns>
-	inline M128F IsFrontFaceOfPerspectiveSpaceTrianglesSIMD(const M128F* verticesX, const M128F* verticesY)
+	inline culling::M128F IsFrontFaceOfPerspectiveSpaceTrianglesSIMD(const culling::M128F* verticesX, const culling::M128F* verticesY)
 	{
 		/*
 		//triangle should be in projection space
@@ -87,10 +86,10 @@ namespace culling
 		(v1x - v0x) * (v2y - v0y) - (v0x - v2x) * (v0y - v1y)
 		// Perform backface test.
 		*/
-		const M128F triArea1 = M128F_MUL(M128F_SUB(verticesX[1], verticesX[0]), M128F_SUB(verticesY[2], verticesY[0]));
-		const M128F triArea2 = M128F_MUL(M128F_SUB(verticesX[0], verticesX[2]), M128F_SUB(verticesY[0], verticesY[1]));
-		const M128F triArea = M128F_SUB(triArea1, triArea2);
-		const M128F ccwMask = _mm_cmpgt_ps(triArea, M128F_Zero);
+		const culling::M128F triArea1 = M128F_MUL(M128F_SUB(verticesX[1], verticesX[0]), M128F_SUB(verticesY[2], verticesY[0]));
+		const culling::M128F triArea2 = M128F_MUL(M128F_SUB(verticesX[0], verticesX[2]), M128F_SUB(verticesY[0], verticesY[1]));
+		const culling::M128F triArea = M128F_SUB(triArea1, triArea2);
+		const culling::M128F ccwMask = _mm_cmpgt_ps(triArea, M128F_Zero);
 		return ccwMask;
 	}
 
@@ -105,14 +104,14 @@ namespace culling
 	/// TriPoint[1] : Second Points Of Triangle
 	/// TriPoint[2] : Third Points Of Triangle
 	/// 
-	/// Passed M256F* is pointer of 3 size array
+	/// Passed culling::M256F* is pointer of 3 size array
 	/// 
 	/// </summary>
 	/// <param name="TriPointX"></param>
 	/// <param name="TriPointY"></param>
-	inline void Sort_8_2DTriangles(M256F* TriPointX, M256F* TriPointY)
+	inline void Sort_8_2DTriangles(culling::M256F* TriPointX, culling::M256F* TriPointY)
 	{
-		M256F MASK;
+		culling::M256F MASK;
 
 		MASK = _mm256_cmp_ps(TriPointY[0], TriPointY[1], _CMP_LE_OQ);
 		M256F_SWAP(TriPointX[0], TriPointX[1], MASK);
@@ -136,15 +135,15 @@ namespace culling
 	/// TriPoint[1] : Second Points Of Triangle
 	/// TriPoint[2] : Third Points Of Triangle
 	/// 
-	/// Passed M256F* is pointer of 3 size array
+	/// Passed culling::M256F* is pointer of 3 size array
 	/// 
 	/// </summary>
-	/// <param name="TriPointX">3 size array M256F</param>
-	/// <param name="TriPointY">3 size array M256F</param>
-	/// <param name="TriPointZ">3 size array M256F</param>
-	inline void Sort_8_3DTriangles(M256F* TriPointX, M256F* TriPointY, M256F* TriPointZ)
+	/// <param name="TriPointX">3 size array culling::M256F</param>
+	/// <param name="TriPointY">3 size array culling::M256F</param>
+	/// <param name="TriPointZ">3 size array culling::M256F</param>
+	inline void Sort_8_3DTriangles(culling::M256F* TriPointX, culling::M256F* TriPointY, culling::M256F* TriPointZ)
 	{
-		M256F MASK;
+		culling::M256F MASK;
 
 		MASK = _mm256_cmp_ps(TriPointY[0], TriPointY[1], _CMP_LE_OQ);
 		M256F_SWAP(TriPointX[0], TriPointX[1], MASK);

@@ -2,7 +2,6 @@
 
 #include <atomic>
 
-#include "SIMD_Core.h"
 #include "SWDepthBuffer.h"
 
 #include "../../DataType/Math/AABB.h"
@@ -29,7 +28,7 @@ namespace culling
 	/// https://www.slideshare.net/IntelSoftware/masked-software-occlusion-culling
 	/// https://www.slideshare.net/IntelSoftware/masked-occlusion-culling
 	/// </summary>
-	class DOOM_API MaskedSWOcclusionCulling : public CullingModule
+	class MaskedSWOcclusionCulling : public CullingModule
 	{
 		friend class EveryCulling;
 		friend class BinTrianglesStage;
@@ -49,9 +48,9 @@ namespace culling
 
 		SWDepthBuffer mDepthBuffer;
 		
-		const UINT32 binCountInRow, binCountInColumn;
-		FLOAT32 mNearClipPlaneDis, mFarClipPlaneDis;
-		FLOAT32* mViewProjectionMatrix;
+		const std::uint32_t binCountInRow, binCountInColumn;
+		float mNearClipPlaneDis, mFarClipPlaneDis;
+		float* mViewProjectionMatrix;
 
 		void ResetDepthBuffer();
 
@@ -68,13 +67,13 @@ namespace culling
 		/// how far next vertex point is from current vertex point 
 		/// ex) 
 		/// 1.0f(Point1_X), 2.0f(Point2_Y), 0.0f(Point3_Z), 3.0f(Normal_X), 3.0f(Normal_Y), 3.0f(Normal_Z),  1.0f(Point1_X), 2.0f(Point2_Y), 0.0f(Point3_Z)
-		/// --> vertexStride is 6 * 4(FLOAT32)
+		/// --> vertexStride is 6 * 4(float)
 		/// </param>
 		/// <param name="modelToClipspaceMatrix"></param>
 		FORCE_INLINE void DrawOccluderTriangles
 		(
-			const FLOAT32* vertices, const UINT32* vertexIndices, SIZE_T indiceCount, bool vertexStrideByte,
-			FLOAT32* modelToClipspaceMatrix
+			const float* vertices, const std::uint32_t* vertexIndices, size_t indiceCount, bool vertexStrideByte,
+			float* modelToClipspaceMatrix
 		)
 		{
 			mBinTrianglesStage.BinTriangles(vertices, vertexIndices, indiceCount, vertexStrideByte, modelToClipspaceMatrix);
@@ -87,7 +86,7 @@ namespace culling
 		/// Depth Test Multiple Occludees
 		/// </summary>
 		/// <param name="worldAABBs"></param>
-		FORCE_INLINE void DepthTestOccludee(const AABB* worldAABBs, SIZE_T aabbCount, char* visibleBitFlags)
+		FORCE_INLINE void DepthTestOccludee(const AABB* worldAABBs, size_t aabbCount, char* visibleBitFlags)
 		{
 			//Check Area of TwoDTriangle
 			//if Area is smaller than setting, Dont draw that occluder
@@ -101,15 +100,15 @@ namespace culling
 			//And Just Compare this minimum depth with Max depth of Tiles
 			//Dont Try drawing triangles of AABB, Just Compute MinDepth of AABB
 
-			M256F aabbVertexX[3];
-			M256F aabbVertexY[3];
-			M256F aabbVertexZ[3];
+			culling::M256F aabbVertexX[3];
+			culling::M256F aabbVertexY[3];
+			culling::M256F aabbVertexZ[3];
 
 			///Temporarily remove unused varaible warning
 			(void)aabbVertexX, (void)aabbVertexY, (void)aabbVertexZ;
 
 			// 3 AABB is checked per loop
-			for (SIZE_T i = 0; i < aabbCount; i += 3)
+			for (size_t i = 0; i < aabbCount; i += 3)
 			{
 				// ComputeMinimumDepths
 			}
@@ -119,7 +118,7 @@ namespace culling
 		}
 
 		// Inherited via CullingModule
-		virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, SIZE_T entityCountInBlock, SIZE_T cameraIndex) override;
+		virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex) override;
 
 		void GetOccluderCandidates()
 		{
@@ -130,11 +129,11 @@ namespace culling
 
 		MaskedSWOcclusionCulling(
 			EveryCulling* frotbiteCullingSystemunsigned, 
-			UINT32 depthBufferWidth, UINT32 depthBufferheight
+			std::uint32_t depthBufferWidth, std::uint32_t depthBufferheight
 		);
 	
-		void SetNearFarClipPlaneDistance(FLOAT32 nearClipPlaneDis, FLOAT32 farClipPlaneDis);
-		void SetViewProjectionMatrix(FLOAT32* viewProjectionMatrix);
+		void SetNearFarClipPlaneDistance(float nearClipPlaneDis, float farClipPlaneDis);
+		void SetViewProjectionMatrix(float* viewProjectionMatrix);
 
 		void ResetState();
 		

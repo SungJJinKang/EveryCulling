@@ -26,9 +26,9 @@ namespace culling
 {
 
 	//This code doesn't consider Memory alignment optimzation.
-	inline constexpr SIZE_T ENTITY_COUNT_IN_ENTITY_BLOCK =
+	inline constexpr size_t ENTITY_COUNT_IN_ENTITY_BLOCK =
 		MAKE_EVEN_NUMBER(
-			(4096 - sizeof(UINT32)) /
+			(4096 - sizeof(std::uint32_t)) /
 			(
 				sizeof(Vec4)
 				+ sizeof(char)
@@ -42,7 +42,7 @@ namespace culling
 	/// <summary>
 	/// EntityBlock size should be less 4KB(Page size) for Block data being allocated in a page
 	/// </summary>
-	struct DOOM_API alignas(CACHE_LINE_SIZE) EntityBlock
+	struct alignas(CACHE_LINE_SIZE) EntityBlock
 	{
 		/// <summary>
 		/// Why align to 32byte?
@@ -89,9 +89,9 @@ namespace culling
 		/// <summary>
 		/// this variable is only used to decide whether to free this EntityBlock
 		/// </summary>
-		UINT32 mCurrentEntityCount;
+		std::uint32_t mCurrentEntityCount;
 
-		FORCE_INLINE bool GetIsCulled(const SIZE_T entityIndex, const UINT32 cameraIndex) const
+		FORCE_INLINE bool GetIsCulled(const size_t entityIndex, const std::uint32_t cameraIndex) const
 		{
 			return ( mIsVisibleBitflag[entityIndex] & (1 << cameraIndex) ) == 0;
 		}

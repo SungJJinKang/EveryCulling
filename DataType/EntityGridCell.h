@@ -24,6 +24,6 @@ namespace culling
 		/// <summary>
 		/// 
 		/// </summary>
-		std::vector<UINT32> AllocatedEntityCountInBlocks;
+		std::vector<std::uint32_t> AllocatedEntityCountInBlocks;
 	};
 }

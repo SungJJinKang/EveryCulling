@@ -20,7 +20,7 @@ namespace culling
 	};
 
 	class EveryCulling;
-	class DOOM_API ViewFrustumCulling : CullingModule
+	class ViewFrustumCulling : CullingModule
 	{
 		friend class EveryCulling;
 
@@ -34,7 +34,7 @@ namespace culling
 
 		}
 
-		void CullBlockEntityJob(EntityBlock* currentEntityBlock, SIZE_T entityCountInBlock, SIZE_T cameraIndex);
+		void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex);
 
 		//TODO : Add AVX2(__m256) version of this function
 		char CheckInFrustumSIMDWithTwoPoint(const Vec4* eightPlanes, const Position_BoundingSphereRadius* twoPoint);
@@ -47,7 +47,7 @@ namespace culling
 		/// </summary>
 		/// <param name="cameraIndex"></param>
 		/// <param name="viewProjectionMatix"></param>
-		virtual void SetViewProjectionMatrix(const UINT32 cameraIndex, const Mat4x4& viewProjectionMatrix) final;
+		virtual void SetViewProjectionMatrix(const std::uint32_t cameraIndex, const Mat4x4& viewProjectionMatrix) final;
 
 		FORCE_INLINE culling::SIMDFrustumPlanes* GetSIMDPlanes()
 		{

@@ -1,11 +1,10 @@
 #pragma once
 
 #include "MaskedSWOcclusionCullingStage.h"
-#include <SIMD_Core.h>
 
 namespace culling
 {
-	class DOOM_API RasterizeTrianglesStage : public MaskedSWOcclusionCullingStage
+	class RasterizeTrianglesStage : public MaskedSWOcclusionCullingStage
 	{
 
 	private:
@@ -65,7 +64,7 @@ namespace culling
 		// Occludee Depth Test
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		M256F ComputeMinimumDepths(const M256F* worldAABBVertX, const M256F* worldAABBVertY, const M256F* worldAABBVertZ)
+		culling::M256F ComputeMinimumDepths(const culling::M256F* worldAABBVertX, const culling::M256F* worldAABBVertY, const culling::M256F* worldAABBVertZ)
 		{
 			//mViewProjectionMatrix
 		}

@@ -5,7 +5,7 @@
 namespace culling
 {
 	class MaskedSWOcclusionCulling;
-	class DOOM_API MaskedSWOcclusionCullingStage
+	class MaskedSWOcclusionCullingStage
 	{
 
 	protected:

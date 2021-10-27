@@ -26,16 +26,16 @@ namespace culling
 	/// references : https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_occlusion_query.txt , https://www.khronos.org/registry/OpenGL/extensions/NV/NV_conditional_render.txt      
 	///
 	/// </summary>
-	class DOOM_API QueryOcclusionCulling : public CullingModule
+	class QueryOcclusionCulling : public CullingModule
 	{
 
 		friend class Graphics_Server;
 
 	private:
 
-		UINT32 mOcclusionMaterialID{ 0 };
-		UINT32 mElementBufferObjectID{ 0 };
-		UINT32 mViewProjectionMatrixUnifromLocation;
+		std::uint32_t mOcclusionMaterialID{ 0 };
+		std::uint32_t mElementBufferObjectID{ 0 };
+		std::uint32_t mViewProjectionMatrixUnifromLocation;
 
 		bool bmIsQueryOcclusionReady{ false };
 
@@ -58,8 +58,8 @@ namespace culling
 		/// draw Simple bounding volume(Occluder) after this function call
 		/// TODO : Disable Pixel Shading, Texturing
 		/// </summary>
-		bool StartQuery(const UINT32 queryID);
-		void StopQuery(const UINT32 queryID);
+		bool StartQuery(const std::uint32_t queryID);
+		void StopQuery(const std::uint32_t queryID);
 
 		/// <summary>
 		/// Start Query and Draw AABB of Occludee
@@ -84,11 +84,11 @@ namespace culling
 		/// <param name="entityCountInBlock"></param>
 		/// <param name="cameraIndex"></param>
 		void DestroyQueryObject(culling::QueryObject* queryObject);
-		void ClearEntityData(EntityBlock* currentEntityBlock, UINT32 entityIndex) override;
+		void ClearEntityData(EntityBlock* currentEntityBlock, std::uint32_t entityIndex) override;
 
 		void QueryOccludeeAABB();
 	
-		void GenQueryObject(EntityBlock* currentEntityBlock, UINT32 entityIndex, const culling::AABB & occlusionAABBLocalMinMax);
+		void GenQueryObject(EntityBlock* currentEntityBlock, std::uint32_t entityIndex, const culling::AABB & occlusionAABBLocalMinMax);
 		void GenQueryObject(culling::EntityBlockViewer& entityBlockViewer, const culling::AABB & occlusionAABBLocalMinMax);
 		
 		/*
@@ -105,7 +105,7 @@ namespace culling
 		///  of non - dependent rendering between an occlusion query and the
 		///	 conditionally - rendered primitives that depend on the query result.
 		/// </summary>
-		FORCE_INLINE static void StartConditionalRender(UINT32 queryID)
+		FORCE_INLINE static void StartConditionalRender(std::uint32_t queryID)
 		{
 #ifdef CULLING_OPENGL
 			assert(queryID > 0);

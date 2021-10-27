@@ -11,7 +11,7 @@ namespace culling
 	/// <summary>
 	/// Used for storing specific EntityBlock pointer
 	/// </summary>
-	class DOOM_API EntityBlockViewer
+	class EntityBlockViewer
 	{
 		friend class EveryCulling;
 		friend class QueryOcclusionCulling;
@@ -23,12 +23,12 @@ namespace culling
 		/// <summary>
 		/// Entity Index in Entity Block
 		/// </summary>
-		UINT32 mEntityIndexInBlock;
+		std::uint32_t mEntityIndexInBlock;
 
 	public:
 
 		EntityBlockViewer() = default;
-		EntityBlockViewer(EntityBlock* entityBlock, UINT32 entityIndexInBlock)
+		EntityBlockViewer(EntityBlock* entityBlock, std::uint32_t entityIndexInBlock)
 			: mTargetEntityBlock{ entityBlock }, mEntityIndexInBlock{ entityIndexInBlock }, bmIsActive{ true }
 		{}
 
@@ -38,7 +38,7 @@ namespace culling
 		/// </summary>
 		/// <param name="cameraIndex">0 <= cameraIndex < EveryCulling::mCameraCount</param>
 		/// <returns></returns>
-		FORCE_INLINE bool GetIsCulled(const UINT32 cameraIndex) const
+		FORCE_INLINE bool GetIsCulled(const std::uint32_t cameraIndex) const
 		{
 			assert(bmIsActive == true);
 			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
@@ -46,8 +46,8 @@ namespace culling
 		}
 
 
-		void SetEntityPosition(const FLOAT32* worldPosition);
+		void SetEntityPosition(const float* worldPosition);
 
-		void SetSphereBoundRadius(FLOAT32 sphereRadius);
+		void SetSphereBoundRadius(float sphereRadius);
 	};
 }

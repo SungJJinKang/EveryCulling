@@ -4,7 +4,7 @@
 
 namespace culling
 {
-	class DOOM_API DepthTestOccludeeStage : public MaskedSWOcclusionCullingStage
+	class DepthTestOccludeeStage : public MaskedSWOcclusionCullingStage
 	{
 
 	private:

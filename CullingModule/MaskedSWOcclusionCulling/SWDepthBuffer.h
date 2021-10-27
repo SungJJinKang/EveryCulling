@@ -21,7 +21,7 @@ namespace culling
 		/// A floating-point value represent Z0 Max DepthValue of A Subtile
 		/// 
 		/// </summary>
-		M256F z0Max;
+		culling::M256F z0Max;
 
 		/// <summary>
 		/// Depth value of subtiles
@@ -30,7 +30,7 @@ namespace culling
 		/// A floating-point value represent Z0 Max DepthValue of A Subtile
 		/// 
 		/// </summary>
-		M256F z1Max;
+		culling::M256F z1Max;
 
 		/// <summary>
 		/// Posion where Current Z1 Depth MaxValue come from
@@ -43,7 +43,7 @@ namespace culling
 		/// 8 byte -> Subtile Count in A Tile
 		/// 
 		/// </summary>
-		M256I depthPosition;
+		culling::M256I depthPosition;
 	};
 	
 	/// <summary>
@@ -58,7 +58,7 @@ namespace culling
 		/// </summary>
 		ThreeDTriangle mTriangleList[BIN_TRIANGLE_CAPACITY_PER_TILE];
 
-		SIZE_T mCurrentTriangleCount = 0;
+		size_t mCurrentTriangleCount = 0;
 	};
 
 	/// <summary>
@@ -74,46 +74,46 @@ namespace culling
 
 	struct Resolution
 	{
-		const UINT32 mWidth;
-		const UINT32 mHeight;
-		const UINT32 mTileCountInARow;
-		const UINT32 mTileCountInAColumn;
+		const std::uint32_t mWidth;
+		const std::uint32_t mHeight;
+		const std::uint32_t mTileCountInARow;
+		const std::uint32_t mTileCountInAColumn;
 
 		/// <summary>
 		/// 0
 		/// </summary>
-		const UINT32 mLeftBottomTileOrginX;
+		const std::uint32_t mLeftBottomTileOrginX;
 		
 		/// <summary>
 		/// 0
 		/// </summary>
-		const UINT32 mLeftBottomTileOrginY;
+		const std::uint32_t mLeftBottomTileOrginY;
 		
 		/// <summary>
 		/// Left Bottom PointX of Right Top Tile
 		/// if Buffer Width is 37 -> 32
 		/// if Buffer Width is 64 -> 32
 		/// </summary>
-		const UINT32 mRightTopTileOrginX;
+		const std::uint32_t mRightTopTileOrginX;
 		
 		/// <summary>
 		/// Left Bottom PointY of Right Top Tile
 		/// if Buffer Width is 37 -> 32
 		/// if Buffer Width is 64 -> 32
 		/// </summary>
-		const UINT32 mRightTopTileOrginY;
+		const std::uint32_t mRightTopTileOrginY;
 
 #if NDC_RANGE == MINUS_ONE_TO_POSITIVE_ONE
-		M256F mReplicatedScreenHalfWidth;
-		M256F mReplicatedScreenHalfHeight;
+		culling::M256F mReplicatedScreenHalfWidth;
+		culling::M256F mReplicatedScreenHalfHeight;
 #elif NDC_RANGE == ZERO_TO_POSITIVE_ONE
-		M256F mReplicatedScreenWidth;
-		M256F mReplicatedScreenHeight;
+		culling::M256F mReplicatedScreenWidth;
+		culling::M256F mReplicatedScreenHeight;
 #endif
 		
 	};
 
-	class DOOM_API SWDepthBuffer
+	class SWDepthBuffer
 	{
 		friend class MaskedSWOcclusionCulling;
 		friend class BinTrianglesStage;
@@ -134,7 +134,7 @@ namespace culling
 		/// </summary>
 		/// <param name="width">Screen Width</param>
 		/// <param name="height">Scree Height</param>
-		SWDepthBuffer(UINT32 width, UINT32 height);
+		SWDepthBuffer(std::uint32_t width, std::uint32_t height);
 
 	};
 }

@@ -3,7 +3,6 @@
 #include <bitset>
 
 #include "../../EveryCullingCore.h"
-#include <SIMD_Core.h>
 
 namespace culling
 {
@@ -20,7 +19,7 @@ namespace culling
 		static_assert(false, "You need to check alignment");
 		M128I mBits; // 16byte
 #elif TILE_WIDTH == 32
-		M256I mBits; // 32byte
+		culling::M256I mBits; // 32byte
 #endif	 
 
 	};

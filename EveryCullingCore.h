@@ -1,8 +1,9 @@
 #pragma once
 #include <assert.h>
 
-#include <Core.h>
+#include <stddef.h>
 
+#include "DataType/Math/SIMD_Core.h"
 
 #if defined(__GNUC__)  || defined( __clang__)
 #  define FORCE_INLINE inline __attribute__ ((always_inline))

@@ -11,12 +11,12 @@ namespace culling
 		/// <summary>
 		/// Volume size
 		/// </summary>
-		FLOAT32 mSize;
+		float mSize;
 
 		/// <summary>
 		/// 
 		/// </summary>
-		FLOAT32 mCullDistance;
+		float mCullDistance;
 	};
 
 	/// <summary>
@@ -26,7 +26,7 @@ namespace culling
 	/// will be culled from view 
 	/// when they are CullDistanceVolume.mCullDistance or more from the Camera.
 	/// </summary>
-	class DOOM_API DistanceCulling : CullingModule
+	class DistanceCulling : CullingModule
 	{
 
 	private:
@@ -35,9 +35,9 @@ namespace culling
 
 	public:
 
-		// TODO : EntityBlockÀÇ mPositions ÀÌ°Å ±×³É »ç¿ëÇÏ¸éµÈ´Ù.
-		// °Å¸® ºñ±³ÇÒ ¶§ sqrtÇÏÁö¸»°í ±×³É mCullDistance * mCullDistance·Î ºñ±³ÇÏÀÚ
-		virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, SIZE_T entityCountInBlock, SIZE_T cameraIndex) final
+		// TODO : EntityBlockï¿½ï¿½ mPositions ï¿½Ì°ï¿½ ï¿½×³ï¿½ ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½È´ï¿½.
+		// ï¿½Å¸ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ sqrtï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½×³ï¿½ mCullDistance * mCullDistanceï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+		virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex) final
 		{
 			if (mCullDistanceVolumes.size() == 0)
 			{
@@ -48,7 +48,7 @@ namespace culling
 		}
 
 		void AddCullDistanceVolume(culling::CullDistanceVolume cullDistanceVolume);
-		void DeleteCullDistanceVolume(SIZE_T index);
+		void DeleteCullDistanceVolume(size_t index);
 
 	};
 }

@@ -4,7 +4,7 @@
 
 void culling::NormalizePlane(Vec4& plane) noexcept
 {
-	FLOAT32 mag = std::sqrt(plane[0] * plane[0] + plane[1] * plane[1] + plane[2] * plane[2]);
+	float mag = std::sqrt(plane[0] * plane[0] + plane[1] * plane[1] + plane[2] * plane[2]);
 	assert(std::isnan(mag) == false);
 
 	plane[0] = plane[0] / mag;
@@ -49,7 +49,7 @@ void culling::ExtractPlanesFromVIewProjectionMatrix(const Mat4x4& viewProjection
 	// Normalize the plane equations, if requested
 	if (normalize == true)
 	{
-		for (SIZE_T i = 0; i < 6; i++)
+		for (size_t i = 0; i < 6; i++)
 		{
 			NormalizePlane(sixPlanes[i]);
 		}

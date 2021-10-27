@@ -11,7 +11,7 @@ static_assert(TILE_WIDTH * TILE_HEIGHT == 128 || TILE_WIDTH * TILE_HEIGHT == 256
 
 namespace culling
 {
-	class DOOM_API CoverageRasterizer
+	class CoverageRasterizer
 	{
 	private:
 
@@ -20,14 +20,14 @@ namespace culling
 		/// </summary>
 		/// <param name="coverageMask"></param>
 		/// <param name="triangle"></param>
-		M256I FillBottomFlatTriangle(CoverageMask& coverageMask, const Vec2& LeftBottomPoint, const Vec2& point1, const Vec2& point2, const Vec2& point3);
+		culling::M256I FillBottomFlatTriangle(CoverageMask& coverageMask, const Vec2& LeftBottomPoint, const Vec2& point1, const Vec2& point2, const Vec2& point3);
 		
 		/// <summary>
 		/// Assume TwoDTriangle intersect with mask
 		/// </summary>
 		/// <param name="coverageMask"></param>
 		/// <param name="triangle"></param>
-		M256I FillTopFlatTriangle(CoverageMask& coverageMask, const Vec2& LeftBottomPoint, const Vec2& point1, const Vec2& point2, const Vec2& point3);
+		culling::M256I FillTopFlatTriangle(CoverageMask& coverageMask, const Vec2& LeftBottomPoint, const Vec2& point1, const Vec2& point2, const Vec2& point3);
 		
 		
 
