@@ -155,57 +155,57 @@ namespace culling
 	inline const culling::M128F M128F_HALF_ONE{ _mm_set1_ps(0.5f) };
 	inline const culling::M128F M128F_EVERY_BITS_ONE{ _mm_castsi128_ps(_mm_set1_epi16(-1)) };
 
-	FORCE_INLINE culling::M128F M128F_ADD(const culling::M128F& M128_A, const culling::M128F& M128_B)
+	FORCE_INLINE extern culling::M128F M128F_ADD(const culling::M128F& M128_A, const culling::M128F& M128_B)
 	{
 		return _mm_add_ps(M128_A.raw, M128_B.raw);
 	}
 
-	FORCE_INLINE culling::M256F M256F_ADD(const culling::M256F& M256_A, const culling::M256F& M256_B)
+	FORCE_INLINE extern culling::M256F M256F_ADD(const culling::M256F& M256_A, const culling::M256F& M256_B)
 	{
 		return _mm256_add_ps(M256_A, M256_B);
 	}
 
-	FORCE_INLINE culling::M128F M128F_SUB(const culling::M128F& M128_A, const culling::M128F& M128_B)
+	FORCE_INLINE extern culling::M128F M128F_SUB(const culling::M128F& M128_A, const culling::M128F& M128_B)
 	{
 		return _mm_sub_ps(M128_A, M128_B);
 	}
 
-	FORCE_INLINE culling::M256F M256F_SUB(const culling::M256F& M256_A, const culling::M256F& M256_B)
+	FORCE_INLINE extern culling::M256F M256F_SUB(const culling::M256F& M256_A, const culling::M256F& M256_B)
 	{
 		return _mm256_sub_ps(M256_A, M256_B);
 	}
 
-	FORCE_INLINE culling::M128F M128F_MUL(const culling::M128F& M128_A, const culling::M128F& M128_B)
+	FORCE_INLINE extern culling::M128F M128F_MUL(const culling::M128F& M128_A, const culling::M128F& M128_B)
 	{
 		return _mm_mul_ps(M128_A, M128_B);
 	}
 
-	FORCE_INLINE culling::M256F M256F_MUL(const culling::M256F& M256_A, const culling::M256F& M256_B)
+	FORCE_INLINE extern culling::M256F M256F_MUL(const culling::M256F& M256_A, const culling::M256F& M256_B)
 	{
 		return _mm256_mul_ps(M256_A, M256_B);
 	}
 
-	FORCE_INLINE culling::M128F M128F_DIV(const culling::M128F& M128_A, const culling::M128F& M128_B)
+	FORCE_INLINE extern culling::M128F M128F_DIV(const culling::M128F& M128_A, const culling::M128F& M128_B)
 	{
 		return _mm_div_ps(M128_A, M128_B);
 	}
 
-	FORCE_INLINE culling::M256F M256F_DIV(const culling::M256F& M256_A, const culling::M256F& M256_B)
+	FORCE_INLINE extern culling::M256F M256F_DIV(const culling::M256F& M256_A, const culling::M256F& M256_B)
 	{
 		return _mm256_div_ps(M256_A, M256_B);
 	}
 
-	FORCE_INLINE culling::M128F M128F_MUL_AND_ADD(const culling::M128F& M128_A, const culling::M128F& M128_B, const culling::M128F& M128_C)
+	FORCE_INLINE extern culling::M128F M128F_MUL_AND_ADD(const culling::M128F& M128_A, const culling::M128F& M128_B, const culling::M128F& M128_C)
 	{
 		return culling::M128F_ADD(M128F_MUL(M128_A, M128_B), M128_C);
 	}
 
-	FORCE_INLINE culling::M256F M256F_MUL_AND_ADD(const culling::M256F& M256_A, const culling::M256F& M256_B, const culling::M256F& M256_C)
+	FORCE_INLINE extern culling::M256F M256F_MUL_AND_ADD(const culling::M256F& M256_A, const culling::M256F& M256_B, const culling::M256F& M256_C)
 	{
 		return M256F_ADD(M256F_MUL(M256_A, M256_B), M256_C);
 	}
 
-	/*FORCE_INLINE culling::M128F M128F_CROSS(const culling::M128F& M128_A, const culling::M128F& M128_B)
+	/*FORCE_INLINE extern culling::M128F M128F_CROSS(const culling::M128F& M128_A, const culling::M128F& M128_B)
 	{
 		culling::M128F A_YZXW = _mm_shuffle_ps(M128_A.raw, M128_A.raw, SHUFFLEMASK(1, 2, 0, 3));
 		culling::M128F B_ZXYW = _mm_shuffle_ps(M128_B, M128_B, SHUFFLEMASK(2, 0, 1, 3));
@@ -214,7 +214,7 @@ namespace culling
 		return M128F_SUB(M128F_MUL(A_YZXW, B_ZXYW), M128F_MUL(A_ZXYW, B_YZXW));
 	}
 
-	FORCE_INLINE culling::M256F M256F_CROSS(const culling::M256F& M256_A, const culling::M256F& M256_B)
+	FORCE_INLINE extern culling::M256F M256F_CROSS(const culling::M256F& M256_A, const culling::M256F& M256_B)
 	{
 		culling::M256F A_YZXW = _mm256_shuffle_ps(M256_A, M256_A, SHUFFLEMASK(1, 2, 0, 3));
 		culling::M256F B_ZXYW = _mm256_shuffle_ps(M256_B, M256_B, SHUFFLEMASK(2, 0, 1, 3));
@@ -224,7 +224,7 @@ namespace culling
 	}*/
 
 
-	FORCE_INLINE void M256F_SWAP(culling::M128F& M128_A, culling::M128F& M128_B, const culling::M128F& MASK)
+	FORCE_INLINE extern void M256F_SWAP(culling::M128F& M128_A, culling::M128F& M128_B, const culling::M128F& MASK)
 	{
 		const culling::M128F TEMP = M128_A.raw;
 		M128_A = _mm_blendv_ps(M128_A.raw, M128_B.raw, MASK.raw);
@@ -248,7 +248,7 @@ namespace culling
 	/// <param name="M256_B"></param>
 	/// <param name="MASK"></param>
 	/// <returns></returns>
-	FORCE_INLINE void M256F_SWAP(culling::M256F& M256_A, culling::M256F& M256_B, const culling::M256F& MASK)
+	FORCE_INLINE extern void M256F_SWAP(culling::M256F& M256_A, culling::M256F& M256_B, const culling::M256F& MASK)
 	{
 		culling::M256F TEMP = M256_A;
 		M256_A = _mm256_blendv_ps(M256_A, M256_B, MASK);
