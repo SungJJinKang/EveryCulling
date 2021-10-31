@@ -26,6 +26,8 @@ namespace culling
 
 		FORCE_INLINE operator __m128() { return raw; }
 		FORCE_INLINE operator __m128() const { return raw; }
+		FORCE_INLINE operator __m128* () { return &raw; }
+		FORCE_INLINE operator __m128* () const { return &raw; }
 
 		FORCE_INLINE __M128F() {}
 		FORCE_INLINE __M128F(const __m128& _raw) : raw{ _raw } {}
@@ -39,6 +41,8 @@ namespace culling
 
 		FORCE_INLINE operator __m128d() { return raw; }
 		FORCE_INLINE operator __m128d() const { return raw; }
+		FORCE_INLINE operator __m128d*() { return &raw; }
+		FORCE_INLINE operator __m128d*() const { return &raw; }
 
 		FORCE_INLINE __M128D() {}
 		FORCE_INLINE __M128D(const __m128d& _raw) : raw{ _raw } {}
@@ -52,6 +56,8 @@ namespace culling
 
 		FORCE_INLINE operator __m128i() { return raw; }
 		FORCE_INLINE operator __m128i() const { return raw; }
+		FORCE_INLINE operator __m128i* () { return &raw; }
+		FORCE_INLINE operator __m128i* () const { return &raw; }
 
 		FORCE_INLINE __M128I() {}
 		FORCE_INLINE __M128I(const __m128i& _raw) : raw{ _raw } {}
@@ -65,6 +71,8 @@ namespace culling
 
 		FORCE_INLINE operator __m256() { return raw; }
 		FORCE_INLINE operator __m256() const { return raw; }
+		FORCE_INLINE operator __m256* () { return &raw; }
+		FORCE_INLINE operator __m256* () const { return &raw; }
 
 		FORCE_INLINE __M256F() {}
 		FORCE_INLINE __M256F(const __m256& _raw) : raw{ _raw } {}
@@ -78,6 +86,8 @@ namespace culling
 
 		FORCE_INLINE operator __m256d() { return raw; }
 		FORCE_INLINE operator __m256d() const { return raw; }
+		FORCE_INLINE operator __m256d* () { return &raw; }
+		FORCE_INLINE operator __m256d* () const { return &raw; }
 
 		FORCE_INLINE __M256D() {}
 		FORCE_INLINE __M256D(const __m256d& _raw) : raw{ _raw } {}
@@ -91,6 +101,8 @@ namespace culling
 
 		FORCE_INLINE operator __m256i() { return raw; }
 		FORCE_INLINE operator __m256i() const { return raw; }
+		FORCE_INLINE operator __m256i* () { return &raw; }
+		FORCE_INLINE operator __m256i* () const { return &raw; }
 
 		FORCE_INLINE __M256I() {}
 		FORCE_INLINE __M256I(const __m256i& _raw) : raw{ _raw } {}
@@ -99,7 +111,7 @@ namespace culling
 	using M256I = __M256I;
 
 	
-#elif defined(_MSC_VER))
+#elif defined(_MSC_VER)
 
 	using M128F = __m128;
 	using M128D = __m128d;
@@ -157,7 +169,7 @@ namespace culling
 
 	FORCE_INLINE extern culling::M128F M128F_ADD(const culling::M128F& M128_A, const culling::M128F& M128_B)
 	{
-		return _mm_add_ps(M128_A.raw, M128_B.raw);
+		return _mm_add_ps(M128_A, M128_B);
 	}
 
 	FORCE_INLINE extern culling::M256F M256F_ADD(const culling::M256F& M256_A, const culling::M256F& M256_B)
@@ -197,12 +209,12 @@ namespace culling
 
 	FORCE_INLINE extern culling::M128F M128F_MUL_AND_ADD(const culling::M128F& M128_A, const culling::M128F& M128_B, const culling::M128F& M128_C)
 	{
-		return culling::M128F_ADD(M128F_MUL(M128_A, M128_B), M128_C);
+		return culling::M128F_ADD(culling::M128F_MUL(M128_A, M128_B), M128_C);
 	}
 
 	FORCE_INLINE extern culling::M256F M256F_MUL_AND_ADD(const culling::M256F& M256_A, const culling::M256F& M256_B, const culling::M256F& M256_C)
 	{
-		return M256F_ADD(M256F_MUL(M256_A, M256_B), M256_C);
+		return culling::M256F_ADD(culling::M256F_MUL(M256_A, M256_B), M256_C);
 	}
 
 	/*FORCE_INLINE extern culling::M128F M128F_CROSS(const culling::M128F& M128_A, const culling::M128F& M128_B)
@@ -226,9 +238,9 @@ namespace culling
 
 	FORCE_INLINE extern void M256F_SWAP(culling::M128F& M128_A, culling::M128F& M128_B, const culling::M128F& MASK)
 	{
-		const culling::M128F TEMP = M128_A.raw;
-		M128_A = _mm_blendv_ps(M128_A.raw, M128_B.raw, MASK.raw);
-		M128_B = _mm_blendv_ps(M128_B.raw, TEMP.raw, MASK.raw);
+		const culling::M128F TEMP = M128_A;
+		M128_A = _mm_blendv_ps(M128_A, M128_B, MASK);
+		M128_B = _mm_blendv_ps(M128_B, TEMP, MASK);
 	}
 
 	/// <summary>

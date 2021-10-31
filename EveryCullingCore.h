@@ -10,7 +10,7 @@
 #  define NEVER_INLINE __attribute__ ((noinline))
 #  define RESTRICT __restrict
 #  define VLA_ARRAY_ON_STACK(type__, varname__, size__) type__ varname__[size__];
-#elif defined(_MSC_VER))
+#elif defined(_MSC_VER)
 #  define FORCE_INLINE __forceinline
 #  define NEVER_INLINE __declspec(noinline)
 #  define RESTRICT __restrict
