@@ -17,17 +17,17 @@ void culling::ViewFrustumCulling::CullBlockEntityJob(EntityBlock* currentEntityB
 
 	for (size_t entityIndex = 0; entityIndex < entityCountInBlock; entityIndex++)
 	{
-		doom::Transform* const transform = reinterpret_cast<doom::Transform*>(currentEntityBlock->mTransform[entityIndex]);
-		doom::Renderer* const renderer = reinterpret_cast<doom::Renderer*>(currentEntityBlock->mRenderer[entityIndex]);
+		dooms::Transform* const transform = reinterpret_cast<dooms::Transform*>(currentEntityBlock->mTransform[entityIndex]);
+		dooms::Renderer* const renderer = reinterpret_cast<dooms::Renderer*>(currentEntityBlock->mRenderer[entityIndex]);
 		Position_BoundingSphereRadius* const posBoundingSphereRadius = currentEntityBlock->mPositions + entityIndex;
 
-		const float worldRadius = renderer->doom::ColliderUpdater<doom::physics::Sphere>::GetWorldCollider()->mRadius;
+		const float worldRadius = renderer->dooms::ColliderUpdater<dooms::physics::Sphere>::GetWorldCollider()->mRadius;
 
 		const culling::Vec3* const entityPos = reinterpret_cast<const culling::Vec3*>(&transform->GetPosition());
 		*reinterpret_cast<culling::M128F*>(posBoundingSphereRadius) = *reinterpret_cast<const culling::M128F*>(entityPos);
 		posBoundingSphereRadius->SetBoundingSphereRadius(worldRadius);
 
-		if(doom::graphics::Graphics_Setting::IsSortObjectFrontToBack == true)
+		if(dooms::graphics::Graphics_Setting::IsSortObjectFrontToBack == true)
 		{
 			renderer->CacheDistanceToCamera(cameraIndex, *cameraPos);
 		}
