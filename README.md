@@ -32,7 +32,7 @@ This library is targeting Maximing SIMD, Cache hit, Multi Threading.
 [구현 영상](https://youtu.be/G-IFukD2bNg)         
 [Slide Resource](https://www.ea.com/frostbite/news/culling-the-battlefield-data-oriented-design-in-practice)        
 [GDC Talk Video](https://www.gdcvault.com/play/1014491/Culling-the-Battlefield-Data-Oriented)   
-[한국어 블로그 글](https://sungjjinkang.github.io/doom/2021/04/02/viewfrustumculling.html)    
+[한국어 블로그 글](https://sungjjinkang.github.io/doom/c++/computergraphics/game/2021/04/02/viewfrustumculling.html)    
 
 MultiThreaded View Frustum Culling is 8ms faster than SingleThreaded View Frustum Culling ( in Stress Test )
 
