@@ -144,6 +144,23 @@ Cull 되는 지를 확인하기 위해서는 그릴 오브젝트의 8 X 4타일 
 둘째. 타일의 사이즈 ( 32 * 8 사이즈의 Coverage Mask와 8개의 Sub타일의 MaxDepthValue )가 SIMD 연산에 적합하기 때문에 SIMD 연산으로 여러 타일을 한꺼번에 연산할 수 있다는 장점이 있다.       
 ```
 
+----------------------
+
+흔히 사용하는 HI-Z Occlusion Culling와 비교를 해보자.        
+
+HI-Z Occlusion Culling은 Masked Occlusion Culling과 비슷하게 전체 해상도에 대한 깊이 값을 구하지 않고 깊이 버퍼 사이즈를 조금 줄인 버전의 Occluder 깊이 버퍼를 만든다.         
+깊이 버퍼가 축소되면서 하나로 합쳐지는 깊이 값들 중 가장 높은 값을 취하는 방식을 가진다.         
+생각해보자. 깊이 값 중 가장 큰 값을 가지면 적어도 그려야할 것을 그리지 않는 참사는 일어나지 않을 것이다. 하지만 단점으로는 그 만큼 정확도가 떨어지다보니 그려지지 않아도 될 것을 그리는 일은 발생할 수 있다. ( 이는 GPU에서 Depth 테스트로 처리가 되니 게이머가 보기에는 아무런 차이를 느끼지 못한다. )           
+그럼 생각을 해보면 화면 전체가 어떤 오브젝트에 의해 덮이고 그 오브젝트보다 가까운 또 다른 오브젝트에 의해 화면 전체가 덮였을 때 Depth 버퍼에는 어떤 Depth 값이 쓰였을까?         
+먼저 그려진, 그러니깐 멀리 있는 오브젝트의 최대 Depth 값이 Depth 버퍼에 쓰여진다. 그리고 이는 아무리 그 오브젝트를 덮는 더 가까운 오브젝트가 그려져도 갱신이 되지 않는다.         
+
+그래서 여기서 Masked Occlusion Culling이 등장한다. 현재 최대 깊이 값의 오브젝트를 모두 덮는 더 가까운 오브젝트가 등장하면 깊이 값을 갱신해주자는 것이다.           
+Depth 버퍼의 깊이 값이 더 적으면 적을 수록 더 많은 오브젝트의 렌더링의 CPU 단계에서 걸러낼 수 있다.              
+
+다만 Masked Occlusion Culling은 깊이 값을 저장하는 버퍼를 두가지(L0 Max Depth, L1 Max Depth) 가지고 있다보니 그 만큼 메모리를 더 많이 사용한다는 단점이 존재한다.          
+
+----------------------
+
 잘 이해가 되지 않으면 아래의 자료를 보기 바란다 :          
 https://www.slideshare.net/IntelSoftware/masked-software-occlusion-culling                       
 https://www.slideshare.net/IntelSoftware/masked-occlusion-culling          
