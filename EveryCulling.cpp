@@ -28,8 +28,8 @@ void culling::EveryCulling::FreeEntityBlock(EntityBlock* freedEntityBlock)
 	assert(IsSuccessToFind == true);
 
 	//swap and pop back trick
-	std::vector_swap_popback(mEntityGridCell.mEntityBlocks, freedEntityBlockIndex);
-	std::vector_swap_popback(mEntityGridCell.AllocatedEntityCountInBlocks, freedEntityBlockIndex);
+	std::vector_swap_popback(mEntityGridCell.mEntityBlocks, mEntityGridCell.mEntityBlocks.begin() + freedEntityBlockIndex);
+	std::vector_swap_popback(mEntityGridCell.AllocatedEntityCountInBlocks, mEntityGridCell.AllocatedEntityCountInBlocks.begin() + freedEntityBlockIndex);
 
 	freedEntityBlock->mCurrentEntityCount = 0;
 
