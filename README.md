@@ -27,7 +27,7 @@ This library is targeting Maximing SIMD, Cache hit, Multi Threading.
 - Precomputed Visibility Volume ( https://docs.unrealengine.com/4.26/en-US/RenderingAndGraphics/VisibilityCulling/PrecomputedVisibilityVolume/ )                          
               
 
-## View Frustum Culling using SIMD, Multithreading
+## View Frustum Culling using SIMD, Multithreading ( 100% )
 
 [구현 영상](https://youtu.be/G-IFukD2bNg)         
 [Slide Resource](https://www.ea.com/frostbite/news/culling-the-battlefield-data-oriented-design-in-practice)        
@@ -128,12 +128,12 @@ Thread 2 : Check Frustum of Entity Block 2, 5, 8
 To minimize waiting time(wait calculating cull finish) , Passing cull job to thread should be placed at foremost of rendering loop.      
 In My experiment, Waiting time is near to zero.
 
-## Masked Software Occlusion Culling
+## Masked Software Occlusion Culling ( 20% )
 
 Read This : ["Masked Software Occlusion Culling"는 어떻게 작동하는가?](https://github.com/SungJJinKang/EveryCulling/blob/main/CullingModule/MaskedSWOcclusionCulling/MaskedSWOcclusionCulling_HowWorks.md)           
 references : https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf         
 
-## Query Occlusion Culling
+## Query Occlusion Culling ( 80% )
 
 Currently This feature is supported only on OpenGL.       
 
