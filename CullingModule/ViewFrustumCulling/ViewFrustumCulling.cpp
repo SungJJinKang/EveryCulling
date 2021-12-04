@@ -19,19 +19,22 @@ void culling::ViewFrustumCulling::CullBlockEntityJob(EntityBlock* currentEntityB
 	{
 		dooms::Transform* const transform = reinterpret_cast<dooms::Transform*>(currentEntityBlock->mTransform[entityIndex]);
 		dooms::Renderer* const renderer = reinterpret_cast<dooms::Renderer*>(currentEntityBlock->mRenderer[entityIndex]);
-		Position_BoundingSphereRadius* const posBoundingSphereRadius = currentEntityBlock->mPositions + entityIndex;
 
-		const float worldRadius = renderer->dooms::ColliderUpdater<dooms::physics::Sphere>::GetWorldCollider()->mRadius;
-
-		const culling::Vec3* const entityPos = reinterpret_cast<const culling::Vec3*>(&transform->GetPosition());
-		*reinterpret_cast<culling::M128F*>(posBoundingSphereRadius) = *reinterpret_cast<const culling::M128F*>(entityPos);
-		posBoundingSphereRadius->SetBoundingSphereRadius(worldRadius);
-
-		if(dooms::graphics::Graphics_Setting::IsSortObjectFrontToBack == true)
+		if(dooms::IsValid(renderer) == true)
 		{
-			renderer->CacheDistanceToCamera(cameraIndex, *cameraPos);
-		}
-		
+			Position_BoundingSphereRadius* const posBoundingSphereRadius = currentEntityBlock->mPositions + entityIndex;
+
+			const float worldRadius = renderer->dooms::ColliderUpdater<dooms::physics::Sphere>::GetWorldCollider()->mRadius;
+
+			const culling::Vec3* const entityPos = reinterpret_cast<const culling::Vec3*>(&transform->GetPosition());
+			*reinterpret_cast<culling::M128F*>(posBoundingSphereRadius) = *reinterpret_cast<const culling::M128F*>(entityPos);
+			posBoundingSphereRadius->SetBoundingSphereRadius(worldRadius);
+
+			if (dooms::graphics::Graphics_Setting::IsSortObjectFrontToBack == true)
+			{
+				renderer->CacheDistanceToCamera(cameraIndex, *cameraPos);
+			}
+		}		
 	}
 
 	// this object's size should be multiples of 32
