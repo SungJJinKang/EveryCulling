@@ -42,7 +42,7 @@ namespace culling
 	/// <summary>
 	/// EntityBlock size should be less 4KB(Page size) for Block data being allocated in a page
 	/// </summary>
-	struct alignas(CACHE_LINE_SIZE) EntityBlock
+	struct EntityBlock
 	{
 		/// <summary>
 		/// Why align to 32byte?
@@ -51,7 +51,7 @@ namespace culling
 		/// You don't need to worry about false sharing.
 		/// void* mRenderer[ENTITY_COUNT_IN_ENTITY_BLOCK] and mCurrentEntityCount isn't read during CullJob
 		/// </summary>
-		char mIsVisibleBitflag[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		alignas(32) char mIsVisibleBitflag[ENTITY_COUNT_IN_ENTITY_BLOCK];
 	
 		//SoA (Structure of Array) !!!!!! for performance 
 

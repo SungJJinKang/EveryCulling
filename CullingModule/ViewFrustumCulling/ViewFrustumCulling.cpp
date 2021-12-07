@@ -41,9 +41,9 @@ void culling::ViewFrustumCulling::CullBlockEntityJob(EntityBlock* currentEntityB
 	const size_t cullingMaskSize = ENTITY_COUNT_IN_ENTITY_BLOCK + 32 - (ENTITY_COUNT_IN_ENTITY_BLOCK % 32);
 	alignas(32) char cullingMask[cullingMaskSize];
 	D_ASSERT(cullingMaskSize % 32 == 0);
-	for(int i = 0 ; i < cullingMaskSize ; i+= 32)
+	for(int i = 0 ; i < cullingMaskSize ; i += 32)
 	{
-		*reinterpret_cast<culling::M256F*>(cullingMask) = _mm256_setzero_ps();
+		*reinterpret_cast<culling::M256F*>((char*)cullingMask + i) = _mm256_setzero_ps();
 	}
 
 	const Vec4* frustumPlane = mSIMDFrustumPlanes[cameraIndex].mFrustumPlanes;
@@ -64,7 +64,7 @@ void culling::ViewFrustumCulling::CullBlockEntityJob(EntityBlock* currentEntityB
 	// use mCulledScreenSpaceAABBArea
 	culling::M256F* m256f_isVisible = reinterpret_cast<culling::M256F*>(currentEntityBlock->mIsVisibleBitflag);
 	const culling::M256F* m256f_cullingMask = reinterpret_cast<const culling::M256F*>(cullingMask);
-	const std::uint32_t m256_count_isvisible = 1 + ((currentEntityBlock->mCurrentEntityCount * sizeof(decltype(*EntityBlock::mIsVisibleBitflag)) - 1) / sizeof(culling::M256F));
+	const std::uint32_t m256_count_isvisible = cullingMaskSize / 2;
 
 	/// <summary>
 	/// M256 = 8bit(1byte = bool size) * 32 
