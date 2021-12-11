@@ -70,52 +70,18 @@ namespace culling
 		/// --> vertexStride is 6 * 4(float)
 		/// </param>
 		/// <param name="modelToClipspaceMatrix"></param>
-		FORCE_INLINE void DrawOccluderTriangles
+		void DrawOccluderTriangles
 		(
 			const float* vertices, const std::uint32_t* vertexIndices, size_t indiceCount, bool vertexStrideByte,
 			float* modelToClipspaceMatrix
-		)
-		{
-			mBinTrianglesStage.BinTriangles(vertices, vertexIndices, indiceCount, vertexStrideByte, modelToClipspaceMatrix);
-
-			//mRasterizeTrianglesStage.RasterizeBinnedTriangles();
-		}
+		);
 
 
 		/// <summary>
 		/// Depth Test Multiple Occludees
 		/// </summary>
 		/// <param name="worldAABBs"></param>
-		FORCE_INLINE void DepthTestOccludee(const AABB* worldAABBs, size_t aabbCount, char* visibleBitFlags)
-		{
-			//Check Area of TwoDTriangle
-			//if Area is smaller than setting, Dont draw that occluder
-			//Occluder should be huge to occlude occludee
-
-			//Compute BoundingBoxs(Sub Tile)
-			//
-
-			//!!!!!!!
-			//We Just need Minimum Depth Of AABB ( regardless with Tile )
-			//And Just Compare this minimum depth with Max depth of Tiles
-			//Dont Try drawing triangles of AABB, Just Compute MinDepth of AABB
-
-			culling::M256F aabbVertexX[3];
-			culling::M256F aabbVertexY[3];
-			culling::M256F aabbVertexZ[3];
-
-			///Temporarily remove unused varaible warning
-			(void)aabbVertexX, (void)aabbVertexY, (void)aabbVertexZ;
-
-			// 3 AABB is checked per loop
-			for (size_t i = 0; i < aabbCount; i += 3)
-			{
-				// ComputeMinimumDepths
-			}
-
-
-
-		}
+		void DepthTestOccludee(const AABB* worldAABBs, size_t aabbCount, char* visibleBitFlags);
 
 		// Inherited via CullingModule
 		virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex) override;
