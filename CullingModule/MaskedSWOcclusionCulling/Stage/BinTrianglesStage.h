@@ -12,8 +12,6 @@ namespace culling
 	
 	class BinTrianglesStage : public MaskedSWOcclusionCullingStage
 	{
-		friend class MaskedSWOcclusionCulling;
-
 	private:
 
 	
@@ -25,8 +23,13 @@ namespace culling
 		/// <param name="outClipVertexY"></param>
 		/// <param name="outClipVertexZ"></param>
 		/// <param name="outClipVertexW"></param>
-		void ConverClipSpaceToNDCSpace(
-			culling::M256F* outClipVertexX, culling::M256F* outClipVertexY, culling::M256F* outClipVertexZ, const culling::M256F* oneDividedByW, std::uint32_t& triangleCullMask
+		void ConverClipSpaceToNDCSpace
+		(
+			culling::M256F* outClipVertexX, 
+			culling::M256F* outClipVertexY, 
+			culling::M256F* outClipVertexZ, 
+			const culling::M256F* oneDividedByW, 
+			std::uint32_t& triangleCullMask
 		);
 
 		/// <summary>
@@ -53,8 +56,12 @@ namespace culling
 		/// <param name="vertW">"W" !!!!!!!!! three culling::M256F -> 12 floating-point value</param>
 		/// <param name="modelToClipspaceMatrix">column major 4x4 matrix</param>
 		void TransformVertexsToClipSpace(
-			culling::M256F* outClipVertexX, culling::M256F* outClipVertexY, culling::M256F* outClipVertexZ,
-			culling::M256F* outClipVertexW, const float* toClipspaceMatrix, std::uint32_t& triangleCullMask
+			culling::M256F* outClipVertexX, 
+			culling::M256F* outClipVertexY, 
+			culling::M256F* outClipVertexZ,
+			culling::M256F* outClipVertexW, 
+			const float* toClipspaceMatrix, 
+			std::uint32_t& triangleCullMask
 		);
 
 		/// <summary>
@@ -125,11 +132,24 @@ namespace culling
 		/// <param name="outVerticesX"></param>
 		/// <param name="outVerticesY"></param>
 		/// <param name="triangleCullMask"></param>
-		void GatherVertex(
-			const float* vertices, const std::uint32_t* vertexIndices, const size_t indiceCount, 
-			const size_t currentIndiceIndex, const size_t vertexStrideByte, const size_t fetchTriangleCount,
-			culling::M256F* outVerticesX, culling::M256F* outVerticesY, culling::M256F* outVerticesZ, std::uint32_t& triangleCullMask
+		void GatherVertices
+		(
+			const float* vertices, 
+			const std::uint32_t* vertexIndices, 
+			const size_t indiceCount, 
+			const size_t currentIndiceIndex, 
+			const size_t vertexStrideByte, 
+			const size_t fetchTriangleCount,
+			culling::M256F* outVerticesX, 
+			culling::M256F* outVerticesY, 
+			culling::M256F* outVerticesZ, 
+			std::uint32_t& triangleCullMask
 		);
+
+
+	public:
+
+		BinTrianglesStage(MaskedSWOcclusionCulling& mMOcclusionCulling);
 
 
 
@@ -146,11 +166,14 @@ namespace culling
 		/// --> vertexStride is 6 * 4(float)
 		/// </param>
 		/// <param name="modelToClipspaceMatrix"></param>
-		void BinTriangles(const float* vertices, const std::uint32_t* vertexIndices, const size_t indiceCount, const size_t vertexStrideByte, const float * modelToClipspaceMatrix);
-
-	public:
-
-		BinTrianglesStage(MaskedSWOcclusionCulling& mMOcclusionCulling);
+		void BinTriangles
+		(
+			const float* vertices, 
+			const std::uint32_t* vertexIndices, 
+			const size_t indiceCount, 
+			const size_t vertexStrideByte, 
+			const float* modelToClipspaceMatrix
+		);
 
 	};
 }

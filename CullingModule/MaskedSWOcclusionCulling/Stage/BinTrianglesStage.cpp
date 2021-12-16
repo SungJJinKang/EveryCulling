@@ -5,7 +5,11 @@
 
 void culling::BinTrianglesStage::ConverClipSpaceToNDCSpace
 (
-	culling::M256F* outClipVertexX, culling::M256F* outClipVertexY, culling::M256F* outClipVertexZ, const culling::M256F* oneDividedByW, std::uint32_t& triangleCullMask
+	culling::M256F* outClipVertexX, 
+	culling::M256F* outClipVertexY, 
+	culling::M256F* outClipVertexZ,
+	const culling::M256F* oneDividedByW,
+	std::uint32_t& triangleCullMask
 )
 {
 	for (size_t i = 0; i < 3; i++)
@@ -59,8 +63,12 @@ void culling::BinTrianglesStage::ConvertNDCSpaceToScreenPixelSpace
 
 void culling::BinTrianglesStage::TransformVertexsToClipSpace
 (
-	culling::M256F* outClipVertexX, culling::M256F* outClipVertexY, culling::M256F* outClipVertexZ, culling::M256F* outClipVertexW, 
-	const float* toClipspaceMatrix, std::uint32_t& triangleCullMask
+	culling::M256F* outClipVertexX, 
+	culling::M256F* outClipVertexY, 
+	culling::M256F* outClipVertexZ, 
+	culling::M256F* outClipVertexW, 
+	const float* toClipspaceMatrix, 
+	std::uint32_t& triangleCullMask
 )
 {
 	if (toClipspaceMatrix != nullptr)
@@ -84,7 +92,12 @@ void culling::BinTrianglesStage::TransformVertexsToClipSpace
 	}
 }
 
-void culling::BinTrianglesStage::CullBackfaces(const culling::M256F* screenPixelX, const culling::M256F* screenPixelY, std::uint32_t& triangleCullMask)
+void culling::BinTrianglesStage::CullBackfaces
+(
+	const culling::M256F* screenPixelX, 
+	const culling::M256F* screenPixelY, 
+	std::uint32_t& triangleCullMask
+)
 {
 	//I don't know How this Works.........
 	//https://stackoverflow.com/questions/67357115/i-found-back-face-culling-code-but-i-cant-know-how-this-works
@@ -101,7 +114,15 @@ void culling::BinTrianglesStage::CullBackfaces(const culling::M256F* screenPixel
 	triangleCullMask = static_cast<std::uint32_t>(_mm256_movemask_ps(ccwMask));
 }
 
-void culling::BinTrianglesStage::ComputeBinBoundingBox(const culling::M256F* screenPixelX, const culling::M256F* screenPixelY, culling::M256I& outBinBoundingBoxMinX, culling::M256I& outBinBoundingBoxMinY, culling::M256I& outBinBoundingBoxMaxX, culling::M256I& outBinBoundingBoxMaxY)
+void culling::BinTrianglesStage::ComputeBinBoundingBox
+(
+	const culling::M256F* screenPixelX, 
+	const culling::M256F* screenPixelY, 
+	culling::M256I& outBinBoundingBoxMinX, 
+	culling::M256I& outBinBoundingBoxMinY, 
+	culling::M256I& outBinBoundingBoxMaxX, 
+	culling::M256I& outBinBoundingBoxMaxY
+)
 {
 	culling::M256I minScreenPixelX, minScreenPixelY, maxScreenPixelX, maxScreenPixelY;
 
@@ -138,26 +159,43 @@ void culling::BinTrianglesStage::ComputeBinBoundingBox(const culling::M256F* scr
 }
 
 
-void culling::BinTrianglesStage::PassTrianglesToTileBin(const culling::M256F* screenPixelX, const culling::M256F* screenPixelY, std::uint32_t& triangleCullMask, TriangleList& tileBin, const culling::M256F& outBinBoundingBoxMinX, const culling::M256F& outBinBoundingBoxMinY, const culling::M256F& outBinBoundingBoxMaxX, const culling::M256F& outBinBoundingBoxMaxY)
+void culling::BinTrianglesStage::PassTrianglesToTileBin
+(
+	const culling::M256F* screenPixelX, 
+	const culling::M256F* screenPixelY, 
+	std::uint32_t& triangleCullMask, 
+	TriangleList& tileBin, 
+	const culling::M256F& outBinBoundingBoxMinX, 
+	const culling::M256F& outBinBoundingBoxMinY, 
+	const culling::M256F& outBinBoundingBoxMaxX, 
+	const culling::M256F& outBinBoundingBoxMaxY
+)
 {
 }
 
 
 
 
-void culling::BinTrianglesStage::GatherVertex
+void culling::BinTrianglesStage::GatherVertices
 (
-	const float* vertices, const std::uint32_t* vertexIndices, const size_t indiceCount, const size_t currentIndiceIndex, const size_t vertexStrideByte, const size_t fetchTriangleCount,
-	culling::M256F* outVerticesX, culling::M256F* outVerticesY, culling::M256F* outVerticesZ, std::uint32_t& triangleCullMask
+	const float* vertices, 
+	const std::uint32_t* vertexIndices, 
+	const size_t indiceCount, 
+	const size_t currentIndiceIndex, 
+	const size_t vertexStrideByte, 
+	const size_t fetchTriangleCount,
+	culling::M256F* outVerticesX, 
+	culling::M256F* outVerticesY, 
+	culling::M256F* outVerticesZ, 
+	std::uint32_t& triangleCullMask
 )
 {
 	assert(indiceCount % 3 == 0);
 	assert(currentIndiceIndex % 3 == 0);
 
 	//Gather Indices
-	culling::M256I m256i_indices[3];
 	const std::uint32_t* currentVertexIndices = vertexIndices + currentIndiceIndex;
-	const culling::M256I indiceIndexs = _mm256_setr_epi32(0, 3, 6, 9, 12, 15, 18, 21);
+	const culling::M256I indiceIndexs = _mm256_set_epi32(21, 18, 15, 12, 9, 6, 3, 0);
 	static const culling::M256I SIMD_LANE_MASK[9] = {
 		_mm256_setr_epi32(0,  0,  0,  0,  0,  0,  0,  0),
 		_mm256_setr_epi32(~0,  0,  0,  0,  0,  0,  0,  0),
@@ -173,36 +211,42 @@ void culling::BinTrianglesStage::GatherVertex
 	// Compute per-lane index list offset that guards against out of bounds memory accesses
 	const culling::M256I safeIndiceIndexs = _mm256_and_si256(indiceIndexs, SIMD_LANE_MASK[fetchTriangleCount]);
 
+
+	culling::M256I m256i_indices[3];
 	//If stride is 7
 	//Current Value 
-	//m256i_indices[0] : 0, 3, 6,  9, 12, 15, 18, 21
-	//m256i_indices[1] : 1, 4, 7, 10, 13, 16, 19, 22
+	//m256i_indices[0] : 0 ( first vertex index ), 3, 6,  9, 12, 15, 18, 21
+	//m256i_indices[1] : 1 ( second vertex index ), 4, 7, 10, 13, 16, 19, 22
 	//m256i_indices[2] : 2, 5, 8, 11, 14, 17, 20, 23
-	//Point1s of Triangle
+	//Point1 indices of Triangles
 	m256i_indices[0] = _mm256_i32gather_epi32(reinterpret_cast<const INT32*>(currentVertexIndices + 0), safeIndiceIndexs, 4); // why 4? -> vertexIndices is std::uint32_t( 4byte )
-	//Point2s of Triangle
+	//Point2 indices of Triangles
 	m256i_indices[1] = _mm256_i32gather_epi32(reinterpret_cast<const INT32*>(currentVertexIndices + 1), safeIndiceIndexs, 4);
-	//Point3s of Triangle
+	//Point3 indices of Triangles
 	m256i_indices[2] = _mm256_i32gather_epi32(reinterpret_cast<const INT32*>(currentVertexIndices + 2), safeIndiceIndexs, 4);
 
-	//Consider Stride
-	//If StrideByte is 28
-	//m256i_indices[0] : 0 * 28, 3 * 28, 6 * 28,  9 * 28, 12 * 28, 15 * 28, 18 * 28, 21 * 28
-	//m256i_indices[1] : 1 * 28, 4 * 28, 7 * 28, 10 * 28, 13 * 28, 16 * 28, 19 * 28, 22 * 28
-	//m256i_indices[2] : 2 * 28, 5 * 28, 8 * 28, 11 * 28, 14 * 28, 17 * 28, 20 * 28, 23 * 28
-	const culling::M256I m256i_stride = _mm256_set1_epi32(static_cast<INT32>(vertexStrideByte));
-	m256i_indices[0] = _mm256_mullo_epi32(m256i_indices[0], m256i_stride);
-	m256i_indices[1] = _mm256_mullo_epi32(m256i_indices[1], m256i_stride);
-	m256i_indices[2] = _mm256_mullo_epi32(m256i_indices[2], m256i_stride);
+	if(vertexStrideByte > 0)
+	{
+		//Consider Stride
+		//If StrideByte is 28
+		//m256i_indices[0] : 0 * 28, 3 * 28, 6 * 28,  9 * 28, 12 * 28, 15 * 28, 18 * 28, 21 * 28
+		//m256i_indices[1] : 1 * 28, 4 * 28, 7 * 28, 10 * 28, 13 * 28, 16 * 28, 19 * 28, 22 * 28
+		//m256i_indices[2] : 2 * 28, 5 * 28, 8 * 28, 11 * 28, 14 * 28, 17 * 28, 20 * 28, 23 * 28
+		const culling::M256I m256i_stride = _mm256_set1_epi32(static_cast<INT32>(vertexStrideByte));
+		m256i_indices[0] = _mm256_mullo_epi32(m256i_indices[0], m256i_stride);
+		m256i_indices[1] = _mm256_mullo_epi32(m256i_indices[1], m256i_stride);
+		m256i_indices[2] = _mm256_mullo_epi32(m256i_indices[2], m256i_stride);
+	}
+	
 
 	//Gather vertexs
 	//Should consider vertexStride(vertices isn't stored contiguously because generally vertex datas is stored with uv, normal datas...) 
 	//And Should consider z value
 	for (size_t i = 0; i < 3; i++)
 	{
-		outVerticesX[i] = _mm256_i32gather_ps(vertices, m256i_indices[i], 1);
-		outVerticesY[i] = _mm256_i32gather_ps(vertices + 1, m256i_indices[i], 1);
-		outVerticesZ[i] = _mm256_i32gather_ps(vertices + 2, m256i_indices[i], 1);
+		outVerticesX[i] = _mm256_i32gather_ps((float*)vertices, m256i_indices[i], 1);
+		outVerticesY[i] = _mm256_i32gather_ps((float*)vertices + 1, m256i_indices[i], 1);
+		outVerticesZ[i] = _mm256_i32gather_ps((float*)vertices + 2, m256i_indices[i], 1);
 	}
 }
 
@@ -211,8 +255,12 @@ culling::BinTrianglesStage::BinTrianglesStage(MaskedSWOcclusionCulling& mMOcclus
 {
 }
 
-void culling::BinTrianglesStage::BinTriangles(
-	const float* vertices, const std::uint32_t* vertexIndices, const size_t indiceCount, const size_t vertexStrideByte, 
+void culling::BinTrianglesStage::BinTriangles
+(
+	const float* vertices, 
+	const std::uint32_t* vertexIndices, 
+	const size_t indiceCount, 
+	const size_t vertexStrideByte, 
 	const float* modelToClipspaceMatrix
 )
 {
@@ -221,7 +269,7 @@ void culling::BinTrianglesStage::BinTriangles(
 
 	while (currentIndiceIndex < indiceCount)
 	{
-		const size_t fetchTriangleCount = (indiceCount - currentIndiceIndex) / 3;
+		const size_t fetchTriangleCount = MIN(8, (indiceCount - currentIndiceIndex) / 3);
 
 		// First 4 bits show if traingle is valid
 		// Current Value : 00000000 00000000 00000000 11111111
@@ -236,6 +284,9 @@ void culling::BinTrianglesStage::BinTriangles(
 		// culling::M256F * 3 -> 8 TwoDTriangle with no unused space
 
 		//We don't need z value in Binning stage!!!
+		// Triangle's First Vertex X is in ndcSpaceVertexX[0][0]
+		// Triangle's Second Vertex X is in ndcSpaceVertexX[0][1]
+		// Triangle's Third Vertex X is in ndcSpaceVertexX[0][2]
 		culling::M256F ndcSpaceVertexX[3], ndcSpaceVertexY[3], ndcSpaceVertexZ[3], oneDividedByW[3];
 
 
@@ -243,7 +294,7 @@ void culling::BinTrianglesStage::BinTriangles(
 
 		//Gather Vertex with indice
 		//WE ARRIVE AT MODEL SPACE COORDINATE!
-		GatherVertex(vertices, vertexIndices, indiceCount, currentIndiceIndex, vertexStrideByte, fetchTriangleCount, ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, triangleCullMask);
+		GatherVertices(vertices, vertexIndices, indiceCount, currentIndiceIndex, vertexStrideByte, fetchTriangleCount, ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, triangleCullMask);
 
 		if (triangleCullMask == 0x0)
 		{
@@ -295,7 +346,7 @@ void culling::BinTrianglesStage::BinTriangles(
 		//Get Intersecting Bin List
 		ComputeBinBoundingBox(screenPixelPosX, screenPixelPosY, outBinBoundingBoxMinX, outBinBoundingBoxMinY, outBinBoundingBoxMaxX, outBinBoundingBoxMaxY);
 
-		std::shared_ptr<Tile[]> tiles = mMaskedOcclusionCulling.mDepthBuffer.mTiles;
+		Tile* const tiles = mMaskedOcclusionCulling.mDepthBuffer.mTiles;
 
 		for (size_t triangleIndex = 0; triangleIndex < triangleCountPerLoop && ( (triangleCullMask & (1 << triangleIndex) ) != 0x0); triangleIndex++)
 		{

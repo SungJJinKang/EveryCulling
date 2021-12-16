@@ -16,7 +16,8 @@ culling::SWDepthBuffer::SWDepthBuffer(std::uint32_t width, std::uint32_t height)
 	_mm256_set1_ps(static_cast<float>(width)),
 	_mm256_set1_ps(static_cast<float>(height))
 #endif
-	}
+	},
+	mTiles(nullptr)
 {
 	//"DepthBuffer's size should be multiple of TILE_WIDTH"
 	assert(mResolution.mWidth % TILE_WIDTH == 0);
@@ -28,6 +29,15 @@ culling::SWDepthBuffer::SWDepthBuffer(std::uint32_t width, std::uint32_t height)
 	//Why don't use std::make_unique
 	//std::make_unique do default initialization, so it reset Tile values
 	//That isn't needed to do
-	mTiles = std::shared_ptr<Tile[]>(new Tile[static_cast<size_t>(mResolution.mTileCountInARow) * static_cast<size_t>(mResolution.mTileCountInAColumn)]);
+	mTiles = new Tile[static_cast<size_t>(mResolution.mTileCountInARow) * static_cast<size_t>(mResolution.mTileCountInAColumn)];
+}
+
+culling::SWDepthBuffer::~SWDepthBuffer()
+{
+	if(mTiles != nullptr)
+	{
+		delete[] mTiles;
+	}
+	
 }
 

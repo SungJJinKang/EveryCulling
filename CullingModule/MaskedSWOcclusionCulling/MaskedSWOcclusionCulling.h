@@ -50,7 +50,6 @@ namespace culling
 		
 		const std::uint32_t binCountInRow, binCountInColumn;
 		float mNearClipPlaneDis, mFarClipPlaneDis;
-		float* mViewProjectionMatrix;
 
 		void ResetDepthBuffer();
 
@@ -72,7 +71,10 @@ namespace culling
 		/// <param name="modelToClipspaceMatrix"></param>
 		void DrawOccluderTriangles
 		(
-			const float* vertices, const std::uint32_t* vertexIndices, size_t indiceCount, bool vertexStrideByte,
+			const float* vertices, 
+			const std::uint32_t* vertexIndices, 
+			size_t indiceCount, 
+			bool vertexStrideByte,
 			float* modelToClipspaceMatrix
 		);
 
@@ -93,27 +95,20 @@ namespace culling
 
 	public:
 
-		MaskedSWOcclusionCulling(
-			EveryCulling* frotbiteCullingSystemunsigned, 
-			std::uint32_t depthBufferWidth, std::uint32_t depthBufferheight
+		MaskedSWOcclusionCulling
+		(
+			EveryCulling* everyCulling,
+			const std::uint32_t depthBufferWidth, 
+			const std::uint32_t depthBufferheight
 		);
 	
-		void SetNearFarClipPlaneDistance(float nearClipPlaneDis, float farClipPlaneDis);
-		void SetViewProjectionMatrix(float* viewProjectionMatrix);
+		void SetNearFarClipPlaneDistance(const float nearClipPlaneDis, const float farClipPlaneDis);
 
 		void ResetState();
 		
 		
 
-		FORCE_INLINE void MaskedSWOcclusionJob()
-		{
-			//TODO : How to decide which objects is used as occluder
-			//FIRST : Use EntityBlock::mPositions's w value(Bounding Sphere Radius), If Bounding Sphere Radius is too small, It is not valuable as Occluder
-			//SECOND : Use EntityBlock::mPositions's x, y, z(Object's Position), If Object is close to camera, Use it Occluder
-		}
-
-	
-
+		void MaskedSWOcclusionJob();
 	};
 }
 

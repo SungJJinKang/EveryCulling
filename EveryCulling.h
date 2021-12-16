@@ -108,19 +108,13 @@ namespace culling
 
 	private:
 
-		std::array<culling::CullingModule*, 
-#ifdef ENABLE_SCREEN_SAPCE_BOUDING_SPHERE_CULLING
-			3
-#else
-			1
-#endif
-		> mUpdatedCullingModules
+		std::vector<culling::CullingModule*> mUpdatedCullingModules
 		{
 			&(mViewFrustumCulling),
 #ifdef ENABLE_SCREEN_SAPCE_BOUDING_SPHERE_CULLING
 			&(mScreenSpaceBoudingSphereCulling),
 #endif	
-			//&(mMaskedSWOcclusionCulling)
+			&(mMaskedSWOcclusionCulling)
 		};
 
 	public:
