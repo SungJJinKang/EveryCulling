@@ -9,11 +9,17 @@
 #include <Transform.h>
 
 
+culling::ViewFrustumCulling::ViewFrustumCulling(EveryCulling* frotbiteCullingSystem)
+	: CullingModule{ frotbiteCullingSystem }
+{
+
+}
+
 void culling::ViewFrustumCulling::CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex)
 {
 
 
-	const math::Vector3* const cameraPos = reinterpret_cast<const math::Vector3*>(&mCullingSystem->GetCameraPosition(cameraIndex));
+	const math::Vector3* const cameraPos = reinterpret_cast<const math::Vector3*>(&(mCullingSystem->GetCameraPosition(cameraIndex)));
 
 	for (size_t entityIndex = 0; entityIndex < entityCountInBlock; entityIndex++)
 	{
@@ -29,11 +35,6 @@ void culling::ViewFrustumCulling::CullBlockEntityJob(EntityBlock* currentEntityB
 			const culling::Vec3* const entityPos = reinterpret_cast<const culling::Vec3*>(&transform->GetPosition());
 			*reinterpret_cast<culling::M128F*>(posBoundingSphereRadius) = *reinterpret_cast<const culling::M128F*>(entityPos);
 			posBoundingSphereRadius->SetBoundingSphereRadius(worldRadius);
-
-			if (dooms::graphics::Graphics_Setting::IsSortObjectFrontToBack == true)
-			{
-				renderer->CacheDistanceToCamera(cameraIndex, *cameraPos);
-			}
 		}		
 	}
 

@@ -28,11 +28,7 @@ namespace culling
 
 		SIMDFrustumPlanes mSIMDFrustumPlanes[MAX_CAMERA_COUNT];
 
-		ViewFrustumCulling(EveryCulling* frotbiteCullingSystem)
-			:CullingModule{ frotbiteCullingSystem }
-		{
-
-		}
+		ViewFrustumCulling(EveryCulling* frotbiteCullingSystem);
 
 		void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex);
 
