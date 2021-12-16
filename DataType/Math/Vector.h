@@ -12,6 +12,16 @@ namespace culling
 		{
 
 		}
+
+		inline float* data()
+		{
+			return &x;
+		}
+
+		inline const float* data() const
+		{
+			return &x;
+		}
 	};
 
 	struct Vec3
@@ -25,7 +35,15 @@ namespace culling
 
 		}
 
-		
+		inline float* data()
+		{
+			return &x;
+		}
+
+		inline const float* data() const
+		{
+			return &x;
+		}
 	};
 
 	inline culling::Vec2 operator+(const culling::Vec2& a, const culling::Vec2& b)
@@ -89,6 +107,16 @@ namespace culling
 		{
 			return values[index];
 		}
+
+		inline float* data()
+		{
+			return values;
+		}
+
+		inline const float* data() const
+		{
+			return values;
+		}
 	};
 
 	struct alignas(16) Quat
@@ -103,6 +131,16 @@ namespace culling
 		inline float operator[](size_t index) const
 		{
 			return values[index];
+		}
+
+		inline float* data()
+		{
+			return values;
+		}
+
+		inline const float* data() const
+		{
+			return values;
 		}
 	};
 }

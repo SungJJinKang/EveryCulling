@@ -27,11 +27,13 @@ namespace culling
 
 	public:
 
-		EntityBlockViewer() = default;
-		EntityBlockViewer(EntityBlock* entityBlock, std::uint32_t entityIndexInBlock)
-			: mTargetEntityBlock{ entityBlock }, mEntityIndexInBlock{ entityIndexInBlock }, bmIsActive{ true }
-		{}
+		EntityBlockViewer();
+		EntityBlockViewer(EntityBlock* const entityBlock, const std::uint32_t entityIndexInBlock);
 
+		FORCE_INLINE bool GetIsActive() const
+		{
+			return bmIsActive;
+		}
 
 		/// <summary>
 		/// Get if entity is visible from Camera of parameter cameraIndex
@@ -49,5 +51,15 @@ namespace culling
 		void SetEntityPosition(const float* worldPosition);
 
 		void SetSphereBoundRadius(float sphereRadius);
+
+		void SetMeshVertexData
+		(
+			const culling::Vec3* const vertices,
+			const size_t verticeCount,
+			const std::uint32_t* const indices,
+			const size_t indiceCount,
+			const size_t verticeStride
+		);
+
 	};
 }

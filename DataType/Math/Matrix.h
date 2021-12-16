@@ -20,5 +20,15 @@ namespace culling
 		{
 			return mColumns[index];
 		}
+
+		inline float* data()
+		{
+			return mColumns[0].values;
+		}
+
+		inline const float* data() const
+		{
+			return mColumns[0].values;
+		}
 	};
 }
