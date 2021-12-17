@@ -13,8 +13,6 @@ namespace culling
 
 	class CullingModule
 	{
-		friend class EveryCulling;
-
 	protected:
 
 		EveryCulling* mCullingSystem;
@@ -35,12 +33,27 @@ namespace culling
 		{
 
 		}
-		virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex) {}
-		virtual void ClearEntityData(EntityBlock* currentEntityBlock, std::uint32_t entityIndex) {};
-
+	
 	public:
 
 		virtual void SetViewProjectionMatrix(const std::uint32_t cameraIndex, const Mat4x4& viewProjectionMatrix);
+		FORCE_INLINE const culling::Mat4x4& GetViewProjectionMatrix(const std::uint32_t cameraIndex)
+		{
+			return mCameraViewProjectionMatrixs[cameraIndex];
+		}
+
+		virtual void ClearEntityData
+		(
+			EntityBlock* currentEntityBlock, 
+			std::uint32_t entityIndex
+		) {};
+		virtual void CullBlockEntityJob
+		(
+			EntityBlock* const currentEntityBlock, 
+			const size_t entityCountInBlock, 
+			const size_t cameraIndex
+		)
+		{}
 
 	};
 

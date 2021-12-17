@@ -22,16 +22,12 @@ namespace culling
 	class EveryCulling;
 	class ViewFrustumCulling : CullingModule
 	{
-		friend class EveryCulling;
-
 	private:
 
 		SIMDFrustumPlanes mSIMDFrustumPlanes[MAX_CAMERA_COUNT];
 
 		ViewFrustumCulling(EveryCulling* frotbiteCullingSystem);
-
-		void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex);
-
+		
 		//TODO : Add AVX2(__m256) version of this function
 		char CheckInFrustumSIMDWithTwoPoint(const Vec4* eightPlanes, const Position_BoundingSphereRadius* twoPoint);
 
@@ -49,7 +45,13 @@ namespace culling
 		{
 			return mSIMDFrustumPlanes;
 		}
-
+		
+		void CullBlockEntityJob
+		(
+			EntityBlock* const currentEntityBlock,
+			const size_t entityCountInBlock,
+			const size_t cameraIndex
+		);
 
 	};
 }

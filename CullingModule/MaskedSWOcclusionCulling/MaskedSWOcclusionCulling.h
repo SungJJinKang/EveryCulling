@@ -1,6 +1,6 @@
 #pragma once
 
-#include <atomic>
+#include <vector>
 
 #include "SWDepthBuffer.h"
 
@@ -10,10 +10,12 @@
 
 #include "Stage/BinTrianglesStage.h"
 #include "Stage/RasterizeTrianglesStage.h"
+#include "Stage/SolveMeshRoleStage.h"
 
 
 namespace culling
 {
+	class MaskedSWOcclusionCullingStage;
 	/// <summary>
 	/// 
 	/// Masked SW Occlusion Culling
@@ -30,26 +32,46 @@ namespace culling
 	/// </summary>
 	class MaskedSWOcclusionCulling : public CullingModule
 	{
-		friend class EveryCulling;
-		friend class BinTrianglesStage;
-		friend class MaskedSWOcclusionCullingStage;
 
-		enum class eMaskedOcclusionCullingStage
+		enum eMaskedOcclusionCullingStage
 		{
-			BinTriangles,
-			DrawOccluder,
-
+			/// <summary>
+			/// Decide mesh is occluder or occludee
+			/// </summary>
+			SolveMeshRole = 0,
+			/// <summary>
+			/// Bin occluder's triangles to tile
+			/// </summary>
+			BinTriangles = 1,
+			/// <summary>
+			/// Draw occluder to depth buffer
+			/// </summary>
+			DrawOccluder = 2,
+			/// <summary>
+			/// 
+			/// </summary>
+			QueryOccludee = 3,
+			Finished = 4
 		};
 
 	private:
 
+		eMaskedOcclusionCullingStage mCurrentStage;
+
+		std::vector<MaskedSWOcclusionCullingStage*> mStages
+		{
+			&mSolveMeshRoleStage,
+			&mBinTrianglesStage,
+			&mRasterizeTrianglesStage,
+		};
+
+		SolveMeshRoleStage mSolveMeshRoleStage;
 		BinTrianglesStage mBinTrianglesStage;
 		RasterizeTrianglesStage mRasterizeTrianglesStage;
 
-		SWDepthBuffer mDepthBuffer;
 		
 		const std::uint32_t binCountInRow, binCountInColumn;
-		float mNearClipPlaneDis, mFarClipPlaneDis;
+		float mNearClipPlaneDis, mFarClipPlaneDis, mFov;
 
 		void ResetDepthBuffer();
 
@@ -85,15 +107,15 @@ namespace culling
 		/// <param name="worldAABBs"></param>
 		void DepthTestOccludee(const AABB* worldAABBs, size_t aabbCount, char* visibleBitFlags);
 
-		// Inherited via CullingModule
-		virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex) override;
-
 		void GetOccluderCandidates()
 		{
 
 		}
 
 	public:
+
+
+		SWDepthBuffer mDepthBuffer;
 
 		MaskedSWOcclusionCulling
 		(
@@ -103,12 +125,20 @@ namespace culling
 		);
 	
 		void SetNearFarClipPlaneDistance(const float nearClipPlaneDis, const float farClipPlaneDis);
+		void SetFov(const float fov);
 
 		void ResetState();
 		
-		
-
 		void MaskedSWOcclusionJob();
+		
+		// Inherited via CullingModule
+		virtual void CullBlockEntityJob
+		(
+			EntityBlock* const currentEntityBlock, 
+			const size_t entityCountInBlock, 
+			const size_t cameraIndex
+		) override;
+
 	};
 }
 

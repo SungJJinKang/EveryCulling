@@ -4,3 +4,12 @@ culling::RasterizeTrianglesStage::RasterizeTrianglesStage(MaskedSWOcclusionCulli
 	: MaskedSWOcclusionCullingStage{ mOcclusionCulling }
 {
 }
+
+void culling::RasterizeTrianglesStage::DoStageJob
+(
+	EntityBlock* const currentEntityBlock,
+	const size_t entityIndex,
+	const size_t cameraIndex
+)
+{
+}

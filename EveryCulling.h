@@ -114,7 +114,10 @@ namespace culling
 #ifdef ENABLE_SCREEN_SAPCE_BOUDING_SPHERE_CULLING
 			&(mScreenSpaceBoudingSphereCulling),
 #endif	
-			&(mMaskedSWOcclusionCulling)
+			&(mMaskedSWOcclusionCulling), // Choose Role Stage
+			&(mMaskedSWOcclusionCulling), // BinTriangles
+			&(mMaskedSWOcclusionCulling), // DrawOccluderStage
+			&(mMaskedSWOcclusionCulling), // QueryOccludeeStage
 		};
 
 	public:

@@ -12,6 +12,7 @@ namespace culling
 	
 	class BinTrianglesStage : public MaskedSWOcclusionCullingStage
 	{
+	
 	private:
 
 	
@@ -55,12 +56,13 @@ namespace culling
 		/// <param name="vertY">three culling::M256F -> 12 floating-point value</param>
 		/// <param name="vertW">"W" !!!!!!!!! three culling::M256F -> 12 floating-point value</param>
 		/// <param name="modelToClipspaceMatrix">column major 4x4 matrix</param>
-		void TransformVertexsToClipSpace(
+		void TransformVertexsToClipSpace
+		(
 			culling::M256F* outClipVertexX, 
 			culling::M256F* outClipVertexY, 
 			culling::M256F* outClipVertexZ,
 			culling::M256F* outClipVertexW, 
-			const float* toClipspaceMatrix, 
+			const float* const toClipspaceMatrix,
 			std::uint32_t& triangleCullMask
 		);
 
@@ -154,8 +156,8 @@ namespace culling
 		/// <param name="triangleCullMask"></param>
 		void GatherVertices
 		(
-			const float* vertices, 
-			const std::uint32_t* vertexIndices, 
+			const float* const vertices,
+			const std::uint32_t* const vertexIndices,
 			const size_t indiceCount, 
 			const size_t currentIndiceIndex, 
 			const size_t vertexStrideByte, 
@@ -188,13 +190,20 @@ namespace culling
 		/// <param name="modelToClipspaceMatrix"></param>
 		void BinTriangles
 		(
-			const float* vertices, 
-			const std::uint32_t* vertexIndices, 
+			const float* const vertices,
+			const std::uint32_t* const vertexIndices,
 			const size_t indiceCount, 
 			const size_t vertexStrideByte, 
-			const float* modelToClipspaceMatrix
+			const float* const modelToClipspaceMatrix
 		);
 
+
+		void DoStageJob
+		(
+			EntityBlock* const currentEntityBlock, 
+			const size_t entityIndex,
+			const size_t cameraIndex
+		) final;
 	};
 }
 

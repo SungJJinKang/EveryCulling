@@ -4,6 +4,7 @@
 
 namespace culling
 {
+	class EntityBlock;
 	class MaskedSWOcclusionCulling;
 	class MaskedSWOcclusionCullingStage
 	{
@@ -15,6 +16,15 @@ namespace culling
 		{
 
 		}
+
+	public:
+
+		virtual void DoStageJob
+		(
+			EntityBlock* const currentEntityBlock,
+			const size_t entityIndex,
+			const size_t cameraIndex
+		) = 0;
 
 	};
 }

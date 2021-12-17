@@ -20,7 +20,7 @@ culling::EntityBlockViewer::EntityBlockViewer
 void culling::EntityBlockViewer::SetEntityPosition(const float* worldPosition)
 {
 	assert(bmIsActive == true);
-	std::memcpy((mTargetEntityBlock->mPositions + mEntityIndexInBlock), worldPosition, sizeof(Vec3));
+	std::memcpy((mTargetEntityBlock->mPositionAndBoundingSpheres + mEntityIndexInBlock), worldPosition, sizeof(Vec3));
 }
 
 void culling::EntityBlockViewer::SetSphereBoundRadius(float sphereRadius)
@@ -32,7 +32,7 @@ void culling::EntityBlockViewer::SetSphereBoundRadius(float sphereRadius)
 	// Think Sphere is on(!!) frustum plane. But it still should be drawd
 	// Distance from plane to EntityPoint is negative.
 	// If Distance from plane to EntityPoint is larget than negative radius, it should be drawed
-	mTargetEntityBlock->mPositions[mEntityIndexInBlock].SetBoundingSphereRadius(sphereRadius);
+	mTargetEntityBlock->mPositionAndBoundingSpheres[mEntityIndexInBlock].SetBoundingSphereRadius(sphereRadius);
 }
 
 void culling::EntityBlockViewer::SetMeshVertexData

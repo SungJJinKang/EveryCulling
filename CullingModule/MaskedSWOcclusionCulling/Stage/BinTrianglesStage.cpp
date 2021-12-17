@@ -67,7 +67,7 @@ void culling::BinTrianglesStage::TransformVertexsToClipSpace
 	culling::M256F* outClipVertexY, 
 	culling::M256F* outClipVertexZ, 
 	culling::M256F* outClipVertexW, 
-	const float* toClipspaceMatrix, 
+	const float* const toClipspaceMatrix, 
 	std::uint32_t& triangleCullMask
 )
 {
@@ -229,8 +229,8 @@ void culling::BinTrianglesStage::PassTrianglesToTileBin
 
 void culling::BinTrianglesStage::GatherVertices
 (
-	const float* vertices, 
-	const std::uint32_t* vertexIndices, 
+	const float* const vertices, 
+	const std::uint32_t* const vertexIndices, 
 	const size_t indiceCount, 
 	const size_t currentIndiceIndex, 
 	const size_t vertexStrideByte, 
@@ -308,11 +308,11 @@ culling::BinTrianglesStage::BinTrianglesStage(MaskedSWOcclusionCulling& mMOcclus
 
 void culling::BinTrianglesStage::BinTriangles
 (
-	const float* vertices, 
-	const std::uint32_t* vertexIndices, 
+	const float* const vertices, 
+	const std::uint32_t* const vertexIndices, 
 	const size_t indiceCount, 
 	const size_t vertexStrideByte, 
-	const float* modelToClipspaceMatrix
+	const float* const modelToClipspaceMatrix
 )
 {
 	size_t currentIndiceIndex = 0;
@@ -421,4 +421,23 @@ void culling::BinTrianglesStage::BinTriangles
 
 		currentIndiceIndex += triangleCountPerLoop * 3; 
 	}
+}
+
+void culling::BinTrianglesStage::DoStageJob
+(
+	EntityBlock* const currentEntityBlock, 
+	const size_t entityIndex,
+	const size_t cameraIndex
+)
+{
+	const VertexData& vertexData = currentEntityBlock->mVertexDatas[entityIndex];
+
+	BinTriangles
+	(
+		reinterpret_cast<const float*>(vertexData.mVertices),
+		vertexData.mIndices,
+		vertexData.mIndiceCount,
+		vertexData.mVertexStride,
+		mMaskedOcclusionCulling.GetViewProjectionMatrix(cameraIndex).data()
+	);
 }

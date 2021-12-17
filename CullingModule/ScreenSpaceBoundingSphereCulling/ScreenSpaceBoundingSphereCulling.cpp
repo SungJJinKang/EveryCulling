@@ -11,7 +11,12 @@ culling::ScreenSpaceBoundingSphereCulling::ScreenSpaceBoundingSphereCulling(Ever
 
 }
 
-void culling::ScreenSpaceBoundingSphereCulling::CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex)
+void culling::ScreenSpaceBoundingSphereCulling::CullBlockEntityJob
+(
+	EntityBlock* const currentEntityBlock,
+	const size_t entityCountInBlock,
+	const size_t cameraIndex
+)
 {
 	alignas(32) char cullingMask[ENTITY_COUNT_IN_ENTITY_BLOCK] = { 0 };
 	culling::Vector4 mScreenSpaceAABBMin;
