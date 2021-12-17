@@ -2,7 +2,7 @@
 
 #include "../../EveryCullingCore.h"
 
-#include <memory>
+#include <atomic>
 
 #include "../../DataType/Math/Triangle.h"
 
@@ -55,10 +55,13 @@ namespace culling
 	{
 		/// <summary>
 		/// Binned Screen Pixel Space Triangles
+		///	x : screen space x ( 0 ~ screen width )
+		///	y : screen space y ( 0 ~ screen height )
+		///	z : ndc space z ( -1 ( or 0 ) ~ 1 )
 		/// </summary>
 		ThreeDTriangle mTriangleList[BIN_TRIANGLE_CAPACITY_PER_TILE];
 
-		size_t mCurrentTriangleCount = 0;
+		std::atomic<size_t> mCurrentTriangleCount = 0;
 	};
 
 	/// <summary>
@@ -140,5 +143,6 @@ namespace culling
 
 		~SWDepthBuffer();
 
+		size_t GetTileCount() const;
 	};
 }

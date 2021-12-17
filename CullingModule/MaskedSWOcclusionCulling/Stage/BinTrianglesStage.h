@@ -87,10 +87,30 @@ namespace culling
 		/// <param name="outBinBoundingBoxMinY">MinY of bounding box intersecting with 8 Triangles, Not Index. ex) 0, 32, 64, ..</param>
 		/// <param name="outBinBoundingBoxMaxX">MaxX of bounding box intersecting with 8 Triangles, Not Index. ex) 0, 32, 64, ..</param>
 		/// <param name="outBinBoundingBoxMaxY">MaxY of bounding box intersecting with 8 Triangles, Not Index. ex) 0, 32, 64, ..</param>
-		void ComputeBinBoundingBox(const culling::M256F* screenPixelX, const culling::M256F* screenPixelY, culling::M256I& outBinBoundingBoxMinX, culling::M256I& outBinBoundingBoxMinY, culling::M256I& outBinBoundingBoxMaxX, culling::M256I& outBinBoundingBoxMaxY);
-		void PassTrianglesToTileBin(const culling::M256F* screenPixelX, const culling::M256F* screenPixelY, std::uint32_t& triangleCullMask, TriangleList& tileBin, const culling::M256F& outBinBoundingBoxMinX, const culling::M256F& outBinBoundingBoxMinY, const culling::M256F& outBinBoundingBoxMaxX, const culling::M256F& outBinBoundingBoxMaxY);
+		void ComputeBinBoundingBox
+		(
+			const culling::M256F* screenPixelX,
+			const culling::M256F* screenPixelY,
+			culling::M256I& outBinBoundingBoxMinX,
+			culling::M256I& outBinBoundingBoxMinY,
+			culling::M256I& outBinBoundingBoxMaxX, 
+			culling::M256I& outBinBoundingBoxMaxY
+		);
 
-		inline float GetAreaOfTriangle(const TwoDTriangle& triangle)
+		void PassTrianglesToTileBin
+		(
+			const culling::M256F* screenPixelPosX,
+			const culling::M256F* screenPixelPosY,
+			const culling::M256F* ndcSpaceVertexZ,
+			std::uint32_t& triangleCullMask,
+			const size_t triangleCountPerLoop,
+			const culling::M256I& outBinBoundingBoxMinX,
+			const culling::M256I& outBinBoundingBoxMinY,
+			const culling::M256I& outBinBoundingBoxMaxX,
+			const culling::M256I& outBinBoundingBoxMaxY
+		);
+
+		/*inline float GetAreaOfTriangle(const TwoDTriangle& triangle)
 		{
 
 		}
@@ -98,7 +118,7 @@ namespace culling
 		inline float GetAreaOfAAABB(const AABB& worldAABB)
 		{
 
-		}
+		}*/
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Binning Triangles to Tile(Sub Tile)

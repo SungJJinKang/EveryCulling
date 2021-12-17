@@ -26,10 +26,7 @@ culling::SWDepthBuffer::SWDepthBuffer(std::uint32_t width, std::uint32_t height)
 
 	
 
-	//Why don't use std::make_unique
-	//std::make_unique do default initialization, so it reset Tile values
-	//That isn't needed to do
-	mTiles = new Tile[static_cast<size_t>(mResolution.mTileCountInARow) * static_cast<size_t>(mResolution.mTileCountInAColumn)];
+	mTiles = new Tile[GetTileCount()];
 }
 
 culling::SWDepthBuffer::~SWDepthBuffer()
@@ -39,5 +36,10 @@ culling::SWDepthBuffer::~SWDepthBuffer()
 		delete[] mTiles;
 	}
 	
+}
+
+size_t culling::SWDepthBuffer::GetTileCount() const
+{
+	return static_cast<size_t>(mResolution.mTileCountInARow) * static_cast<size_t>(mResolution.mTileCountInAColumn);
 }
 
