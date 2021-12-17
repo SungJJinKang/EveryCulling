@@ -354,7 +354,7 @@ void culling::BinTrianglesStage::BinTriangles
 		{
 			if( (triangleCullMask & (1 << triangleIndex) ) != 0x0 )
 			{
-				const size_t intersectingMinBoxX = reinterpret_cast<INT32*>(&outBinBoundingBoxMinX)[triangleIndex];
+				const size_t intersectingMinBoxX = reinterpret_cast<INT32*>(&outBinBoundingBoxMinX)[triangleIndex]; // this is screen space coordinate
 				const size_t intersectingMinBoxY = reinterpret_cast<INT32*>(&outBinBoundingBoxMinY)[triangleIndex];
 				const size_t intersectingMaxBoxX = reinterpret_cast<INT32*>(&outBinBoundingBoxMaxX)[triangleIndex];
 				const size_t intersectingMaxBoxY = reinterpret_cast<INT32*>(&outBinBoundingBoxMaxY)[triangleIndex];
