@@ -53,9 +53,9 @@ void culling::BinTrianglesStage::ConvertNDCSpaceToScreenPixelSpace
 		//Rasterization operations also refer to a fragment��s center, which is offset by ( 1/2, 1/2 )
 		//from its lower left corner(and so lies on half - integer coordinates).
 
-		//outScreenPixelSpaceX[i] = _mm256_floor_ps(tmpScreenSpaceX);
-		//outScreenPixelSpaceY[i] = _mm256_floor_ps(tmpScreenSpaceY);
-
+		outScreenPixelSpaceX[i] = _mm256_floor_ps(tmpScreenSpaceX);
+		outScreenPixelSpaceY[i] = _mm256_floor_ps(tmpScreenSpaceY);
+		// TODO : Add (1/2, 1/2) offset.
 
 	}
 
@@ -141,10 +141,12 @@ void culling::BinTrianglesStage::ComputeBinBoundingBox
 
 	// How "and" works?
 	// 0000 0000 0110 0011 <- 96 = 32 * 3 + 3
-	//		   AND
+	//        AND
 	// 1111 1111 1110 0000 <- WIDTH_MASK
-	//
-	// 0000 0000 0110 0000 <- 92 = 32 * 3
+	//         |
+	//         | Masking low bits to make coordinate multiple of tile size
+	//         V
+	// 0000 0000 0110 0000 <- 92 = 32 * 3 ( multiple of tile size )
 	//		
 
 	outBinBoundingBoxMinX = _mm256_and_si256(minScreenPixelX, WIDTH_MASK);
@@ -348,36 +350,38 @@ void culling::BinTrianglesStage::BinTriangles
 
 		Tile* const tiles = mMaskedOcclusionCulling.mDepthBuffer.mTiles;
 
-		for (size_t triangleIndex = 0; triangleIndex < triangleCountPerLoop && ( (triangleCullMask & (1 << triangleIndex) ) != 0x0); triangleIndex++)
+		for (size_t triangleIndex = 0; triangleIndex < triangleCountPerLoop ; triangleIndex++)
 		{
-			const size_t intersectingMinBoxX = reinterpret_cast<INT32*>(&outBinBoundingBoxMinX)[triangleIndex];
-			const size_t intersectingMinBoxY = reinterpret_cast<INT32*>(&outBinBoundingBoxMinY)[triangleIndex];
-			const size_t intersectingMaxBoxX = reinterpret_cast<INT32*>(&outBinBoundingBoxMaxX)[triangleIndex];
-			const size_t intersectingMaxBoxY = reinterpret_cast<INT32*>(&outBinBoundingBoxMaxY)[triangleIndex];
-
-			for (size_t y = intersectingMinBoxY; y <= intersectingMaxBoxY; y++)
+			if( (triangleCullMask & (1 << triangleIndex) ) != 0x0 )
 			{
-				for (size_t x = intersectingMinBoxX; y <= intersectingMaxBoxX; y++)
-				{
-					Tile& targetTile = tiles[x + y * mMaskedOcclusionCulling.mDepthBuffer.mResolution.mTileCountInARow];
+				const size_t intersectingMinBoxX = reinterpret_cast<INT32*>(&outBinBoundingBoxMinX)[triangleIndex];
+				const size_t intersectingMinBoxY = reinterpret_cast<INT32*>(&outBinBoundingBoxMinY)[triangleIndex];
+				const size_t intersectingMaxBoxX = reinterpret_cast<INT32*>(&outBinBoundingBoxMaxX)[triangleIndex];
+				const size_t intersectingMaxBoxY = reinterpret_cast<INT32*>(&outBinBoundingBoxMaxY)[triangleIndex];
 
-					const size_t triListIndex = targetTile.mBinnedTriangles.mCurrentTriangleCount;
-					for (size_t pointIndex = 0; pointIndex < 3; pointIndex++)
-					{
-						targetTile.mBinnedTriangles.mTriangleList[triListIndex].Points[pointIndex].x = reinterpret_cast<float*>(&screenPixelPosX)[triListIndex];
-						targetTile.mBinnedTriangles.mTriangleList[triListIndex].Points[pointIndex].y = reinterpret_cast<float*>(&screenPixelPosY)[triListIndex];
-						targetTile.mBinnedTriangles.mTriangleList[triListIndex].Points[pointIndex].z = reinterpret_cast<float*>(&ndcSpaceVertexZ)[triListIndex];
-					}
+				assert(intersectingMinBoxX <= intersectingMaxBoxX);
+				assert(intersectingMinBoxY <= intersectingMaxBoxY);
 				
-					targetTile.mBinnedTriangles.mCurrentTriangleCount++;
-					
+				for (size_t y = intersectingMinBoxY; y <= intersectingMaxBoxY; y++)
+				{
+					for (size_t x = intersectingMinBoxX; y <= intersectingMaxBoxX; y++)
+					{
+						Tile& targetTile = tiles[x + y * mMaskedOcclusionCulling.mDepthBuffer.mResolution.mTileCountInARow];
+
+						const size_t triListIndex = targetTile.mBinnedTriangles.mCurrentTriangleCount;
+						for (size_t pointIndex = 0; pointIndex < 3; pointIndex++)
+						{
+							targetTile.mBinnedTriangles.mTriangleList[triListIndex].Points[pointIndex].x = reinterpret_cast<float*>(&screenPixelPosX)[triListIndex];
+							targetTile.mBinnedTriangles.mTriangleList[triListIndex].Points[pointIndex].y = reinterpret_cast<float*>(&screenPixelPosY)[triListIndex];
+							targetTile.mBinnedTriangles.mTriangleList[triListIndex].Points[pointIndex].z = reinterpret_cast<float*>(&ndcSpaceVertexZ)[triListIndex];
+						}
+
+						targetTile.mBinnedTriangles.mCurrentTriangleCount++;
+
+					}
 				}
 			}
-
 		}
-
-
-		//ComputeBinBoundingBox
 
 		currentIndiceIndex += triangleCountPerLoop * 3; 
 	}
