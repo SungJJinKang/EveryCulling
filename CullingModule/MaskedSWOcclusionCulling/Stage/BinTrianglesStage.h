@@ -23,7 +23,7 @@ namespace culling
 		/// <param name="outClipVertexY"></param>
 		/// <param name="outClipVertexZ"></param>
 		/// <param name="outClipVertexW"></param>
-		void ConverClipSpaceToNDCSpace
+		void ConvertClipSpaceToNDCSpace
 		(
 			culling::M256F* outClipVertexX, 
 			culling::M256F* outClipVertexY, 

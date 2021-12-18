@@ -3,7 +3,7 @@
 
 #include "../SWDepthBuffer.h"
 
-void culling::BinTrianglesStage::ConverClipSpaceToNDCSpace
+void culling::BinTrianglesStage::ConvertClipSpaceToNDCSpace
 (
 	culling::M256F* outClipVertexX, 
 	culling::M256F* outClipVertexY, 
@@ -29,8 +29,11 @@ void culling::BinTrianglesStage::ConverClipSpaceToNDCSpace
 
 void culling::BinTrianglesStage::ConvertNDCSpaceToScreenPixelSpace
 (
-	const culling::M256F* ndcSpaceVertexX, const culling::M256F* ndcSpaceVertexY,
-	culling::M256F* outScreenPixelSpaceX, culling::M256F* outScreenPixelSpaceY, std::uint32_t& triangleCullMask
+	const culling::M256F* ndcSpaceVertexX, 
+	const culling::M256F* ndcSpaceVertexY,
+	culling::M256F* outScreenPixelSpaceX, 
+	culling::M256F* outScreenPixelSpaceY, 
+	std::uint32_t& triangleCullMask
 )
 {
 	for (size_t i = 0; i < 3; i++)
@@ -315,7 +318,9 @@ void culling::BinTrianglesStage::BinTriangles
 		//If you use Opengl, Vertexs have value from -1 to 1
 		//if you use DirectX, Vertexs have value from 0 to 1 
 		//W BECOME USELESS, IGNORE IT
-		ConverClipSpaceToNDCSpace(ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, oneDividedByW, triangleCullMask);
+		ConvertClipSpaceToNDCSpace(ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, oneDividedByW, triangleCullMask);
+
+		// TODO : Set triangleCullMask about NDC x, y, z is in -1 ~ 1
 
 		//ScreenPixelPos : 0 ~ mDepthBuffer.Width, Height
 		culling::M256F screenPixelPosX[3], screenPixelPosY[3];
