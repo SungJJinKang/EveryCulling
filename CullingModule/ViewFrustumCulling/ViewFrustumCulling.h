@@ -20,18 +20,19 @@ namespace culling
 	};
 
 	class EveryCulling;
-	class ViewFrustumCulling : CullingModule
+	class ViewFrustumCulling : public CullingModule
 	{
 	private:
 
 		SIMDFrustumPlanes mSIMDFrustumPlanes[MAX_CAMERA_COUNT];
 
-		ViewFrustumCulling(EveryCulling* frotbiteCullingSystem);
 		
 		//TODO : Add AVX2(__m256) version of this function
 		char CheckInFrustumSIMDWithTwoPoint(const Vec4* eightPlanes, const Position_BoundingSphereRadius* twoPoint);
 
 	public:
+
+		ViewFrustumCulling(EveryCulling* frotbiteCullingSystem);
 
 		/// <summary>
 		/// before Start solving culling, Update Every Camera's frustum plane

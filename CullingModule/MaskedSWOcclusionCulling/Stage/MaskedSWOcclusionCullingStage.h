@@ -4,7 +4,7 @@
 
 namespace culling
 {
-	class EntityBlock;
+	struct EntityBlock;
 	class MaskedSWOcclusionCulling;
 	class MaskedSWOcclusionCullingStage
 	{

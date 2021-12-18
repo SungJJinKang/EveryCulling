@@ -19,8 +19,8 @@ namespace culling
 
 		bool CheckIsOccluderFromAABB
 		(
-			const culling::Vec3& const minPointInWorldSpace,
-			const culling::Vec3& const maxPointInWorldSpace
+			const culling::Vec3& minPointInWorldSpace,
+			const culling::Vec3& maxPointInWorldSpace
 		) const;
 
 	public:

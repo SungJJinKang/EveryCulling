@@ -347,7 +347,7 @@ void culling::EveryCulling::SetCameraPosition(const size_t cameraIndex, const cu
 	
 }
 
-void culling::EveryCulling::SetViewProjectionMatrix(const std::uint32_t cameraIndex, const culling::Mat4x4& viewProjectionMatrix)
+void culling::EveryCulling::SetViewProjectionMatrix(const size_t cameraIndex, const culling::Mat4x4& viewProjectionMatrix)
 {
 	assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
 
@@ -360,6 +360,35 @@ void culling::EveryCulling::SetViewProjectionMatrix(const std::uint32_t cameraIn
 			updatedCullingModule->SetViewProjectionMatrix(cameraIndex, viewProjectionMatrix);
 		}
 	}
+}
+
+void culling::EveryCulling::SetFieldOfViewInDegree(const size_t cameraIndex, const float fov)
+{
+	assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
+	assert(fov > 0.0f);
+
+	mMaskedSWOcclusionCulling.SetFieldOfViewInDegree(cameraIndex, fov);
+}
+
+void culling::EveryCulling::SetCameraNearFarClipPlaneDistance
+(
+	const size_t cameraIndex,
+	const float nearPlaneDistance, 
+	const float farPlaneDistance
+)
+{
+	assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
+	assert(nearPlaneDistance > 0.0f);
+	assert(farPlaneDistance > 0.0f);
+
+	mMaskedSWOcclusionCulling.SetNearFarClipPlaneDistance(cameraIndex, nearPlaneDistance, farPlaneDistance);
+}
+
+void culling::EveryCulling::Configure(const size_t cameraIndex, const SettingParameters settingParameters)
+{
+	SetViewProjectionMatrix(cameraIndex, settingParameters.mViewProjectionMatrix);
+	SetFieldOfViewInDegree(cameraIndex, settingParameters.mFieldOfViewInDegree);
+	SetCameraNearFarClipPlaneDistance(cameraIndex, settingParameters.mCameraNearPlaneDistance, settingParameters.mCameraFarPlaneDistance);
 }
 
 std::uint32_t culling::EveryCulling::GetCameraCount() const

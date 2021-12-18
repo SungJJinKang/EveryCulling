@@ -71,7 +71,8 @@ namespace culling
 
 		
 		const std::uint32_t binCountInRow, binCountInColumn;
-		float mNearClipPlaneDis, mFarClipPlaneDis, mFov;
+		std::array<float, MAX_CAMERA_COUNT> mNearClipPlaneDistance, mFarClipPlaneDistance, mFieldOfViewInDegree;
+		 
 
 		void ResetDepthBuffer();
 
@@ -124,8 +125,8 @@ namespace culling
 			const std::uint32_t depthBufferheight
 		);
 	
-		void SetNearFarClipPlaneDistance(const float nearClipPlaneDis, const float farClipPlaneDis);
-		void SetFov(const float fov);
+		void SetNearFarClipPlaneDistance(const size_t cameraIndex, const float nearClipPlaneDis, const float farClipPlaneDis);
+		void SetFieldOfViewInDegree(const size_t cameraIndex, const float fov);
 
 		void ResetState();
 		

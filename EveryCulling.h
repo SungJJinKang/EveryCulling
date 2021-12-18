@@ -120,6 +120,11 @@ namespace culling
 			&(mMaskedSWOcclusionCulling), // QueryOccludeeStage
 		};
 
+
+		void SetViewProjectionMatrix(const size_t cameraIndex, const culling::Mat4x4& viewProjectionMatrix);
+		void SetFieldOfViewInDegree(const size_t cameraIndex, const float fov);
+		void SetCameraNearFarClipPlaneDistance(const size_t cameraIndex, const float nearPlaneDistance, const float farPlaneDistance);;
+
 	public:
 
 		EveryCulling(std::uint32_t resolutionWidth, std::uint32_t resolutionHeight);
@@ -127,7 +132,16 @@ namespace culling
 		void SetCameraCount(std::uint32_t cameraCount);
 		void SetCameraPosition(const size_t cameraIndex, const culling::Vec3& cameraPosition);
 
-		void SetViewProjectionMatrix(const std::uint32_t cameraIndex, const culling::Mat4x4& viewProjectionMatrix);
+		struct SettingParameters
+		{
+			culling::Mat4x4 mViewProjectionMatrix;
+			float mFieldOfViewInDegree;
+			float mCameraNearPlaneDistance;
+			float mCameraFarPlaneDistance;
+		};
+
+		void Configure(const size_t cameraIndex, const SettingParameters settingParameters);
+
 		std::uint32_t GetCameraCount() const;
 		inline const culling::Vec3& GetCameraPosition(const size_t cameraIndex) const
 		{

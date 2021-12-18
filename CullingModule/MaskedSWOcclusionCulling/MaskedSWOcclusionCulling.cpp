@@ -77,21 +77,27 @@ culling::MaskedSWOcclusionCulling::MaskedSWOcclusionCulling
 	binCountInRow{ depthBufferWidth / SUB_TILE_WIDTH },
 	binCountInColumn{ depthBufferheight / SUB_TILE_HEIGHT },
 	mBinTrianglesStage{*this},
-	mRasterizeTrianglesStage{*this}
+	mRasterizeTrianglesStage{*this},
+	mSolveMeshRoleStage{ *this }
 {
 	assert(depthBufferWidth% TILE_WIDTH == 0);
 	assert(depthBufferheight% TILE_HEIGHT == 0);
 }
 
-void culling::MaskedSWOcclusionCulling::SetNearFarClipPlaneDistance(const float nearClipPlaneDis, const float farClipPlaneDis)
+void culling::MaskedSWOcclusionCulling::SetNearFarClipPlaneDistance
+(
+	const size_t cameraIndex, 
+	const float nearClipPlaneDis, 
+	const float farClipPlaneDis
+)
 {
-	mNearClipPlaneDis = nearClipPlaneDis;
-	mFarClipPlaneDis = farClipPlaneDis;
+	mNearClipPlaneDistance[cameraIndex] = nearClipPlaneDis;
+	mFarClipPlaneDistance[cameraIndex] = farClipPlaneDis;
 }
 
-void culling::MaskedSWOcclusionCulling::SetFov(const float fov)
+void culling::MaskedSWOcclusionCulling::SetFieldOfViewInDegree(const size_t cameraIndex, const float fov)
 {
-	mFov = fov;
+	mFieldOfViewInDegree[cameraIndex] = fov;
 }
 
 

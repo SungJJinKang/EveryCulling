@@ -11,6 +11,8 @@ bool culling::SolveMeshRoleStage::CheckIsOccluderFromBoundingSphere
 	//check https://stackoverflow.com/questions/21648630/radius-of-projected-sphere-in-screen-space
 	//		https://stackoverflow.com/questions/3717226/radius-of-projected-sphere
 	//		https://en.wikipedia.org/wiki/Spherical_cap
+
+	return true;
 }
 
 bool culling::SolveMeshRoleStage::CheckIsOccluderFromAABB
@@ -19,6 +21,7 @@ bool culling::SolveMeshRoleStage::CheckIsOccluderFromAABB
 	const culling::Vec3& maxPointInWorldSpace
 ) const
 {
+	return false;
 }
 
 culling::SolveMeshRoleStage::SolveMeshRoleStage(MaskedSWOcclusionCulling& occlusionCulling)
