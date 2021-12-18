@@ -56,9 +56,9 @@ void culling::BinTrianglesStage::ConvertNDCSpaceToScreenPixelSpace
 		//Rasterization operations also refer to a fragment��s center, which is offset by ( 1/2, 1/2 )
 		//from its lower left corner(and so lies on half - integer coordinates).
 
-		//outScreenPixelSpaceX[i] = _mm256_floor_ps(tmpScreenSpaceX);
-		//outScreenPixelSpaceY[i] = _mm256_floor_ps(tmpScreenSpaceY);
-
+		outScreenPixelSpaceX[i] = _mm256_floor_ps(tmpScreenSpaceX);
+		outScreenPixelSpaceY[i] = _mm256_floor_ps(tmpScreenSpaceY);
+		// TODO : Add (1/2, 1/2) offset.
 
 	}
 
@@ -70,7 +70,7 @@ void culling::BinTrianglesStage::TransformVertexsToClipSpace
 	culling::M256F* outClipVertexY, 
 	culling::M256F* outClipVertexZ, 
 	culling::M256F* outClipVertexW, 
-	const float* toClipspaceMatrix, 
+	const float* const toClipspaceMatrix, 
 	std::uint32_t& triangleCullMask
 )
 {
@@ -144,10 +144,12 @@ void culling::BinTrianglesStage::ComputeBinBoundingBox
 
 	// How "and" works?
 	// 0000 0000 0110 0011 <- 96 = 32 * 3 + 3
-	//		   AND
+	//        AND
 	// 1111 1111 1110 0000 <- WIDTH_MASK
-	//
-	// 0000 0000 0110 0000 <- 92 = 32 * 3
+	//         |
+	//         | Masking low bits to make coordinate multiple of tile size
+	//         V
+	// 0000 0000 0110 0000 <- 92 = 32 * 3 ( multiple of tile size )
 	//		
 
 	outBinBoundingBoxMinX = _mm256_and_si256(minScreenPixelX, WIDTH_MASK);
@@ -164,16 +166,65 @@ void culling::BinTrianglesStage::ComputeBinBoundingBox
 
 void culling::BinTrianglesStage::PassTrianglesToTileBin
 (
-	const culling::M256F* screenPixelX, 
-	const culling::M256F* screenPixelY, 
+	const culling::M256F* screenPixelPosX,
+	const culling::M256F* screenPixelPosY,
+	const culling::M256F* ndcSpaceVertexZ,
 	std::uint32_t& triangleCullMask, 
-	TriangleList& tileBin, 
-	const culling::M256F& outBinBoundingBoxMinX, 
-	const culling::M256F& outBinBoundingBoxMinY, 
-	const culling::M256F& outBinBoundingBoxMaxX, 
-	const culling::M256F& outBinBoundingBoxMaxY
+	const size_t triangleCountPerLoop,
+	const culling::M256I& outBinBoundingBoxMinX, 
+	const culling::M256I& outBinBoundingBoxMinY,
+	const culling::M256I& outBinBoundingBoxMaxX,
+	const culling::M256I& outBinBoundingBoxMaxY
 )
 {
+
+	Tile* const tiles = mMaskedOcclusionCulling.mDepthBuffer.mTiles;
+
+	for (size_t triangleIndex = 0; triangleIndex < triangleCountPerLoop; triangleIndex++)
+	{
+		if ((triangleCullMask & (1 << triangleIndex)) != 0x0)
+		{
+			const size_t intersectingMinBoxX = (reinterpret_cast<const INT32*>(&outBinBoundingBoxMinX))[triangleIndex]; // this is screen space coordinate
+			const size_t intersectingMinBoxY = (reinterpret_cast<const INT32*>(&outBinBoundingBoxMinY))[triangleIndex];
+			const size_t intersectingMaxBoxX = (reinterpret_cast<const INT32*>(&outBinBoundingBoxMaxX))[triangleIndex];
+			const size_t intersectingMaxBoxY = (reinterpret_cast<const INT32*>(&outBinBoundingBoxMaxY))[triangleIndex];
+
+			assert(intersectingMinBoxX <= intersectingMaxBoxX);
+			assert(intersectingMinBoxY <= intersectingMaxBoxY);
+
+			const int startBoxIndexX = MIN(mMaskedOcclusionCulling.mDepthBuffer.mResolution.mTileCountInARow - 1, intersectingMinBoxX / TILE_WIDTH);
+			const int startBoxIndexY = MIN(mMaskedOcclusionCulling.mDepthBuffer.mResolution.mTileCountInAColumn - 1, intersectingMinBoxY / TILE_HEIGHT);
+			const int endBoxIndexX = MIN(mMaskedOcclusionCulling.mDepthBuffer.mResolution.mTileCountInARow, (intersectingMaxBoxX + TILE_WIDTH - 1) / TILE_WIDTH);
+			const int endBoxIndexY = MIN(mMaskedOcclusionCulling.mDepthBuffer.mResolution.mTileCountInAColumn, (intersectingMaxBoxY + TILE_HEIGHT - 1) / TILE_HEIGHT);
+
+			assert(startBoxIndexX >= 0 && startBoxIndexX < mMaskedOcclusionCulling.mDepthBuffer.mResolution.mTileCountInARow);
+			assert(startBoxIndexY >= 0 && startBoxIndexY < mMaskedOcclusionCulling.mDepthBuffer.mResolution.mTileCountInAColumn);
+
+			for (size_t y = startBoxIndexY; y <= endBoxIndexY; y++)
+			{
+				for (size_t x = startBoxIndexX; y <= endBoxIndexX; y++)
+				{
+					Tile& targetTile = tiles[x + y * mMaskedOcclusionCulling.mDepthBuffer.mResolution.mTileCountInARow];
+
+					const size_t triListIndex = targetTile.mBinnedTriangles.mCurrentTriangleCount++;
+
+					assert(triListIndex < BIN_TRIANGLE_CAPACITY_PER_TILE);
+					if(triListIndex >= BIN_TRIANGLE_CAPACITY_PER_TILE)
+					{
+						return;
+					}
+
+					for (size_t pointIndex = 0; pointIndex < 3; pointIndex++)
+					{
+						targetTile.mBinnedTriangles.mTriangleList[triListIndex].Points[pointIndex].x = (reinterpret_cast<const float*>(screenPixelPosX + pointIndex))[triListIndex];
+						targetTile.mBinnedTriangles.mTriangleList[triListIndex].Points[pointIndex].y = (reinterpret_cast<const float*>(screenPixelPosY + pointIndex))[triListIndex];
+						targetTile.mBinnedTriangles.mTriangleList[triListIndex].Points[pointIndex].z = (reinterpret_cast<const float*>(ndcSpaceVertexZ + pointIndex))[triListIndex];
+					}
+
+				}
+			}
+		}
+	}
 }
 
 
@@ -181,8 +232,8 @@ void culling::BinTrianglesStage::PassTrianglesToTileBin
 
 void culling::BinTrianglesStage::GatherVertices
 (
-	const float* vertices, 
-	const std::uint32_t* vertexIndices, 
+	const float* const vertices, 
+	const std::uint32_t* const vertexIndices, 
 	const size_t indiceCount, 
 	const size_t currentIndiceIndex, 
 	const size_t vertexStrideByte, 
@@ -260,11 +311,11 @@ culling::BinTrianglesStage::BinTrianglesStage(MaskedSWOcclusionCulling& mMOcclus
 
 void culling::BinTrianglesStage::BinTriangles
 (
-	const float* vertices, 
-	const std::uint32_t* vertexIndices, 
+	const float* const vertices, 
+	const std::uint32_t* const vertexIndices, 
 	const size_t indiceCount, 
 	const size_t vertexStrideByte, 
-	const float* modelToClipspaceMatrix
+	const float* const modelToClipspaceMatrix
 )
 {
 	size_t currentIndiceIndex = 0;
@@ -349,41 +400,49 @@ void culling::BinTrianglesStage::BinTriangles
 
 		//Compute Bin Bounding Box
 		//Get Intersecting Bin List
-		ComputeBinBoundingBox(screenPixelPosX, screenPixelPosY, outBinBoundingBoxMinX, outBinBoundingBoxMinY, outBinBoundingBoxMaxX, outBinBoundingBoxMaxY);
-
-		Tile* const tiles = mMaskedOcclusionCulling.mDepthBuffer.mTiles;
-
-		for (size_t triangleIndex = 0; triangleIndex < triangleCountPerLoop && ( (triangleCullMask & (1 << triangleIndex) ) != 0x0); triangleIndex++)
-		{
-			const size_t intersectingMinBoxX = reinterpret_cast<INT32*>(&outBinBoundingBoxMinX)[triangleIndex];
-			const size_t intersectingMinBoxY = reinterpret_cast<INT32*>(&outBinBoundingBoxMinY)[triangleIndex];
-			const size_t intersectingMaxBoxX = reinterpret_cast<INT32*>(&outBinBoundingBoxMaxX)[triangleIndex];
-			const size_t intersectingMaxBoxY = reinterpret_cast<INT32*>(&outBinBoundingBoxMaxY)[triangleIndex];
-
-			for (size_t y = intersectingMinBoxY; y <= intersectingMaxBoxY; y++)
-			{
-				for (size_t x = intersectingMinBoxX; y <= intersectingMaxBoxX; y++)
-				{
-					Tile& targetTile = tiles[x + y * mMaskedOcclusionCulling.mDepthBuffer.mResolution.mTileCountInARow];
-
-					const size_t triListIndex = targetTile.mBinnedTriangles.mCurrentTriangleCount;
-					for (size_t pointIndex = 0; pointIndex < 3; pointIndex++)
-					{
-						targetTile.mBinnedTriangles.mTriangleList[triListIndex].Points[pointIndex].x = reinterpret_cast<float*>(&screenPixelPosX)[triListIndex];
-						targetTile.mBinnedTriangles.mTriangleList[triListIndex].Points[pointIndex].y = reinterpret_cast<float*>(&screenPixelPosY)[triListIndex];
-						targetTile.mBinnedTriangles.mTriangleList[triListIndex].Points[pointIndex].z = reinterpret_cast<float*>(&ndcSpaceVertexZ)[triListIndex];
-					}
-				
-					targetTile.mBinnedTriangles.mCurrentTriangleCount++;
-					
-				}
-			}
-
-		}
+		ComputeBinBoundingBox
+		(
+			screenPixelPosX, 
+			screenPixelPosY, 
+			outBinBoundingBoxMinX, 
+			outBinBoundingBoxMinY, 
+			outBinBoundingBoxMaxX, 
+			outBinBoundingBoxMaxY
+		);
 
 
-		//ComputeBinBoundingBox
+		PassTrianglesToTileBin
+		(
+			screenPixelPosX,
+			screenPixelPosY,
+			ndcSpaceVertexZ,
+			triangleCullMask,
+			triangleCountPerLoop,
+			outBinBoundingBoxMinX,
+			outBinBoundingBoxMinY,
+			outBinBoundingBoxMaxX,
+			outBinBoundingBoxMaxY
+		);
 
 		currentIndiceIndex += triangleCountPerLoop * 3; 
 	}
+}
+
+void culling::BinTrianglesStage::DoStageJob
+(
+	EntityBlock* const currentEntityBlock, 
+	const size_t entityIndex,
+	const size_t cameraIndex
+)
+{
+	const VertexData& vertexData = currentEntityBlock->mVertexDatas[entityIndex];
+
+	BinTriangles
+	(
+		reinterpret_cast<const float*>(vertexData.mVertices),
+		vertexData.mIndices,
+		vertexData.mIndiceCount,
+		vertexData.mVertexStride,
+		mMaskedOcclusionCulling.GetViewProjectionMatrix(cameraIndex).data()
+	);
 }

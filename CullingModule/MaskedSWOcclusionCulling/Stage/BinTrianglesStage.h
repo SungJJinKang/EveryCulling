@@ -12,6 +12,7 @@ namespace culling
 	
 	class BinTrianglesStage : public MaskedSWOcclusionCullingStage
 	{
+	
 	private:
 
 	
@@ -55,12 +56,13 @@ namespace culling
 		/// <param name="vertY">three culling::M256F -> 12 floating-point value</param>
 		/// <param name="vertW">"W" !!!!!!!!! three culling::M256F -> 12 floating-point value</param>
 		/// <param name="modelToClipspaceMatrix">column major 4x4 matrix</param>
-		void TransformVertexsToClipSpace(
+		void TransformVertexsToClipSpace
+		(
 			culling::M256F* outClipVertexX, 
 			culling::M256F* outClipVertexY, 
 			culling::M256F* outClipVertexZ,
 			culling::M256F* outClipVertexW, 
-			const float* toClipspaceMatrix, 
+			const float* const toClipspaceMatrix,
 			std::uint32_t& triangleCullMask
 		);
 
@@ -87,10 +89,30 @@ namespace culling
 		/// <param name="outBinBoundingBoxMinY">MinY of bounding box intersecting with 8 Triangles, Not Index. ex) 0, 32, 64, ..</param>
 		/// <param name="outBinBoundingBoxMaxX">MaxX of bounding box intersecting with 8 Triangles, Not Index. ex) 0, 32, 64, ..</param>
 		/// <param name="outBinBoundingBoxMaxY">MaxY of bounding box intersecting with 8 Triangles, Not Index. ex) 0, 32, 64, ..</param>
-		void ComputeBinBoundingBox(const culling::M256F* screenPixelX, const culling::M256F* screenPixelY, culling::M256I& outBinBoundingBoxMinX, culling::M256I& outBinBoundingBoxMinY, culling::M256I& outBinBoundingBoxMaxX, culling::M256I& outBinBoundingBoxMaxY);
-		void PassTrianglesToTileBin(const culling::M256F* screenPixelX, const culling::M256F* screenPixelY, std::uint32_t& triangleCullMask, TriangleList& tileBin, const culling::M256F& outBinBoundingBoxMinX, const culling::M256F& outBinBoundingBoxMinY, const culling::M256F& outBinBoundingBoxMaxX, const culling::M256F& outBinBoundingBoxMaxY);
+		void ComputeBinBoundingBox
+		(
+			const culling::M256F* screenPixelX,
+			const culling::M256F* screenPixelY,
+			culling::M256I& outBinBoundingBoxMinX,
+			culling::M256I& outBinBoundingBoxMinY,
+			culling::M256I& outBinBoundingBoxMaxX, 
+			culling::M256I& outBinBoundingBoxMaxY
+		);
 
-		inline float GetAreaOfTriangle(const TwoDTriangle& triangle)
+		void PassTrianglesToTileBin
+		(
+			const culling::M256F* screenPixelPosX,
+			const culling::M256F* screenPixelPosY,
+			const culling::M256F* ndcSpaceVertexZ,
+			std::uint32_t& triangleCullMask,
+			const size_t triangleCountPerLoop,
+			const culling::M256I& outBinBoundingBoxMinX,
+			const culling::M256I& outBinBoundingBoxMinY,
+			const culling::M256I& outBinBoundingBoxMaxX,
+			const culling::M256I& outBinBoundingBoxMaxY
+		);
+
+		/*inline float GetAreaOfTriangle(const TwoDTriangle& triangle)
 		{
 
 		}
@@ -98,7 +120,7 @@ namespace culling
 		inline float GetAreaOfAAABB(const AABB& worldAABB)
 		{
 
-		}
+		}*/
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Binning Triangles to Tile(Sub Tile)
@@ -134,8 +156,8 @@ namespace culling
 		/// <param name="triangleCullMask"></param>
 		void GatherVertices
 		(
-			const float* vertices, 
-			const std::uint32_t* vertexIndices, 
+			const float* const vertices,
+			const std::uint32_t* const vertexIndices,
 			const size_t indiceCount, 
 			const size_t currentIndiceIndex, 
 			const size_t vertexStrideByte, 
@@ -168,13 +190,20 @@ namespace culling
 		/// <param name="modelToClipspaceMatrix"></param>
 		void BinTriangles
 		(
-			const float* vertices, 
-			const std::uint32_t* vertexIndices, 
+			const float* const vertices,
+			const std::uint32_t* const vertexIndices,
 			const size_t indiceCount, 
 			const size_t vertexStrideByte, 
-			const float* modelToClipspaceMatrix
+			const float* const modelToClipspaceMatrix
 		);
 
+
+		void DoStageJob
+		(
+			EntityBlock* const currentEntityBlock, 
+			const size_t entityIndex,
+			const size_t cameraIndex
+		) final;
 	};
 }
 

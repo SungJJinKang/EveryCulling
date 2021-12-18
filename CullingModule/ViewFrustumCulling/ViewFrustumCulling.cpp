@@ -15,7 +15,12 @@ culling::ViewFrustumCulling::ViewFrustumCulling(EveryCulling* frotbiteCullingSys
 
 }
 
-void culling::ViewFrustumCulling::CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex)
+void culling::ViewFrustumCulling::CullBlockEntityJob
+(
+	EntityBlock* const currentEntityBlock,
+	const size_t entityCountInBlock,
+	const size_t cameraIndex
+)
 {
 
 
@@ -28,7 +33,7 @@ void culling::ViewFrustumCulling::CullBlockEntityJob(EntityBlock* currentEntityB
 
 		if(dooms::IsValid(renderer) == true)
 		{
-			Position_BoundingSphereRadius* const posBoundingSphereRadius = currentEntityBlock->mPositions + entityIndex;
+			Position_BoundingSphereRadius* const posBoundingSphereRadius = currentEntityBlock->mPositionAndBoundingSpheres + entityIndex;
 
 			const float worldRadius = renderer->dooms::ColliderUpdater<dooms::physics::Sphere>::GetWorldCollider()->mRadius;
 
@@ -51,7 +56,7 @@ void culling::ViewFrustumCulling::CullBlockEntityJob(EntityBlock* currentEntityB
 
 	for (size_t entityIndex = 0; entityIndex < entityCountInBlock - 1 ; entityIndex = entityIndex + 2)
 	{
-		char result = CheckInFrustumSIMDWithTwoPoint(frustumPlane, currentEntityBlock->mPositions + entityIndex);
+		char result = CheckInFrustumSIMDWithTwoPoint(frustumPlane, currentEntityBlock->mPositionAndBoundingSpheres + entityIndex);
 		// if first low bit has 1 value, Pos A is In Frustum
 		// if second low bit has 1 value, Pos A is In Frustum
 

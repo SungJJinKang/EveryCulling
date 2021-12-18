@@ -6,7 +6,7 @@ namespace culling
 {
 	class RasterizeTrianglesStage : public MaskedSWOcclusionCullingStage
 	{
-
+	
 	private:
 
 	public:
@@ -64,10 +64,21 @@ namespace culling
 		// Occludee Depth Test
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		culling::M256F ComputeMinimumDepths(const culling::M256F* worldAABBVertX, const culling::M256F* worldAABBVertY, const culling::M256F* worldAABBVertZ)
+		culling::M256F ComputeMinimumDepths
+		(
+			const culling::M256F* worldAABBVertX,
+			const culling::M256F* worldAABBVertY,
+			const culling::M256F* worldAABBVertZ
+		)
 		{
-			//mViewProjectionMatrix
 		}
+
+		void DoStageJob
+		(
+			EntityBlock* const currentEntityBlock, 
+			const size_t entityIndex,
+			const size_t cameraIndex
+		) override;
 	};
 }
 

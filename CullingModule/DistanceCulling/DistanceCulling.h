@@ -35,7 +35,7 @@ namespace culling
 
 	public:
 
-		// TODO : EntityBlock�� mPositions �̰� �׳� ����ϸ�ȴ�.
+		// TODO : EntityBlock�� mPositionAndBoundingSpheres �̰� �׳� ����ϸ�ȴ�.
 		// �Ÿ� ���� �� sqrt�������� �׳� mCullDistance * mCullDistance�� ������
 		virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex) final
 		{

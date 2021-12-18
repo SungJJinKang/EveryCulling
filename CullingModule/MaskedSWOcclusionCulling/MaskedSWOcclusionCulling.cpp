@@ -89,41 +89,81 @@ void culling::MaskedSWOcclusionCulling::SetNearFarClipPlaneDistance(const float 
 	mFarClipPlaneDis = farClipPlaneDis;
 }
 
+void culling::MaskedSWOcclusionCulling::SetFov(const float fov)
+{
+	mFov = fov;
+}
+
 
 void culling::MaskedSWOcclusionCulling::ResetState()
 {
 	ResetDepthBuffer();
-
+	mCurrentStage = eMaskedOcclusionCullingStage::SolveMeshRole;
 }
 
 void culling::MaskedSWOcclusionCulling::MaskedSWOcclusionJob()
 {
 	//TODO : How to decide which objects is used as occluder
-	//FIRST : Use EntityBlock::mPositions's w value(Bounding Sphere Radius), If Bounding Sphere Radius is too small, It is not valuable as Occluder
-	//SECOND : Use EntityBlock::mPositions's x, y, z(Object's Position), If Object is close to camera, Use it Occluder
+	//FIRST : Use EntityBlock::mPositionAndBoundingSpheres's w value(Bounding Sphere Radius), If Bounding Sphere Radius is too small, It is not valuable as Occluder
+	//SECOND : Use EntityBlock::mPositionAndBoundingSpheres's x, y, z(Object's Position), If Object is close to camera, Use it Occluder
 }
 
 void culling::MaskedSWOcclusionCulling::CullBlockEntityJob
 (
-	EntityBlock* currentEntityBlock, 
-	size_t entityCountInBlock, 
-	size_t cameraIndex
+	EntityBlock* const currentEntityBlock, 
+	const size_t entityCountInBlock,
+	const size_t cameraIndex
 )
 {
-
-	for(size_t entityIndex = 0; entityIndex < entityCountInBlock ; entityIndex++)
+	switch(mCurrentStage)
 	{
-		const VertexData& vertexData = currentEntityBlock->mVertexDatas[entityIndex];
+	case eMaskedOcclusionCullingStage::SolveMeshRole:
+
+		for (size_t entityIndex = 0; entityIndex < entityCountInBlock; entityIndex++)
+		{
+			if (currentEntityBlock->mIsVisibleBitflag[entityIndex] != 0)
+			{
+				//Yes!! it pass previous culling modules
+				mSolveMeshRoleStage.DoStageJob(currentEntityBlock, entityIndex, cameraIndex);
+			}
+		}
+
+		break;
+
+	case eMaskedOcclusionCullingStage::BinTriangles:
+
+		for (size_t entityIndex = 0; entityIndex < entityCountInBlock; entityIndex++)
+		{
+			if (currentEntityBlock->mIsVisibleBitflag[entityIndex] != 0)
+			{
+				//Yes!! it pass previous culling modules
+				mBinTrianglesStage.DoStageJob(currentEntityBlock, entityIndex, cameraIndex);
+			}
+		}
+
+		break;
+
+
+	case eMaskedOcclusionCullingStage::DrawOccluder:
+
+		break;
+
+
+	case eMaskedOcclusionCullingStage::QueryOccludee:
+
 		
-		mBinTrianglesStage.BinTriangles
-		(
-			reinterpret_cast<const float*>(vertexData.mVertices),
-			vertexData.mIndices,
-			vertexData.mIndiceCount,
-			vertexData.mVertexStride,
-			mCameraViewProjectionMatrixs[cameraIndex].data()
-		);
+
+		break;
+		
+	case eMaskedOcclusionCullingStage::Finished:
+
+		break;
+
+	default:
+		assert(0);
 	}
+
+	
 	
 }
 

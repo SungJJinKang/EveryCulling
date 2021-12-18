@@ -65,9 +65,9 @@ namespace culling
 		/// To set mIsVisibleBitflag, We use _m256
 		/// 
 		/// If Size of mIsVisibleBitflag isn't multiples of 256bit,
-		/// Setting mIsVisibleBitflag make mPositions value dirty
+		/// Setting mIsVisibleBitflag make mPositionAndBoundingSpheres value dirty
 		/// </summary>
-		alignas(32) culling::Position_BoundingSphereRadius mPositions[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		alignas(32) culling::Position_BoundingSphereRadius mPositionAndBoundingSpheres[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 #ifdef ENABLE_QUERY_OCCLUSION
 		culling::QueryObject* mQueryObjects[ENTITY_COUNT_IN_ENTITY_BLOCK];
@@ -83,6 +83,7 @@ namespace culling
 		void* mTransform[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 		VertexData mVertexDatas[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		bool mIsOccluder[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		
 		//EntityHandle mHandles[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
