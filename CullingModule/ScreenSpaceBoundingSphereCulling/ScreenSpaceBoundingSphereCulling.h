@@ -23,8 +23,6 @@ namespace culling
 
 		ScreenSpaceBoundingSphereCulling(EveryCulling* everyCulling);
 
-	public:
-		
 		void CullBlockEntityJob
 		(
 			EntityBlock* const currentEntityBlock,
@@ -32,5 +30,13 @@ namespace culling
 			const size_t cameraIndex
 		);
 
+	public:
+		
+		
+
+		virtual void CullBlockEntityJob(const size_t cameraIndex);
+
 	};
+
+	
 }

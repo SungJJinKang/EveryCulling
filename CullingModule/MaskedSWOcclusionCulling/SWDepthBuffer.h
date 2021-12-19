@@ -153,5 +153,7 @@ namespace culling
 		size_t GetTileCount() const;
 
 		void Reset();
+
+		const Tile* GetTiles() const;
 	};
 }

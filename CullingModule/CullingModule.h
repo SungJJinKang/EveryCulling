@@ -5,59 +5,101 @@
 
 #include "../EveryCullingCore.h"
 #include "../DataType/EntityBlock.h"
+#include "../EveryCulling.h"
 
 namespace culling
 {
 	class EveryCulling;
 	struct EntityBlock;
 
-	class CullingModule
+	struct EntityBlockState
 	{
-	private:
-
-		std::uint32_t mCameraCount;
-		std::array<culling::Mat4x4, MAX_CAMERA_COUNT> mCameraViewProjectionMatrixs;
-		std::array<culling::Vec3, MAX_CAMERA_COUNT> mCameraWorldPosition;
-
-	protected:
-
-		EveryCulling* mCullingSystem;
-
-		
-
-		CullingModule(EveryCulling* frotbiteCullingSystem)
-			:mCullingSystem{ frotbiteCullingSystem }, mCameraCount{ 0 }
-		{
-
-		}
-		
-	public:
-
+		char padding1[64];
 		//static inline constexpr std::uint32_t M256_COUNT_OF_VISIBLE_ARRAY = 1 + ( (ENTITY_COUNT_IN_ENTITY_BLOCK * sizeof(decltype(*EntityBlock::mIsVisibleBitflag)) - 1) / 32 );
 		/// <summary>
 		/// will be used at CullBlockEntityJob
 		/// </summary>
 		//std::atomic<std::uint32_t> mAtomicCurrentBlockIndex;
-		std::array<std::atomic<std::uint32_t>, MAX_CAMERA_COUNT> mCurrentCulledEntityBlockIndex;
-		std::array<std::atomic<std::uint32_t>, MAX_CAMERA_COUNT> mFinishedCullEntityBlockCount;
+		std::array<std::atomic<size_t>, MAX_CAMERA_COUNT> mCurrentCulledEntityBlockIndex;
+		char padding2[64];
+		std::array<std::atomic<size_t>, MAX_CAMERA_COUNT> mFinishedThreadCount;
+		char padding4[64];
+	};
+	class CullingModule
+	{
+	private:
 
 
-		virtual void SetViewProjectionMatrix(const size_t cameraIndex, const Mat4x4& viewProjectionMatrix);
+		EntityBlockState mCullJobState;
+
+	protected:
+
+		EveryCulling* const mCullingSystem;
+
+		/// <summary>
+		/// return next entity block
+		///	if consume all entity block, return nullptr
+		/// </summary>
+		/// <param name="cameraIndex"></param>
+		/// <returns></returns>
+		culling::EntityBlock* GetNextEntityBlock(const size_t cameraIndex);
+
+		CullingModule(EveryCulling* frotbiteCullingSystem)
+			:mCullingSystem{ frotbiteCullingSystem }
+		{
+
+		}
+
+		
+
+	public:
+
+
+		virtual void ResetCullingModule();
+		std::uint32_t GetFinishedThreadCount(const size_t cameraIndex) const;
+		
 		FORCE_INLINE const culling::Mat4x4& GetViewProjectionMatrix(const size_t cameraIndex) const
 		{
-			return mCameraViewProjectionMatrixs[cameraIndex];
+			return mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex);
 		}
-
-		void SetCameraWorldPosition(const size_t cameraIndex, const Vec3& cameraWorldPosition);
 		FORCE_INLINE const culling::Vec3& GetCameraWorldPosition(const size_t cameraIndex) const
 		{
-			return mCameraWorldPosition[cameraIndex];
+			return mCullingSystem->GetCameraWorldPosition(cameraIndex);
+		}
+		FORCE_INLINE float GetCameraFarClipPlaneDistance(const size_t cameraIndex) const
+		{
+			return mCullingSystem->GetCameraFarClipPlaneDistance(cameraIndex);
+		}
+		FORCE_INLINE float GetCameraNearClipPlaneDistance(const size_t cameraIndex) const
+		{
+			return mCullingSystem->GetCameraNearClipPlaneDistance(cameraIndex);
+		}
+		FORCE_INLINE float GetCameraFieldOfView(const size_t cameraIndex) const
+		{
+			return mCullingSystem->GetCameraFieldOfView(cameraIndex);
 		}
 
-		void SetCameraCount(const size_t cameraCount);
-		FORCE_INLINE size_t GetCameraWorldPosition() const
+		FORCE_INLINE size_t GetCameraCount() const
 		{
-			return mCameraCount;
+			return mCullingSystem->GetCameraCount();
+		}
+		virtual void OnSetViewProjectionMatrix(const size_t cameraIndex, const culling::Mat4x4& cameraViewProjectionMatrix)
+		{
+		}
+		virtual void OnSetCameraWorldPosition(const size_t cameraIndex, const culling::Vec3& cameraWorldPosition)
+		{
+		}
+		virtual void OnSetCameraCount(const size_t cameraCount)
+		{
+		}
+		virtual void OnSetCameraFarClipPlaneDistance(const size_t cameraIndex, const float farClipPlaneDistance)
+		{
+		}
+		virtual void OnSetCameraNearClipPlaneDistance(const size_t cameraIndex, const float nearClipPlaneDistance)
+		{
+		}
+		virtual void OnSetCameraFieldOfView(const size_t cameraIndex, const float fieldOfView)
+		{
 		}
 
 		virtual void ClearEntityData
@@ -65,14 +107,13 @@ namespace culling
 			EntityBlock* currentEntityBlock, 
 			size_t entityIndex
 		) {};
+
 		virtual void CullBlockEntityJob
 		(
-			EntityBlock* const currentEntityBlock, 
-			const size_t entityCountInBlock, 
 			const size_t cameraIndex
-		)
-		{}
-
+		) = 0;
+		
+		void ThreadCullJob(const size_t cameraIndex);
 	};
 
 }

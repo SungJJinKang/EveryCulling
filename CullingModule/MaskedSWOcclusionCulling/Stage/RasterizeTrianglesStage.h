@@ -9,9 +9,7 @@ namespace culling
 	
 	private:
 
-	public:
-
-		RasterizeTrianglesStage(MaskedSWOcclusionCulling& mOcclusionCulling);
+		
 
 		/// <summary>
 		/// 
@@ -73,12 +71,11 @@ namespace culling
 		{
 		}
 
-		void DoStageJob
-		(
-			EntityBlock* const currentEntityBlock, 
-			const size_t entityIndex,
-			const size_t cameraIndex
-		) override;
+	public:
+
+		RasterizeTrianglesStage(MaskedSWOcclusionCulling* mOcclusionCulling);
+
+		void CullBlockEntityJob(const size_t cameraIndex) override;
 	};
 }
 

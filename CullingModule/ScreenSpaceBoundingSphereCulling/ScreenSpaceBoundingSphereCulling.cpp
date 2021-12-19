@@ -78,5 +78,8 @@ void culling::ScreenSpaceBoundingSphereCulling::CullBlockEntityJob
 	}
 }
 
+inline void culling::ScreenSpaceBoundingSphereCulling::CullBlockEntityJob(const size_t cameraIndex)
+{
+}
 
 #endif

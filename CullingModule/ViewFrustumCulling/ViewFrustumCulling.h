@@ -30,6 +30,12 @@ namespace culling
 		//TODO : Add AVX2(__m256) version of this function
 		char CheckInFrustumSIMDWithTwoPoint(const Vec4* eightPlanes, const Position_BoundingSphereRadius* twoPoint);
 
+		void CullBlockEntityJob
+		(
+			const size_t cameraIndex,
+			culling::EntityBlock* const entityBlock
+		);
+
 	public:
 
 		ViewFrustumCulling(EveryCulling* frotbiteCullingSystem);
@@ -40,19 +46,13 @@ namespace culling
 		/// </summary>
 		/// <param name="cameraIndex"></param>
 		/// <param name="viewProjectionMatix"></param>
-		virtual void SetViewProjectionMatrix(const size_t cameraIndex, const Mat4x4& viewProjectionMatrix) final;
+		virtual void OnSetViewProjectionMatrix(const size_t cameraIndex, const culling::Mat4x4& cameraViewProjectionMatrix) final;
 
 		FORCE_INLINE culling::SIMDFrustumPlanes* GetSIMDPlanes()
 		{
 			return mSIMDFrustumPlanes;
 		}
-		
-		void CullBlockEntityJob
-		(
-			EntityBlock* const currentEntityBlock,
-			const size_t entityCountInBlock,
-			const size_t cameraIndex
-		);
 
+		virtual void CullBlockEntityJob(const size_t cameraIndex);
 	};
 }

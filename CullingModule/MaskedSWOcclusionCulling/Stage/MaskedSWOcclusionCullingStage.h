@@ -1,31 +1,24 @@
 #pragma once
 
 #include "../../../EveryCullingCore.h"
+#include "../../../CullingModule/CullingModule.h"
 
 namespace culling
 {
 	struct EntityBlock;
 	class MaskedSWOcclusionCulling;
-	class MaskedSWOcclusionCullingStage
+	class MaskedSWOcclusionCullingStage : public CullingModule
 	{
-
-	protected:
-		MaskedSWOcclusionCulling& mMaskedOcclusionCulling;
-		MaskedSWOcclusionCullingStage(MaskedSWOcclusionCulling& mOcclusionCulling)
-			: mMaskedOcclusionCulling{ mOcclusionCulling }
-		{
-
-		}
 
 	public:
 
-		virtual void DoStageJob
+		MaskedSWOcclusionCulling* const mMaskedOcclusionCulling;
+		MaskedSWOcclusionCullingStage(MaskedSWOcclusionCulling* const mOcclusionCulling);
+
+		virtual void CullBlockEntityJob
 		(
-			EntityBlock* const currentEntityBlock,
-			const size_t entityIndex,
 			const size_t cameraIndex
 		) = 0;
-
 	};
 }
 

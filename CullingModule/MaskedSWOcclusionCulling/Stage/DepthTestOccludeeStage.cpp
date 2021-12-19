@@ -2,17 +2,13 @@
 
 culling::DepthTestOccludeeStage::DepthTestOccludeeStage
 (
-	MaskedSWOcclusionCulling& mOcclusionCulling
+	MaskedSWOcclusionCulling* mOcclusionCulling
 )
 	: MaskedSWOcclusionCullingStage{ mOcclusionCulling }
 {
 }
 
-void culling::DepthTestOccludeeStage::DoStageJob
-(
-	EntityBlock* const currentEntityBlock, 
-	const size_t entityIndex,
-	const size_t cameraIndex
-)
+void culling::DepthTestOccludeeStage::CullBlockEntityJob(const size_t cameraIndex)
 {
 }
+

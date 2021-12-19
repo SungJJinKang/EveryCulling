@@ -25,17 +25,17 @@ namespace culling
 			const culling::Vec3& maxPointInWorldSpace
 		) const;
 
+		void SolveMeshRole
+		(
+			const size_t cameraIndex,
+			EntityBlock* const currentEntityBlock
+		);
+
 	public:
 
-		SolveMeshRoleStage(MaskedSWOcclusionCulling& occlusionCulling);
-
-		void DoStageJob
-		(
-			EntityBlock* const currentEntityBlock, 
-			const size_t entityIndex,
-			const size_t cameraIndex
-		) override;
-
+		SolveMeshRoleStage(MaskedSWOcclusionCulling* occlusionCulling);
+		
+		void CullBlockEntityJob(const size_t cameraIndex) override;
 	};
 }
 

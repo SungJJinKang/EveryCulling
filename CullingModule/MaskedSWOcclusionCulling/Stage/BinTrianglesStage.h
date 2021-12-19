@@ -167,14 +167,7 @@ namespace culling
 			culling::M256F* outVerticesZ, 
 			std::uint32_t& triangleCullMask
 		);
-
-
-	public:
-
-		BinTrianglesStage(MaskedSWOcclusionCulling& mMOcclusionCulling);
-
-
-
+		
 		/// <summary>
 		/// Bin Triangles
 		/// </summary>
@@ -198,12 +191,12 @@ namespace culling
 		);
 
 
-		void DoStageJob
-		(
-			EntityBlock* const currentEntityBlock, 
-			const size_t entityIndex,
-			const size_t cameraIndex
-		) final;
+	public:
+
+		BinTrianglesStage(MaskedSWOcclusionCulling* mMOcclusionCulling);
+
+
+		void CullBlockEntityJob(const size_t cameraIndex) override;
 	};
 }
 

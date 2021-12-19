@@ -10,20 +10,15 @@
 #include <functional>
 #include <thread>
 
-#include "CullingModule/ViewFrustumCulling/ViewFrustumCulling.h"
 
-#ifdef ENABLE_SCREEN_SAPCE_BOUDING_SPHERE_CULLING
-#include "CullingModule/ScreenSpaceBoundingSphereCulling/ScreenSpaceBoundingSphereCulling.h"
-#endif
-
-#include "CullingModule/MaskedSWOcclusionCulling/MaskedSWOcclusionCulling.h"
-
-#ifdef ENABLE_QUERY_OCCLUSION
-#include "CullingModule/QueryOcclusionCulling/QueryOcclusionCulling.h"
-#endif
 
 namespace culling
 {
+	class CullingModule;
+	class ViewFrustumCulling;
+	class ScreenSpaceBoundingSphereCulling;
+	class MaskedSWOcclusionCulling;
+	class QueryOcclusionCulling;
 	/// <summary>
 	/// 
 	/// This is implementation of Data Oriented ViewFrustumCulling of Frostbite in 2011
@@ -51,14 +46,15 @@ namespace culling
 	/// </summary>
 	class EveryCulling
 	{
-		friend class ScreenSpaceBoundingSphereCulling;
-		friend class ViewFrustumCulling;
-		friend class QueryOcclusionCulling;
-
 	private:
 
-		std::uint32_t mCameraCount;
-		std::array<culling::Vec3, MAX_CAMERA_COUNT> mCameraPositions;
+		size_t mThreadCount;
+		size_t mCameraCount;
+		std::array<culling::Mat4x4, MAX_CAMERA_COUNT> mCameraViewProjectionMatrixes;
+		std::array<culling::Vec3, MAX_CAMERA_COUNT> mCameraWorldPositions;
+		std::array<float, MAX_CAMERA_COUNT> mCameraFieldOfView;
+		std::array<float, MAX_CAMERA_COUNT> mFarClipPlaneDistance;
+		std::array<float, MAX_CAMERA_COUNT> mNearClipPlaneDistance;
 
 		bool bmIsEntityBlockPoolInitialized{ false };
 
@@ -81,7 +77,7 @@ namespace culling
 
 		void AllocateEntityBlockPool();
 		void ResetEntityBlock(culling::EntityBlock* entityBlock);
-		std::pair<culling::EntityBlock*, std::uint32_t*> AllocateNewEntityBlockFromPool();
+		culling::EntityBlock* AllocateNewEntityBlockFromPool();
 		void RemoveEntityFromBlock(EntityBlock* ownerEntityBlock, std::uint32_t entityIndexInBlock);
 		/// <summary>
 		/// Block Swap removedblock with last block, and return swapped lastblock to pool
@@ -97,41 +93,39 @@ namespace culling
 
 	public:
 
-		ViewFrustumCulling mViewFrustumCulling;
+		std::unique_ptr<ViewFrustumCulling> mViewFrustumCulling;
 #ifdef ENABLE_SCREEN_SAPCE_BOUDING_SPHERE_CULLING
-		ScreenSpaceBoundingSphereCulling mScreenSpaceBoudingSphereCulling;
+		std::unique_ptr<ScreenSpaceBoundingSphereCulling> mScreenSpaceBoudingSphereCulling;
 #endif
-		MaskedSWOcclusionCulling mMaskedSWOcclusionCulling;
+		std::unique_ptr<MaskedSWOcclusionCulling> mMaskedSWOcclusionCulling;
 #ifdef ENABLE_QUERY_OCCLUSION
-		QueryOcclusionCulling mQueryOcclusionCulling;
+		std::unique_ptr<QueryOcclusionCulling> mQueryOcclusionCulling;
 #endif
 
 	private:
 
-		std::vector<culling::CullingModule*> mUpdatedCullingModules
-		{
-			&(mViewFrustumCulling),
-#ifdef ENABLE_SCREEN_SAPCE_BOUDING_SPHERE_CULLING
-			&(mScreenSpaceBoudingSphereCulling),
-#endif	
-			&(mMaskedSWOcclusionCulling), // Choose Role Stage
-			&(mMaskedSWOcclusionCulling), // BinTriangles
-			&(mMaskedSWOcclusionCulling), // DrawOccluderStage
-			&(mMaskedSWOcclusionCulling), // QueryOccludeeStage
-		};
+		std::vector<culling::CullingModule*> mUpdatedCullingModules;
 
 
 		void SetViewProjectionMatrix(const size_t cameraIndex, const culling::Mat4x4& viewProjectionMatrix);
 		void SetFieldOfViewInDegree(const size_t cameraIndex, const float fov);
 		void SetCameraNearFarClipPlaneDistance(const size_t cameraIndex, const float nearPlaneDistance, const float farPlaneDistance);;
 		void SetCameraWorldPosition(const size_t cameraIndex, const culling::Vec3& cameraWorldPos);
+		
 
 	public:
 
-		EveryCulling(std::uint32_t resolutionWidth, std::uint32_t resolutionHeight);
+		EveryCulling() = delete;
+		EveryCulling(const std::uint32_t resolutionWidth, const std::uint32_t resolutionHeight);
+		EveryCulling(const EveryCulling&) = delete;
+		EveryCulling(EveryCulling&&) noexcept = delete;
+		EveryCulling& operator=(const EveryCulling&) = delete;
+		EveryCulling& operator=(EveryCulling&&) noexcept = delete;
+
 		~EveryCulling();
-		void SetCameraCount(std::uint32_t cameraCount);
-		void SetCameraPosition(const size_t cameraIndex, const culling::Vec3& cameraPosition);
+
+		void SetCameraCount(const size_t cameraCount);
+		void SetThreadCount(const size_t threadCount);
 
 		struct SettingParameters
 		{
@@ -144,18 +138,46 @@ namespace culling
 
 		void Configure(const size_t cameraIndex, const SettingParameters settingParameters);
 
-		std::uint32_t GetCameraCount() const;
-		inline const culling::Vec3& GetCameraPosition(const size_t cameraIndex) const
+		FORCE_INLINE size_t GetCameraCount() const
+		{
+			return mCameraCount;
+		}
+		FORCE_INLINE const culling::Vec3& GetCameraWorldPosition(const size_t cameraIndex) const
 		{
 			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
-			return mCameraPositions[cameraIndex];
+			return mCameraWorldPositions[cameraIndex];
 		}
+		FORCE_INLINE const culling::Mat4x4& GetCameraViewProjectionMatrix(const size_t cameraIndex) const
+		{
+			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
+			return mCameraViewProjectionMatrixes[cameraIndex];
+		}
+		FORCE_INLINE float GetCameraFieldOfView(const size_t cameraIndex) const
+		{
+			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
+			return mCameraFieldOfView[cameraIndex];
+		}
+		FORCE_INLINE float GetCameraFarClipPlaneDistance(const size_t cameraIndex) const
+		{
+			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
+			return mFarClipPlaneDistance[cameraIndex];
+		}
+		FORCE_INLINE float GetCameraNearClipPlaneDistance(const size_t cameraIndex) const
+		{
+			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
+			return mNearClipPlaneDistance[cameraIndex];
+		}
+
+		
+		const EntityGridCell& GetEntityGridCell() const;
+		EntityGridCell& GetEntityGridCell();
 
 		/// <summary>
 		/// Get EntityBlock List with entities
 		/// </summary>
 		/// <returns></returns>
 		const std::vector<EntityBlock*>& GetActiveEntityBlockList() const;
+		size_t GetActiveEntityBlockCount() const;
 
 		/// <summary>
 		/// You should call this function on your Transform Component or In your game engine
@@ -189,13 +211,6 @@ namespace culling
 		void CullBlockEntityJob();
 		void CullBlockEntityJob(const size_t cameraIndex);
 		//void CullBlockEntityJob(const std::uint32_t threadIndex, const std::uint32_t threadCount);
-
-		/// <summary>
-		/// Get Is All block's culling job is finished.
-		/// if true, you can check object's visibility(culled)
-		/// </summary>
-		/// <returns></returns>
-		bool GetIsCullJobFinished(const std::atomic<std::uint32_t>& mFinishedCullEntityBlockCount, std::uint32_t entityBlockCount) const;
 
 		/// <summary>
 		/// Caller thread will stall until cull job of all entity block is finished

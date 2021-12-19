@@ -90,7 +90,12 @@ namespace culling
 	
 		void GenQueryObject(EntityBlock* currentEntityBlock, size_t entityIndex, const culling::AABB & occlusionAABBLocalMinMax);
 		void GenQueryObject(culling::EntityBlockViewer& entityBlockViewer, const culling::AABB & occlusionAABBLocalMinMax);
-		
+
+		virtual void CullBlockEntityJob
+		(
+			const size_t cameraIndex
+		);
+
 		/*
 		/// <summary>
 		/// draw complex mesh after this function call

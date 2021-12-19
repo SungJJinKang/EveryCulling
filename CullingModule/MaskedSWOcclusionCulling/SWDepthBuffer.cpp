@@ -70,3 +70,8 @@ void culling::SWDepthBuffer::Reset()
 	}
 }
 
+const culling::Tile* culling::SWDepthBuffer::GetTiles() const
+{
+	return mTiles;
+}
+

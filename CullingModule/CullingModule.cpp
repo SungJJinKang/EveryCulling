@@ -1,20 +1,43 @@
 #include "CullingModule.h"
 
-void culling::CullingModule::SetViewProjectionMatrix(const size_t cameraIndex, const Mat4x4& viewProjectionMatrix)
-{
-	assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
+#include "Graphics/Acceleration/LinearData_ViewFrustumCulling/EveryCulling.h"
 
-	mCameraViewProjectionMatrixs[cameraIndex] = viewProjectionMatrix;
+culling::EntityBlock* culling::CullingModule::GetNextEntityBlock(const size_t cameraIndex)
+{
+	const std::uint32_t currentEntityBlockIndex = mCullJobState.mCurrentCulledEntityBlockIndex[cameraIndex]++;
+
+	const size_t entityBlockCount = mCullingSystem->GetActiveEntityBlockCount();
+	EntityBlock* const currentEntityBlock = (currentEntityBlockIndex >= entityBlockCount) ? nullptr : mCullingSystem->GetActiveEntityBlockList()[currentEntityBlockIndex];
+
+	if(currentEntityBlock != nullptr)
+	{
+		assert(currentEntityBlock->mCurrentEntityCount != 0);
+	}
+
+	return currentEntityBlock;
 }
 
-void culling::CullingModule::SetCameraWorldPosition(const size_t cameraIndex, const Vec3& cameraWorldPosition)
+void culling::CullingModule::ResetCullingModule()
 {
-	assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
+	for (std::atomic<size_t>& atomicVal : mCullJobState.mCurrentCulledEntityBlockIndex)
+	{
+		atomicVal.store(0, std::memory_order_relaxed);
+	}
 
-	mCameraWorldPosition[cameraIndex] = cameraWorldPosition;
+	for (std::atomic<size_t>& atomicVal : mCullJobState.mFinishedThreadCount)
+	{
+		atomicVal.store(0, std::memory_order_relaxed);
+	}
 }
 
-void culling::CullingModule::SetCameraCount(const size_t cameraCount)
+std::uint32_t culling::CullingModule::GetFinishedThreadCount(const size_t cameraIndex) const
 {
-	mCameraCount = cameraCount;
+	return mCullJobState.mFinishedThreadCount[cameraIndex];
+}
+
+
+void culling::CullingModule::ThreadCullJob(const size_t cameraIndex)
+{
+	CullBlockEntityJob(cameraIndex);
+	++(mCullJobState.mFinishedThreadCount[cameraIndex]);
 }

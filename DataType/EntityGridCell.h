@@ -20,10 +20,6 @@ namespace culling
 		/// So we use array of pointers
 		/// </summary>
 		std::vector<EntityBlock*> mEntityBlocks;
-
-		/// <summary>
-		/// 
-		/// </summary>
-		std::vector<std::uint32_t> AllocatedEntityCountInBlocks;
+		
 	};
 }

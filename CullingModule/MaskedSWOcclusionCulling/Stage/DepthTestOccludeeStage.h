@@ -11,13 +11,9 @@ namespace culling
 
 	public:
 
-		DepthTestOccludeeStage(MaskedSWOcclusionCulling& mOcclusionCulling);
-		void DoStageJob
-		(
-			EntityBlock* const currentEntityBlock, 
-			const size_t entityIndex,
-			const size_t cameraIndex
-		) override;
+		DepthTestOccludeeStage(MaskedSWOcclusionCulling* mOcclusionCulling);
+
+		void CullBlockEntityJob(const size_t cameraIndex) override;
 	};
 }
 

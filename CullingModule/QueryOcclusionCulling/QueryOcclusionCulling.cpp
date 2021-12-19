@@ -317,6 +317,10 @@ void culling::QueryOcclusionCulling::GenQueryObject(culling::EntityBlockViewer& 
 	GenQueryObject(entityBlockViewer.mTargetEntityBlock, entityBlockViewer.mEntityIndexInBlock, occlusionAABBLocalMinMax);
 }
 
+void culling::QueryOcclusionCulling::CullBlockEntityJob(const size_t cameraIndex)
+{
+}
+
 /// <summary>
 /// Use Query Result After a frame
 /// == Do ConditionalRendering on previous frame's query ( Maybe I need Two Query )

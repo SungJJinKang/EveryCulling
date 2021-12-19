@@ -32,74 +32,11 @@ namespace culling
 	/// </summary>
 	class MaskedSWOcclusionCulling : public CullingModule
 	{
-
-		enum eMaskedOcclusionCullingStage
-		{
-			/// <summary>
-			/// Decide mesh is occluder or occludee
-			/// </summary>
-			SolveMeshRole = 0,
-			/// <summary>
-			/// Bin occluder's triangles to tile
-			/// </summary>
-			BinTriangles = 1,
-			/// <summary>
-			/// Draw occluder to depth buffer
-			/// </summary>
-			DrawOccluder = 2,
-			/// <summary>
-			/// 
-			/// </summary>
-			QueryOccludee = 3,
-			Finished = 4
-		};
-
 	private:
-
-		eMaskedOcclusionCullingStage mCurrentStage;
-
-		std::vector<MaskedSWOcclusionCullingStage*> mStages
-		{
-			&mSolveMeshRoleStage,
-			&mBinTrianglesStage,
-			&mRasterizeTrianglesStage,
-		};
-
-		SolveMeshRoleStage mSolveMeshRoleStage;
-		BinTrianglesStage mBinTrianglesStage;
-		RasterizeTrianglesStage mRasterizeTrianglesStage;
-
 		
 		const std::uint32_t binCountInRow, binCountInColumn;
-		std::array<float, MAX_CAMERA_COUNT> mNearClipPlaneDistance, mFarClipPlaneDistance, mFieldOfViewInDegree;
-		 
 
 		void ResetDepthBuffer();
-
-
-
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="vertices"></param>
-		/// <param name="vertexIndices"></param>
-		/// <param name="indiceCount"></param>
-		/// <param name="vertexStrideByte">
-		/// how far next vertex point is from current vertex point 
-		/// ex) 
-		/// 1.0f(Point1_X), 2.0f(Point2_Y), 0.0f(Point3_Z), 3.0f(Normal_X), 3.0f(Normal_Y), 3.0f(Normal_Z),  1.0f(Point1_X), 2.0f(Point2_Y), 0.0f(Point3_Z)
-		/// --> vertexStride is 6 * 4(float)
-		/// </param>
-		/// <param name="modelToClipspaceMatrix"></param>
-		void DrawOccluderTriangles
-		(
-			const float* vertices, 
-			const std::uint32_t* vertexIndices, 
-			size_t indiceCount, 
-			bool vertexStrideByte,
-			float* modelToClipspaceMatrix
-		);
 
 
 		/// <summary>
@@ -115,6 +52,11 @@ namespace culling
 
 	public:
 
+		culling::EveryCulling* const mEveryCulling;
+
+		SolveMeshRoleStage mSolveMeshRoleStage;
+		BinTrianglesStage mBinTrianglesStage;
+		RasterizeTrianglesStage mRasterizeTrianglesStage;
 
 		SWDepthBuffer mDepthBuffer;
 
@@ -125,25 +67,8 @@ namespace culling
 			const std::uint32_t depthBufferheight
 		);
 	
-		void SetNearFarClipPlaneDistance(const size_t cameraIndex, const float nearClipPlaneDis, const float farClipPlaneDis);
-		void SetFieldOfViewInDegree(const size_t cameraIndex, const float fov);
-		FORCE_INLINE float GetFieldOfViewInDegree(const size_t cameraIndex) const
-		{
-			return mFieldOfViewInDegree[cameraIndex];
-		}
-
 		void ResetState();
-		
-		void MaskedSWOcclusionJob();
-		
-		// Inherited via CullingModule
-		virtual void CullBlockEntityJob
-		(
-			EntityBlock* const currentEntityBlock, 
-			const size_t entityCountInBlock, 
-			const size_t cameraIndex
-		) override;
-
+		void CullBlockEntityJob(const size_t cameraIndex) override;
 	};
 }
 
