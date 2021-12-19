@@ -144,7 +144,7 @@ FORCE_INLINE char culling::ViewFrustumCulling::CheckInFrustumSIMDWithTwoPoint(co
 	return IsPointABInFrustum;
 }
 
-void culling::ViewFrustumCulling::SetViewProjectionMatrix(const std::uint32_t cameraIndex, const Mat4x4& viewProjectionMatrix)
+void culling::ViewFrustumCulling::SetViewProjectionMatrix(const size_t cameraIndex, const Mat4x4& viewProjectionMatrix)
 {
 	culling::CullingModule::SetViewProjectionMatrix(cameraIndex, viewProjectionMatrix);
 

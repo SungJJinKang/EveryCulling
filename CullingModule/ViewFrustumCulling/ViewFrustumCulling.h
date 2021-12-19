@@ -40,7 +40,7 @@ namespace culling
 		/// </summary>
 		/// <param name="cameraIndex"></param>
 		/// <param name="viewProjectionMatix"></param>
-		virtual void SetViewProjectionMatrix(const std::uint32_t cameraIndex, const Mat4x4& viewProjectionMatrix) final;
+		virtual void SetViewProjectionMatrix(const size_t cameraIndex, const Mat4x4& viewProjectionMatrix) final;
 
 		FORCE_INLINE culling::SIMDFrustumPlanes* GetSIMDPlanes()
 		{

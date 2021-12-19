@@ -42,7 +42,7 @@ namespace culling
 		std::array<std::atomic<std::uint32_t>, MAX_CAMERA_COUNT> mFinishedCullEntityBlockCount;
 
 
-		void SetViewProjectionMatrix(const size_t cameraIndex, const Mat4x4& viewProjectionMatrix);
+		virtual void SetViewProjectionMatrix(const size_t cameraIndex, const Mat4x4& viewProjectionMatrix);
 		FORCE_INLINE const culling::Mat4x4& GetViewProjectionMatrix(const size_t cameraIndex) const
 		{
 			return mCameraViewProjectionMatrixs[cameraIndex];
