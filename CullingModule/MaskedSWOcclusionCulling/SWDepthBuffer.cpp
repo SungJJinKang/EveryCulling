@@ -9,7 +9,7 @@ void culling::HizData::Reset()
 
 void culling::TriangleList::Reset()
 {
-	mCurrentTriangleCount = 0;
+	mCurrentTriangleCount.store(0, std::memory_order_relaxed);
 }
 
 void culling::Tile::Reset()
@@ -68,6 +68,8 @@ void culling::SWDepthBuffer::Reset()
 	{
 		mTiles[i].Reset();
 	}
+
+	std::atomic_thread_fence(std::memory_order_release);
 }
 
 const culling::Tile* culling::SWDepthBuffer::GetTiles() const
