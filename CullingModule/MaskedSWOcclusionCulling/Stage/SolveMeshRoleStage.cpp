@@ -24,7 +24,7 @@ bool culling::SolveMeshRoleStage::CheckIsOccluderFromBoundingSphere
 	
 	const float radiusOfViewSpaceSphere = (std::cos(halfOfFieldOfView) / std::sin(halfOfFieldOfView)) * sphereRadiusInWorldSpace / disFromCameraToSphereHorizon;
 	
-	return (radiusOfViewSpaceSphere > OCCLUDER_VIEW_BOUNDING_SPHERE_AREA);
+	return (radiusOfViewSpaceSphere > mOccluderViewSpaceBoundingSphereRadius);
 }
 
 bool culling::SolveMeshRoleStage::CheckIsOccluderFromAABB

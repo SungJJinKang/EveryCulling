@@ -188,10 +188,7 @@ void culling::BinTrianglesStage::PassTrianglesToTileBin
 			const size_t intersectingMinBoxY = (reinterpret_cast<const INT32*>(&outBinBoundingBoxMinY))[triangleIndex];
 			const size_t intersectingMaxBoxX = (reinterpret_cast<const INT32*>(&outBinBoundingBoxMaxX))[triangleIndex];
 			const size_t intersectingMaxBoxY = (reinterpret_cast<const INT32*>(&outBinBoundingBoxMaxY))[triangleIndex];
-
-			assert(intersectingMinBoxX <= intersectingMaxBoxX);
-			assert(intersectingMinBoxY <= intersectingMaxBoxY);
-
+			
 			const int startBoxIndexX = MIN(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mTileCountInARow - 1, intersectingMinBoxX / TILE_WIDTH);
 			const int startBoxIndexY = MIN(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mTileCountInAColumn - 1, intersectingMinBoxY / TILE_HEIGHT);
 			const int endBoxIndexX = MIN(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mTileCountInARow, (intersectingMaxBoxX + TILE_WIDTH - 1) / TILE_WIDTH);
@@ -202,7 +199,7 @@ void culling::BinTrianglesStage::PassTrianglesToTileBin
 
 			for (size_t y = startBoxIndexY; y <= endBoxIndexY; y++)
 			{
-				for (size_t x = startBoxIndexX; y <= endBoxIndexX; y++)
+				for (size_t x = startBoxIndexX; x <= endBoxIndexX; x++)
 				{
 					Tile& targetTile = tiles[x + y * mMaskedOcclusionCulling->mDepthBuffer.mResolution.mTileCountInARow];
 
@@ -362,13 +359,18 @@ void culling::BinTrianglesStage::BinTriangles
 {
 	static constexpr std::int32_t triangleCountPerLoop = 8;
 
-	size_t currentIndiceIndex = -(triangleCountPerLoop * 3);
+	std::int32_t currentIndiceIndex = -(triangleCountPerLoop * 3);
 
-	while (currentIndiceIndex < indiceCount)
+	while (currentIndiceIndex < (std::int32_t)indiceCount)
 	{
 		currentIndiceIndex += (triangleCountPerLoop * 3);
 
+		if(currentIndiceIndex >= (std::int32_t)indiceCount)
+		{
+			break;
+		}
 		const size_t fetchTriangleCount = MIN(8, (indiceCount - currentIndiceIndex) / 3);
+		assert(fetchTriangleCount != 0);
 
 		// First 4 bits show if traingle is valid
 		// Current Value : 00000000 00000000 00000000 11111111

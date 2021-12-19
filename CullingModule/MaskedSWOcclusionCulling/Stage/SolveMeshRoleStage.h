@@ -33,6 +33,8 @@ namespace culling
 
 	public:
 
+		float mOccluderViewSpaceBoundingSphereRadius = 0.9f;
+
 		SolveMeshRoleStage(MaskedSWOcclusionCulling* occlusionCulling);
 		
 		void CullBlockEntityJob(const size_t cameraIndex) override;
