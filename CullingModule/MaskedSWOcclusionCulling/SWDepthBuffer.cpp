@@ -1,5 +1,23 @@
 #include "SWDepthBuffer.h"
 
+void culling::HizData::Reset()
+{
+	depthPosition = _mm256_set1_epi32(0);
+	z0Max = _mm256_set1_ps(1.0f);
+	z1Max = _mm256_set1_ps(1.0f);
+}
+
+void culling::TriangleList::Reset()
+{
+	mCurrentTriangleCount = 0;
+}
+
+void culling::Tile::Reset()
+{
+	mHizDatas.Reset();
+	mBinnedTriangles.Reset();
+}
+
 culling::SWDepthBuffer::SWDepthBuffer(std::uint32_t width, std::uint32_t height)
 	: 
 	mResolution{
@@ -25,8 +43,9 @@ culling::SWDepthBuffer::SWDepthBuffer(std::uint32_t width, std::uint32_t height)
 	assert(mResolution.mHeight % TILE_HEIGHT == 0);
 
 	
-
-	mTiles = new Tile[GetTileCount()];
+	const size_t tileCount = GetTileCount();
+	mTiles = new Tile[tileCount];
+	mTileCount = tileCount;
 }
 
 culling::SWDepthBuffer::~SWDepthBuffer()
@@ -41,5 +60,13 @@ culling::SWDepthBuffer::~SWDepthBuffer()
 size_t culling::SWDepthBuffer::GetTileCount() const
 {
 	return static_cast<size_t>(mResolution.mTileCountInARow) * static_cast<size_t>(mResolution.mTileCountInAColumn);
+}
+
+void culling::SWDepthBuffer::Reset()
+{
+	for (size_t i = 0; i < mTileCount; i++)
+	{
+		mTiles[i].Reset();
+	}
 }
 

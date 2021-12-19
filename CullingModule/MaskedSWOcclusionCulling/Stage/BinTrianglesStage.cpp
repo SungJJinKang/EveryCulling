@@ -182,7 +182,7 @@ void culling::BinTrianglesStage::PassTrianglesToTileBin
 
 	for (size_t triangleIndex = 0; triangleIndex < triangleCountPerLoop; triangleIndex++)
 	{
-		if ((triangleCullMask & (1 << triangleIndex)) != 0x0)
+		if ((triangleCullMask & (1 << triangleIndex)) != 0x00000000)
 		{
 			const size_t intersectingMinBoxX = (reinterpret_cast<const INT32*>(&outBinBoundingBoxMinX))[triangleIndex]; // this is screen space coordinate
 			const size_t intersectingMinBoxY = (reinterpret_cast<const INT32*>(&outBinBoundingBoxMinY))[triangleIndex];
@@ -424,7 +424,7 @@ void culling::BinTrianglesStage::BinTriangles
 			outBinBoundingBoxMaxY
 		);
 
-		currentIndiceIndex += triangleCountPerLoop * 3; 
+		currentIndiceIndex += (triangleCountPerLoop * 3); 
 	}
 }
 

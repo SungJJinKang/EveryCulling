@@ -44,6 +44,8 @@ namespace culling
 		/// 
 		/// </summary>
 		culling::M256I depthPosition;
+
+		void Reset();
 	};
 	
 	/// <summary>
@@ -62,6 +64,8 @@ namespace culling
 		ThreeDTriangle mTriangleList[BIN_TRIANGLE_CAPACITY_PER_TILE];
 
 		std::atomic<size_t> mCurrentTriangleCount = 0;
+
+		void Reset();
 	};
 
 	/// <summary>
@@ -73,6 +77,8 @@ namespace culling
 	{
 		HizData mHizDatas;
 		TriangleList mBinnedTriangles;
+
+		void Reset();
 	};
 
 	struct Resolution
@@ -131,6 +137,7 @@ namespace culling
 		/// Left Bottom is (0, 0)
 		/// </summary>
 		Tile* mTiles;
+		size_t mTileCount;
 
 		/// <summary>
 		/// 
@@ -144,5 +151,7 @@ namespace culling
 		~SWDepthBuffer();
 
 		size_t GetTileCount() const;
+
+		void Reset();
 	};
 }
