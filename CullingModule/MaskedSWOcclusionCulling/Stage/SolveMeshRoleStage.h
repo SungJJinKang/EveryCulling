@@ -12,6 +12,7 @@ namespace culling
 
 		bool CheckIsOccluderFromBoundingSphere
 		(
+			const size_t cameraIndex,
 			const culling::Vec3& spherePointInWorldSpace,
 			const float sphereRadiusInWorldSpace
 		) const;
@@ -19,6 +20,7 @@ namespace culling
 
 		bool CheckIsOccluderFromAABB
 		(
+			const size_t cameraIndex,
 			const culling::Vec3& minPointInWorldSpace,
 			const culling::Vec3& maxPointInWorldSpace
 		) const;

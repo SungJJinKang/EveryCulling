@@ -84,11 +84,11 @@ namespace culling
 		/// <param name="entityCountInBlock"></param>
 		/// <param name="cameraIndex"></param>
 		void DestroyQueryObject(culling::QueryObject* queryObject);
-		void ClearEntityData(EntityBlock* currentEntityBlock, std::uint32_t entityIndex) override;
+		void ClearEntityData(EntityBlock* currentEntityBlock, size_t entityIndex) override;
 
 		void QueryOccludeeAABB();
 	
-		void GenQueryObject(EntityBlock* currentEntityBlock, std::uint32_t entityIndex, const culling::AABB & occlusionAABBLocalMinMax);
+		void GenQueryObject(EntityBlock* currentEntityBlock, size_t entityIndex, const culling::AABB & occlusionAABBLocalMinMax);
 		void GenQueryObject(culling::EntityBlockViewer& entityBlockViewer, const culling::AABB & occlusionAABBLocalMinMax);
 		
 		/*

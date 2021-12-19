@@ -124,6 +124,7 @@ namespace culling
 		void SetViewProjectionMatrix(const size_t cameraIndex, const culling::Mat4x4& viewProjectionMatrix);
 		void SetFieldOfViewInDegree(const size_t cameraIndex, const float fov);
 		void SetCameraNearFarClipPlaneDistance(const size_t cameraIndex, const float nearPlaneDistance, const float farPlaneDistance);;
+		void SetCameraWorldPosition(const size_t cameraIndex, const culling::Vec3& cameraWorldPos);
 
 	public:
 
@@ -138,6 +139,7 @@ namespace culling
 			float mFieldOfViewInDegree;
 			float mCameraNearPlaneDistance;
 			float mCameraFarPlaneDistance;
+			culling::Vec3 mCameraWorldPosition;
 		};
 
 		void Configure(const size_t cameraIndex, const SettingParameters settingParameters);

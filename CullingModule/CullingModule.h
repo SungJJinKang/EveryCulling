@@ -13,6 +13,12 @@ namespace culling
 
 	class CullingModule
 	{
+	private:
+
+		std::uint32_t mCameraCount;
+		std::array<culling::Mat4x4, MAX_CAMERA_COUNT> mCameraViewProjectionMatrixs;
+		std::array<culling::Vec3, MAX_CAMERA_COUNT> mCameraWorldPosition;
+
 	protected:
 
 		EveryCulling* mCullingSystem;
@@ -24,7 +30,7 @@ namespace culling
 		{
 
 		}
-	
+		
 	public:
 
 		//static inline constexpr std::uint32_t M256_COUNT_OF_VISIBLE_ARRAY = 1 + ( (ENTITY_COUNT_IN_ENTITY_BLOCK * sizeof(decltype(*EntityBlock::mIsVisibleBitflag)) - 1) / 32 );
@@ -35,19 +41,29 @@ namespace culling
 		std::array<std::atomic<std::uint32_t>, MAX_CAMERA_COUNT> mCurrentCulledEntityBlockIndex;
 		std::array<std::atomic<std::uint32_t>, MAX_CAMERA_COUNT> mFinishedCullEntityBlockCount;
 
-		std::uint32_t mCameraCount;
-		std::array<culling::Mat4x4, MAX_CAMERA_COUNT> mCameraViewProjectionMatrixs;
 
-		virtual void SetViewProjectionMatrix(const std::uint32_t cameraIndex, const Mat4x4& viewProjectionMatrix);
-		FORCE_INLINE const culling::Mat4x4& GetViewProjectionMatrix(const std::uint32_t cameraIndex)
+		void SetViewProjectionMatrix(const size_t cameraIndex, const Mat4x4& viewProjectionMatrix);
+		FORCE_INLINE const culling::Mat4x4& GetViewProjectionMatrix(const size_t cameraIndex) const
 		{
 			return mCameraViewProjectionMatrixs[cameraIndex];
+		}
+
+		void SetCameraWorldPosition(const size_t cameraIndex, const Vec3& cameraWorldPosition);
+		FORCE_INLINE const culling::Vec3& GetCameraWorldPosition(const size_t cameraIndex) const
+		{
+			return mCameraWorldPosition[cameraIndex];
+		}
+
+		void SetCameraCount(const size_t cameraCount);
+		FORCE_INLINE size_t GetCameraWorldPosition() const
+		{
+			return mCameraCount;
 		}
 
 		virtual void ClearEntityData
 		(
 			EntityBlock* currentEntityBlock, 
-			std::uint32_t entityIndex
+			size_t entityIndex
 		) {};
 		virtual void CullBlockEntityJob
 		(

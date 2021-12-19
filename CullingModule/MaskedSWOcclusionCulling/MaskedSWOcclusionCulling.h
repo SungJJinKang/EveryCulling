@@ -127,6 +127,10 @@ namespace culling
 	
 		void SetNearFarClipPlaneDistance(const size_t cameraIndex, const float nearClipPlaneDis, const float farClipPlaneDis);
 		void SetFieldOfViewInDegree(const size_t cameraIndex, const float fov);
+		FORCE_INLINE float GetFieldOfViewInDegree(const size_t cameraIndex) const
+		{
+			return mFieldOfViewInDegree[cameraIndex];
+		}
 
 		void ResetState();
 		

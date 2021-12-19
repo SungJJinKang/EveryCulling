@@ -249,7 +249,7 @@ void culling::QueryOcclusionCulling::DestroyQueryObject(culling::QueryObject* qu
 }
 
 
-void culling::QueryOcclusionCulling::ClearEntityData(EntityBlock* currentEntityBlock, std::uint32_t entityIndex)
+void culling::QueryOcclusionCulling::ClearEntityData(EntityBlock* currentEntityBlock, size_t entityIndex)
 {
 	culling::QueryObject* queryObject = currentEntityBlock->mQueryObjects[entityIndex];
 	if (queryObject != nullptr)
@@ -263,7 +263,7 @@ void culling::QueryOcclusionCulling::ClearEntityData(EntityBlock* currentEntityB
 
 
 
-void culling::QueryOcclusionCulling::GenQueryObject(EntityBlock* currentEntityBlock, std::uint32_t entityIndex, const culling::AABB& occlusionAABBLocalMinMax)
+void culling::QueryOcclusionCulling::GenQueryObject(EntityBlock* currentEntityBlock, size_t entityIndex, const culling::AABB& occlusionAABBLocalMinMax)
 {
 	assert(currentEntityBlock != nullptr);
 

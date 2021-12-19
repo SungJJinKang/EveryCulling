@@ -127,7 +127,7 @@ void culling::MaskedSWOcclusionCulling::CullBlockEntityJob
 
 		for (size_t entityIndex = 0; entityIndex < entityCountInBlock; entityIndex++)
 		{
-			if (currentEntityBlock->mIsVisibleBitflag[entityIndex] != 0)
+			if (currentEntityBlock->GetIsCulled(entityIndex, cameraIndex) == false)
 			{
 				//Yes!! it pass previous culling modules
 				mSolveMeshRoleStage.DoStageJob(currentEntityBlock, entityIndex, cameraIndex);
@@ -140,7 +140,11 @@ void culling::MaskedSWOcclusionCulling::CullBlockEntityJob
 
 		for (size_t entityIndex = 0; entityIndex < entityCountInBlock; entityIndex++)
 		{
-			if (currentEntityBlock->mIsVisibleBitflag[entityIndex] != 0)
+			if
+			(
+				currentEntityBlock->GetIsCulled(entityIndex, cameraIndex) == false && 
+				currentEntityBlock->mIsOccluder[entityIndex] == true
+			)
 			{
 				//Yes!! it pass previous culling modules
 				mBinTrianglesStage.DoStageJob(currentEntityBlock, entityIndex, cameraIndex);
@@ -152,13 +156,29 @@ void culling::MaskedSWOcclusionCulling::CullBlockEntityJob
 
 	case eMaskedOcclusionCullingStage::DrawOccluder:
 
+		for (size_t entityIndex = 0; entityIndex < entityCountInBlock; entityIndex++)
+		{
+			if (currentEntityBlock->GetIsCulled(entityIndex, cameraIndex) == false)
+			{
+				//Yes!! it pass previous culling modules
+				//mBinTrianglesStage.DoStageJob(currentEntityBlock, entityIndex, cameraIndex);
+			}
+		}
+
 		break;
 
 
 	case eMaskedOcclusionCullingStage::QueryOccludee:
 
+		for (size_t entityIndex = 0; entityIndex < entityCountInBlock; entityIndex++)
+		{
+			if (currentEntityBlock->GetIsCulled(entityIndex, cameraIndex) == false)
+			{
+				//Yes!! it pass previous culling modules
+				//mBinTrianglesStage.DoStageJob(currentEntityBlock, entityIndex, cameraIndex);
+			}
+		}
 		
-
 		break;
 		
 	case eMaskedOcclusionCullingStage::Finished:

@@ -330,10 +330,11 @@ culling::EveryCulling::~EveryCulling()
 void culling::EveryCulling::SetCameraCount(std::uint32_t cameraCount)
 {
 	mCameraCount = cameraCount;
-	mViewFrustumCulling.mCameraCount = cameraCount;
-#ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
-	mScreenSpaceBoudingSphereCulling.mCameraCount = cameraCount;
-#endif
+
+	for (auto updatedCullingModule : mUpdatedCullingModules)
+	{
+		updatedCullingModule->SetCameraCount(cameraCount);
+}
 }
 
 void culling::EveryCulling::SetCameraPosition(const size_t cameraIndex, const culling::Vec3& cameraPosition)
@@ -384,11 +385,25 @@ void culling::EveryCulling::SetCameraNearFarClipPlaneDistance
 	mMaskedSWOcclusionCulling.SetNearFarClipPlaneDistance(cameraIndex, nearPlaneDistance, farPlaneDistance);
 }
 
+void culling::EveryCulling::SetCameraWorldPosition(const size_t cameraIndex, const culling::Vec3& cameraWorldPos)
+{
+	assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
+	
+	if (cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT)
+	{
+		for (auto updatedCullingModule : mUpdatedCullingModules)
+		{
+			updatedCullingModule->SetCameraWorldPosition(cameraIndex, cameraWorldPos);
+		}
+	}
+}
+
 void culling::EveryCulling::Configure(const size_t cameraIndex, const SettingParameters settingParameters)
 {
 	SetViewProjectionMatrix(cameraIndex, settingParameters.mViewProjectionMatrix);
 	SetFieldOfViewInDegree(cameraIndex, settingParameters.mFieldOfViewInDegree);
 	SetCameraNearFarClipPlaneDistance(cameraIndex, settingParameters.mCameraNearPlaneDistance, settingParameters.mCameraFarPlaneDistance);
+	SetCameraWorldPosition(cameraIndex, settingParameters.mCameraWorldPosition);
 }
 
 std::uint32_t culling::EveryCulling::GetCameraCount() const

@@ -46,4 +46,9 @@ namespace culling
 		b = original;
 	}
 
+	inline extern float PI = 3.14159265358979323846f;
+
+	inline extern float DEGREE_TO_RADIAN = PI / 180.0f;
+
+	inline extern float RADIAN_TO_DEGREE = 180.0f / PI;
 }
