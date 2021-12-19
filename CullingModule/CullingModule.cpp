@@ -4,10 +4,10 @@
 
 culling::EntityBlock* culling::CullingModule::GetNextEntityBlock(const size_t cameraIndex)
 {
-	const std::uint32_t currentEntityBlockIndex = mCullJobState.mCurrentCulledEntityBlockIndex[cameraIndex]++;
+	const std::uint32_t currentEntityBlockIndex = mCullJobState.mCurrentCulledEntityBlockIndex[cameraIndex].fetch_add(1, std::memory_order_seq_cst);
 
 	const size_t entityBlockCount = mCullingSystem->GetActiveEntityBlockCount();
-	EntityBlock* const currentEntityBlock = (currentEntityBlockIndex >= entityBlockCount) ? nullptr : mCullingSystem->GetActiveEntityBlockList()[currentEntityBlockIndex];
+	EntityBlock* const currentEntityBlock = (currentEntityBlockIndex >= entityBlockCount) ? (nullptr) : (mCullingSystem->GetActiveEntityBlockList()[currentEntityBlockIndex]);
 
 	if(currentEntityBlock != nullptr)
 	{

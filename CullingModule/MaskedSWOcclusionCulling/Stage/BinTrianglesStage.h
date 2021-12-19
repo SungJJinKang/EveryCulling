@@ -157,6 +157,7 @@ namespace culling
 		void GatherVertices
 		(
 			const float* const vertices,
+			const size_t verticeCount,
 			const std::uint32_t* const vertexIndices,
 			const size_t indiceCount, 
 			const size_t currentIndiceIndex, 
@@ -184,6 +185,7 @@ namespace culling
 		void BinTriangles
 		(
 			const float* const vertices,
+			const size_t verticeCount,
 			const std::uint32_t* const vertexIndices,
 			const size_t indiceCount, 
 			const size_t vertexStrideByte, 

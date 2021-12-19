@@ -232,7 +232,8 @@ void culling::BinTrianglesStage::PassTrianglesToTileBin
 
 void culling::BinTrianglesStage::GatherVertices
 (
-	const float* const vertices, 
+	const float* const vertices,
+	const size_t verticeCount,
 	const std::uint32_t* const vertexIndices, 
 	const size_t indiceCount, 
 	const size_t currentIndiceIndex, 
@@ -319,13 +320,18 @@ void culling::BinTrianglesStage::CullBlockEntityJob(const size_t cameraIndex)
 		{
 			for(size_t entityIndex = 0 ; entityIndex < nextEntityBlock->mCurrentEntityCount ; entityIndex++)
 			{
-				if(nextEntityBlock->GetIsCulled(entityIndex, cameraIndex) == false)
+				if
+				(
+					(nextEntityBlock->GetIsCulled(entityIndex, cameraIndex) == false) &&
+					(nextEntityBlock->GetIsOccluder(entityIndex, cameraIndex) == true)
+				)
 				{
 					const VertexData& vertexData = nextEntityBlock->mVertexDatas[entityIndex];
 
 					BinTriangles
 					(
 						reinterpret_cast<const float*>(vertexData.mVertices),
+						vertexData.mVerticeCount,
 						vertexData.mIndices,
 						vertexData.mIndiceCount,
 						vertexData.mVertexStride,
@@ -347,17 +353,21 @@ void culling::BinTrianglesStage::CullBlockEntityJob(const size_t cameraIndex)
 void culling::BinTrianglesStage::BinTriangles
 (
 	const float* const vertices, 
+	const size_t verticeCount,
 	const std::uint32_t* const vertexIndices, 
 	const size_t indiceCount, 
 	const size_t vertexStrideByte, 
 	const float* const modelToClipspaceMatrix
 )
 {
-	size_t currentIndiceIndex = 0;
-	static constexpr std::uint32_t triangleCountPerLoop = 8;
+	static constexpr std::int32_t triangleCountPerLoop = 8;
+
+	size_t currentIndiceIndex = -(triangleCountPerLoop * 3);
 
 	while (currentIndiceIndex < indiceCount)
 	{
+		currentIndiceIndex += (triangleCountPerLoop * 3);
+
 		const size_t fetchTriangleCount = MIN(8, (indiceCount - currentIndiceIndex) / 3);
 
 		// First 4 bits show if traingle is valid
@@ -383,7 +393,7 @@ void culling::BinTrianglesStage::BinTriangles
 
 		//Gather Vertex with indice
 		//WE ARRIVE AT MODEL SPACE COORDINATE!
-		GatherVertices(vertices, vertexIndices, indiceCount, currentIndiceIndex, vertexStrideByte, fetchTriangleCount, ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, triangleCullMask);
+		GatherVertices(vertices, verticeCount, vertexIndices, indiceCount, currentIndiceIndex, vertexStrideByte, fetchTriangleCount, ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, triangleCullMask);
 
 		if (triangleCullMask == 0x0)
 		{
@@ -459,7 +469,7 @@ void culling::BinTrianglesStage::BinTriangles
 			outBinBoundingBoxMaxY
 		);
 
-		currentIndiceIndex += (triangleCountPerLoop * 3); 
+		
 	}
 }
 

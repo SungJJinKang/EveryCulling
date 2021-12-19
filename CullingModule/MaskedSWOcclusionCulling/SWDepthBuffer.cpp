@@ -43,7 +43,7 @@ culling::SWDepthBuffer::SWDepthBuffer(std::uint32_t width, std::uint32_t height)
 	assert(mResolution.mHeight % TILE_HEIGHT == 0);
 
 	
-	const size_t tileCount = GetTileCount();
+	const size_t tileCount = static_cast<size_t>(mResolution.mTileCountInARow) * static_cast<size_t>(mResolution.mTileCountInAColumn);
 	mTiles = new Tile[tileCount];
 	mTileCount = tileCount;
 }
@@ -59,7 +59,7 @@ culling::SWDepthBuffer::~SWDepthBuffer()
 
 size_t culling::SWDepthBuffer::GetTileCount() const
 {
-	return static_cast<size_t>(mResolution.mTileCountInARow) * static_cast<size_t>(mResolution.mTileCountInAColumn);
+	return mTileCount;
 }
 
 void culling::SWDepthBuffer::Reset()

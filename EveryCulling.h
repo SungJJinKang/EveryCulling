@@ -59,11 +59,11 @@ namespace culling
 		bool bmIsEntityBlockPoolInitialized{ false };
 
 		/// <summary>
-		/// List of EntityBlock with no Entity ( maybe entity was destroyed)
+		/// List of EntityBlock with no entity ( maybe entity was destroyed)
 		/// </summary>
 		std::vector<EntityBlock*> mFreeEntityBlockList{};
 		/// <summary>
-		/// List of EntityBlock with Entities
+		/// List of EntityBlock containing Entities
 		/// </summary>
 		std::vector<EntityBlock*> mActiveEntityBlockList{};
 		/// <summary>
@@ -71,7 +71,6 @@ namespace culling
 		/// This objects will be released at destructor
 		/// </summary>
 		std::vector<EntityBlock*> mAllocatedEntityBlockChunkList{};
-		EntityGridCell mEntityGridCell{};
 
 		std::atomic<bool> mIsCullJobFinished;
 
@@ -85,7 +84,7 @@ namespace culling
 		void FreeEntityBlock(EntityBlock* freedEntityBlock);
 		EntityBlock* GetNewEntityBlockFromPool();
 
-		void ResetCullJobStateVariable();
+		void ResetCullingModules();
 		/// <summary>
 		/// Reset VisibleFlag
 		/// </summary>
@@ -167,11 +166,7 @@ namespace culling
 			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
 			return mNearClipPlaneDistance[cameraIndex];
 		}
-
 		
-		const EntityGridCell& GetEntityGridCell() const;
-		EntityGridCell& GetEntityGridCell();
-
 		/// <summary>
 		/// Get EntityBlock List with entities
 		/// </summary>
@@ -198,17 +193,7 @@ namespace culling
 		/// Removing Entity isn't thread safe
 		/// </summary>
 		void RemoveEntityFromBlock(EntityBlockViewer& entityBlockViewer);
-
-		/// <summary>
-		/// Solve View Frustum Culling from multiple threads
-		/// Call this before start draw
-		/// 
-		/// for pushing to job pool , this function is declared with static
-		/// 
-		/// CullBlockEntityJob never access to shared variable.
-		/// So CullBlockEntityJob is thread safe.
-		/// </summary>
-		void CullBlockEntityJob();
+		
 		void CullBlockEntityJob(const size_t cameraIndex);
 		//void CullBlockEntityJob(const std::uint32_t threadIndex, const std::uint32_t threadCount);
 
@@ -222,19 +207,7 @@ namespace culling
 		/// Reset cull job state before pushing cull jobs to job pool
 		/// </summary>
 		void ResetCullJobState();
-
-		/// <summary>
-		/// Return Cached cull job std::function 
-		/// </summary>
-		/// <returns></returns>
-		constexpr auto GetCullJobInLambda()
-		{
-			return [this]() 
-			{
-				this->CullBlockEntityJob();
-			};
-		}
-
+		
 		constexpr auto GetCullJobInLambda(const size_t cameraIndex)
 		{
 			return [this, cameraIndex]()
