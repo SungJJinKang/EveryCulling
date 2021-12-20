@@ -26,18 +26,8 @@ namespace culling
 {
 
 	//This code doesn't consider Memory alignment optimzation.
-	inline constexpr size_t ENTITY_COUNT_IN_ENTITY_BLOCK =
-		MAKE_EVEN_NUMBER(
-			(4096 - sizeof(std::uint32_t)) /
-			(
-				sizeof(Vec4)
-				+ sizeof(char)
-				+ sizeof(void*)
-				+ sizeof(void*)
-				+ QUERY_OBJECT_PTR_SIZE
-				+ sizeof(culling::VertexData)
-		)) 
-		- 2;
+	inline constexpr size_t ENTITY_COUNT_IN_ENTITY_BLOCK = 32;
+	static_assert(ENTITY_COUNT_IN_ENTITY_BLOCK % 32 == 0);
 
 	/// <summary>
 	/// EntityBlock size should be less 4KB(Page size) for Block data being allocated in a page
@@ -83,7 +73,7 @@ namespace culling
 		void* mTransform[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 		VertexData mVertexDatas[ENTITY_COUNT_IN_ENTITY_BLOCK];
-		bool mIsOccluder[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		char mIsOccluder[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		
 		//EntityHandle mHandles[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
@@ -95,6 +85,23 @@ namespace culling
 		FORCE_INLINE bool GetIsCulled(const size_t entityIndex, const size_t cameraIndex) const
 		{
 			return ( mIsVisibleBitflag[entityIndex] & (1 << cameraIndex) ) == 0;
+		}
+
+		FORCE_INLINE bool GetIsOccluder(const size_t entityIndex, const std::uint32_t cameraIndex) const
+		{
+			return (mIsOccluder[entityIndex] & (1 << cameraIndex)) != 0;
+		}
+
+		FORCE_INLINE void SetIsOccluder(const size_t entityIndex, const std::uint32_t cameraIndex, const bool isOccluder)
+		{
+			if(isOccluder == true)
+			{
+				mIsOccluder[entityIndex] |= (1 << cameraIndex);
+			}
+			else
+			{
+				mIsOccluder[entityIndex] &= (~(1 << cameraIndex));
+			}
 		}
 	};
 

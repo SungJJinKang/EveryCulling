@@ -81,10 +81,10 @@ void culling::BinTrianglesStage::TransformVertexsToClipSpace
 		//TODO : Consider Trimask
 		for (size_t i = 0; i < 3; ++i)
 		{
-			const culling::M256F tmpX = M256F_MUL_AND_ADD(outClipVertexX[i], _mm256_set1_ps(toClipspaceMatrix[0]), M256F_MUL_AND_ADD(outClipVertexY[i], _mm256_set1_ps(toClipspaceMatrix[4]), M256F_MUL_AND_ADD(outClipVertexW[i], _mm256_set1_ps(toClipspaceMatrix[8]), _mm256_set1_ps(toClipspaceMatrix[12]))));
-			const culling::M256F tmpY = M256F_MUL_AND_ADD(outClipVertexX[i], _mm256_set1_ps(toClipspaceMatrix[1]), M256F_MUL_AND_ADD(outClipVertexY[i], _mm256_set1_ps(toClipspaceMatrix[5]), M256F_MUL_AND_ADD(outClipVertexW[i], _mm256_set1_ps(toClipspaceMatrix[9]), _mm256_set1_ps(toClipspaceMatrix[13]))));
-			const culling::M256F tmpZ = M256F_MUL_AND_ADD(outClipVertexX[i], _mm256_set1_ps(toClipspaceMatrix[2]), M256F_MUL_AND_ADD(outClipVertexY[i], _mm256_set1_ps(toClipspaceMatrix[6]), M256F_MUL_AND_ADD(outClipVertexW[i], _mm256_set1_ps(toClipspaceMatrix[10]), _mm256_set1_ps(toClipspaceMatrix[14]))));
-			const culling::M256F tmpW = M256F_MUL_AND_ADD(outClipVertexX[i], _mm256_set1_ps(toClipspaceMatrix[3]), M256F_MUL_AND_ADD(outClipVertexY[i], _mm256_set1_ps(toClipspaceMatrix[7]), M256F_MUL_AND_ADD(outClipVertexW[i], _mm256_set1_ps(toClipspaceMatrix[11]), _mm256_set1_ps(toClipspaceMatrix[15]))));
+			const culling::M256F tmpX = M256F_MUL_AND_ADD(outClipVertexX[i], _mm256_set1_ps(toClipspaceMatrix[0]), M256F_MUL_AND_ADD(outClipVertexY[i], _mm256_set1_ps(toClipspaceMatrix[4]), M256F_MUL_AND_ADD(outClipVertexZ[i], _mm256_set1_ps(toClipspaceMatrix[8]), _mm256_set1_ps(toClipspaceMatrix[12]))));
+			const culling::M256F tmpY = M256F_MUL_AND_ADD(outClipVertexX[i], _mm256_set1_ps(toClipspaceMatrix[1]), M256F_MUL_AND_ADD(outClipVertexY[i], _mm256_set1_ps(toClipspaceMatrix[5]), M256F_MUL_AND_ADD(outClipVertexZ[i], _mm256_set1_ps(toClipspaceMatrix[9]), _mm256_set1_ps(toClipspaceMatrix[13]))));
+			const culling::M256F tmpZ = M256F_MUL_AND_ADD(outClipVertexX[i], _mm256_set1_ps(toClipspaceMatrix[2]), M256F_MUL_AND_ADD(outClipVertexY[i], _mm256_set1_ps(toClipspaceMatrix[6]), M256F_MUL_AND_ADD(outClipVertexZ[i], _mm256_set1_ps(toClipspaceMatrix[10]), _mm256_set1_ps(toClipspaceMatrix[14]))));
+			const culling::M256F tmpW = M256F_MUL_AND_ADD(outClipVertexX[i], _mm256_set1_ps(toClipspaceMatrix[3]), M256F_MUL_AND_ADD(outClipVertexY[i], _mm256_set1_ps(toClipspaceMatrix[7]), M256F_MUL_AND_ADD(outClipVertexZ[i], _mm256_set1_ps(toClipspaceMatrix[11]), _mm256_set1_ps(toClipspaceMatrix[15]))));
 
 			outClipVertexX[i] = tmpX;
 			outClipVertexY[i] = tmpY;
@@ -188,10 +188,7 @@ void culling::BinTrianglesStage::PassTrianglesToTileBin
 			const size_t intersectingMinBoxY = (reinterpret_cast<const INT32*>(&outBinBoundingBoxMinY))[triangleIndex];
 			const size_t intersectingMaxBoxX = (reinterpret_cast<const INT32*>(&outBinBoundingBoxMaxX))[triangleIndex];
 			const size_t intersectingMaxBoxY = (reinterpret_cast<const INT32*>(&outBinBoundingBoxMaxY))[triangleIndex];
-
-			assert(intersectingMinBoxX <= intersectingMaxBoxX);
-			assert(intersectingMinBoxY <= intersectingMaxBoxY);
-
+			
 			const int startBoxIndexX = MIN(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mTileCountInARow - 1, intersectingMinBoxX / TILE_WIDTH);
 			const int startBoxIndexY = MIN(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mTileCountInAColumn - 1, intersectingMinBoxY / TILE_HEIGHT);
 			const int endBoxIndexX = MIN(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mTileCountInARow, (intersectingMaxBoxX + TILE_WIDTH - 1) / TILE_WIDTH);
@@ -202,7 +199,7 @@ void culling::BinTrianglesStage::PassTrianglesToTileBin
 
 			for (size_t y = startBoxIndexY; y <= endBoxIndexY; y++)
 			{
-				for (size_t x = startBoxIndexX; y <= endBoxIndexX; y++)
+				for (size_t x = startBoxIndexX; x <= endBoxIndexX; x++)
 				{
 					Tile& targetTile = tiles[x + y * mMaskedOcclusionCulling->mDepthBuffer.mResolution.mTileCountInARow];
 
@@ -216,9 +213,9 @@ void culling::BinTrianglesStage::PassTrianglesToTileBin
 
 					for (size_t pointIndex = 0; pointIndex < 3; pointIndex++)
 					{
-						targetTile.mBinnedTriangles.mTriangleList[triListIndex].Points[pointIndex].x = (reinterpret_cast<const float*>(screenPixelPosX + pointIndex))[triListIndex];
-						targetTile.mBinnedTriangles.mTriangleList[triListIndex].Points[pointIndex].y = (reinterpret_cast<const float*>(screenPixelPosY + pointIndex))[triListIndex];
-						targetTile.mBinnedTriangles.mTriangleList[triListIndex].Points[pointIndex].z = (reinterpret_cast<const float*>(ndcSpaceVertexZ + pointIndex))[triListIndex];
+						targetTile.mBinnedTriangles.mTriangleList[triListIndex].Points[pointIndex].x = (reinterpret_cast<const float*>(screenPixelPosX + pointIndex))[triangleIndex];
+						targetTile.mBinnedTriangles.mTriangleList[triListIndex].Points[pointIndex].y = (reinterpret_cast<const float*>(screenPixelPosY + pointIndex))[triangleIndex];
+						targetTile.mBinnedTriangles.mTriangleList[triListIndex].Points[pointIndex].z = (reinterpret_cast<const float*>(ndcSpaceVertexZ + pointIndex))[triangleIndex];
 					}
 
 				}
@@ -232,7 +229,8 @@ void culling::BinTrianglesStage::PassTrianglesToTileBin
 
 void culling::BinTrianglesStage::GatherVertices
 (
-	const float* const vertices, 
+	const float* const vertices,
+	const size_t verticeCount,
 	const std::uint32_t* const vertexIndices, 
 	const size_t indiceCount, 
 	const size_t currentIndiceIndex, 
@@ -264,7 +262,6 @@ void culling::BinTrianglesStage::GatherVertices
 
 	// Compute per-lane index list offset that guards against out of bounds memory accesses
 	const culling::M256I safeIndiceIndexs = _mm256_and_si256(indiceIndexs, SIMD_LANE_MASK[fetchTriangleCount]);
-
 
 	culling::M256I m256i_indices[3];
 	//If stride is 7
@@ -304,6 +301,18 @@ void culling::BinTrianglesStage::GatherVertices
 	}
 }
 
+void culling::BinTrianglesStage::ConvertToPlatformDepth(culling::M256F* const depth)
+{
+
+#if (NDC_RANGE == MINUS_ONE_TO_POSITIVE_ONE)
+	for (size_t i = 0; i < 3; i++)
+	{
+		//depth[i]
+	}
+#endif
+	
+}
+
 culling::BinTrianglesStage::BinTrianglesStage(MaskedSWOcclusionCulling* mMOcclusionCulling)
 	: MaskedSWOcclusionCullingStage{ mMOcclusionCulling }
 {
@@ -319,13 +328,18 @@ void culling::BinTrianglesStage::CullBlockEntityJob(const size_t cameraIndex)
 		{
 			for(size_t entityIndex = 0 ; entityIndex < nextEntityBlock->mCurrentEntityCount ; entityIndex++)
 			{
-				if(nextEntityBlock->GetIsCulled(entityIndex, cameraIndex) == false)
+				if
+				(
+					(nextEntityBlock->GetIsCulled(entityIndex, cameraIndex) == false) &&
+					(nextEntityBlock->GetIsOccluder(entityIndex, cameraIndex) == true)
+				)
 				{
 					const VertexData& vertexData = nextEntityBlock->mVertexDatas[entityIndex];
 
 					BinTriangles
 					(
 						reinterpret_cast<const float*>(vertexData.mVertices),
+						vertexData.mVerticeCount,
 						vertexData.mIndices,
 						vertexData.mIndiceCount,
 						vertexData.mVertexStride,
@@ -347,18 +361,27 @@ void culling::BinTrianglesStage::CullBlockEntityJob(const size_t cameraIndex)
 void culling::BinTrianglesStage::BinTriangles
 (
 	const float* const vertices, 
+	const size_t verticeCount,
 	const std::uint32_t* const vertexIndices, 
 	const size_t indiceCount, 
 	const size_t vertexStrideByte, 
 	const float* const modelToClipspaceMatrix
 )
 {
-	size_t currentIndiceIndex = 0;
-	static constexpr std::uint32_t triangleCountPerLoop = 8;
+	static constexpr std::int32_t triangleCountPerLoop = 8;
 
-	while (currentIndiceIndex < indiceCount)
+	std::int32_t currentIndiceIndex = -(triangleCountPerLoop * 3);
+
+	while (currentIndiceIndex < (std::int32_t)indiceCount)
 	{
+		currentIndiceIndex += (triangleCountPerLoop * 3);
+
+		if(currentIndiceIndex >= (std::int32_t)indiceCount)
+		{
+			break;
+		}
 		const size_t fetchTriangleCount = MIN(8, (indiceCount - currentIndiceIndex) / 3);
+		assert(fetchTriangleCount != 0);
 
 		// First 4 bits show if traingle is valid
 		// Current Value : 00000000 00000000 00000000 11111111
@@ -383,9 +406,9 @@ void culling::BinTrianglesStage::BinTriangles
 
 		//Gather Vertex with indice
 		//WE ARRIVE AT MODEL SPACE COORDINATE!
-		GatherVertices(vertices, vertexIndices, indiceCount, currentIndiceIndex, vertexStrideByte, fetchTriangleCount, ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, triangleCullMask);
+		GatherVertices(vertices, verticeCount, vertexIndices, indiceCount, currentIndiceIndex, vertexStrideByte, fetchTriangleCount, ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, triangleCullMask);
 
-		if (triangleCullMask == 0x0)
+		if (triangleCullMask == 0x00000000)
 		{
 			continue;
 		}
@@ -406,6 +429,8 @@ void culling::BinTrianglesStage::BinTriangles
 		//W BECOME USELESS, IGNORE IT
 		ConvertClipSpaceToNDCSpace(ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, oneDividedByW, triangleCullMask);
 
+		ConvertToPlatformDepth(ndcSpaceVertexZ);
+
 		// TODO : Set triangleCullMask about NDC x, y, z is in -1 ~ 1
 
 		//ScreenPixelPos : 0 ~ mDepthBuffer.Width, Height
@@ -422,7 +447,7 @@ void culling::BinTrianglesStage::BinTriangles
 		//Sort triangle in drawing depth stage/
 		//In that stage, all triangles is valid
 
-		if (triangleCullMask == 0x0)
+		if (triangleCullMask == 0x00000000)
 		{
 			continue;
 		}
@@ -459,7 +484,7 @@ void culling::BinTrianglesStage::BinTriangles
 			outBinBoundingBoxMaxY
 		);
 
-		currentIndiceIndex += (triangleCountPerLoop * 3); 
+		
 	}
 }
 

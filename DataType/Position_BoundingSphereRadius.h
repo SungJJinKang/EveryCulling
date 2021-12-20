@@ -28,7 +28,7 @@ namespace culling
 			// why minus?
 			// Calculated distance between frustum plane and object is positive when object is in frustum
 
-			BoundingSphereRadius = -(_boundingSphereRadius + BOUNDING_SPHRE_RADIUS_MARGIN);
+			BoundingSphereRadius = _boundingSphereRadius;
 		}
 	};
 }
