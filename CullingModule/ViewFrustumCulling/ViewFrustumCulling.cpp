@@ -46,7 +46,7 @@ void culling::ViewFrustumCulling::CullBlockEntityJob
 	const size_t cullingMaskSize = ENTITY_COUNT_IN_ENTITY_BLOCK;
 	assert(cullingMaskSize % 32 == 0);
 
-	alignas(32) char cullingMask[cullingMaskSize];
+	alignas(32) char cullingMask[cullingMaskSize + 1];
 	D_ASSERT(cullingMaskSize % 32 == 0);
 	for (int i = 0; i < cullingMaskSize; i += 32)
 	{
@@ -56,7 +56,7 @@ void culling::ViewFrustumCulling::CullBlockEntityJob
 	const Vec4* frustumPlane = mSIMDFrustumPlanes[cameraIndex].mFrustumPlanes;
 
 	assert(entityBlock->mCurrentEntityCount != 0);
-	for (size_t entityIndex = 0; entityIndex < entityBlock->mCurrentEntityCount - 1; entityIndex = entityIndex + 2)
+	for (size_t entityIndex = 0; entityIndex < entityBlock->mCurrentEntityCount ; entityIndex = entityIndex + 2)
 	{
 		char result = CheckInFrustumSIMDWithTwoPoint(frustumPlane, entityBlock->mPositionAndBoundingSpheres + entityIndex);
 		// if first low bit has 1 value, Pos A is In Frustum
