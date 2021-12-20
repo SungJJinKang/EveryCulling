@@ -383,12 +383,28 @@ void culling::EveryCulling::SetCameraWorldPosition(const size_t cameraIndex, con
 	}
 }
 
+void culling::EveryCulling::SetCameraRotation(const size_t cameraIndex, const culling::Vec4& cameraRotation)
+{
+	assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
+
+	mCameraRotations[cameraIndex] = cameraRotation;
+
+	if (cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT)
+	{
+		for (auto updatedCullingModule : mUpdatedCullingModules)
+		{
+			updatedCullingModule->OnSetCameraRotation(cameraIndex, cameraRotation);
+		}
+	}
+}
+
 void culling::EveryCulling::Configure(const size_t cameraIndex, const SettingParameters settingParameters)
 {
 	SetViewProjectionMatrix(cameraIndex, settingParameters.mViewProjectionMatrix);
 	SetFieldOfViewInDegree(cameraIndex, settingParameters.mFieldOfViewInDegree);
 	SetCameraNearFarClipPlaneDistance(cameraIndex, settingParameters.mCameraNearPlaneDistance, settingParameters.mCameraFarPlaneDistance);
 	SetCameraWorldPosition(cameraIndex, settingParameters.mCameraWorldPosition);
+	SetCameraRotation(cameraIndex, settingParameters.mCameraRotation);
 }
 
 const std::vector<culling::EntityBlock*>& culling::EveryCulling::GetActiveEntityBlockList() const

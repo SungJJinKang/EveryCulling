@@ -55,6 +55,7 @@ namespace culling
 	/// </summary>
 	struct TriangleList
 	{
+		//TODO : Do consider cache coherency ( In bin stage, multiple threads can write triangle vertex data to same tile )
 		/// <summary>
 		/// Binned Screen Pixel Space Triangles
 		///	x : screen space x ( 0 ~ screen width )

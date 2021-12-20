@@ -67,6 +67,9 @@ namespace culling
 		virtual void OnSetCameraWorldPosition(const size_t cameraIndex, const culling::Vec3& cameraWorldPosition)
 		{
 		}
+		virtual void OnSetCameraRotation(const size_t cameraIndex, const culling::Vec4& cameraRotation)
+		{
+		}
 		virtual void OnSetCameraCount(const size_t cameraCount)
 		{
 		}

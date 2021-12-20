@@ -53,6 +53,7 @@ namespace culling
 		std::array<culling::Mat4x4, MAX_CAMERA_COUNT> mCameraModelMatrixes;
 		std::array<culling::Mat4x4, MAX_CAMERA_COUNT> mCameraViewProjectionMatrixes;
 		std::array<culling::Vec3, MAX_CAMERA_COUNT> mCameraWorldPositions;
+		std::array<culling::Vec4, MAX_CAMERA_COUNT> mCameraRotations;
 		std::array<float, MAX_CAMERA_COUNT> mCameraFieldOfView;
 		std::array<float, MAX_CAMERA_COUNT> mFarClipPlaneDistance;
 		std::array<float, MAX_CAMERA_COUNT> mNearClipPlaneDistance;
@@ -111,6 +112,7 @@ namespace culling
 		void SetFieldOfViewInDegree(const size_t cameraIndex, const float fov);
 		void SetCameraNearFarClipPlaneDistance(const size_t cameraIndex, const float nearPlaneDistance, const float farPlaneDistance);;
 		void SetCameraWorldPosition(const size_t cameraIndex, const culling::Vec3& cameraWorldPos);
+		void SetCameraRotation(const size_t cameraIndex, const culling::Vec4& cameraRotation);
 		
 
 	public:
@@ -134,6 +136,7 @@ namespace culling
 			float mCameraNearPlaneDistance;
 			float mCameraFarPlaneDistance;
 			culling::Vec3 mCameraWorldPosition;
+			culling::Vec4 mCameraRotation;
 		};
 
 		void Configure(const size_t cameraIndex, const SettingParameters settingParameters);
