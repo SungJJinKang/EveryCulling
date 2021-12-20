@@ -92,7 +92,7 @@ namespace culling
 		/// </summary>
 		std::uint32_t mCurrentEntityCount;
 
-		FORCE_INLINE bool GetIsCulled(const size_t entityIndex, const std::uint32_t cameraIndex) const
+		FORCE_INLINE bool GetIsCulled(const size_t entityIndex, const size_t cameraIndex) const
 		{
 			return ( mIsVisibleBitflag[entityIndex] & (1 << cameraIndex) ) == 0;
 		}
