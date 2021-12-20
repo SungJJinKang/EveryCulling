@@ -34,6 +34,20 @@ namespace culling
 		);
 
 		/// <summary>
+		/// frustum culling in clip space
+		/// </summary>
+		/// <param name="clipspaceVertexX"></param>
+		/// <param name="clipspaceVertexY"></param>
+		/// <param name="triangleCullMask"></param>
+		void FrustumCulling
+		(
+			const culling::M256F* const clipspaceVertexX,
+			const culling::M256F* const clipspaceVertexY,
+			const culling::M256F* const clipspaceVertexW,
+			std::uint32_t& triangleCullMask
+		);
+
+		/// <summary>
 		/// Convert NDC Space X,Y To Screen Space X,Y according to Graphics API
 		/// And Snap Screen Space X,Y To Pixel Coordinate in Buffer
 		/// 

@@ -119,7 +119,33 @@ namespace culling
 		culling::M256F mReplicatedScreenWidth;
 		culling::M256F mReplicatedScreenHeight;
 #endif
-		
+
+		Resolution
+		(
+			const std::uint32_t width,
+			const std::uint32_t height,
+			const std::uint32_t rowCount,
+			const std::uint32_t columnCount,
+			const std::uint32_t leftBottomTileOrginX,
+			const std::uint32_t leftBottomTileOrginY,
+			const std::uint32_t rightTopTileOrginX,
+			const std::uint32_t rightTopTileOrginY,
+			const culling::M256F replicatedScreenHalfWidth,
+			const culling::M256F replicatedScreenHeight
+		)
+			:
+			mWidth(width),
+			mHeight(height),
+			mRowCount(rowCount),
+			mColumnCount(columnCount),
+			mLeftBottomTileOrginX(leftBottomTileOrginX),
+			mLeftBottomTileOrginY(leftBottomTileOrginY),
+			mRightTopTileOrginX(rightTopTileOrginX),
+			mRightTopTileOrginY(rightTopTileOrginY),
+			mReplicatedScreenHalfWidth(replicatedScreenHalfWidth),
+			mReplicatedScreenHalfHeight(replicatedScreenHeight)
+		{
+		}
 	};
 
 	class SWDepthBuffer

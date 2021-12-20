@@ -23,7 +23,7 @@ culling::SWDepthBuffer::SWDepthBuffer(std::uint32_t width, std::uint32_t height)
 	: 
 	mResolution{
 	width, height,
-	width / TILE_WIDTH, height / TILE_HEIGHT,
+	height / TILE_HEIGHT,width / TILE_WIDTH,
 	0, 0,
 	( (width % TILE_WIDTH) > 0 ? width + (width - width % TILE_WIDTH) : width ) - TILE_WIDTH,
 	( (height % TILE_HEIGHT) > 0 ? height + (height - height % TILE_HEIGHT) : height ) - TILE_HEIGHT,

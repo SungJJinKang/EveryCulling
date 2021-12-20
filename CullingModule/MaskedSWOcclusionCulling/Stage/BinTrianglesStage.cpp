@@ -29,6 +29,26 @@ void culling::BinTrianglesStage::ConvertClipSpaceToNDCSpace
 
 }
 
+void culling::BinTrianglesStage::FrustumCulling
+(
+	const culling::M256F* const clipspaceVertexX,
+	const culling::M256F* const clipspaceVertexY,
+	const culling::M256F* const clipspaceVertexW,
+	std::uint32_t& triangleCullMask
+)
+{
+	const culling::M256F pointANdcX = clipspaceVertexX[0];
+	const culling::M256F pointBNdcX = clipspaceVertexX[1];
+	const culling::M256F pointCNdcX = clipspaceVertexX[2];
+	const culling::M256F pointANdcY = clipspaceVertexY[0];
+	const culling::M256F pointBNdcY = clipspaceVertexY[1];
+	const culling::M256F pointCNdcY = clipspaceVertexY[2];
+
+	
+	// TODO : implement FrustumCulling
+	// if any vertex of triangle is in -W ~ W, it's not culled
+}
+
 void culling::BinTrianglesStage::ConvertNDCSpaceToScreenPixelSpace
 (
 	const culling::M256F* ndcSpaceVertexX, 
@@ -42,8 +62,8 @@ void culling::BinTrianglesStage::ConvertNDCSpaceToScreenPixelSpace
 	{
 		//Convert NDC Space Coordinates To Screen Space Coordinates 
 #if NDC_RANGE == MINUS_ONE_TO_POSITIVE_ONE
-		const culling::M256F tmpScreenSpaceX = culling::M256F_MUL_AND_ADD(ndcSpaceVertexX[i], mMaskedOcclusionCulling->mDepthBuffer.mResolution.mReplicatedScreenHalfWidth, mMaskedOcclusionCulling->mDepthBuffer.mResolution.mReplicatedScreenHalfWidth);
-		const culling::M256F tmpScreenSpaceY = culling::M256F_MUL_AND_ADD(ndcSpaceVertexY[i], mMaskedOcclusionCulling->mDepthBuffer.mResolution.mReplicatedScreenHalfHeight, mMaskedOcclusionCulling->mDepthBuffer.mResolution.mReplicatedScreenHalfHeight);
+		const culling::M256F tmpScreenSpaceX = culling::M256F_MUL(culling::M256F_ADD(ndcSpaceVertexX[i], _mm256_set1_ps(1.0f)), mMaskedOcclusionCulling->mDepthBuffer.mResolution.mReplicatedScreenHalfWidth);
+		const culling::M256F tmpScreenSpaceY = culling::M256F_MUL(culling::M256F_ADD(ndcSpaceVertexY[i], _mm256_set1_ps(1.0f)), mMaskedOcclusionCulling->mDepthBuffer.mResolution.mReplicatedScreenHalfHeight);
 #elif NDC_RANGE == ZERO_TO_POSITIVE_ONE
 		const culling::M256F tmpScreenSpaceX = culling::M256F_MUL(ndcSpaceVertexX[i], mDepthBuffer.mResolution.mReplicatedScreenWidth);
 		const culling::M256F tmpScreenSpaceY = culling::M256F_MUL(ndcSpaceVertexY[i], mDepthBuffer.mResolution.mReplicatedScreenHeight);
@@ -420,27 +440,16 @@ void culling::BinTrianglesStage::BinTriangles
 			continue;
 		}
 
-		for (size_t triangleIndex = 0; triangleIndex < triangleCountPerLoop; triangleIndex++)
-		{
-			if ((triangleCullMask & (1 << triangleIndex)) != 0x00000000)
-			{
-				for(size_t triangleVertexIndex = 0 ; triangleVertexIndex < 3 ; triangleVertexIndex++)
-				{
-
-					dooms::graphics::DebugDrawer::GetSingleton()->DebugDraw3DTriangle
-					(
-						*(const math::Vector3*)((reinterpret_cast<const float*>(ndcSpaceVertexX + triangleVertexIndex)) + triangleIndex),
-						*(const math::Vector3*)((reinterpret_cast<const float*>(ndcSpaceVertexY + triangleVertexIndex)) + triangleIndex),
-						*(const math::Vector3*)((reinterpret_cast<const float*>(ndcSpaceVertexZ + triangleVertexIndex)) + triangleIndex),
-						eColor::Blue
-					);
-				}
-			}
-		}
-
 		//Convert Model space Vertex To Clip space Vertex
 		//WE ARRIVE AT CLIP SPACE COORDINATE. W IS NOT 1
 		TransformVertexsToClipSpace(ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, oneDividedByW, modelToClipspaceMatrix, triangleCullMask);
+		
+		FrustumCulling(ndcSpaceVertexX, ndcSpaceVertexY, oneDividedByW, triangleCullMask);
+
+		if (triangleCullMask == 0x00000000)
+		{
+			continue;
+		}
 
 		for (size_t i = 0; i < 3; i++)
 		{
@@ -453,6 +462,7 @@ void culling::BinTrianglesStage::BinTriangles
 		//if you use DirectX, Vertexs have value from 0 to 1 
 		//W BECOME USELESS, IGNORE IT
 		ConvertClipSpaceToNDCSpace(ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, oneDividedByW, triangleCullMask);
+
 
 		ConvertToPlatformDepth(ndcSpaceVertexZ);
 
