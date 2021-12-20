@@ -76,6 +76,8 @@ namespace culling
 		RasterizeTrianglesStage(MaskedSWOcclusionCulling* mOcclusionCulling);
 
 		void CullBlockEntityJob(const size_t cameraIndex) override;
+
+		// TODO : Use linear depth!! ( float linearDepth = (2.0 * near * far) / (far + near - z * (far - near)) )
 	};
 }
 

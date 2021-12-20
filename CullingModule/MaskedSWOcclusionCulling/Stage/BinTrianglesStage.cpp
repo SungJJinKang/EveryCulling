@@ -3,8 +3,6 @@
 
 #include "../SWDepthBuffer.h"
 
-#include <Graphics/DebugGraphics/DebugDrawer.h>
-
 void culling::BinTrianglesStage::ConvertClipSpaceToNDCSpace
 (
 	culling::M256F* outClipVertexX, 
@@ -289,7 +287,8 @@ void culling::BinTrianglesStage::GatherVertices
 {
 	assert(indiceCount % 3 == 0);
 	assert(currentIndiceIndex % 3 == 0);
-
+	assert(indiceCount != 0); // TODO : implement gatherVertices when there is no indiceCount
+	
 	//Gather Indices
 	const std::uint32_t* currentVertexIndices = vertexIndices + currentIndiceIndex;
 	const culling::M256I indiceIndexs = _mm256_set_epi32(21, 18, 15, 12, 9, 6, 3, 0);
@@ -417,6 +416,8 @@ void culling::BinTrianglesStage::BinTriangles
 	static constexpr std::int32_t triangleCountPerLoop = 8;
 
 	std::int32_t currentIndiceIndex = -(triangleCountPerLoop * 3);
+
+	assert(indiceCount != 0); // check GatherVertices function
 
 	while (currentIndiceIndex < (std::int32_t)indiceCount)
 	{
