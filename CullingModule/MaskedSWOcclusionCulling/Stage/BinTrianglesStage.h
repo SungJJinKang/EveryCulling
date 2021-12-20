@@ -43,6 +43,7 @@ namespace culling
 		(
 			const culling::M256F* const clipspaceVertexX,
 			const culling::M256F* const clipspaceVertexY,
+			const culling::M256F* const clipspaceVertexZ,
 			const culling::M256F* const clipspaceVertexW,
 			std::uint32_t& triangleCullMask
 		);

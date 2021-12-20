@@ -29,22 +29,38 @@ void culling::BinTrianglesStage::ConvertClipSpaceToNDCSpace
 
 }
 
+#define CONVERT_TO_M256I(_M256F) *reinterpret_cast<const culling::M256I*>(&_M256F)
+
 void culling::BinTrianglesStage::FrustumCulling
 (
 	const culling::M256F* const clipspaceVertexX,
 	const culling::M256F* const clipspaceVertexY,
+	const culling::M256F* const clipspaceVertexZ,
 	const culling::M256F* const clipspaceVertexW,
 	std::uint32_t& triangleCullMask
 )
 {
-	const culling::M256F pointANdcX = clipspaceVertexX[0];
-	const culling::M256F pointBNdcX = clipspaceVertexX[1];
-	const culling::M256F pointCNdcX = clipspaceVertexX[2];
-	const culling::M256F pointANdcY = clipspaceVertexY[0];
-	const culling::M256F pointBNdcY = clipspaceVertexY[1];
-	const culling::M256F pointCNdcY = clipspaceVertexY[2];
+	const culling::M256F pointANdcW = _mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexW[0]);
+	const culling::M256F pointBNdcW = _mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexW[1]);
+	const culling::M256F pointCNdcW = _mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexW[2]);
 
+	const culling::M256F pointANdcX = _mm256_cmp_ps(_mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexX[0]), pointANdcW, _CMP_LE_OQ); // make positive values ( https://stackoverflow.com/questions/23847377/how-does-this-function-compute-the-absolute-value-of-a-float-through-a-not-and-a )
+	const culling::M256F pointBNdcX = _mm256_cmp_ps(_mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexX[1]), pointBNdcW, _CMP_LE_OQ);
+	const culling::M256F pointCNdcX = _mm256_cmp_ps(_mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexX[2]), pointCNdcW, _CMP_LE_OQ);
+	const culling::M256F pointANdcY = _mm256_cmp_ps(_mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexY[0]), pointANdcW, _CMP_LE_OQ);
+	const culling::M256F pointBNdcY = _mm256_cmp_ps(_mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexY[1]), pointBNdcW, _CMP_LE_OQ);
+	const culling::M256F pointCNdcY = _mm256_cmp_ps(_mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexY[2]), pointCNdcW, _CMP_LE_OQ);
+	const culling::M256F pointANdcZ = _mm256_cmp_ps(_mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexZ[0]), pointANdcW, _CMP_LE_OQ);
+	const culling::M256F pointBNdcZ = _mm256_cmp_ps(_mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexZ[1]), pointBNdcW, _CMP_LE_OQ);
+	const culling::M256F pointCNdcZ = _mm256_cmp_ps(_mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexZ[2]), pointCNdcW, _CMP_LE_OQ);
 	
+	const culling::M256I pointAInFrustum = _mm256_and_si256(_mm256_and_si256(*reinterpret_cast<const culling::M256I*>(&pointANdcX), *reinterpret_cast<const culling::M256I*>(&pointANdcY)), *reinterpret_cast<const culling::M256I*>(&pointANdcZ));
+	const culling::M256I pointBInFrustum = _mm256_and_si256(_mm256_and_si256(*reinterpret_cast<const culling::M256I*>(&pointBNdcX), *reinterpret_cast<const culling::M256I*>(&pointBNdcY)), *reinterpret_cast<const culling::M256I*>(&pointBNdcZ));
+	const culling::M256I pointCInFrustum = _mm256_and_si256(_mm256_and_si256(*reinterpret_cast<const culling::M256I*>(&pointCNdcX), *reinterpret_cast<const culling::M256I*>(&pointCNdcY)), *reinterpret_cast<const culling::M256I*>(&pointCNdcZ));
+
+	const culling::M256I verticesInFrustum = _mm256_or_si256(_mm256_or_si256(*reinterpret_cast<const culling::M256I*>(&pointAInFrustum), *reinterpret_cast<const culling::M256I*>(&pointBInFrustum)), *reinterpret_cast<const culling::M256I*>(&pointCInFrustum));
+
+	triangleCullMask &= _mm256_movemask_ps(*reinterpret_cast<const culling::M256F*>(&verticesInFrustum));
 	// TODO : implement FrustumCulling
 	// if any vertex of triangle is in -W ~ W, it's not culled
 }
@@ -136,7 +152,7 @@ void culling::BinTrianglesStage::CullBackfaces
 	//Set each bit of mask dst based on the most significant bit of the corresponding packed single-precision (32-bit) floating-point element in a.
 	//https://software.intel.com/sites/landingpage/IntrinsicsGuide/#techs=SSE,SSE2,SSE3,SSSE3,SSE4_1,SSE4_2,AVX&expand=2156,4979,4979,1731,4929,951,4979,3869&text=movemask
 	//if second triangle is front facing, low second bit of triangleCullMask is 1
-	triangleCullMask = static_cast<std::uint32_t>(_mm256_movemask_ps(ccwMask));
+	triangleCullMask &= static_cast<std::uint32_t>(_mm256_movemask_ps(ccwMask));
 }
 
 void culling::BinTrianglesStage::ComputeBinBoundingBox
@@ -217,15 +233,18 @@ void culling::BinTrianglesStage::PassTrianglesToTileBin
 
 			const int startBoxIndexX = MIN(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mColumnCount - 1, intersectingMinBoxX / TILE_WIDTH);
 			const int startBoxIndexY = MIN(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mRowCount - 1, intersectingMinBoxY / TILE_HEIGHT);
-			const int endBoxIndexX = MIN(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mColumnCount, (intersectingMaxBoxX + TILE_WIDTH - 1) / TILE_WIDTH);
-			const int endBoxIndexY = MIN(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mRowCount, (intersectingMaxBoxY + TILE_HEIGHT - 1) / TILE_HEIGHT);
+			const int endBoxIndexX = MIN(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mColumnCount - 1, intersectingMaxBoxX / TILE_WIDTH);
+			const int endBoxIndexY = MIN(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mRowCount - 1, intersectingMaxBoxY / TILE_HEIGHT);
 
 			assert(startBoxIndexX >= 0 && startBoxIndexX < mMaskedOcclusionCulling->mDepthBuffer.mResolution.mColumnCount);
 			assert(startBoxIndexY >= 0 && startBoxIndexY < mMaskedOcclusionCulling->mDepthBuffer.mResolution.mRowCount);
+			
+			assert(endBoxIndexX >= 0 && endBoxIndexX <= mMaskedOcclusionCulling->mDepthBuffer.mResolution.mColumnCount);
+			assert(endBoxIndexY >= 0 && endBoxIndexY <= mMaskedOcclusionCulling->mDepthBuffer.mResolution.mRowCount);
 
-			for (size_t y = startBoxIndexY; y < endBoxIndexY; y++)
+			for (size_t y = startBoxIndexY; y <= endBoxIndexY; y++)
 			{
-				for (size_t x = startBoxIndexX; x < endBoxIndexX; x++)
+				for (size_t x = startBoxIndexX; x <= endBoxIndexX; x++)
 				{
 					Tile* const targetTile = mMaskedOcclusionCulling->mDepthBuffer.GetTile(y, x);
 
@@ -444,7 +463,7 @@ void culling::BinTrianglesStage::BinTriangles
 		//WE ARRIVE AT CLIP SPACE COORDINATE. W IS NOT 1
 		TransformVertexsToClipSpace(ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, oneDividedByW, modelToClipspaceMatrix, triangleCullMask);
 		
-		FrustumCulling(ndcSpaceVertexX, ndcSpaceVertexY, oneDividedByW, triangleCullMask);
+		FrustumCulling(ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, oneDividedByW, triangleCullMask);
 
 		if (triangleCullMask == 0x00000000)
 		{
