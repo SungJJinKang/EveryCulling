@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../EveryCullingCore.h"
+#include "SIMD_Core.h"
 #include "Vector.h"
 #include "Matrix.h"
 
@@ -37,6 +38,59 @@ namespace culling
 		};
 	}
 
+	NO_DISCARD FORCE_INLINE Vec4 operator*(const culling::Mat4x4& mat4, const culling::Vec4& vec4) noexcept
+	{
+		culling::M128F tempVec4;
+
+		const culling::M128F* A = reinterpret_cast<const culling::M128F*>(&mat4);
+		const culling::M128F* B = reinterpret_cast<const culling::M128F*>(&vec4);
+		culling::M128F* R = reinterpret_cast<culling::M128F*>(&tempVec4);
+
+		// First row of result (Matrix1[0] * Matrix2).
+		*R = culling::M128F_MUL(M128F_REPLICATE(*B, 0), A[0]);
+		*R = culling::M128F_MUL_AND_ADD(M128F_REPLICATE(*B, 1), A[1], *R);
+		*R = culling::M128F_MUL_AND_ADD(M128F_REPLICATE(*B, 2), A[2], *R);
+		*R = culling::M128F_MUL_AND_ADD(M128F_REPLICATE(*B, 3), A[3], *R);
+
+		return Vec4{ *(Vec4*)(&tempVec4) };
+	}
+
+	NO_DISCARD FORCE_INLINE culling::Mat4x4 operator*(const culling::Mat4x4& mat4_A, const culling::Mat4x4& mat4_B) noexcept
+	{
+		culling::M256F _REULST_MAT4[2];
+		culling::M128F TEMP_M128F;
+
+		const culling::M128F* const A = reinterpret_cast<const culling::M128F*>(mat4_A.data());
+		//const M128F* A = (const M128F*)this->data(); // this is slower
+		const culling::M128F* const B = reinterpret_cast<const culling::M128F*>(mat4_B.data());
+		culling::M128F* R = reinterpret_cast<culling::M128F*>(&_REULST_MAT4);
+
+		// First row of result (Matrix1[0] * Matrix2).
+		TEMP_M128F = culling::M128F_MUL(M128F_REPLICATE(B[0], 0), A[0]);
+		TEMP_M128F = culling::M128F_MUL_AND_ADD(M128F_REPLICATE(B[0], 1), A[1], TEMP_M128F);
+		TEMP_M128F = culling::M128F_MUL_AND_ADD(M128F_REPLICATE(B[0], 2), A[2], TEMP_M128F);
+		R[0] = culling::M128F_MUL_AND_ADD(M128F_REPLICATE(B[0], 3), A[3], TEMP_M128F);
+
+		// Second row of result (Matrix1[1] * Matrix2).
+		TEMP_M128F = culling::M128F_MUL(M128F_REPLICATE(B[1], 0), A[0]);
+		TEMP_M128F = culling::M128F_MUL_AND_ADD(M128F_REPLICATE(B[1], 1), A[1], TEMP_M128F);
+		TEMP_M128F = culling::M128F_MUL_AND_ADD(M128F_REPLICATE(B[1], 2), A[2], TEMP_M128F);
+		R[1] = culling::M128F_MUL_AND_ADD(M128F_REPLICATE(B[1], 3), A[3], TEMP_M128F);
+
+		// Third row of result (Matrix1[2] * Matrix2).
+		TEMP_M128F = culling::M128F_MUL(M128F_REPLICATE(B[2], 0), A[0]);
+		TEMP_M128F = culling::M128F_MUL_AND_ADD(M128F_REPLICATE(B[2], 1), A[1], TEMP_M128F);
+		TEMP_M128F = culling::M128F_MUL_AND_ADD(M128F_REPLICATE(B[2], 2), A[2], TEMP_M128F);
+		R[2] = culling::M128F_MUL_AND_ADD(M128F_REPLICATE(B[2], 3), A[3], TEMP_M128F);
+
+		// Fourth row of result (Matrix1[3] * Matrix2).
+		TEMP_M128F = culling::M128F_MUL(M128F_REPLICATE(B[3], 0), A[0]);
+		TEMP_M128F = culling::M128F_MUL_AND_ADD(M128F_REPLICATE(B[3], 1), A[1], TEMP_M128F);
+		TEMP_M128F = culling::M128F_MUL_AND_ADD(M128F_REPLICATE(B[3], 2), A[2], TEMP_M128F);
+		R[3] = culling::M128F_MUL_AND_ADD(M128F_REPLICATE(B[3], 3), A[3], TEMP_M128F);
+
+		return culling::Mat4x4{ *reinterpret_cast<culling::Mat4x4*>(&_REULST_MAT4) };
+	}
 
 	template <typename T>
 	void SWAP(T& a, T& b) noexcept

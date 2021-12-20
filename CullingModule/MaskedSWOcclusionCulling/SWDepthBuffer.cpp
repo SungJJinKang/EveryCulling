@@ -18,6 +18,7 @@ void culling::Tile::Reset()
 	mBinnedTriangles.Reset();
 }
 
+
 culling::SWDepthBuffer::SWDepthBuffer(std::uint32_t width, std::uint32_t height)
 	: 
 	mResolution{
@@ -43,7 +44,7 @@ culling::SWDepthBuffer::SWDepthBuffer(std::uint32_t width, std::uint32_t height)
 	assert(mResolution.mHeight % TILE_HEIGHT == 0);
 
 	
-	const size_t tileCount = static_cast<size_t>(mResolution.mTileCountInARow) * static_cast<size_t>(mResolution.mTileCountInAColumn);
+	const size_t tileCount = static_cast<size_t>(mResolution.mRowCount) * static_cast<size_t>(mResolution.mColumnCount);
 	mTiles = new Tile[tileCount];
 	mTileCount = tileCount;
 }
@@ -75,5 +76,31 @@ void culling::SWDepthBuffer::Reset()
 const culling::Tile* culling::SWDepthBuffer::GetTiles() const
 {
 	return mTiles;
+}
+
+const culling::Tile* culling::SWDepthBuffer::GetTile(const size_t rowIndex, const size_t colIndex) const
+{
+	const size_t tileIndex = rowIndex * mResolution.mColumnCount + colIndex;
+	assert(tileIndex < mTileCount);
+	return mTiles + tileIndex;
+}
+
+culling::Tile* culling::SWDepthBuffer::GetTile(const size_t rowIndex, const size_t colIndex)
+{
+	const size_t tileIndex = rowIndex * mResolution.mColumnCount + colIndex;
+	assert(tileIndex < mTileCount);
+	return mTiles + tileIndex;
+}
+
+const culling::Tile* culling::SWDepthBuffer::GetTile(const size_t tileIndex) const
+{
+	assert(tileIndex < mTileCount);
+	return mTiles + tileIndex;
+}
+
+culling::Tile* culling::SWDepthBuffer::GetTile(const size_t tileIndex)
+{
+	assert(tileIndex < mTileCount);
+	return mTiles + tileIndex;
 }
 

@@ -57,33 +57,11 @@ namespace culling
 
 		virtual void ResetCullingModule();
 		std::uint32_t GetFinishedThreadCount(const size_t cameraIndex) const;
-		
-		FORCE_INLINE const culling::Mat4x4& GetViewProjectionMatrix(const size_t cameraIndex) const
-		{
-			return mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex);
-		}
-		FORCE_INLINE const culling::Vec3& GetCameraWorldPosition(const size_t cameraIndex) const
-		{
-			return mCullingSystem->GetCameraWorldPosition(cameraIndex);
-		}
-		FORCE_INLINE float GetCameraFarClipPlaneDistance(const size_t cameraIndex) const
-		{
-			return mCullingSystem->GetCameraFarClipPlaneDistance(cameraIndex);
-		}
-		FORCE_INLINE float GetCameraNearClipPlaneDistance(const size_t cameraIndex) const
-		{
-			return mCullingSystem->GetCameraNearClipPlaneDistance(cameraIndex);
-		}
-		FORCE_INLINE float GetCameraFieldOfView(const size_t cameraIndex) const
-		{
-			return mCullingSystem->GetCameraFieldOfView(cameraIndex);
-		}
 
-		FORCE_INLINE size_t GetCameraCount() const
-		{
-			return mCullingSystem->GetCameraCount();
-		}
 		virtual void OnSetViewProjectionMatrix(const size_t cameraIndex, const culling::Mat4x4& cameraViewProjectionMatrix)
+		{
+		}
+		virtual void OnSetModelViewProjectionMatrix(const size_t cameraIndex, const culling::Mat4x4& cameraModelViewProjectionMatrix)
 		{
 		}
 		virtual void OnSetCameraWorldPosition(const size_t cameraIndex, const culling::Vec3& cameraWorldPosition)

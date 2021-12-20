@@ -74,6 +74,16 @@ namespace culling
 
 		VertexData mVertexDatas[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		char mIsOccluder[ENTITY_COUNT_IN_ENTITY_BLOCK];
+
+		/// <summary>
+		/// Model Matrix of object
+		///	Only static object require this
+		///	Model matrix data should be aligned to 32byte
+		///
+		///	Column major
+		///	0(row) x 0(column) , 1 x 0 , 2 x 0, 3 x 0, 0 x 1 
+		/// </summary>
+		const float* mModelMatrixes[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		
 		//EntityHandle mHandles[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
@@ -102,6 +112,15 @@ namespace culling
 			{
 				mIsOccluder[entityIndex] &= (~(1 << cameraIndex));
 			}
+		}
+
+		FORCE_INLINE void SetModelMatrix(const size_t entityIndex, const float* const modelToClipspaceMatrix)
+		{
+			mModelMatrixes[entityIndex] = modelToClipspaceMatrix;
+		}
+		FORCE_INLINE const float* GetModelMatrix(const size_t entityIndex)
+		{
+			return mModelMatrixes[entityIndex];
 		}
 	};
 

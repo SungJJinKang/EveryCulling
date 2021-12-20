@@ -60,6 +60,8 @@ namespace culling
 			const size_t indiceCount,
 			const size_t verticeStride
 		);
+		
+		void SetModelMatrix(const float* const modelMatrix);
 
 	};
 }

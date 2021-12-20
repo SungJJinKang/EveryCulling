@@ -19,20 +19,28 @@ culling::EntityBlockViewer::EntityBlockViewer
 
 void culling::EntityBlockViewer::SetEntityPosition(const float* worldPosition)
 {
-	assert(bmIsActive == true);
-	std::memcpy((mTargetEntityBlock->mPositionAndBoundingSpheres + mEntityIndexInBlock), worldPosition, sizeof(Vec3));
+	if (GetIsActive() == true)
+	{
+		assert(bmIsActive == true);
+		std::memcpy((mTargetEntityBlock->mPositionAndBoundingSpheres + mEntityIndexInBlock), worldPosition, sizeof(Vec3));
+	}
+
 }
 
 void culling::EntityBlockViewer::SetSphereBoundRadius(float sphereRadius)
 {
-	assert(bmIsActive == true);
-	assert(sphereRadius >= 0.0f);
+	if (GetIsActive() == true)
+	{
+		assert(bmIsActive == true);
+		assert(sphereRadius >= 0.0f);
 
-	// WHY NEGATIVE??
-	// Think Sphere is on(!!) frustum plane. But it still should be drawd
-	// Distance from plane to EntityPoint is negative.
-	// If Distance from plane to EntityPoint is larget than negative radius, it should be drawed
-	mTargetEntityBlock->mPositionAndBoundingSpheres[mEntityIndexInBlock].SetBoundingSphereRadius(sphereRadius);
+		// WHY NEGATIVE??
+		// Think Sphere is on(!!) frustum plane. But it still should be drawd
+		// Distance from plane to EntityPoint is negative.
+		// If Distance from plane to EntityPoint is larget than negative radius, it should be drawed
+		mTargetEntityBlock->mPositionAndBoundingSpheres[mEntityIndexInBlock].SetBoundingSphereRadius(sphereRadius);
+	}
+
 }
 
 void culling::EntityBlockViewer::SetMeshVertexData
@@ -44,10 +52,21 @@ void culling::EntityBlockViewer::SetMeshVertexData
 	const size_t verticeStride
 )
 {
-	mTargetEntityBlock->mVertexDatas[mEntityIndexInBlock].mVertices = vertices;
-	mTargetEntityBlock->mVertexDatas[mEntityIndexInBlock].mVerticeCount = verticeCount;
-	mTargetEntityBlock->mVertexDatas[mEntityIndexInBlock].mIndices = indices;
-	mTargetEntityBlock->mVertexDatas[mEntityIndexInBlock].mIndiceCount = indiceCount;
-	mTargetEntityBlock->mVertexDatas[mEntityIndexInBlock].mVertexStride = verticeStride;
+	if (GetIsActive() == true)
+	{
+		mTargetEntityBlock->mVertexDatas[mEntityIndexInBlock].mVertices = vertices;
+		mTargetEntityBlock->mVertexDatas[mEntityIndexInBlock].mVerticeCount = verticeCount;
+		mTargetEntityBlock->mVertexDatas[mEntityIndexInBlock].mIndices = indices;
+		mTargetEntityBlock->mVertexDatas[mEntityIndexInBlock].mIndiceCount = indiceCount;
+		mTargetEntityBlock->mVertexDatas[mEntityIndexInBlock].mVertexStride = verticeStride;
+	}
+}
+
+void culling::EntityBlockViewer::SetModelMatrix(const float* const modelMatrix)
+{
+	if (GetIsActive() == true)
+	{
+		mTargetEntityBlock->mModelMatrixes[mEntityIndexInBlock] = modelMatrix;
+	}
 }
 

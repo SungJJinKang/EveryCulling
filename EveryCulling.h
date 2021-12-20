@@ -50,6 +50,7 @@ namespace culling
 
 		size_t mThreadCount;
 		size_t mCameraCount;
+		std::array<culling::Mat4x4, MAX_CAMERA_COUNT> mCameraModelMatrixes;
 		std::array<culling::Mat4x4, MAX_CAMERA_COUNT> mCameraViewProjectionMatrixes;
 		std::array<culling::Vec3, MAX_CAMERA_COUNT> mCameraWorldPositions;
 		std::array<float, MAX_CAMERA_COUNT> mCameraFieldOfView;
@@ -105,7 +106,7 @@ namespace culling
 
 		std::vector<culling::CullingModule*> mUpdatedCullingModules;
 
-
+		
 		void SetViewProjectionMatrix(const size_t cameraIndex, const culling::Mat4x4& viewProjectionMatrix);
 		void SetFieldOfViewInDegree(const size_t cameraIndex, const float fov);
 		void SetCameraNearFarClipPlaneDistance(const size_t cameraIndex, const float nearPlaneDistance, const float farPlaneDistance);;
@@ -145,6 +146,11 @@ namespace culling
 		{
 			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
 			return mCameraWorldPositions[cameraIndex];
+		}
+		FORCE_INLINE const culling::Mat4x4& GetCameraModelMatrix(const size_t cameraIndex) const
+		{
+			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
+			return mCameraModelMatrixes[cameraIndex];
 		}
 		FORCE_INLINE const culling::Mat4x4& GetCameraViewProjectionMatrix(const size_t cameraIndex) const
 		{

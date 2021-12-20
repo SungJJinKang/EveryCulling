@@ -85,8 +85,8 @@ namespace culling
 	{
 		const std::uint32_t mWidth;
 		const std::uint32_t mHeight;
-		const std::uint32_t mTileCountInARow;
-		const std::uint32_t mTileCountInAColumn;
+		const std::uint32_t mRowCount;
+		const std::uint32_t mColumnCount;
 
 		/// <summary>
 		/// 0
@@ -129,8 +129,6 @@ namespace culling
 
 	private:
 
-		const Resolution mResolution;
-
 		/// <summary>
 		/// 32 X 8 Tiles
 		/// 
@@ -147,6 +145,8 @@ namespace culling
 		SWDepthBuffer(std::uint32_t width, std::uint32_t height);
 
 	public:
+		
+		const Resolution mResolution;
 
 		~SWDepthBuffer();
 
@@ -155,5 +155,10 @@ namespace culling
 		void Reset();
 
 		const Tile* GetTiles() const;
+
+		const Tile* GetTile(const size_t rowIndex, const size_t colIndex) const;
+		Tile* GetTile(const size_t rowIndex, const size_t colIndex);
+		const Tile* GetTile(const size_t tileIndex) const;
+		Tile* GetTile(const size_t tileIndex);
 	};
 }
