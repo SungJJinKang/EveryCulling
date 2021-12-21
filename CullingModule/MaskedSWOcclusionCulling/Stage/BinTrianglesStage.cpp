@@ -230,13 +230,13 @@ FORCE_INLINE void culling::BinTrianglesStage::PassTrianglesToTileBin
 						return;
 					}
 
-					for (size_t pointIndex = 0; pointIndex < 3; pointIndex++)
+					for(size_t pointIndex = 0 ; pointIndex < 3 ; pointIndex++)
 					{
-						targetTile->mBinnedTriangles.mTriangleList[triListIndex].Points[pointIndex].x = (reinterpret_cast<const float*>(screenPixelPosX + pointIndex))[triangleIndex];
-						targetTile->mBinnedTriangles.mTriangleList[triListIndex].Points[pointIndex].y = (reinterpret_cast<const float*>(screenPixelPosY + pointIndex))[triangleIndex];
-						targetTile->mBinnedTriangles.mTriangleList[triListIndex].Points[pointIndex].z = (reinterpret_cast<const float*>(ndcSpaceVertexZ + pointIndex))[triangleIndex];
+						targetTile->mBinnedTriangles.VertexX[pointIndex][triListIndex] = (reinterpret_cast<const float*>(screenPixelPosX + pointIndex))[triangleIndex];
+						targetTile->mBinnedTriangles.VertexY[pointIndex][triListIndex] = (reinterpret_cast<const float*>(screenPixelPosY + pointIndex))[triangleIndex];
+						targetTile->mBinnedTriangles.VertexZ[pointIndex][triListIndex] = (reinterpret_cast<const float*>(ndcSpaceVertexZ + pointIndex))[triangleIndex];
 					}
-
+					
 				}
 			}
 		}

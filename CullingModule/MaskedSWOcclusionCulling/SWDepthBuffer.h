@@ -71,18 +71,17 @@ namespace culling
 	struct TriangleList
 	{
 		//TODO : Do consider cache coherency ( In bin stage, multiple threads can write triangle vertex data to same tile )
-		/// <summary>
-		/// Binned Screen Pixel Space Triangles
-		///	x : screen space x ( 0 ~ screen width )
-		///	y : screen space y ( 0 ~ screen height )
-		///	z : ndc space z ( -1 ( or 0 ) ~ 1 )
-		/// </summary>
-		ThreeDTriangle mTriangleList[BIN_TRIANGLE_CAPACITY_PER_TILE];
+		
+		alignas(32) float VertexX[3][INITIAL_ENTITY_BLOCK_RESERVED_SIZE]; // VertexX[0] : Point1 of Triangle, VertexX[1] : Point2 of Triangle, VertexX[2] : 3 of Triangle
+		alignas(32) float VertexY[3][INITIAL_ENTITY_BLOCK_RESERVED_SIZE];
+		alignas(32) float VertexZ[3][INITIAL_ENTITY_BLOCK_RESERVED_SIZE];
 
 		size_t mCurrentTriangleCount = 0;
 
 		void Reset();
 	};
+
+	static_assert(INITIAL_ENTITY_BLOCK_RESERVED_SIZE % 8 == 0);
 
 	/// <summary>
 	/// 32 X 8 Tile

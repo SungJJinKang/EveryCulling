@@ -42,7 +42,7 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 
 	for(size_t triangleIndex = 0 ; triangleIndex < tile->mBinnedTriangles.mCurrentTriangleCount ; triangleIndex++)
 	{
-		culling::CoverageRasterizer::FillTriangle(*tile, tileOriginPoint, tile->mBinnedTriangles.mTriangleList[triangleIndex]);
+		//culling::CoverageRasterizer::FillTriangle(*tile, tileOriginPoint, tile->mBinnedTriangles.mTriangleList[triangleIndex]);
 
 
 
