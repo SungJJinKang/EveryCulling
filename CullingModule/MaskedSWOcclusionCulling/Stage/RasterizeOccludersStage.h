@@ -31,7 +31,7 @@ namespace culling
 		/// https://www.rose-hulman.edu/class/cs/csse351/m10/triangle_fill.pdf
 		/// https://www.comp.nus.edu.sg/~lowkl/publications/lowk_persp_interp_techrep.pdf
 		/// </summary>
-		void RasterizeBinnedTriangles(culling::Tile* const tile);
+		void RasterizeBinnedTriangles(const size_t cameraIndex, culling::Tile* const tile);
 
 		
 		culling::Tile* GetNextDepthBufferTile(const size_t cameraIndex);

@@ -1,4 +1,4 @@
-#include "RasterizeOccludersStage.h"
+﻿#include "RasterizeOccludersStage.h"
 
 #include "../MaskedSWOcclusionCulling.h"
 #include "../Rasterizer/CoverageRasterizer.h"
@@ -27,8 +27,29 @@ void culling::RasterizeOccludersStage::ComputeTrianglesDepthValueInTile()
 {
 }
 
-void culling::RasterizeOccludersStage::RasterizeBinnedTriangles(culling::Tile* const tile)
+void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
+(
+	const size_t cameraIndex, 
+	culling::Tile* const tile
+)
 {
+	assert(tile != nullptr);
+
+	const culling::Vec2 tileOriginPoint{ static_cast<float>(tile->GetLeftBottomTileOrginX()), static_cast<float>(tile->GetLeftBottomTileOrginY()) };
+
+	for(size_t triangleIndex = 0 ; triangleIndex < tile->mBinnedTriangles.mCurrentTriangleCount ; triangleIndex++)
+	{
+		culling::CoverageRasterizer::FillTriangle(*tile, tileOriginPoint, tile->mBinnedTriangles.mTriangleList[triangleIndex]);
+
+
+
+		//Snap Screen Space Coordinates To Integer Coordinate In ScreenBuffer(or DepthBuffer)
+
+		//A grid square, including its (x, y) window coordinates, z (depth), and associated data which may be added by fragment shaders, is called a fragment. A
+		//fragment is located by its lower left corner, which lies on integer grid coordinates.
+		//Rasterization operations also refer to a fragment��s center, which is offset by ( 1/2, 1/2 )
+		//from its lower left corner(and so lies on half - integer coordinates).
+	}
 	
 }
 
@@ -36,7 +57,7 @@ culling::Tile* culling::RasterizeOccludersStage::GetNextDepthBufferTile(const si
 {
 	culling::Tile* nextDepthBufferTile = nullptr;
 
-	const size_t currentTileIndex = mFinishedTileCount[cameraIndex]++;
+	const size_t currentTileIndex = mFinishedTileCount[cameraIndex].fetch_add(1, std::memory_order_seq_cst);
 
 	const size_t tileCount = mMaskedOcclusionCulling->mDepthBuffer.GetTileCount();
 
@@ -69,12 +90,16 @@ void culling::RasterizeOccludersStage::CullBlockEntityJob(const size_t cameraInd
 	{
 		culling::Tile* const nextTile = GetNextDepthBufferTile(cameraIndex);
 
-		if(nextTile == nullptr)
+		if (nextTile != nullptr && nextTile->mBinnedTriangles.mCurrentTriangleCount > 0)
+		{
+			RasterizeBinnedTriangles(cameraIndex, nextTile);
+		}
+		else
 		{
 			break;
 		}
 
-		RasterizeBinnedTriangles(nextTile);
+		
 	}
 
 }
