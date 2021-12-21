@@ -1,7 +1,7 @@
 #include "MaskedSWOcclusionCulling.h"
 
 #include "Stage/BinTrianglesStage.h"
-#include "Stage/RasterizeTrianglesStage.h"
+#include "Stage/RasterizeOccludersStage.h"
 
 void culling::MaskedSWOcclusionCulling::ResetDepthBuffer()
 {

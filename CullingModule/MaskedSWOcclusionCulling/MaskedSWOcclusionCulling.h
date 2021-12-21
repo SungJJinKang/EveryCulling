@@ -9,7 +9,7 @@
 #include "../CullingModule.h"
 
 #include "Stage/BinTrianglesStage.h"
-#include "Stage/RasterizeTrianglesStage.h"
+#include "Stage/RasterizeOccludersStage.h"
 #include "Stage/SolveMeshRoleStage.h"
 
 
@@ -51,7 +51,7 @@ namespace culling
 
 		SolveMeshRoleStage mSolveMeshRoleStage;
 		BinTrianglesStage mBinTrianglesStage;
-		RasterizeTrianglesStage mRasterizeTrianglesStage;
+		RasterizeOccludersStage mRasterizeTrianglesStage;
 
 		SWDepthBuffer mDepthBuffer;
 
