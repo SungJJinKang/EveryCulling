@@ -48,6 +48,24 @@ culling::SWDepthBuffer::SWDepthBuffer(std::uint32_t width, std::uint32_t height)
 	const size_t tileCount = static_cast<size_t>(mResolution.mRowCount) * static_cast<size_t>(mResolution.mColumnCount);
 	mTiles = new Tile[tileCount];
 	mTileCount = tileCount;
+
+	for(size_t y = 0 ; y < mResolution.mRowCount ; y++)
+	{
+		for (size_t x = 0; x < mResolution.mColumnCount; x++)
+		{
+			culling::Tile* const tile = GetTile(y, x);
+			tile->mLeftBottomTileOrginX = x * TILE_WIDTH;
+			tile->mLeftBottomTileOrginY = y * TILE_HEIGHT;
+		}
+	}
+
+	//test
+	for(size_t i = 0 ; i < tileCount ; i++)
+	{
+		assert(mTiles[i].mLeftBottomTileOrginX != 0xFFFFFFFF);
+		assert(mTiles[i].mLeftBottomTileOrginY != 0xFFFFFFFF);
+	}
+
 }
 
 culling::SWDepthBuffer::~SWDepthBuffer()

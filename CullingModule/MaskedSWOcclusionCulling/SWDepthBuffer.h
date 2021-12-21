@@ -94,8 +94,8 @@ namespace culling
 		friend class SWDepthBuffer;
 	private:
 		
-		std::uint32_t mLeftBottomTileOrginX;
-		std::uint32_t mLeftBottomTileOrginY;
+		std::uint32_t mLeftBottomTileOrginX = 0xFFFFFFFF;
+		std::uint32_t mLeftBottomTileOrginY = 0xFFFFFFFF;
 		
 	public:
 
