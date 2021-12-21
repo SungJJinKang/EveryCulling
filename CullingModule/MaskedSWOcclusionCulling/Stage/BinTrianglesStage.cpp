@@ -82,7 +82,13 @@ FORCE_INLINE void culling::BinTrianglesStage::ConvertNDCSpaceToScreenPixelSpace
 #else 
 		assert(0); //NEVER HAPPEN
 #endif
+
 		
+		outScreenPixelSpaceX[i] = _mm256_floor_ps(outScreenPixelSpaceX[i]);
+		outScreenPixelSpaceY[i] = _mm256_floor_ps(outScreenPixelSpaceY[i]);
+
+		outScreenPixelSpaceX[i] = culling::M256F_ADD(outScreenPixelSpaceX[i], _mm256_set1_ps(0.5f));
+		outScreenPixelSpaceY[i] = culling::M256F_ADD(outScreenPixelSpaceY[i], _mm256_set1_ps(0.5f));
 		
 	}
 
@@ -151,8 +157,8 @@ void culling::BinTrianglesStage::ComputeBinBoundingBox
 
 	minScreenPixelX = _mm256_cvttps_epi32( _mm256_floor_ps(_mm256_min_ps(screenPixelX[0], _mm256_min_ps(screenPixelX[1], screenPixelX[2]))) );
 	minScreenPixelY = _mm256_cvttps_epi32( _mm256_floor_ps(_mm256_min_ps(screenPixelY[0], _mm256_min_ps(screenPixelY[1], screenPixelY[2]))) );
-	maxScreenPixelX = _mm256_cvttps_epi32( _mm256_floor_ps(_mm256_max_ps(screenPixelX[0], _mm256_max_ps(screenPixelX[1], screenPixelX[2]))) );
-	maxScreenPixelY = _mm256_cvttps_epi32( _mm256_floor_ps(_mm256_max_ps(screenPixelY[0], _mm256_max_ps(screenPixelY[1], screenPixelY[2]))) );
+	maxScreenPixelX = _mm256_cvttps_epi32( _mm256_ceil_ps(_mm256_max_ps(screenPixelX[0], _mm256_max_ps(screenPixelX[1], screenPixelX[2]))) );
+	maxScreenPixelY = _mm256_cvttps_epi32(_mm256_ceil_ps(_mm256_max_ps(screenPixelY[0], _mm256_max_ps(screenPixelY[1], screenPixelY[2]))) );
 
 	// How "and" works?
 	// 0000 0000 0110 0011 <- 96 = 32 * 3 + 3
@@ -232,9 +238,9 @@ FORCE_INLINE void culling::BinTrianglesStage::PassTrianglesToTileBin
 
 					for(size_t pointIndex = 0 ; pointIndex < 3 ; pointIndex++)
 					{
-						targetTile->mBinnedTriangles.VertexX[pointIndex][triListIndex] = (reinterpret_cast<const float*>(screenPixelPosX + pointIndex))[triangleIndex];
-						targetTile->mBinnedTriangles.VertexY[pointIndex][triListIndex] = (reinterpret_cast<const float*>(screenPixelPosY + pointIndex))[triangleIndex];
-						targetTile->mBinnedTriangles.VertexZ[pointIndex][triListIndex] = (reinterpret_cast<const float*>(ndcSpaceVertexZ + pointIndex))[triangleIndex];
+						targetTile->mBinnedTriangles.mTriangleList[triListIndex].Points[pointIndex].x = (reinterpret_cast<const float*>(screenPixelPosX + pointIndex))[triangleIndex];
+						targetTile->mBinnedTriangles.mTriangleList[triListIndex].Points[pointIndex].y = (reinterpret_cast<const float*>(screenPixelPosY + pointIndex))[triangleIndex];
+						targetTile->mBinnedTriangles.mTriangleList[triListIndex].Points[pointIndex].z = (reinterpret_cast<const float*>(ndcSpaceVertexZ + pointIndex))[triangleIndex];
 					}
 					
 				}
