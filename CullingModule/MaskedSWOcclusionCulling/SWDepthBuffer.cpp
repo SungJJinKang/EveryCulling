@@ -3,13 +3,14 @@
 void culling::HizData::Reset()
 {
 	depthPosition = _mm256_set1_epi32(0);
-	z0Max = _mm256_set1_ps(1.0f);
-	z1Max = _mm256_set1_ps(1.0f);
+	l0MaxDepthValue = _mm256_set1_ps(1.0f);
+	l1MaxDepthValue = _mm256_set1_ps(1.0f);
+	l1CoverageMask = _mm256_setzero_si256();
 }
 
 void culling::TriangleList::Reset()
 {
-	mCurrentTriangleCount.store(0, std::memory_order_relaxed);
+	mCurrentTriangleCount = 0;
 }
 
 void culling::Tile::Reset()

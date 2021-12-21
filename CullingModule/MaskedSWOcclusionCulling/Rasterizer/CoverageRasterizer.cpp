@@ -1,6 +1,7 @@
 #include "CoverageRasterizer.h"
 
-culling::M256I culling::CoverageRasterizer::FillBottomFlatTriangle(CoverageMask& coverageMask, const Vec2& LeftBottomPoint, const Vec2& point1, const Vec2& point2, const Vec2& point3)
+
+FORCE_INLINE culling::M256I culling::coverageRasterizer::FillBottomFlatTriangle(const Vec2& LeftBottomPoint, const Vec2& point1, const Vec2& point2, const Vec2& point3)
 {
     //Assume Triangle is sorted
 
@@ -32,7 +33,7 @@ culling::M256I culling::CoverageRasterizer::FillBottomFlatTriangle(CoverageMask&
     return Result;
 }
 
-culling::M256I culling::CoverageRasterizer::FillTopFlatTriangle(CoverageMask& coverageMask, const Vec2& LeftBottomPoint, const Vec2& point1, const Vec2& point2, const Vec2& point3)
+FORCE_INLINE culling::M256I culling::coverageRasterizer::FillTopFlatTriangle(const Vec2& LeftBottomPoint, const Vec2& point1, const Vec2& point2, const Vec2& point3)
 {
     //Assume Triangle is sorted
     
@@ -69,22 +70,23 @@ culling::M256I culling::CoverageRasterizer::FillTopFlatTriangle(CoverageMask& co
 /// <param name="coverageMask"></param>
 /// <param name="LeftBottomPoint"></param>
 /// <param name="triangle"></param>
-void culling::CoverageRasterizer::FillTriangle(CoverageMask& coverageMask, Vec2 LeftBottomPoint, TwoDTriangle& triangle)
+void culling::coverageRasterizer::FillTriangle(culling::Tile& tile, Vec2 LeftBottomPoint, TwoDTriangle& triangle)
 {
     SortTriangle(triangle);
 
     if (triangle.Points[1].y == triangle.Points[2].y)
     {
-        coverageMask.mBits = FillBottomFlatTriangle(coverageMask, LeftBottomPoint, triangle.Points[0], triangle.Points[1], triangle.Points[2]);
+        tile.mHizDatas.l1CoverageMask = FillBottomFlatTriangle(LeftBottomPoint, triangle.Points[0], triangle.Points[1], triangle.Points[2]);
     }
-    /* check for trivial case of top-flat triangle */
+    
+    // check for trivial case of top-flat triangle
     else if (triangle.Points[0].y == triangle.Points[1].y)
     {
-        coverageMask.mBits = FillTopFlatTriangle(coverageMask, LeftBottomPoint, triangle.Points[0], triangle.Points[1], triangle.Points[2]);
+        tile.mHizDatas.l1CoverageMask = FillTopFlatTriangle(LeftBottomPoint, triangle.Points[0], triangle.Points[1], triangle.Points[2]);
     }
     else
     {
-        /* general case - split the triangle in a topflat and bottom-flat one */
+        // general case - split the triangle in a topflat and bottom-flat one
         Vec2 point4{ triangle.Points[0].x + ((float)(triangle.Points[1].y - triangle.Points[0].y) / (float)(triangle.Points[2].y - triangle.Points[0].y)) * (triangle.Points[2].x - triangle.Points[0].x), triangle.Points[1].y };
 
 #if TILE_WIDTH == 16
@@ -93,16 +95,17 @@ void culling::CoverageRasterizer::FillTriangle(CoverageMask& coverageMask, Vec2 
         culling::M256I Result1, Result2;
 #endif	
 
-        Result1 = FillBottomFlatTriangle(coverageMask, LeftBottomPoint, triangle.Points[0], triangle.Points[1], point4);
-        Result2 = FillTopFlatTriangle(coverageMask, LeftBottomPoint, triangle.Points[1], point4, triangle.Points[2]);
+        Result1 = FillBottomFlatTriangle(LeftBottomPoint, triangle.Points[0], triangle.Points[1], point4);
+        Result2 = FillTopFlatTriangle(LeftBottomPoint, triangle.Points[1], point4, triangle.Points[2]);
 
 #if TILE_WIDTH == 16
-        coverageMask.mBits = _mm_or_si128(Result1, Result2);
+        tile.mHizDatas.l1CoverageMask = _mm_or_si128(Result1, Result2);
 #elif TILE_WIDTH == 32
-        coverageMask.mBits = _mm256_or_si256(Result1, Result2);
+        tile.mHizDatas.l1CoverageMask = _mm256_or_si256(Result1, Result2);
 #endif	
 
         
     }
 
 }
+

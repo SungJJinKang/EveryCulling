@@ -21,7 +21,7 @@ namespace culling
 		/// A floating-point value represent Z0 Max DepthValue of A Subtile
 		/// 
 		/// </summary>
-		culling::M256F z0Max;
+		culling::M256F l0MaxDepthValue;
 
 		/// <summary>
 		/// Depth value of subtiles
@@ -30,7 +30,7 @@ namespace culling
 		/// A floating-point value represent Z0 Max DepthValue of A Subtile
 		/// 
 		/// </summary>
-		culling::M256F z1Max;
+		culling::M256F l1MaxDepthValue;
 
 		/// <summary>
 		/// Posion where Current Z1 Depth MaxValue come from
@@ -44,6 +44,21 @@ namespace culling
 		/// 
 		/// </summary>
 		culling::M256I depthPosition;
+
+		/// <summary>
+		/// Coverage mask
+		///
+		/// index 0 : (0, 0) fragment is covered by L1 triangle
+		/// index 1 : (1, 0) fragment is covered by L1 triangle
+		/// index 2 : (2, 0) fragment is covered by L1 triangle
+		///	.
+		///	.
+		///	.
+		/// index 255 : (31, 7) fragment is covered by L1 triangle
+		///
+		///	1 bit mean 1 fragment is covered by L1 triangle
+		/// </summary>
+		culling::M256I l1CoverageMask;
 
 		void Reset();
 	};
@@ -64,7 +79,7 @@ namespace culling
 		/// </summary>
 		ThreeDTriangle mTriangleList[BIN_TRIANGLE_CAPACITY_PER_TILE];
 
-		std::atomic<size_t> mCurrentTriangleCount = 0;
+		size_t mCurrentTriangleCount = 0;
 
 		void Reset();
 	};
@@ -180,7 +195,7 @@ namespace culling
 		size_t GetTileCount() const;
 
 		void Reset();
-
+		
 		const Tile* GetTiles() const;
 
 		const Tile* GetTile(const size_t rowIndex, const size_t colIndex) const;
