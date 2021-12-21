@@ -74,15 +74,14 @@ FORCE_INLINE void culling::BinTrianglesStage::ConvertNDCSpaceToScreenPixelSpace
 	{
 		//Convert NDC Space Coordinates To Screen Space Coordinates 
 #if NDC_RANGE == MINUS_ONE_TO_POSITIVE_ONE
-		const culling::M256F tmpScreenSpaceX = culling::M256F_MUL(culling::M256F_ADD(ndcSpaceVertexX[i], _mm256_set1_ps(1.0f)), mMaskedOcclusionCulling->mDepthBuffer.mResolution.mReplicatedScreenHalfWidth);
-		const culling::M256F tmpScreenSpaceY = culling::M256F_MUL(culling::M256F_ADD(ndcSpaceVertexY[i], _mm256_set1_ps(1.0f)), mMaskedOcclusionCulling->mDepthBuffer.mResolution.mReplicatedScreenHalfHeight);
+		outScreenPixelSpaceX[i] = culling::M256F_MUL(culling::M256F_ADD(ndcSpaceVertexX[i], _mm256_set1_ps(1.0f)), mMaskedOcclusionCulling->mDepthBuffer.mResolution.mReplicatedScreenHalfWidth);
+		outScreenPixelSpaceY[i] = culling::M256F_MUL(culling::M256F_ADD(ndcSpaceVertexY[i], _mm256_set1_ps(1.0f)), mMaskedOcclusionCulling->mDepthBuffer.mResolution.mReplicatedScreenHalfHeight);
 #elif NDC_RANGE == ZERO_TO_POSITIVE_ONE
-		const culling::M256F tmpScreenSpaceX = culling::M256F_MUL(ndcSpaceVertexX[i], mDepthBuffer.mResolution.mReplicatedScreenWidth);
-		const culling::M256F tmpScreenSpaceY = culling::M256F_MUL(ndcSpaceVertexY[i], mDepthBuffer.mResolution.mReplicatedScreenHeight);
+		outScreenPixelSpaceX[i] = culling::M256F_MUL(ndcSpaceVertexX[i], mDepthBuffer.mResolution.mReplicatedScreenWidth);
+		outScreenPixelSpaceY[i] = culling::M256F_MUL(ndcSpaceVertexY[i], mDepthBuffer.mResolution.mReplicatedScreenHeight);
 #else 
 		assert(0); //NEVER HAPPEN
 #endif
-
 		
 		
 	}
