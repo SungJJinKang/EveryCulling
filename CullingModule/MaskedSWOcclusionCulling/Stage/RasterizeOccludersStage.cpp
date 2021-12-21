@@ -3,6 +3,9 @@
 #include "../MaskedSWOcclusionCulling.h"
 #include "../Rasterizer/CoverageRasterizer.h"
 
+
+#define FETCH_TILE_COUNT_IN_CHUNK 10 //for minimizing performance drop form write combined buffer flush
+
 void culling::RasterizeOccludersStage::UpdateHierarchicalDepthBuffer()
 {
 	/*
@@ -53,11 +56,11 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 	
 }
 
-culling::Tile* culling::RasterizeOccludersStage::GetNextDepthBufferTile(const size_t cameraIndex)
+culling::Tile* culling::RasterizeOccludersStage::GetNextDepthBufferTileChunk(const size_t cameraIndex)
 {
 	culling::Tile* nextDepthBufferTile = nullptr;
 
-	const size_t currentTileIndex = mFinishedTileCount[cameraIndex].fetch_add(1, std::memory_order_seq_cst);
+	const size_t currentTileIndex = mFinishedTileCount[cameraIndex].fetch_add(FETCH_TILE_COUNT_IN_CHUNK, std::memory_order_seq_cst);
 
 	const size_t tileCount = mMaskedOcclusionCulling->mDepthBuffer.GetTileCount();
 
@@ -86,20 +89,35 @@ void culling::RasterizeOccludersStage::ResetCullingModule()
 
 void culling::RasterizeOccludersStage::CullBlockEntityJob(const size_t cameraIndex)
 {
+	const culling::Tile* const endTile = mMaskedOcclusionCulling->mDepthBuffer.GetTiles() + mMaskedOcclusionCulling->mDepthBuffer.GetTileCount();
+
 	while(true)
 	{
-		culling::Tile* const nextTile = GetNextDepthBufferTile(cameraIndex);
+		culling::Tile* const nextTileChunk = GetNextDepthBufferTileChunk(cameraIndex);
 
-		if (nextTile != nullptr && nextTile->mBinnedTriangles.mCurrentTriangleCount > 0)
+		if(nextTileChunk != nullptr)
 		{
-			RasterizeBinnedTriangles(cameraIndex, nextTile);
+			for (size_t tileIndexInChunk = 0; tileIndexInChunk < FETCH_TILE_COUNT_IN_CHUNK; tileIndexInChunk++)
+			{
+				culling::Tile* const nextTile = nextTileChunk + tileIndexInChunk;
+
+				if (nextTile < endTile)
+				{
+					if (nextTile->mBinnedTriangles.mCurrentTriangleCount > 0)
+					{
+						RasterizeBinnedTriangles(cameraIndex, nextTile);
+					}
+				}
+				else
+				{
+					break;
+				}
+			}
 		}
 		else
 		{
 			break;
 		}
-
-		
 	}
 
 }

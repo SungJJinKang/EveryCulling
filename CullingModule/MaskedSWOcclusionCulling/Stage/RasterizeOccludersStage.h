@@ -2,6 +2,7 @@
 
 #include "MaskedSWOcclusionCullingStage.h"
 
+
 namespace culling
 {
 	struct Tile;
@@ -34,7 +35,7 @@ namespace culling
 		void RasterizeBinnedTriangles(const size_t cameraIndex, culling::Tile* const tile);
 
 		
-		culling::Tile* GetNextDepthBufferTile(const size_t cameraIndex);
+		culling::Tile* GetNextDepthBufferTileChunk(const size_t cameraIndex);
 
 	public:
 
