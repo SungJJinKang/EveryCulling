@@ -2,9 +2,9 @@
 
 #include "Graphics/Acceleration/LinearData_ViewFrustumCulling/EveryCulling.h"
 
-culling::EntityBlock* culling::CullingModule::GetNextEntityBlock(const size_t cameraIndex)
+culling::EntityBlock* culling::CullingModule::GetNextEntityBlock(const size_t cameraIndex, const bool forceOrdering)
 {
-	const std::uint32_t currentEntityBlockIndex = mCullJobState.mCurrentCulledEntityBlockIndex[cameraIndex].fetch_add(1, std::memory_order_seq_cst);
+	const std::uint32_t currentEntityBlockIndex = mCullJobState.mCurrentCulledEntityBlockIndex[cameraIndex].fetch_add(1, forceOrdering == true ? std::memory_order_seq_cst : std::memory_order_relaxed);
 
 	const size_t entityBlockCount = mCullingSystem->GetActiveEntityBlockCount();
 	EntityBlock* const currentEntityBlock = (currentEntityBlockIndex >= entityBlockCount) ? (nullptr) : (mCullingSystem->GetActiveEntityBlockList()[currentEntityBlockIndex]);

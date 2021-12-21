@@ -97,12 +97,12 @@ namespace culling
 			return ( mIsVisibleBitflag[entityIndex] & (1 << cameraIndex) ) == 0;
 		}
 
-		FORCE_INLINE bool GetIsOccluder(const size_t entityIndex, const std::uint32_t cameraIndex) const
+		FORCE_INLINE bool GetIsOccluder(const size_t entityIndex, const size_t cameraIndex) const
 		{
 			return (mIsOccluder[entityIndex] & (1 << cameraIndex)) != 0;
 		}
 
-		FORCE_INLINE void SetIsOccluder(const size_t entityIndex, const std::uint32_t cameraIndex, const bool isOccluder)
+		FORCE_INLINE void SetIsOccluder(const size_t entityIndex, const size_t cameraIndex, const bool isOccluder)
 		{
 			if(isOccluder == true)
 			{

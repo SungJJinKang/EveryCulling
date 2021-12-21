@@ -12,8 +12,9 @@ namespace culling
 	
 	class BinTrianglesStage : public MaskedSWOcclusionCullingStage
 	{
-	
 	private:
+
+		std::atomic<bool> IsWorkingByAThread;
 
 	
 		/// <summary>
@@ -213,6 +214,7 @@ namespace culling
 
 		BinTrianglesStage(MaskedSWOcclusionCulling* mMOcclusionCulling);
 
+		void ResetCullingModule() override;
 
 		void CullBlockEntityJob(const size_t cameraIndex) override;
 	};

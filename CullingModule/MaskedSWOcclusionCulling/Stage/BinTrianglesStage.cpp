@@ -362,45 +362,56 @@ culling::BinTrianglesStage::BinTrianglesStage(MaskedSWOcclusionCulling* mMOcclus
 {
 }
 
+void culling::BinTrianglesStage::ResetCullingModule()
+{
+	MaskedSWOcclusionCullingStage::ResetCullingModule();
+
+	IsWorkingByAThread.store(false, std::memory_order_seq_cst);
+}
+
 void culling::BinTrianglesStage::CullBlockEntityJob(const size_t cameraIndex)
 {
-	while (true)
+	const bool canWorkable = !(IsWorkingByAThread.exchange(true, std::memory_order_seq_cst));
+
+	// Only one thread can work on this stage
+	if(canWorkable == true)
 	{
-		culling::EntityBlock* const nextEntityBlock = GetNextEntityBlock(cameraIndex);;
-
-		if (nextEntityBlock != nullptr)
+		while (true)
 		{
-			for(size_t entityIndex = 0 ; entityIndex < nextEntityBlock->mCurrentEntityCount ; entityIndex++)
+			culling::EntityBlock* const nextEntityBlock = GetNextEntityBlock(cameraIndex, false);
+
+			if (nextEntityBlock != nullptr)
 			{
-				if
-				(
-					(nextEntityBlock->GetIsCulled(entityIndex, cameraIndex) == false) &&
-					(nextEntityBlock->GetIsOccluder(entityIndex, cameraIndex) == true)
-				)
+				for (size_t entityIndex = 0; entityIndex < nextEntityBlock->mCurrentEntityCount; entityIndex++)
 				{
-					const culling::Mat4x4 modelToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex) * (*reinterpret_cast<const culling::Mat4x4*>(nextEntityBlock->GetModelMatrix(entityIndex)));
-					const VertexData& vertexData = nextEntityBlock->mVertexDatas[entityIndex];
+					if
+						(
+							(nextEntityBlock->GetIsCulled(entityIndex, cameraIndex) == false) &&
+							(nextEntityBlock->GetIsOccluder(entityIndex, cameraIndex) == true)
+							)
+					{
+						const culling::Mat4x4 modelToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex) * (*reinterpret_cast<const culling::Mat4x4*>(nextEntityBlock->GetModelMatrix(entityIndex)));
+						const VertexData& vertexData = nextEntityBlock->mVertexDatas[entityIndex];
 
-					BinTriangles
-					(
-						reinterpret_cast<const float*>(vertexData.mVertices),
-						vertexData.mVerticeCount,
-						vertexData.mIndices,
-						vertexData.mIndiceCount,
-						vertexData.mVertexStride,
-						modelToClipSpaceMatrix.data()
-					);
+						BinTriangles
+						(
+							reinterpret_cast<const float*>(vertexData.mVertices),
+							vertexData.mVerticeCount,
+							vertexData.mIndices,
+							vertexData.mIndiceCount,
+							vertexData.mVertexStride,
+							modelToClipSpaceMatrix.data()
+						);
+					}
 				}
+
 			}
-			
-		}
-		else
-		{
-			break;
+			else
+			{
+				break;
+			}
 		}
 	}
-
-	
 }
 
 void culling::BinTrianglesStage::BinTriangles
