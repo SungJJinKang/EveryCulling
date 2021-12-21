@@ -21,20 +21,20 @@ FORCE_INLINE culling::M256I culling::CoverageRasterizer::FillBottomFlatTriangle
     const float curx = point1.x - LeftBottomPoint.x; 
 
     //Ceil event values and Cast to integer
-    const culling::M256F rightEvent1Floating = _mm256_set_ps(curx, curx + invslope1, curx + invslope1 * 2, curx + invslope1 * 3, curx + invslope1 * 4, curx + invslope1 * 5, curx + invslope1 * 6, curx + invslope1 * 7);
-    culling::M256I rightEvent1 = _mm256_cvtps_epi32(_mm256_ceil_ps(rightEvent1Floating));
-    rightEvent1 = _mm256_max_epi32(rightEvent1, *reinterpret_cast<const culling::M256I*>(&M128F_Zero));
+    const culling::M256F rightEventFloat = _mm256_set_ps(curx, curx + invslope1, curx + invslope1 * 2, curx + invslope1 * 3, curx + invslope1 * 4, curx + invslope1 * 5, curx + invslope1 * 6, curx + invslope1 * 7);
+    culling::M256I rightEvent = _mm256_cvtps_epi32(_mm256_ceil_ps(rightEventFloat));
+    rightEvent = _mm256_max_epi32(rightEvent, _mm256_set1_epi32(0));
     
     //Ceil event values and Cast to integer
-    const culling::M256F rightEvent2Floating = _mm256_set_ps(curx, curx + invslope1, curx + invslope1 * 2, curx + invslope1 * 3, curx + invslope1 * 4, curx + invslope1 * 5, curx + invslope1 * 6, curx + invslope1 * 7);
-    culling::M256I rightEvent2 = _mm256_cvtps_epi32(_mm256_ceil_ps(rightEvent2Floating));
-    rightEvent2 = _mm256_max_epi32(rightEvent2, *reinterpret_cast<const culling::M256I*>(&M128F_Zero));
+    const culling::M256F leftEventFloat = _mm256_set_ps(curx, curx + invslope2, curx + invslope2 * 2, curx + invslope2 * 3, curx + invslope2 * 4, curx + invslope2 * 5, curx + invslope2 * 6, curx + invslope2 * 7);
+    culling::M256I leftEvent = _mm256_cvtps_epi32(_mm256_ceil_ps(leftEventFloat));
+    leftEvent = _mm256_max_epi32(leftEvent, _mm256_set1_epi32(0));
 
-    culling::M256I Mask1 = _mm256_srlv_epi32(*reinterpret_cast<const culling::M256I*>(&M128F_EVERY_BITS_ONE), rightEvent1);
-    culling::M256I Mask2 = _mm256_srlv_epi32(*reinterpret_cast<const culling::M256I*>(&M128F_EVERY_BITS_ONE), rightEvent2);
+    culling::M256I Mask1 = _mm256_srlv_epi32(_mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF), rightEvent);
+    culling::M256I Mask2 = _mm256_srlv_epi32(_mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF), leftEvent);
 
-    Mask1 = _mm256_xor_si256(Mask1, *reinterpret_cast<const culling::M256I*>(&((invslope1 > 0.0f) ? M128F_Zero : M128F_EVERY_BITS_ONE)));
-    Mask2 = _mm256_xor_si256(Mask2, *reinterpret_cast<const culling::M256I*>(&((invslope2 > 0.0f) ? M128F_Zero : M128F_EVERY_BITS_ONE)));
+    //Mask1 = _mm256_xor_si256(Mask1, (invslope1 < 0.0f) ? _mm256_set1_epi64x(0x0000000000000000) : _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF));
+    //Mask2 = _mm256_xor_si256(Mask2, (invslope2 < 0.0f) ? _mm256_set1_epi64x(0x0000000000000000) : _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF));
 
     culling::M256I Result = _mm256_and_si256(Mask1, Mask2);
 
@@ -56,21 +56,22 @@ FORCE_INLINE culling::M256I culling::CoverageRasterizer::FillTopFlatTriangle
     const float invslope1 = (point3.x - point1.x) / (point3.y - point1.y);
     const float invslope2 = (point3.x - point2.x) / (point3.y - point2.y);
 
-    const float curx = point1.x - LeftBottomPoint.x;
+    const float curx = point3.x - LeftBottomPoint.x;
 
-    const culling::M256F rightEvent1Floating = _mm256_set_ps(curx, curx - invslope1, curx - invslope1 * 2, curx - invslope1 * 3, curx - invslope1 * 4, curx - invslope1 * 5, curx - invslope1 * 6, curx - invslope1 * 7);
-    culling::M256I rightEvent1 = _mm256_cvtps_epi32(_mm256_ceil_ps(rightEvent1Floating)); 
-    rightEvent1 = _mm256_max_epi32(rightEvent1, *reinterpret_cast<const culling::M256I*>(&M128F_Zero));
+    const culling::M256F rightEventFloat = _mm256_set_ps(curx, curx - invslope1, curx - invslope1 * 2, curx - invslope1 * 3, curx - invslope1 * 4, curx - invslope1 * 5, curx - invslope1 * 6, curx - invslope1 * 7);
+    culling::M256I rightEvent = _mm256_cvtps_epi32(_mm256_ceil_ps(rightEventFloat)); 
+    rightEvent = _mm256_max_epi32(rightEvent, _mm256_set1_epi32(0));
 
-    const culling::M256F rightEvent2Floating = _mm256_set_ps(curx, curx - invslope2, curx - invslope2 * 2, curx - invslope2 * 3, curx - invslope2 * 4, curx - invslope2 * 5, curx - invslope2 * 6, curx - invslope2 * 7);
-    culling::M256I rightEvent2 = _mm256_cvtps_epi32(_mm256_ceil_ps(rightEvent2Floating)); // I will use this variable like 2byte integer, not 4byte
-    rightEvent2 = _mm256_max_epi32(rightEvent2, *reinterpret_cast<const culling::M256I*>(&M128F_Zero));
+    const culling::M256F leftEventFloat = _mm256_set_ps(curx, curx - invslope2, curx - invslope2 * 2, curx - invslope2 * 3, curx - invslope2 * 4, curx - invslope2 * 5, curx - invslope2 * 6, curx - invslope2 * 7);
+    culling::M256I leftEvent = _mm256_cvtps_epi32(_mm256_ceil_ps(leftEventFloat)); // I will use this variable like 2byte integer, not 4byte
+    leftEvent = _mm256_max_epi32(leftEvent, _mm256_set1_epi32(0));
 
-    culling::M256I Mask1 = _mm256_srlv_epi32(*reinterpret_cast<const culling::M256I*>(&M128F_EVERY_BITS_ONE), rightEvent1);
-    culling::M256I Mask2 = _mm256_srlv_epi32(*reinterpret_cast<const culling::M256I*>(&M128F_EVERY_BITS_ONE), rightEvent2);
+    culling::M256I Mask1 = _mm256_srlv_epi32(_mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF), rightEvent);
+    culling::M256I Mask2 = _mm256_srlv_epi32(_mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF), leftEvent);
 
-    Mask1 = _mm256_xor_si256(Mask1, *reinterpret_cast<const culling::M256I*>(&((invslope1 < 0.0f) ? M128F_Zero : M128F_EVERY_BITS_ONE)));
-    Mask2 = _mm256_xor_si256(Mask2, *reinterpret_cast<const culling::M256I*>(&((invslope2 < 0.0f) ? M128F_Zero : M128F_EVERY_BITS_ONE)));
+    
+    //Mask1 = _mm256_xor_si256(Mask1, (invslope1 < 0.0f) ? _mm256_set1_epi64x(0x0000000000000000) : _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF));
+    //Mask2 = _mm256_xor_si256(Mask2, (invslope2 < 0.0f) ? _mm256_set1_epi64x(0x0000000000000000) : _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF));
 
     culling::M256I Result = _mm256_and_si256(Mask1, Mask2);
 
@@ -102,8 +103,19 @@ void culling::CoverageRasterizer::FillTriangle
 
         culling::M256I Result1, Result2;
 
-        Result1 = FillBottomFlatTriangle(LeftBottomPoint, triangleVertex1, triangleVertex2, point4);
-        Result2 = FillTopFlatTriangle(LeftBottomPoint, triangleVertex2, point4, triangleVertex3);
+        Result1 = FillBottomFlatTriangle
+    	(
+            LeftBottomPoint, 
+            triangleVertex1, 
+            (triangleVertex2.x < point4.x) ? triangleVertex2 : point4, 
+            (triangleVertex2.x < point4.x) ? point4 : triangleVertex2
+        );
+        Result2 = FillTopFlatTriangle
+    	(
+            LeftBottomPoint, 
+            (triangleVertex2.x < point4.x) ? triangleVertex2 : point4,
+            (triangleVertex2.x < point4.x) ? point4 : triangleVertex2, 
+            triangleVertex3);
 
         tile.mHizDatas.l1CoverageMask = _mm256_or_si256(tile.mHizDatas.l1CoverageMask, _mm256_or_si256(Result1, Result2));
 
