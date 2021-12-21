@@ -16,23 +16,19 @@ FORCE_INLINE culling::M256I culling::CoverageRasterizer::FillBottomFlatTriangle
     assert(point1.y > point2.y);
     assert(point1.y > point3.y);
 
-    //Assume Triangle is sorted
+    const float inverseSlope1 = (point1.x - point2.x) / (point1.y - point2.y);
+    const float inverseSlope2 = (point1.x - point3.x) / (point1.y - point3.y);
 
-    //if invslope > 0, left facing edge
-    //else, right facing edge
-    const float inverseSlope1 = (point2.x - point1.x) / (point2.y - point1.y);
-    const float inverseSlope2 = (point3.x - point1.x) / (point3.y - point1.y);
-    
-    const float curx1 = point1.x - TileLeftBottomOriginPoint.x;
-    const float curx2 = point1.x - TileLeftBottomOriginPoint.x;
+    const float curx1 = point2.x + (TileLeftBottomOriginPoint.y - point2.y) * inverseSlope1 - TileLeftBottomOriginPoint.x;
+    const float curx2 = point3.x + (TileLeftBottomOriginPoint.y - point3.y) * inverseSlope2 - TileLeftBottomOriginPoint.x;
 
     //Ceil event values and Cast to integer
-    const culling::M256F leftSideEventFloat = _mm256_set_ps(curx1 - inverseSlope1 * 7, curx1 - inverseSlope1 * 6, curx1 - inverseSlope1 * 5, curx1 - inverseSlope1 * 4, curx1 - inverseSlope1 * 3, curx1 - inverseSlope1 * 2, curx1 - inverseSlope1 * 1, curx1);
-    culling::M256I leftSideEvent = _mm256_cvtps_epi32(_mm256_ceil_ps(leftSideEventFloat));
+    const culling::M256F leftSideEventFloat = _mm256_set_ps(curx1 + inverseSlope1 * 7, curx1 + inverseSlope1 * 6, curx1 + inverseSlope1 * 5, curx1 + inverseSlope1 * 4, curx1 + inverseSlope1 * 3, curx1 + inverseSlope1 * 2, curx1 + inverseSlope1 * 1, curx1); 
+    culling::M256I leftSideEvent = _mm256_cvtps_epi32(_mm256_floor_ps(leftSideEventFloat));
     leftSideEvent = _mm256_max_epi32(leftSideEvent, _mm256_set1_epi32(0));
     
     //Ceil event values and Cast to integer
-    const culling::M256F rightSideEventFloat = _mm256_set_ps(curx2 - inverseSlope2 * 7, curx2 - inverseSlope2 * 6, curx2 - inverseSlope2 * 5, curx2 - inverseSlope2 * 4, curx2 - inverseSlope2 * 3, curx2 - inverseSlope2 * 2, curx2 - inverseSlope2 * 1, curx2);
+    const culling::M256F rightSideEventFloat = _mm256_set_ps(curx2 + inverseSlope2 * 7, curx2 + inverseSlope2 * 6, curx2 + inverseSlope2 * 5, curx2 + inverseSlope2 * 4, curx2 + inverseSlope2 * 3, curx2 + inverseSlope2 * 2, curx2 + inverseSlope2 * 1, curx2); 
     culling::M256I rightSideEvent = _mm256_cvtps_epi32(_mm256_ceil_ps(rightSideEventFloat));
     rightSideEvent = _mm256_max_epi32(rightSideEvent, _mm256_set1_epi32(0));
 
@@ -42,7 +38,7 @@ FORCE_INLINE culling::M256I culling::CoverageRasterizer::FillBottomFlatTriangle
     //Mask1 = _mm256_xor_si256(Mask1, (invslope1 < 0.0f) ? _mm256_set1_epi64x(0x0000000000000000) : _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF));
     //Mask2 = _mm256_xor_si256(Mask2, (invslope2 < 0.0f) ? _mm256_set1_epi64x(0x0000000000000000) : _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF));
 
-    culling::M256I Result = _mm256_and_si256(Mask1, _mm256_xor_si256 (Mask2, _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF)));
+    culling::M256I Result = _mm256_and_si256(Mask1, _mm256_xor_si256(Mask2, _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF)));
 
     return Result;
 }
@@ -60,31 +56,24 @@ FORCE_INLINE culling::M256I culling::CoverageRasterizer::FillTopFlatTriangle
     assert(point1.y > point3.y);
     assert(point2.y > point3.y);
 
-    //Assume Triangle is sorted
-    
-    //if invslope < 0, left facing edge
-    //else, right facing edge
     const float inverseSlope1 = (point3.x - point1.x) / (point3.y - point1.y);
     const float inverseSlope2 = (point3.x - point2.x) / (point3.y - point2.y);
-    
-    const float curx1 = point3.x - TileLeftBottomOriginPoint.x;
-    const float curx2 = point3.x - TileLeftBottomOriginPoint.x;
 
-    const culling::M256F leftSideEventFloat = _mm256_set_ps(curx1, curx1 + inverseSlope1, curx1 + inverseSlope1 * 2, curx1 + inverseSlope1 * 3, curx1 + inverseSlope1 * 4, curx1 + inverseSlope1 * 5, curx1 + inverseSlope1 * 6, curx1 + inverseSlope1 * 7);
-    culling::M256I leftSideEvent = _mm256_cvtps_epi32(_mm256_ceil_ps(leftSideEventFloat)); 
+    const float curx1 = point1.x + (TileLeftBottomOriginPoint.y - point1.y) * inverseSlope1 - TileLeftBottomOriginPoint.x;
+    const float curx2 = point2.x + (TileLeftBottomOriginPoint.y - point2.y) * inverseSlope2 - TileLeftBottomOriginPoint.x;
+
+    const culling::M256F leftSideEventFloat = _mm256_set_ps(curx1 + inverseSlope1 * 7, curx1 + inverseSlope1 * 6, curx1 + inverseSlope1 * 5, curx1 + inverseSlope1 * 4, curx1 + inverseSlope1 * 3, curx1 + inverseSlope1 * 2, curx1 + inverseSlope1 * 1, curx1);
+    culling::M256I leftSideEvent = _mm256_cvtps_epi32(_mm256_floor_ps(leftSideEventFloat));
     leftSideEvent = _mm256_max_epi32(leftSideEvent, _mm256_set1_epi32(0));
-
-    const culling::M256F rightSideEventFloat = _mm256_set_ps(curx2, curx2 + inverseSlope2, curx2 + inverseSlope2 * 2, curx2 + inverseSlope2 * 3, curx2 + inverseSlope2 * 4, curx2 + inverseSlope2 * 5, curx2 + inverseSlope2 * 6, curx2 + inverseSlope2 * 7);
-    culling::M256I rightSideEvent = _mm256_cvtps_epi32(_mm256_ceil_ps(rightSideEventFloat)); // I will use this variable like 2byte integer, not 4byte
+    
+    //Ceil event values and Cast to integer
+    const culling::M256F rightSideEventFloat = _mm256_set_ps(curx2 + inverseSlope2 * 7, curx2 + inverseSlope2 * 6, curx2 + inverseSlope2 * 5, curx2 + inverseSlope2 * 4, curx2 + inverseSlope2 * 3, curx2 + inverseSlope2 * 2, curx2 + inverseSlope2 * 1, curx2);
+    culling::M256I rightSideEvent = _mm256_cvtps_epi32(_mm256_ceil_ps(rightSideEventFloat));
     rightSideEvent = _mm256_max_epi32(rightSideEvent, _mm256_set1_epi32(0));
 
     culling::M256I Mask1 = _mm256_srlv_epi32(_mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF), leftSideEvent);
     culling::M256I Mask2 = _mm256_srlv_epi32(_mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF), rightSideEvent);
-
     
-    //Mask1 = _mm256_xor_si256(Mask1, (invslope1 < 0.0f) ? _mm256_set1_epi64x(0x0000000000000000) : _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF));
-    //Mask2 = _mm256_xor_si256(Mask2, (invslope2 < 0.0f) ? _mm256_set1_epi64x(0x0000000000000000) : _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF));
-
     culling::M256I Result = _mm256_and_si256(Mask1, _mm256_xor_si256(Mask2, _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF)));
 
     return Result;
