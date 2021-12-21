@@ -8,7 +8,7 @@
 
 namespace culling
 {
-	
+	class SWDepthBuffer;
 	/// <summary>
 	/// Hierarchical depth for a Tile ( 32 X 8 )
 	/// </summary>
@@ -89,12 +89,29 @@ namespace culling
 	/// 
 	/// alignas(64) is for preventing false sharing
 	/// </summary>
-	struct alignas(64) Tile
+	class alignas(64) Tile
 	{
+		friend class SWDepthBuffer;
+	private:
+		
+		std::uint32_t mLeftBottomTileOrginX;
+		std::uint32_t mLeftBottomTileOrginY;
+		
+	public:
+
 		HizData mHizDatas;
 		TriangleList mBinnedTriangles;
 
 		void Reset();
+		FORCE_INLINE std::uint32_t GetLeftBottomTileOrginX() const
+		{
+			return mLeftBottomTileOrginX;
+		}
+
+		FORCE_INLINE std::uint32_t GetLeftBottomTileOrginY() const
+		{
+			return mLeftBottomTileOrginY;
+		}
 	};
 
 	struct Resolution
@@ -166,9 +183,6 @@ namespace culling
 
 	class SWDepthBuffer
 	{
-		friend class MaskedSWOcclusionCulling;
-		friend class BinTrianglesStage;
-
 	private:
 
 		/// <summary>
@@ -179,16 +193,17 @@ namespace culling
 		Tile* mTiles;
 		size_t mTileCount;
 
+
+	public:
+
+		const Resolution mResolution;
+
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="width">Screen Width</param>
 		/// <param name="height">Scree Height</param>
 		SWDepthBuffer(std::uint32_t width, std::uint32_t height);
-
-	public:
-		
-		const Resolution mResolution;
 
 		~SWDepthBuffer();
 

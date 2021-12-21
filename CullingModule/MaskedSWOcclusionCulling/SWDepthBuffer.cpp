@@ -81,14 +81,20 @@ const culling::Tile* culling::SWDepthBuffer::GetTiles() const
 
 const culling::Tile* culling::SWDepthBuffer::GetTile(const size_t rowIndex, const size_t colIndex) const
 {
-	const size_t tileIndex = rowIndex * mResolution.mColumnCount + colIndex;
+	assert(rowIndex < mResolution.mRowCount);
+	assert(colIndex < mResolution.mColumnCount);
+
+	const size_t tileIndex = (mResolution.mRowCount - rowIndex - 1) * mResolution.mColumnCount + colIndex;
 	assert(tileIndex < mTileCount);
 	return mTiles + tileIndex;
 }
 
 culling::Tile* culling::SWDepthBuffer::GetTile(const size_t rowIndex, const size_t colIndex)
 {
-	const size_t tileIndex = rowIndex * mResolution.mColumnCount + colIndex;
+	assert(rowIndex < mResolution.mRowCount);
+	assert(colIndex < mResolution.mColumnCount);
+
+	const size_t tileIndex = (mResolution.mRowCount - rowIndex - 1) * mResolution.mColumnCount + colIndex;
 	assert(tileIndex < mTileCount);
 	return mTiles + tileIndex;
 }
