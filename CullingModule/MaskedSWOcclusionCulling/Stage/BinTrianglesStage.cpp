@@ -216,9 +216,9 @@ FORCE_INLINE void culling::BinTrianglesStage::PassTrianglesToTileBin
 			assert(endBoxIndexX >= 0 && endBoxIndexX <= mMaskedOcclusionCulling->mDepthBuffer.mResolution.mColumnCount);
 			assert(endBoxIndexY >= 0 && endBoxIndexY <= mMaskedOcclusionCulling->mDepthBuffer.mResolution.mRowCount);
 
-			for (size_t y = startBoxIndexY; y <= endBoxIndexY; y++)
+			for (size_t y = startBoxIndexY; y < endBoxIndexY; y++)
 			{
-				for (size_t x = startBoxIndexX; x <= endBoxIndexX; x++)
+				for (size_t x = startBoxIndexX; x < endBoxIndexX; x++)
 				{
 					Tile* const targetTile = mMaskedOcclusionCulling->mDepthBuffer.GetTile(y, x);
 
