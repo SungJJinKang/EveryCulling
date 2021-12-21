@@ -3,6 +3,8 @@
 
 #include "../SWDepthBuffer.h"
 
+#include <Graphics/DebugGraphics/DebugDrawer.h>
+
 FORCE_INLINE void culling::BinTrianglesStage::ConvertClipSpaceToNDCSpace
 (
 	culling::M256F* outClipVertexX, 
@@ -24,6 +26,19 @@ FORCE_INLINE void culling::BinTrianglesStage::ConvertClipSpaceToNDCSpace
 		//This code is useless
 		//outClipVertexW[i] = culling::M256F_MUL(outClipVertexW[i], outClipVertexW[i]);
 	}
+
+
+	
+	/*
+	for (size_t i = 0 ; i < 8; i++)
+	{
+		math::Vector3 vertexA{ (reinterpret_cast<const float*>(outClipVertexX + 0))[i], (reinterpret_cast<const float*>(outClipVertexY + 0))[i], (reinterpret_cast<const float*>(outClipVertexZ + 0))[i] };
+		math::Vector3 vertexB{ (reinterpret_cast<const float*>(outClipVertexX + 1))[i], (reinterpret_cast<const float*>(outClipVertexY + 1))[i], (reinterpret_cast<const float*>(outClipVertexZ + 1))[i] };
+		math::Vector3 vertexC{ (reinterpret_cast<const float*>(outClipVertexX + 2))[i], (reinterpret_cast<const float*>(outClipVertexY + 2))[i], (reinterpret_cast<const float*>(outClipVertexZ + 2))[i] };
+
+		dooms::graphics::DebugDrawer::GetSingleton()->DebugDraw2DTriangle(vertexA, vertexB, vertexC, eColor::Green);
+	}
+	*/
 
 }
 
@@ -456,7 +471,21 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 		//Convert Model space Vertex To Clip space Vertex
 		//WE ARRIVE AT CLIP SPACE COORDINATE. W IS NOT 1
 		TransformVertexsToClipSpace(ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, oneDividedByW, modelToClipspaceMatrix, triangleCullMask);
-		
+
+		//BackFace Cull
+		// 
+		BackfaceCulling(ndcSpaceVertexX, ndcSpaceVertexY, triangleCullMask);
+
+		//Do not Sort Triangle in binning stage
+		//because Culled triangles is also sorted
+		//Sort triangle in drawing depth stage/
+		//In that stage, all triangles is valid
+
+		if (triangleCullMask == 0x00000000)
+		{
+			continue;
+		}
+
 		FrustumCulling(ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, oneDividedByW, triangleCullMask);
 
 		if (triangleCullMask == 0x00000000)
@@ -486,19 +515,7 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 		ConvertNDCSpaceToScreenPixelSpace(ndcSpaceVertexX, ndcSpaceVertexY, screenPixelPosX, screenPixelPosY, triangleCullMask);
 		//Clip Space Cull
 
-		//BackFace Cull
-		// 
-		BackfaceCulling(screenPixelPosX, screenPixelPosY, triangleCullMask);
-
-		//Do not Sort Triangle in binning stage
-		//because Culled triangles is also sorted
-		//Sort triangle in drawing depth stage/
-		//In that stage, all triangles is valid
-
-		if (triangleCullMask == 0x00000000)
-		{
-			continue;
-		}
+		
 
 		
 		

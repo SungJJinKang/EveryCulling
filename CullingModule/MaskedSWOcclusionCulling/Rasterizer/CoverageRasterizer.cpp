@@ -3,7 +3,7 @@
 #include <cmath>
 #include <limits>
 
-#define COVERAGEMASK_OFFSET (TILE_WIDTH * 4)
+#define COVERAGEMASK_OFFSET ((float)(TILE_WIDTH * 2) - 1.0f)
 
 FORCE_INLINE culling::M256I culling::CoverageRasterizer::FillBottomFlatTriangle
 (
@@ -15,8 +15,8 @@ FORCE_INLINE culling::M256I culling::CoverageRasterizer::FillBottomFlatTriangle
 {
     assert(point2.x <= point3.x);
     assert(std::abs(point2.y - point3.y) < std::numeric_limits<float>::epsilon());
-    assert(point1.y > point2.y);
-    assert(point1.y > point3.y);
+    assert(point1.y >= point2.y);
+    assert(point1.y >= point3.y);
 
     const float inverseSlope1 = (point2.x - point1.x) / (point2.y - point1.y);
     const float inverseSlope2 = (point3.x - point1.x) / (point3.y - point1.y);
@@ -25,11 +25,11 @@ FORCE_INLINE culling::M256I culling::CoverageRasterizer::FillBottomFlatTriangle
     const float curx2 = point1.x + (TileLeftBottomOriginPoint.y - point1.y) * inverseSlope2 - TileLeftBottomOriginPoint.x + COVERAGEMASK_OFFSET;
 
     const culling::M256F leftFaceEventFloat = _mm256_set_ps(curx1 + inverseSlope1 * 7, curx1 + inverseSlope1 * 6, curx1 + inverseSlope1 * 5, curx1 + inverseSlope1 * 4, curx1 + inverseSlope1 * 3, curx1 + inverseSlope1 * 2, curx1 + inverseSlope1 * 1, curx1 );
-    culling::M256I leftFaceEvent = _mm256_cvtps_epi32(_mm256_floor_ps(leftFaceEventFloat));
+    culling::M256I leftFaceEvent = _mm256_cvtps_epi32(leftFaceEventFloat);
     leftFaceEvent = _mm256_max_epi32(leftFaceEvent, _mm256_set1_epi32(0));
     
     const culling::M256F rightFaceEventFloat = _mm256_set_ps(curx2 + inverseSlope1 * 7, curx2 + inverseSlope2 * 6, curx2 + inverseSlope2 * 5, curx2 + inverseSlope2 * 4, curx2 + inverseSlope2 * 3, curx2 + inverseSlope2 * 2, curx2 + inverseSlope2 * 1, curx2 );
-    culling::M256I rightFaceEvent = _mm256_cvtps_epi32(_mm256_ceil_ps(rightFaceEventFloat));
+    culling::M256I rightFaceEvent = _mm256_cvtps_epi32(rightFaceEventFloat);
     rightFaceEvent = _mm256_max_epi32(rightFaceEvent, _mm256_set1_epi32(0));
 
     culling::M256I Mask1 = _mm256_srlv_epi32(_mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF), leftFaceEvent);
@@ -54,8 +54,8 @@ FORCE_INLINE culling::M256I culling::CoverageRasterizer::FillTopFlatTriangle
 {
     assert(point1.x <= point2.x);
     assert(std::abs(point1.y - point2.y) < std::numeric_limits<float>::epsilon());
-    assert(point1.y > point3.y);
-    assert(point2.y > point3.y);
+    assert(point1.y >= point3.y);
+    assert(point2.y >= point3.y);
     
     const float inverseSlope1 = (point1.x - point3.x) / (point1.y - point3.y);
     const float inverseSlope2 = (point2.x - point3.x) / (point2.y - point3.y);
@@ -64,11 +64,11 @@ FORCE_INLINE culling::M256I culling::CoverageRasterizer::FillTopFlatTriangle
     const float curx2 = point3.x + (TileLeftBottomOriginPoint.y - point3.y) * inverseSlope2 - TileLeftBottomOriginPoint.x + COVERAGEMASK_OFFSET;
 
     const culling::M256F leftFaceEventFloat = _mm256_set_ps(curx1, curx1 + inverseSlope1 * 1, curx1 + inverseSlope1 * 2, curx1 + inverseSlope1 * 3, curx1 + inverseSlope1 * 4, curx1 + inverseSlope1 * 5, curx1 + inverseSlope1 * 6, curx1 + inverseSlope2 * 7);
-    culling::M256I leftFaceEvent = _mm256_cvtps_epi32(_mm256_floor_ps(leftFaceEventFloat));
+    culling::M256I leftFaceEvent = _mm256_cvtps_epi32(leftFaceEventFloat);
     leftFaceEvent = _mm256_max_epi32(leftFaceEvent, _mm256_set1_epi32(0));
 
     const culling::M256F rightFaceEventFloat = _mm256_set_ps(curx2, curx2 + inverseSlope2 * 1, curx2 + inverseSlope2 * 2, curx2 + inverseSlope2 * 3, curx2 + inverseSlope2 * 4, curx2 + inverseSlope2 * 5, curx2 + inverseSlope2 * 6, curx2 + inverseSlope2 * 7);
-    culling::M256I rightFaceEvent = _mm256_cvtps_epi32(_mm256_ceil_ps(rightFaceEventFloat));
+    culling::M256I rightFaceEvent = _mm256_cvtps_epi32(rightFaceEventFloat);
     rightFaceEvent = _mm256_max_epi32(rightFaceEvent, _mm256_set1_epi32(0));
 
     culling::M256I Mask1 = _mm256_srlv_epi32(_mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF), leftFaceEvent);
@@ -118,7 +118,7 @@ void culling::CoverageRasterizer::FillTriangle
     {
         // http://www.sunshine2k.de/coding/java/TriangleRasterization/TriangleRasterization.html
         // general case - split the triangle in a topflat and bottom-flat one
-        const Vec2 point4{ triangleVertex1.x + ((triangleVertex2.y - triangleVertex1.y) / (triangleVertex3.y - triangleVertex1.y)) * (triangleVertex3.x - triangleVertex1.x), triangleVertex2.y };
+        const Vec2 point4{ triangleVertex1.x + ((float)(triangleVertex2.y - triangleVertex1.y) / (float)(triangleVertex3.y - triangleVertex1.y)) * (triangleVertex3.x - triangleVertex1.x), triangleVertex2.y };
 
         culling::M256I Result1, Result2;
 
