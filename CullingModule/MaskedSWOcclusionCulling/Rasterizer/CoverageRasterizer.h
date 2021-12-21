@@ -18,14 +18,14 @@ namespace culling
 		/// </summary>
 		/// <param name="coverageMask"></param>
 		/// <param name="triangle"></param>
-		FORCE_INLINE static culling::M256I FillBottomFlatTriangle(const Vec2& LeftBottomPoint, const Vec2& point1, const Vec2& point2, const Vec2& point3);
+		FORCE_INLINE static culling::M256I FillBottomFlatTriangle(const Vec2& TileLeftBottomOriginPoint, const Vec2& point1, const Vec2& point2, const Vec2& point3);
 		
 		/// <summary>
 		/// Assume TwoDTriangle intersect with mask
 		/// </summary>
 		/// <param name="coverageMask"></param>
 		/// <param name="triangle"></param>
-		FORCE_INLINE static culling::M256I FillTopFlatTriangle(const Vec2& LeftBottomPoint, const Vec2& point1, const Vec2& point2, const Vec2& point3);
+		FORCE_INLINE static culling::M256I FillTopFlatTriangle(const Vec2& TileLeftBottomOriginPoint, const Vec2& point1, const Vec2& point2, const Vec2& point3);
 
 	public:
 		/// <summary>
