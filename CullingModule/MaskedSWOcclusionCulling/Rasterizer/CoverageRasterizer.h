@@ -27,6 +27,36 @@ namespace culling
 		/// <param name="triangle"></param>
 		FORCE_INLINE static culling::M256I FillTopFlatTriangle(const Vec2& TileLeftBottomOriginPoint, const Vec2& point1, const Vec2& point2, const Vec2& point3);
 
+		/// <summary>
+		/// Assume TwoDTriangle intersect with mask
+		/// </summary>
+		/// <param name="coverageMask"></param>
+		/// <param name="triangle"></param>
+		static culling::M256I FillBottomFlatTriangleFillTriangleBatch
+		(
+			culling::M256I* const coverageMask, // 8 coverage mask. array size should be 8
+			const Vec2& LeftBottomPoint,
+			const culling::M256F* const triangleVertex1,
+			// [0] : First Vertex of Triangle, [1] : Second Vertex of Triangle, [2] : Third Vertex of Triangle
+			const culling::M256F* const triangleVertex2,
+			const culling::M256F* const triangleVertex3
+		);
+
+		/// <summary>
+		/// Assume TwoDTriangle intersect with mask
+		/// </summary>
+		/// <param name="coverageMask"></param>
+		/// <param name="triangle"></param>
+		static culling::M256I FillTopFlatTriangleFillTriangleBatch
+		(
+			culling::M256I* const coverageMask, // 8 coverage mask. array size should be 8
+			const Vec2& LeftBottomPoint,
+			const culling::M256F* const triangleVertex1,
+			// [0] : First Vertex of Triangle, [1] : Second Vertex of Triangle, [2] : Third Vertex of Triangle
+			const culling::M256F* const triangleVertex2,
+			const culling::M256F* const triangleVertex3
+		);
+
 	public:
 		/// <summary>
 		/// https://dl.acm.org/doi/pdf/10.1145/800250.807490?casa_token=alcaBmG1OpoAAAAA:a7Wktjv1YCEp-IODF_dRPbZNDVkRQxPGz67vvDGBfseW6UayupLQM8JizEuMdHT22ymouD-ExDVNPmU
@@ -44,6 +74,16 @@ namespace culling
 		);
 		static void FillTriangle(culling::Tile& tile, const Vec2& LeftBottomPoint, TwoDTriangle& triangle);
 		static void FillTriangle(culling::Tile& tile, const Vec2& LeftBottomPoint, ThreeDTriangle& triangle);
+
+		static void FillTriangleBatch
+		(
+			culling::M256I* const coverageMask, // 8 coverage mask. array size should be 8
+			const Vec2& LeftBottomPoint,
+			const culling::M256F* const triangleVertex1,
+			// [0] : First Vertex of Triangle, [1] : Second Vertex of Triangle, [2] : Third Vertex of Triangle
+			const culling::M256F* const triangleVertex2,
+			const culling::M256F* const triangleVertex3
+		);
 	};
 }
 

@@ -191,3 +191,44 @@ void culling::CoverageRasterizer::FillTriangle(culling::Tile& tile, const Vec2& 
 
 }
 
+
+culling::M256I culling::CoverageRasterizer::FillBottomFlatTriangleFillTriangleBatch
+(
+    culling::M256I* const coverageMask, // 8 coverage mask. array size should be 8
+    const culling::Vec2& LeftBottomPoint,
+    const culling::M256F* const triangleVertex1,
+    // [0] : First Vertex of Triangle, [1] : Second Vertex of Triangle, [2] : Third Vertex of Triangle
+    const culling::M256F* const triangleVertex2,
+    const culling::M256F* const triangleVertex3
+)
+{
+    return _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF);
+}
+
+culling::M256I culling::CoverageRasterizer::FillTopFlatTriangleFillTriangleBatch
+(
+    culling::M256I* const coverageMask, // 8 coverage mask. array size should be 8
+    const culling::Vec2& LeftBottomPoint,
+    const culling::M256F* const triangleVertex1,
+    // [0] : First Vertex of Triangle, [1] : Second Vertex of Triangle, [2] : Third Vertex of Triangle
+    const culling::M256F* const triangleVertex2,
+    const culling::M256F* const triangleVertex3
+)
+{
+    return _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF);
+}
+
+
+void culling::CoverageRasterizer::FillTriangleBatch
+(
+    culling::M256I* const coverageMask, // 8 coverage mask. array size should be 8
+    const culling::Vec2& LeftBottomPoint,
+    const culling::M256F* const triangleVertex1, // [0] : First Vertex of Triangle, [1] : Second Vertex of Triangle, [2] : Third Vertex of Triangle
+    const culling::M256F* const triangleVertex2,
+    const culling::M256F* const triangleVertex3
+)
+{
+
+
+
+}
