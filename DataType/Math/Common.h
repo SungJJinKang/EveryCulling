@@ -93,7 +93,7 @@ namespace culling
 	}
 
 	template <typename T>
-	void SWAP(T& a, T& b) noexcept
+	FORCE_INLINE void SWAP(T& a, T& b) noexcept
 	{
 		const T original = a;
 		a = b;

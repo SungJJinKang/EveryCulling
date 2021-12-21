@@ -45,6 +45,22 @@ namespace culling
 		}
 	}
 
+	FORCE_INLINE void SortTriangle(ThreeDTriangle& triangle)
+	{
+		if (triangle.Points[0].y < triangle.Points[1].y)
+		{
+			culling::SWAP(triangle.Points[0], triangle.Points[1]);
+		}
+		if (triangle.Points[0].y < triangle.Points[2].y)
+		{
+			culling::SWAP(triangle.Points[0], triangle.Points[2]);
+		}
+		if (triangle.Points[1].y < triangle.Points[2].y)
+		{
+			culling::SWAP(triangle.Points[1], triangle.Points[2]);
+		}
+	}
+
 	FORCE_INLINE bool IsFrontFaceOfProjectSpaceTriangle(const TwoDTriangle& triangle)
 	{
 		return PerpDot(triangle.Points[1] - triangle.Points[0], triangle.Points[2] - triangle.Points[0]) > 0;
@@ -115,7 +131,7 @@ namespace culling
 	/// </summary>
 	/// <param name="TriPointX"></param>
 	/// <param name="TriPointY"></param>
-	inline void Sort_8_2DTriangles(culling::M256F* TriPointX, culling::M256F* TriPointY)
+	FORCE_INLINE void Sort_8_2DTriangles(culling::M256F* TriPointX, culling::M256F* TriPointY)
 	{
 		culling::M256F MASK;
 
@@ -147,7 +163,7 @@ namespace culling
 	/// <param name="TriPointX">3 size array culling::M256F</param>
 	/// <param name="TriPointY">3 size array culling::M256F</param>
 	/// <param name="TriPointZ">3 size array culling::M256F</param>
-	inline void Sort_8_3DTriangles(culling::M256F* TriPointX, culling::M256F* TriPointY, culling::M256F* TriPointZ)
+	FORCE_INLINE void Sort_8_3DTriangles(culling::M256F* TriPointX, culling::M256F* TriPointY, culling::M256F* TriPointZ)
 	{
 		culling::M256F MASK;
 

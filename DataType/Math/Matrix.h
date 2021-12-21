@@ -11,22 +11,22 @@ namespace culling
 	{
 		culling::Vec4 mColumns[4];
 
-		inline Vec4& operator[](size_t index)
+		FORCE_INLINE Vec4& operator[](size_t index)
 		{
 			return mColumns[index];
 		}
 
-		inline const Vec4& operator[](size_t index) const
+		FORCE_INLINE const Vec4& operator[](size_t index) const
 		{
 			return mColumns[index];
 		}
 
-		inline float* data()
+		FORCE_INLINE float* data()
 		{
 			return mColumns[0].values;
 		}
 
-		inline const float* data() const
+		FORCE_INLINE const float* data() const
 		{
 			return mColumns[0].values;
 		}
