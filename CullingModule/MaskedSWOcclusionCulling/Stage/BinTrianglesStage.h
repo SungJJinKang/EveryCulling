@@ -25,7 +25,7 @@ namespace culling
 		/// <param name="outClipVertexY"></param>
 		/// <param name="outClipVertexZ"></param>
 		/// <param name="outClipVertexW"></param>
-		void ConvertClipSpaceToNDCSpace
+		FORCE_INLINE void ConvertClipSpaceToNDCSpace
 		(
 			culling::M256F* outClipVertexX, 
 			culling::M256F* outClipVertexY, 
@@ -40,7 +40,7 @@ namespace culling
 		/// <param name="clipspaceVertexX"></param>
 		/// <param name="clipspaceVertexY"></param>
 		/// <param name="triangleCullMask"></param>
-		void FrustumCulling
+		FORCE_INLINE void FrustumCulling
 		(
 			const culling::M256F* const clipspaceVertexX,
 			const culling::M256F* const clipspaceVertexY,
@@ -60,7 +60,8 @@ namespace culling
 		/// <param name="triangleCullMask"></param>
 		/// <param name="outScreenPixelSpaceX"></param>
 		/// <param name="outScreenPixelSpaceY"></param>
-		void ConvertNDCSpaceToScreenPixelSpace(
+		FORCE_INLINE void ConvertNDCSpaceToScreenPixelSpace
+		(
 			const culling::M256F* ndcSpaceVertexX, const culling::M256F* ndcSpaceVertexY,
 			culling::M256F* outScreenPixelSpaceX, culling::M256F* outScreenPixelSpaceY, std::uint32_t& triangleCullMask
 		);
@@ -72,7 +73,7 @@ namespace culling
 		/// <param name="vertY">three culling::M256F -> 12 floating-point value</param>
 		/// <param name="vertW">"W" !!!!!!!!! three culling::M256F -> 12 floating-point value</param>
 		/// <param name="modelToClipspaceMatrix">column major 4x4 matrix</param>
-		void TransformVertexsToClipSpace
+		FORCE_INLINE void TransformVertexsToClipSpace
 		(
 			culling::M256F* outClipVertexX, 
 			culling::M256F* outClipVertexY, 
@@ -89,7 +90,7 @@ namespace culling
 		/// <param name="screenPixelX"></param>
 		/// <param name="screenPixelY"></param>
 		/// <param name="triangleCullMask"></param>
-		void CullBackfaces(const culling::M256F* screenPixelX, const culling::M256F* screenPixelY, std::uint32_t& triangleCullMask);
+		FORCE_INLINE void BackfaceCulling(const culling::M256F* screenPixelX, const culling::M256F* screenPixelY, std::uint32_t& triangleCullMask);
 
 		
 		
@@ -105,7 +106,7 @@ namespace culling
 		/// <param name="outBinBoundingBoxMinY">MinY of bounding box intersecting with 8 Triangles, Not Index. ex) 0, 32, 64, ..</param>
 		/// <param name="outBinBoundingBoxMaxX">MaxX of bounding box intersecting with 8 Triangles, Not Index. ex) 0, 32, 64, ..</param>
 		/// <param name="outBinBoundingBoxMaxY">MaxY of bounding box intersecting with 8 Triangles, Not Index. ex) 0, 32, 64, ..</param>
-		void ComputeBinBoundingBox
+		FORCE_INLINE void ComputeBinBoundingBox
 		(
 			const culling::M256F* screenPixelX,
 			const culling::M256F* screenPixelY,
@@ -115,7 +116,7 @@ namespace culling
 			culling::M256I& outBinBoundingBoxMaxY
 		);
 
-		void PassTrianglesToTileBin
+		FORCE_INLINE void PassTrianglesToTileBin
 		(
 			const culling::M256F* screenPixelPosX,
 			const culling::M256F* screenPixelPosY,
@@ -127,23 +128,7 @@ namespace culling
 			const culling::M256I& outBinBoundingBoxMaxX,
 			const culling::M256I& outBinBoundingBoxMaxY
 		);
-
-		/*inline float GetAreaOfTriangle(const TwoDTriangle& triangle)
-		{
-
-		}
-
-		inline float GetAreaOfAAABB(const AABB& worldAABB)
-		{
-
-		}*/
-
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// Binning Triangles to Tile(Sub Tile)
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
+		
 
 		/// <summary>
 		/// Gather Vertex from VertexList with IndiceList
@@ -170,7 +155,7 @@ namespace culling
 		/// <param name="outVerticesX"></param>
 		/// <param name="outVerticesY"></param>
 		/// <param name="triangleCullMask"></param>
-		void GatherVertices
+		FORCE_INLINE void GatherVertices
 		(
 			const float* const vertices,
 			const size_t verticeCount,
@@ -198,7 +183,7 @@ namespace culling
 		/// --> vertexStride is 6 * 4(float)
 		/// </param>
 		/// <param name="modelToClipspaceMatrix"></param>
-		void BinTriangles
+		FORCE_INLINE void BinTriangles
 		(
 			const float* const vertices,
 			const size_t verticeCount,
@@ -208,7 +193,7 @@ namespace culling
 			const float* const modelToClipspaceMatrix
 		);
 
-		void ConvertToPlatformDepth(culling::M256F* const depth);
+		FORCE_INLINE void ConvertToPlatformDepth(culling::M256F* const depth);
 
 	public:
 

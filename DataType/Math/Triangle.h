@@ -29,7 +29,7 @@ namespace culling
 	/// Point1 is TopMost Vec2
 	/// </summary>
 	/// <param name="triangle"></param>
-	inline void SortTriangle(TwoDTriangle& triangle)
+	FORCE_INLINE void SortTriangle(TwoDTriangle& triangle)
 	{
 		if (triangle.Points[0].y < triangle.Points[1].y)
 		{
@@ -45,7 +45,7 @@ namespace culling
 		}
 	}
 
-	inline bool IsFrontFaceOfProjectSpaceTriangle(const TwoDTriangle& triangle)
+	FORCE_INLINE bool IsFrontFaceOfProjectSpaceTriangle(const TwoDTriangle& triangle)
 	{
 		return PerpDot(triangle.Points[1] - triangle.Points[0], triangle.Points[2] - triangle.Points[0]) > 0;
 		/*
@@ -78,20 +78,25 @@ namespace culling
 	/// <param name="vertexX"></param>
 	/// <param name="vertexY"></param>
 	/// <returns></returns>
-	inline culling::M128F IsFrontFaceOfPerspectiveSpaceTrianglesSIMD(const culling::M128F* verticesX, const culling::M128F* verticesY)
+	FORCE_INLINE std::uint32_t TestTrianglesIsFrontFaceUsingSIMD
+	(
+		const culling::M256F* const verticesX,
+		const culling::M256F* const verticesY
+	)
 	{
-		/*
-		//triangle should be in projection space
-		(v1x - v0x)(v2y - v0y) - (v1y - v0y)(v2x - v0x)
-		==
-		(v1x - v0x) * (v2y - v0y) - (v0x - v2x) * (v0y - v1y)
-		// Perform backface test.
-		*/
-		const culling::M128F triArea1 = culling::M128F_MUL(culling::M128F_SUB(verticesX[1], verticesX[0]), culling::M128F_SUB(verticesY[2], verticesY[0]));
-		const culling::M128F triArea2 = culling::M128F_MUL(culling::M128F_SUB(verticesX[0], verticesX[2]), culling::M128F_SUB(verticesY[0], verticesY[1]));
-		const culling::M128F triArea = culling::M128F_SUB(triArea1, triArea2);
-		const culling::M128F ccwMask = _mm_cmpgt_ps(triArea, culling::M128F_Zero);
-		return ccwMask;
+		//I don't know How this Works.........
+		//https://stackoverflow.com/questions/67357115/i-found-back-face-culling-code-but-i-cant-know-how-this-works
+		const culling::M256F triArea1 = culling::M256F_MUL(culling::M256F_SUB(verticesX[1], verticesX[0]), culling::M256F_SUB(verticesY[2], verticesY[0]));
+		const culling::M256F triArea2 = culling::M256F_MUL(culling::M256F_SUB(verticesX[0], verticesX[2]), culling::M256F_SUB(verticesY[0], verticesY[1]));
+		const culling::M256F triArea = culling::M256F_SUB(triArea1, triArea2);
+		
+		//_CMP_GT_OQ vs _CMP_GT_OQ : https://stackoverflow.com/questions/16988199/how-to-choose-avx-compare-predicate-variants
+		const culling::M256F ccwMask = _mm256_cmp_ps(triArea, _mm256_set1_ps(0.0f), _CMP_GT_OQ);
+
+		//Set each bit of mask dst based on the most significant bit of the corresponding packed single-precision (32-bit) floating-point element in a.
+		//https://software.intel.com/sites/landingpage/IntrinsicsGuide/#techs=SSE,SSE2,SSE3,SSSE3,SSE4_1,SSE4_2,AVX&expand=2156,4979,4979,1731,4929,951,4979,3869&text=movemask
+		//if second triangle is front facing, low second bit of triangleCullMask is 1
+		return static_cast<std::uint32_t>(_mm256_movemask_ps(ccwMask));
 	}
 
 	

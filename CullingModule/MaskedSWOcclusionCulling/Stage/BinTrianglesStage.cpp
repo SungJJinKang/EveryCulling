@@ -3,7 +3,7 @@
 
 #include "../SWDepthBuffer.h"
 
-void culling::BinTrianglesStage::ConvertClipSpaceToNDCSpace
+FORCE_INLINE void culling::BinTrianglesStage::ConvertClipSpaceToNDCSpace
 (
 	culling::M256F* outClipVertexX, 
 	culling::M256F* outClipVertexY, 
@@ -29,7 +29,7 @@ void culling::BinTrianglesStage::ConvertClipSpaceToNDCSpace
 
 #define CONVERT_TO_M256I(_M256F) *reinterpret_cast<const culling::M256I*>(&_M256F)
 
-void culling::BinTrianglesStage::FrustumCulling
+FORCE_INLINE void culling::BinTrianglesStage::FrustumCulling
 (
 	const culling::M256F* const clipspaceVertexX,
 	const culling::M256F* const clipspaceVertexY,
@@ -59,11 +59,9 @@ void culling::BinTrianglesStage::FrustumCulling
 	const culling::M256I verticesInFrustum = _mm256_or_si256(_mm256_or_si256(*reinterpret_cast<const culling::M256I*>(&pointAInFrustum), *reinterpret_cast<const culling::M256I*>(&pointBInFrustum)), *reinterpret_cast<const culling::M256I*>(&pointCInFrustum));
 
 	triangleCullMask &= _mm256_movemask_ps(*reinterpret_cast<const culling::M256F*>(&verticesInFrustum));
-	// TODO : implement FrustumCulling
-	// if any vertex of triangle is in -W ~ W, it's not culled
 }
 
-void culling::BinTrianglesStage::ConvertNDCSpaceToScreenPixelSpace
+FORCE_INLINE void culling::BinTrianglesStage::ConvertNDCSpaceToScreenPixelSpace
 (
 	const culling::M256F* ndcSpaceVertexX, 
 	const culling::M256F* ndcSpaceVertexY,
@@ -100,7 +98,7 @@ void culling::BinTrianglesStage::ConvertNDCSpaceToScreenPixelSpace
 
 }
 
-void culling::BinTrianglesStage::TransformVertexsToClipSpace
+FORCE_INLINE void culling::BinTrianglesStage::TransformVertexsToClipSpace
 (
 	culling::M256F* outClipVertexX, 
 	culling::M256F* outClipVertexY, 
@@ -131,26 +129,14 @@ void culling::BinTrianglesStage::TransformVertexsToClipSpace
 	}
 }
 
-void culling::BinTrianglesStage::CullBackfaces
+FORCE_INLINE void culling::BinTrianglesStage::BackfaceCulling
 (
 	const culling::M256F* screenPixelX, 
 	const culling::M256F* screenPixelY, 
 	std::uint32_t& triangleCullMask
 )
 {
-	//I don't know How this Works.........
-	//https://stackoverflow.com/questions/67357115/i-found-back-face-culling-code-but-i-cant-know-how-this-works
-	const culling::M256F triArea1 = culling::M256F_MUL(culling::M256F_SUB(screenPixelX[1], screenPixelX[0]), culling::M256F_SUB(screenPixelY[2], screenPixelY[0]));
-	const culling::M256F triArea2 = culling::M256F_MUL(culling::M256F_SUB(screenPixelX[0], screenPixelX[2]), culling::M256F_SUB(screenPixelY[0], screenPixelY[1]));
-	const culling::M256F triArea = culling::M256F_SUB(triArea1, triArea2);
-
-	//_CMP_GT_OQ vs _CMP_GT_OQ : https://stackoverflow.com/questions/16988199/how-to-choose-avx-compare-predicate-variants
-	const culling::M256F ccwMask = _mm256_cmp_ps(triArea, _mm256_set1_ps(0.0f), _CMP_GT_OQ);
-
-	//Set each bit of mask dst based on the most significant bit of the corresponding packed single-precision (32-bit) floating-point element in a.
-	//https://software.intel.com/sites/landingpage/IntrinsicsGuide/#techs=SSE,SSE2,SSE3,SSSE3,SSE4_1,SSE4_2,AVX&expand=2156,4979,4979,1731,4929,951,4979,3869&text=movemask
-	//if second triangle is front facing, low second bit of triangleCullMask is 1
-	triangleCullMask &= static_cast<std::uint32_t>(_mm256_movemask_ps(ccwMask));
+	triangleCullMask &= culling::TestTrianglesIsFrontFaceUsingSIMD(screenPixelX, screenPixelY);
 }
 
 void culling::BinTrianglesStage::ComputeBinBoundingBox
@@ -204,7 +190,7 @@ void culling::BinTrianglesStage::ComputeBinBoundingBox
 }
 
 
-void culling::BinTrianglesStage::PassTrianglesToTileBin
+FORCE_INLINE void culling::BinTrianglesStage::PassTrianglesToTileBin
 (
 	const culling::M256F* screenPixelPosX,
 	const culling::M256F* screenPixelPosY,
@@ -270,7 +256,7 @@ void culling::BinTrianglesStage::PassTrianglesToTileBin
 
 
 
-void culling::BinTrianglesStage::GatherVertices
+FORCE_INLINE void culling::BinTrianglesStage::GatherVertices
 (
 	const float* const vertices,
 	const size_t verticeCount,
@@ -345,7 +331,7 @@ void culling::BinTrianglesStage::GatherVertices
 	}
 }
 
-void culling::BinTrianglesStage::ConvertToPlatformDepth(culling::M256F* const depth)
+FORCE_INLINE void culling::BinTrianglesStage::ConvertToPlatformDepth(culling::M256F* const depth)
 {
 
 #if (NDC_RANGE == MINUS_ONE_TO_POSITIVE_ONE)
@@ -414,7 +400,7 @@ void culling::BinTrianglesStage::CullBlockEntityJob(const size_t cameraIndex)
 	}
 }
 
-void culling::BinTrianglesStage::BinTriangles
+FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 (
 	const float* const vertices, 
 	const size_t verticeCount,
@@ -506,7 +492,7 @@ void culling::BinTrianglesStage::BinTriangles
 
 		//BackFace Cull
 		// 
-		CullBackfaces(screenPixelPosX, screenPixelPosY, triangleCullMask);
+		BackfaceCulling(screenPixelPosX, screenPixelPosY, triangleCullMask);
 
 		//Do not Sort Triangle in binning stage
 		//because Culled triangles is also sorted
