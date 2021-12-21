@@ -32,9 +32,9 @@ namespace culling
 		/// </summary>
 		/// <param name="coverageMask"></param>
 		/// <param name="triangle"></param>
-		static culling::M256I FillBottomFlatTriangleFillTriangleBatch
+		static void FillBottomFlatTriangleBatch
 		(
-			culling::M256I* const coverageMask, // 8 coverage mask. array size should be 8
+			culling::M256I* const outCoverageMask, // 8 coverage mask. array size should be 8
 			const Vec2& LeftBottomPoint,
 			const culling::M256F* const triangleVertex1,
 			// [0] : First Vertex of Triangle, [1] : Second Vertex of Triangle, [2] : Third Vertex of Triangle
@@ -47,9 +47,9 @@ namespace culling
 		/// </summary>
 		/// <param name="coverageMask"></param>
 		/// <param name="triangle"></param>
-		static culling::M256I FillTopFlatTriangleFillTriangleBatch
+		static void FillTopFlatTriangleBatch
 		(
-			culling::M256I* const coverageMask, // 8 coverage mask. array size should be 8
+			culling::M256I* const outCoverageMask, // 8 coverage mask. array size should be 8
 			const Vec2& LeftBottomPoint,
 			const culling::M256F* const triangleVertex1,
 			// [0] : First Vertex of Triangle, [1] : Second Vertex of Triangle, [2] : Third Vertex of Triangle
@@ -67,7 +67,7 @@ namespace culling
 		static void FillTriangle
 		(
 			culling::Tile& tile, 
-			const Vec2& LeftBottomPoint, 
+			const Vec2& TileLeftBottomOriginPoint, 
 			const culling::Vec2& triangleVertex1,
 			const culling::Vec2& triangleVertex2,
 			const culling::Vec2& triangleVertex3
@@ -77,7 +77,7 @@ namespace culling
 
 		static void FillTriangleBatch
 		(
-			culling::M256I* const coverageMask, // 8 coverage mask. array size should be 8
+			culling::M256I* const outCoverageMask, // 8 coverage mask. array size should be 8
 			const Vec2& LeftBottomPoint,
 			const culling::M256F* const triangleVertex1,
 			// [0] : First Vertex of Triangle, [1] : Second Vertex of Triangle, [2] : Third Vertex of Triangle
