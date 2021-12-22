@@ -187,8 +187,8 @@ void culling::BinTrianglesStage::ComputeBinBoundingBox
 
 	outBinBoundingBoxMinX = _mm256_and_si256(minScreenPixelX, WIDTH_MASK);
 	outBinBoundingBoxMinY = _mm256_and_si256(minScreenPixelY, HEIGHT_MASK);
-	outBinBoundingBoxMaxX = _mm256_and_si256(_mm256_add_epi32(maxScreenPixelX, _mm256_set1_epi32(TILE_WIDTH)), WIDTH_MASK);
-	outBinBoundingBoxMaxY = _mm256_and_si256(_mm256_add_epi32(maxScreenPixelY, _mm256_set1_epi32(TILE_HEIGHT)), HEIGHT_MASK);
+	outBinBoundingBoxMaxX = _mm256_and_si256(maxScreenPixelX, WIDTH_MASK);
+	outBinBoundingBoxMaxY = _mm256_and_si256(maxScreenPixelY, HEIGHT_MASK);
 	
 	outBinBoundingBoxMinX = _mm256_min_epi32(_mm256_set1_epi32(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mRightTopTileOrginX), _mm256_max_epi32(outBinBoundingBoxMinX, _mm256_set1_epi32(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mLeftBottomTileOrginX)));
 	outBinBoundingBoxMinY = _mm256_min_epi32(_mm256_set1_epi32(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mRightTopTileOrginY), _mm256_max_epi32(outBinBoundingBoxMinY, _mm256_set1_epi32(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mLeftBottomTileOrginY)));
@@ -237,9 +237,9 @@ FORCE_INLINE void culling::BinTrianglesStage::PassTrianglesToTileBin
 			assert(endBoxIndexX >= 0 && endBoxIndexX <= mMaskedOcclusionCulling->mDepthBuffer.mResolution.mColumnCount);
 			assert(endBoxIndexY >= 0 && endBoxIndexY <= mMaskedOcclusionCulling->mDepthBuffer.mResolution.mRowCount);
 
-			for (size_t y = startBoxIndexY; y < endBoxIndexY; y++)
+			for (size_t y = startBoxIndexY; y <= endBoxIndexY; y++)
 			{
-				for (size_t x = startBoxIndexX; x < endBoxIndexX; x++)
+				for (size_t x = startBoxIndexX; x <= endBoxIndexX; x++)
 				{
 					Tile* const targetTile = mMaskedOcclusionCulling->mDepthBuffer.GetTile(y, x);
 
