@@ -3,8 +3,8 @@
 #include <cmath>
 #include <limits>
 
-#define DEFAULT_COVERAGEMASK_FLAT_FACE_X_OFFSET (32.0f + 16.0f) // ((float)(TILE_WIDTH * 2.0f) - 1.0f)
-#define DEFAULT_COVERAGEMASK_FLAT_FACE_Y_OFFSET (1.1f) // ((float)(TILE_WIDTH * 2.0f) - 1.0f)
+#define DEFAULT_COVERAGEMASK_FLAT_FACE_X_OFFSET (TILE_WIDTH) // ((float)(TILE_WIDTH * 2.0f) - 1.0f)
+#define DEFAULT_COVERAGEMASK_FLAT_FACE_Y_OFFSET (0.0f) // ((float)(TILE_WIDTH * 2.0f) - 1.0f)
 
 FORCE_INLINE culling::M256I culling::CoverageRasterizer::FillBottomFlatTriangle
 (
