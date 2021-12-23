@@ -5,7 +5,17 @@ void culling::HizData::Reset()
 	depthPosition = _mm256_set1_epi32(0);
 	l0MaxDepthValue = _mm256_set1_ps(1.0f);
 	l1MaxDepthValue = _mm256_set1_ps(1.0f);
+	ClearCoverageMask();
+}
+
+void culling::HizData::ClearCoverageMask()
+{
 	l1CoverageMask = _mm256_setzero_si256();
+}
+
+void culling::HizData::FillCoverageMask()
+{
+	l1CoverageMask = _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF);
 }
 
 void culling::TriangleList::Reset()

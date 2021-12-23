@@ -61,6 +61,8 @@ namespace culling
 		culling::M256I l1CoverageMask;
 
 		void Reset();
+		void ClearCoverageMask();
+		void FillCoverageMask();
 	};
 	
 	/// <summary>
