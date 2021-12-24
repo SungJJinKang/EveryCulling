@@ -303,13 +303,13 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 			
 		}
 
-		/*
+		
 		// for coverage mask testing
 		for (size_t triangleIndex = triangleBatchIndex; triangleIndex < triangleBatchIndex + 8 && triangleIndex < tile->mBinnedTriangles.mCurrentTriangleCount; triangleIndex++)
 		{
 			tile->mHizDatas.l1CoverageMask = _mm256_or_si256(tile->mHizDatas.l1CoverageMask, CoverageMask[triangleIndex - triangleBatchIndex]);
 		}
-		*/
+		
 
 		// algo : if coverage mask is full, overrite tile->mHizDatas.l1MaxDepthValue to tile->mHizDatas.lMaxDepthValue and clear coverage mask
 	}

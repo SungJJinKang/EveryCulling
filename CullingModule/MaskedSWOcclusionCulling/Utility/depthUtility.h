@@ -21,6 +21,14 @@ namespace culling
 			culling::M256F& outZPixelDy
 		)
 		{
+			//Point2, 3 should be located at same y
+
+#ifdef DEBUG_CULLING
+			const culling::M256F LE_23Y = _mm256_cmp_ps(vertexPoint1Y, vertexPoint2Y, _CMP_EQ_OQ);
+
+			assert(_mm256_testc_si256(*reinterpret_cast<const culling::M256I*>(&LE_23Y), _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF)) == 1);
+#endif
+
 			const culling::M256F x2 = culling::M256F_SUB(vertexPoint3X, vertexPoint1X);
 			const culling::M256F x1 = culling::M256F_SUB(vertexPoint2X, vertexPoint1X);
 			const culling::M256F y1 = culling::M256F_SUB(vertexPoint2Y, vertexPoint1Y);
