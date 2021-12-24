@@ -111,8 +111,8 @@ void culling::DepthValueComputer::ComputeFlatTopDepthValue
 		vertexPoint1X,
 		vertexPoint1Y,
 		vertexPoint1Z,
-		vertexPoint2X,
 
+		vertexPoint2X,
 		vertexPoint2Y,
 		vertexPoint2Z,
 

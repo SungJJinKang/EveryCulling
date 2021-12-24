@@ -80,6 +80,7 @@ namespace culling
 		void ClearCoverageMaskAllSubTile();
 		FORCE_INLINE void ClearCoverageMask(const size_t subTileIndex)
 		{
+			assert(subTileIndex < 8);
 			(reinterpret_cast<std::uint32_t*>(&l1CoverageMask))[subTileIndex] = 0x00000000;
 		}
 		void FillCoverageMask();
@@ -91,6 +92,7 @@ namespace culling
 
 		FORCE_INLINE void ClearL1MaxDepthValue(const size_t subTileIndex)
 		{
+			assert(subTileIndex < 8);
 			(reinterpret_cast<std::uint32_t*>(&l1MaxDepthValue))[subTileIndex] = 0x00000000;
 		}
 
@@ -127,6 +129,7 @@ namespace culling
 		/// <returns></returns>
 		FORCE_INLINE bool IsCoverageMaskFullByOne(const size_t subTileIndex) const
 		{
+			assert(subTileIndex < 8);
 			return reinterpret_cast<const std::uint32_t*>(&l1CoverageMask)[subTileIndex] == 0xFFFFFFFF;
 		}
 		
