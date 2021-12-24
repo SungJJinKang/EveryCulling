@@ -61,8 +61,21 @@ namespace culling
 		culling::M256I l1CoverageMask;
 
 		void Reset();
+
 		void ClearCoverageMask();
 		void FillCoverageMask();
+
+		FORCE_INLINE void ClearL1MaxDepthValue()
+		{
+			l1MaxDepthValue = _mm256_set1_ps(0.0f);
+		}
+
+		FORCE_INLINE bool IsCoverageMaskFullByOne() const
+		{
+			return _mm256_testc_si256(tile->mHizDatas.l1CoverageMask, _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF)) == 1;
+		}
+		
+
 	};
 	
 	/// <summary>
