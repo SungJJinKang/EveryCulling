@@ -24,14 +24,14 @@ FORCE_INLINE culling::M256I culling::CoverageRasterizer::FillBottomFlatTriangle
     const float inverseSlope1 = (float)(point2.x - point1.x) / (point2.y - point1.y);
     const float inverseSlope2 = (float)(point3.x - point1.x) / (point3.y - point1.y);
 
-    const float curx1 = point1.x + (TileLeftBottomOriginPoint.y - point1.y) * inverseSlope1 - TileLeftBottomOriginPoint.x - floatFaceXOffset;
-    const float curx2 = point1.x + (TileLeftBottomOriginPoint.y - point1.y) * inverseSlope2 - TileLeftBottomOriginPoint.x + floatFaceXOffset;
+    const float curx1 = point1.x + (TileLeftBottomOriginPoint.y + 0.5f - point1.y) * inverseSlope1 - TileLeftBottomOriginPoint.x + 0.5f - floatFaceXOffset;
+    const float curx2 = point1.x + (TileLeftBottomOriginPoint.y + 0.5f - point1.y) * inverseSlope2 - TileLeftBottomOriginPoint.x + 0.5f + floatFaceXOffset;
 
-    const culling::M256F leftFaceEventFloat = _mm256_floor_ps(_mm256_set_ps(curx1 + inverseSlope1 * 7.0f, curx1 + inverseSlope1 * 6.0f, curx1 + inverseSlope1 * 5.0f, curx1 + inverseSlope1 * 4.0f, curx1 + inverseSlope1 * 3.0f, curx1 + inverseSlope1 * 2.0f, curx1 + inverseSlope1 * 1.0f, curx1));
+    const culling::M256F leftFaceEventFloat = _mm256_round_ps(_mm256_set_ps(curx1, curx1 + inverseSlope1 * 1.0f, curx1 + inverseSlope1 * 2.0f, curx1 + inverseSlope1 * 3.0f, curx1 + inverseSlope1 * 4.0f, curx1 + inverseSlope1 * 5.0f, curx1 + inverseSlope1 * 6.0f, curx1 + inverseSlope1 * 7.0f), (_MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC));
     culling::M256I leftFaceEvent = _mm256_cvtps_epi32(leftFaceEventFloat);
     leftFaceEvent = _mm256_max_epi32(leftFaceEvent, _mm256_set1_epi32(0));
-    
-    const culling::M256F rightFaceEventFloat = _mm256_ceil_ps(_mm256_set_ps(curx2 + inverseSlope2 * 7.0f, curx2 + inverseSlope2 * 6.0f, curx2 + inverseSlope2 * 5.0f, curx2 + inverseSlope2 * 4.0f, curx2 + inverseSlope2 * 3.0f, curx2 + inverseSlope2 * 2.0f, curx2 + inverseSlope2 * 1.0f, curx2 ));
+
+    const culling::M256F rightFaceEventFloat = _mm256_round_ps(_mm256_set_ps(curx2, curx2 + inverseSlope2 * 1.0f, curx2 + inverseSlope2 * 2.0f, curx2 + inverseSlope2 * 3.0f, curx2 + inverseSlope2 * 4.0f, curx2 + inverseSlope2 * 5.0f, curx2 + inverseSlope2 * 6.0f, curx2 + inverseSlope2 * 7.0f), (_MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC));
     culling::M256I rightFaceEvent = _mm256_cvtps_epi32(rightFaceEventFloat);
     rightFaceEvent = _mm256_max_epi32(rightFaceEvent, _mm256_set1_epi32(0));
 
@@ -65,14 +65,14 @@ FORCE_INLINE culling::M256I culling::CoverageRasterizer::FillTopFlatTriangle
     const float inverseSlope1 = (float)(point1.x - point3.x) / (point1.y - point3.y);
     const float inverseSlope2 = (float)(point2.x - point3.x) / (point2.y - point3.y);
 
-    const float curx1 = point3.x + (TileLeftBottomOriginPoint.y - point3.y) * inverseSlope1 - TileLeftBottomOriginPoint.x - floatFaceXOffset;
-    const float curx2 = point3.x + (TileLeftBottomOriginPoint.y - point3.y) * inverseSlope2 - TileLeftBottomOriginPoint.x + floatFaceXOffset;
+    const float curx1 = point3.x + (TileLeftBottomOriginPoint.y + 0.5f - point3.y) * inverseSlope1 - TileLeftBottomOriginPoint.x + 0.5f - floatFaceXOffset;
+    const float curx2 = point3.x + (TileLeftBottomOriginPoint.y + 0.5f - point3.y) * inverseSlope2 - TileLeftBottomOriginPoint.x + 0.5f + floatFaceXOffset;
 
-    const culling::M256F leftFaceEventFloat = _mm256_floor_ps(_mm256_set_ps(curx1, curx1 + inverseSlope1 * 1.0f, curx1 + inverseSlope1 * 2.0f, curx1 + inverseSlope1 * 3.0f, curx1 + inverseSlope1 * 4.0f, curx1 + inverseSlope1 * 5.0f, curx1 + inverseSlope1 * 6.0f, curx1 + inverseSlope1 * 7.0f));
+    const culling::M256F leftFaceEventFloat = _mm256_round_ps(_mm256_set_ps(curx1, curx1 + inverseSlope1 * 1.0f, curx1 + inverseSlope1 * 2.0f, curx1 + inverseSlope1 * 3.0f, curx1 + inverseSlope1 * 4.0f, curx1 + inverseSlope1 * 5.0f, curx1 + inverseSlope1 * 6.0f, curx1 + inverseSlope1 * 7.0f), (_MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC));
     culling::M256I leftFaceEvent = _mm256_cvtps_epi32(leftFaceEventFloat);
     leftFaceEvent = _mm256_max_epi32(leftFaceEvent, _mm256_set1_epi32(0));
 
-    const culling::M256F rightFaceEventFloat = _mm256_ceil_ps(_mm256_set_ps(curx2, curx2 + inverseSlope2 * 1.0f, curx2 + inverseSlope2 * 2.0f, curx2 + inverseSlope2 * 3.0f, curx2 + inverseSlope2 * 4.0f, curx2 + inverseSlope2 * 5.0f, curx2 + inverseSlope2 * 6.0f, curx2 + inverseSlope2 * 7.0f));
+    const culling::M256F rightFaceEventFloat = _mm256_round_ps(_mm256_set_ps(curx2, curx2 + inverseSlope2 * 1.0f, curx2 + inverseSlope2 * 2.0f, curx2 + inverseSlope2 * 3.0f, curx2 + inverseSlope2 * 4.0f, curx2 + inverseSlope2 * 5.0f, curx2 + inverseSlope2 * 6.0f, curx2 + inverseSlope2 * 7.0f), (_MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC));
     culling::M256I rightFaceEvent = _mm256_cvtps_epi32(rightFaceEventFloat);
     rightFaceEvent = _mm256_max_epi32(rightFaceEvent, _mm256_set1_epi32(0));
 
