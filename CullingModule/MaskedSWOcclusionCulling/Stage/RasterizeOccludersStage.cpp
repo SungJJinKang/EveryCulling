@@ -2,7 +2,7 @@
 
 #include "../MaskedSWOcclusionCulling.h"
 #include "../Utility/CoverageRasterizer.h"
-
+#include "../Utility/DepthValueComputer.h"
 
 void culling::RasterizeOccludersStage::UpdateHierarchicalDepthBuffer()
 {
@@ -88,22 +88,43 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 			*reinterpret_cast<culling::M256F*>(&(tile->mBinnedTriangles.VertexX[2][triangleBatchIndex])),
 			*reinterpret_cast<culling::M256F*>(&(tile->mBinnedTriangles.VertexY[2][triangleBatchIndex]))
 		);
-
+		
+		/*
 		for(size_t triangleIndex = triangleBatchIndex ; triangleIndex < triangleBatchIndex + 8 && triangleIndex < tile->mBinnedTriangles.mCurrentTriangleCount ; triangleIndex++)
 		{
 			tile->mHizDatas.l1CoverageMask = _mm256_or_si256(tile->mHizDatas.l1CoverageMask, CoverageMask[triangleIndex - triangleBatchIndex]);
 		}
+		*/
+		culling::M256F subTileMaxDepth[8];
+
+		culling::DepthValueComputer::ComputeDepthValue
+		(
+			subTileMaxDepth,
+			tile->GetLeftBottomTileOrginX(),
+			tile->GetLeftBottomTileOrginY(),
+			*reinterpret_cast<culling::M256F*>(&(tile->mBinnedTriangles.VertexX[0][triangleBatchIndex])),
+			*reinterpret_cast<culling::M256F*>(&(tile->mBinnedTriangles.VertexY[0][triangleBatchIndex])),
+			*reinterpret_cast<culling::M256F*>(&(tile->mBinnedTriangles.VertexZ[0][triangleBatchIndex])),
+			*reinterpret_cast<culling::M256F*>(&(tile->mBinnedTriangles.VertexX[1][triangleBatchIndex])),
+			*reinterpret_cast<culling::M256F*>(&(tile->mBinnedTriangles.VertexY[1][triangleBatchIndex])),
+			*reinterpret_cast<culling::M256F*>(&(tile->mBinnedTriangles.VertexZ[1][triangleBatchIndex])),
+			*reinterpret_cast<culling::M256F*>(&(tile->mBinnedTriangles.VertexX[2][triangleBatchIndex])),
+			*reinterpret_cast<culling::M256F*>(&(tile->mBinnedTriangles.VertexY[2][triangleBatchIndex])),
+			*reinterpret_cast<culling::M256F*>(&(tile->mBinnedTriangles.VertexZ[2][triangleBatchIndex]))
+		);
 
 
-		//Snap Screen Space Coordinates To Integer Coordinate In ScreenBuffer(or DepthBuffer)
+		for (size_t triangleIndex = triangleBatchIndex; triangleIndex < triangleBatchIndex + 8 && triangleIndex < tile->mBinnedTriangles.mCurrentTriangleCount; triangleIndex++)
+		{
+			CoverageMask[triangleIndex] = ShuffleCoverageMask(CoverageMask[triangleIndex]);
 
-		//A grid square, including its (x, y) window coordinates, z (depth), and associated data which may be added by fragment shaders, is called a fragment. A
-		//fragment is located by its lower left corner, which lies on integer grid coordinates.
-		//Rasterization operations also refer to a fragment��s center, which is offset by ( 1/2, 1/2 )
-		//from its lower left corner(and so lies on half - integer coordinates).
+
+		}
+		
+		// algo : if coverage mask is full, overrite tile->mHizDatas.l1MaxDepthValue to tile->mHizDatas.lMaxDepthValue and clear coverage mask
 	}
 	
-	tile->mHizDatas.l1CoverageMask = ShuffleCoverageMask(tile->mHizDatas.l1CoverageMask);
+	
 
 
 	
