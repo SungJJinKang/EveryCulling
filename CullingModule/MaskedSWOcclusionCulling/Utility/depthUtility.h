@@ -27,9 +27,9 @@ namespace culling
 			const culling::M256F y2 = culling::M256F_SUB(vertexPoint3Y, vertexPoint1Y);
 			const culling::M256F z1 = culling::M256F_SUB(vertexPoint2Z, vertexPoint1Z);
 			const culling::M256F z2 = culling::M256F_SUB(vertexPoint3Z, vertexPoint1Z);
-			const culling::M256F d = culling::M256F_DIV(_mm256_set1_ps(1.0f), culling::M256F_SUB(culling::M256F_MUL(x1, y2), culling::M256F_MUL(y1, x2)));
-			outZPixelDx = culling::M256F_MUL(culling::M256F_SUB(culling::M256F_MUL(z1, y2), culling::M256F_MUL(y1, z2)), d);
-			outZPixelDy = culling::M256F_MUL(culling::M256F_SUB(culling::M256F_MUL(x1, z2), culling::M256F_MUL(z1, x2)), d);
+			const culling::M256F d = culling::M256F_DIV(_mm256_set1_ps(1.0f), _mm256_fmsub_ps(x1, y2, culling::M256F_MUL(y1, x2)));
+			outZPixelDx = culling::M256F_MUL(_mm256_fmsub_ps(z1, y2, culling::M256F_MUL(y1, z2)), d);
+			outZPixelDy = culling::M256F_MUL(_mm256_fmsub_ps(x1, z2, culling::M256F_MUL(z1, x2)), d);
 		}
 	}
 }

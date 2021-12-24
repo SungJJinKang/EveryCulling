@@ -221,24 +221,24 @@ FORCE_INLINE void culling::BinTrianglesStage::PassTrianglesToTileBin
 	{
 		if ((triangleCullMask & (1 << triangleIndex)) != 0x00000000)
 		{
-			const size_t intersectingMinBoxX = (reinterpret_cast<const INT32*>(&outBinBoundingBoxMinX))[triangleIndex]; // this is screen space coordinate
-			const size_t intersectingMinBoxY = (reinterpret_cast<const INT32*>(&outBinBoundingBoxMinY))[triangleIndex];
-			const size_t intersectingMaxBoxX = (reinterpret_cast<const INT32*>(&outBinBoundingBoxMaxX))[triangleIndex];
-			const size_t intersectingMaxBoxY = (reinterpret_cast<const INT32*>(&outBinBoundingBoxMaxY))[triangleIndex];
+			const int intersectingMinBoxX = (reinterpret_cast<const int*>(&outBinBoundingBoxMinX))[triangleIndex]; // this is screen space coordinate
+			const int intersectingMinBoxY = (reinterpret_cast<const int*>(&outBinBoundingBoxMinY))[triangleIndex];
+			const int intersectingMaxBoxX = (reinterpret_cast<const int*>(&outBinBoundingBoxMaxX))[triangleIndex];
+			const int intersectingMaxBoxY = (reinterpret_cast<const int*>(&outBinBoundingBoxMaxY))[triangleIndex];
 
 			assert(intersectingMinBoxX <= intersectingMaxBoxX);
 			assert(intersectingMinBoxY <= intersectingMaxBoxY);
 
-			const int startBoxIndexX = MIN(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mColumnCount - 1, intersectingMinBoxX / TILE_WIDTH);
-			const int startBoxIndexY = MIN(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mRowCount - 1, intersectingMinBoxY / TILE_HEIGHT);
-			const int endBoxIndexX = MIN(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mColumnCount - 1, intersectingMaxBoxX / TILE_WIDTH);
-			const int endBoxIndexY = MIN(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mRowCount - 1, intersectingMaxBoxY / TILE_HEIGHT);
+			const int startBoxIndexX = MIN((int)(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mColumnCount - 1), intersectingMinBoxX / TILE_WIDTH);
+			const int startBoxIndexY = MIN((int)(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mRowCount - 1), intersectingMinBoxY / TILE_HEIGHT);
+			const int endBoxIndexX = MIN((int)(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mColumnCount - 1), intersectingMaxBoxX / TILE_WIDTH);
+			const int endBoxIndexY = MIN((int)(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mRowCount - 1), intersectingMaxBoxY / TILE_HEIGHT);
 
-			assert(startBoxIndexX >= 0 && startBoxIndexX < mMaskedOcclusionCulling->mDepthBuffer.mResolution.mColumnCount);
-			assert(startBoxIndexY >= 0 && startBoxIndexY < mMaskedOcclusionCulling->mDepthBuffer.mResolution.mRowCount);
+			assert(startBoxIndexX >= 0 && startBoxIndexX < (int)(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mColumnCount));
+			assert(startBoxIndexY >= 0 && startBoxIndexY < (int)(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mRowCount));
 			
-			assert(endBoxIndexX >= 0 && endBoxIndexX <= mMaskedOcclusionCulling->mDepthBuffer.mResolution.mColumnCount);
-			assert(endBoxIndexY >= 0 && endBoxIndexY <= mMaskedOcclusionCulling->mDepthBuffer.mResolution.mRowCount);
+			assert(endBoxIndexX >= 0 && endBoxIndexX <= (int)(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mColumnCount));
+			assert(endBoxIndexY >= 0 && endBoxIndexY <= (int)(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mRowCount));
 
 			for (size_t y = startBoxIndexY; y <= endBoxIndexY; y++)
 			{
@@ -508,7 +508,7 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 		//W BECOME USELESS, IGNORE IT
 		ConvertClipSpaceToNDCSpace(ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, oneDividedByW, triangleCullMask);
 
-
+		// we don't linearize depth value
 		ConvertToPlatformDepth(ndcSpaceVertexZ);
 
 		// TODO : Set triangleCullMask about NDC x, y, z is in -1 ~ 1

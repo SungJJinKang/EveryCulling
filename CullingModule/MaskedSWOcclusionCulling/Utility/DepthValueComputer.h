@@ -4,13 +4,9 @@
 
 namespace culling
 {
-	class DepthValueComputer
+	namespace DepthValueComputer
 	{
-	private:
-
-	public:
-
-		static void ComputeDepthValue
+		extern void ComputeFloatBottomDepthValue
 		(
 			culling::M256F* const subTileMaxValues,
 			const std::uint32_t tileOriginX, // 32x8 tile
@@ -25,6 +21,41 @@ namespace culling
 			const culling::M256F& pVtx3Y,
 			const culling::M256F& pVtx3Z
 		);
+
+		extern void ComputeFlatTopDepthValue
+		(
+			culling::M256F* const subTileMaxValues,
+			const std::uint32_t tileOriginX, // 32x8 tile
+			const std::uint32_t tileOriginY, // 32x8 tile
+			const culling::M256F& pVtx1X,
+			const culling::M256F& pVtx1Y,
+			const culling::M256F& pVtx1Z,
+			const culling::M256F& pVtx2X,
+			const culling::M256F& pVtx2Y,
+			const culling::M256F& pVtx2Z,
+			const culling::M256F& pVtx3X,
+			const culling::M256F& pVtx3Y,
+			const culling::M256F& pVtx3Z
+		);
+		
+		/*
+		 *static void ComputeDepthValue
+		(
+			culling::M256F* const subTileMaxValues,
+			const std::uint32_t tileOriginX, // 32x8 tile
+			const std::uint32_t tileOriginY, // 32x8 tile
+			const culling::M256F& pVtx1X,
+			const culling::M256F& pVtx1Y,
+			const culling::M256F& pVtx1Z,
+			const culling::M256F& pVtx2X,
+			const culling::M256F& pVtx2Y,
+			const culling::M256F& pVtx2Z,
+			const culling::M256F& pVtx3X,
+			const culling::M256F& pVtx3Y,
+			const culling::M256F& pVtx3Z
+		);
+		*/
+
 	};
 }
 

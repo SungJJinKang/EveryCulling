@@ -5,7 +5,7 @@
 
 namespace culling
 {
-	struct Tile;
+	class Tile;
 	class RasterizeOccludersStage : public MaskedSWOcclusionCullingStage
 	{
 	private:
