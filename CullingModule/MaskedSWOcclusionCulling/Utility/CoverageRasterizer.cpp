@@ -3,7 +3,7 @@
 #include <cmath>
 #include <limits>
 
-FORCE_INLINE culling::M256I culling::CoverageRasterizer::FillBottomFlatTriangle
+culling::M256I culling::CoverageRasterizer::FillBottomFlatTriangle
 (
     const Vec2& TileLeftBottomOriginPoint, 
     const Vec2& point1, 
@@ -42,7 +42,7 @@ FORCE_INLINE culling::M256I culling::CoverageRasterizer::FillBottomFlatTriangle
 	return Result;
 }
 
-FORCE_INLINE culling::M256I culling::CoverageRasterizer::FillTopFlatTriangle
+culling::M256I culling::CoverageRasterizer::FillTopFlatTriangle
 (
     const Vec2& TileLeftBottomOriginPoint, 
     const Vec2& point1, 
@@ -306,7 +306,7 @@ void culling::CoverageRasterizer::FillTopFlatTriangleBatch
     culling::M256F aboveFlatBottomTriangleFace[8];
     for (size_t triIndex = 0; triIndex < 8; triIndex++)
     {
-        aboveFlatBottomTriangleFace[triIndex] = _mm256_cmp_ps(_mm256_set_ps(TileLeftBottomOriginPoint.y, TileLeftBottomOriginPoint.y + 1.0f, TileLeftBottomOriginPoint.y + 2.0f, TileLeftBottomOriginPoint.y + 3.0f, TileLeftBottomOriginPoint.y + 4.0f, TileLeftBottomOriginPoint.y + 5.0f, TileLeftBottomOriginPoint.y + 6.0f, TileLeftBottomOriginPoint.y + 7.0f), _mm256_set1_ps(reinterpret_cast<const float*>(&TriPointC_Y)[triIndex]), _CMP_GE_OQ);
+        aboveFlatBottomTriangleFace[triIndex] = _mm256_cmp_ps(_mm256_set_ps(TileLeftBottomOriginPoint.y, TileLeftBottomOriginPoint.y + 1.0f, TileLeftBottomOriginPoint.y + 2.0f, TileLeftBottomOriginPoint.y + 3.0f, TileLeftBottomOriginPoint.y + 4.0f, TileLeftBottomOriginPoint.y + 5.0f, TileLeftBottomOriginPoint.y + 6.0f, TileLeftBottomOriginPoint.y + 7.0f), _mm256_set1_ps(reinterpret_cast<const float*>(&TriPointA_Y)[triIndex]), _CMP_LE_OQ);
     }
 
     for (size_t triIndex = 0; triIndex < 8; triIndex++)

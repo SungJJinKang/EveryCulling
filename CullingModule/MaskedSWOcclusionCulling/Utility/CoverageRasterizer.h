@@ -10,15 +10,14 @@ static_assert(TILE_WIDTH * TILE_HEIGHT == 128 || TILE_WIDTH * TILE_HEIGHT == 256
 
 namespace culling
 {
-	class CoverageRasterizer
+	namespace CoverageRasterizer
 	{
-	private:
 		/// <summary>
 		/// Assume TwoDTriangle intersect with mask
 		/// </summary>
 		/// <param name="coverageMask"></param>
 		/// <param name="triangle"></param>
-		FORCE_INLINE static culling::M256I FillBottomFlatTriangle
+		extern culling::M256I FillBottomFlatTriangle
 		(
 			const Vec2& TileLeftBottomOriginPoint, 
 			const Vec2& point1, 
@@ -31,7 +30,7 @@ namespace culling
 		/// </summary>
 		/// <param name="coverageMask"></param>
 		/// <param name="triangle"></param>
-		FORCE_INLINE static culling::M256I FillTopFlatTriangle
+		extern culling::M256I FillTopFlatTriangle
 		(
 			const Vec2& TileLeftBottomOriginPoint, 
 			const Vec2& point1, 
@@ -41,42 +40,37 @@ namespace culling
 
 		
 
-	public:
 		/// <summary>
 		/// https://dl.acm.org/doi/pdf/10.1145/800250.807490?casa_token=alcaBmG1OpoAAAAA:a7Wktjv1YCEp-IODF_dRPbZNDVkRQxPGz67vvDGBfseW6UayupLQM8JizEuMdHT22ymouD-ExDVNPmU
 		/// 4page
 		/// 
 		/// 
 		/// </summary>
-		static culling::M256I FillTriangle
+		extern culling::M256I FillTriangle
 		(
 			const Vec2& TileLeftBottomOriginPoint, 
 			const culling::Vec2& triangleVertex1,
 			const culling::Vec2& triangleVertex2,
 			const culling::Vec2& triangleVertex3
 		);
-		static culling::M256I FillTriangle
+		extern culling::M256I FillTriangle
 		(
 			const Vec2& LeftBottomPoint, 
 			TwoDTriangle& triangle
 		);
-		static culling::M256I FillTriangle
+		extern culling::M256I FillTriangle
 		(
 			const Vec2& LeftBottomPoint, 
 			ThreeDTriangle& triangle
 		);
 
-
 		
-
-	private:
-
 		/// <summary>
 		/// Assume TwoDTriangle intersect with mask
 		/// </summary>
 		/// <param name="coverageMask"></param>
 		/// <param name="triangle"></param>
-		static void FillBottomFlatTriangleBatch
+		extern void FillBottomFlatTriangleBatch
 		(
 			culling::M256I* const outCoverageMask, // 8 coverage mask. array size should be 8
 			const Vec2& LeftBottomPoint,
@@ -95,7 +89,7 @@ namespace culling
 		/// </summary>
 		/// <param name="coverageMask"></param>
 		/// <param name="triangle"></param>
-		static void FillTopFlatTriangleBatch
+		extern void FillTopFlatTriangleBatch
 		(
 			culling::M256I* const outCoverageMask, // 8 coverage mask. array size should be 8
 			const Vec2& LeftBottomPoint,
@@ -108,10 +102,8 @@ namespace culling
 			const culling::M256F& TriPointC_X,
 			const culling::M256F& TriPointC_Y
 		);
-
-	public:
-
-		static void FillTriangleBatch
+		
+		extern void FillTriangleBatch
 		(
 			culling::M256I* const outCoverageMask, // 8 coverage mask. array size should be 8
 			const Vec2& LeftBottomPoint,
