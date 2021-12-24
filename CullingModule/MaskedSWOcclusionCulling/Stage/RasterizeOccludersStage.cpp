@@ -4,8 +4,6 @@
 #include "../Rasterizer/CoverageRasterizer.h"
 
 
-#define FETCH_TILE_COUNT_IN_CHUNK 10 //for minimizing performance drop form write combined buffer flush
-
 void culling::RasterizeOccludersStage::UpdateHierarchicalDepthBuffer()
 {
 	/*
@@ -115,11 +113,11 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 	
 }
 
-culling::Tile* culling::RasterizeOccludersStage::GetNextDepthBufferTileChunk(const size_t cameraIndex)
+culling::Tile* culling::RasterizeOccludersStage::GetNextDepthBufferTile(const size_t cameraIndex)
 {
 	culling::Tile* nextDepthBufferTile = nullptr;
 
-	const size_t currentTileIndex = mFinishedTileCount[cameraIndex].fetch_add(FETCH_TILE_COUNT_IN_CHUNK, std::memory_order_seq_cst);
+	const size_t currentTileIndex = mFinishedTileCount[cameraIndex].fetch_add(1, std::memory_order_seq_cst);
 
 	const size_t tileCount = mMaskedOcclusionCulling->mDepthBuffer.GetTileCount();
 
@@ -152,25 +150,13 @@ void culling::RasterizeOccludersStage::CullBlockEntityJob(const size_t cameraInd
 
 	while(true)
 	{
-		culling::Tile* const nextTileChunk = GetNextDepthBufferTileChunk(cameraIndex);
+		culling::Tile* const nextTile = GetNextDepthBufferTile(cameraIndex);
 
-		if(nextTileChunk != nullptr)
+		if(nextTile != nullptr)
 		{
-			for (size_t tileIndexInChunk = 0; tileIndexInChunk < FETCH_TILE_COUNT_IN_CHUNK; tileIndexInChunk++)
+			if (nextTile->mBinnedTriangles.mCurrentTriangleCount > 0)
 			{
-				culling::Tile* const nextTile = nextTileChunk + tileIndexInChunk;
-
-				if (nextTile < endTile)
-				{
-					if (nextTile->mBinnedTriangles.mCurrentTriangleCount > 0)
-					{
-						RasterizeBinnedTriangles(cameraIndex, nextTile);
-					}
-				}
-				else
-				{
-					break;
-				}
+				RasterizeBinnedTriangles(cameraIndex, nextTile);
 			}
 		}
 		else

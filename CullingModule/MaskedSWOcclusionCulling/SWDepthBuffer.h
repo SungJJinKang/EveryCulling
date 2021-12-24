@@ -72,7 +72,7 @@ namespace culling
 
 		FORCE_INLINE bool IsCoverageMaskFullByOne() const
 		{
-			return _mm256_testc_si256(tile->mHizDatas.l1CoverageMask, _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF)) == 1;
+			return _mm256_testc_si256(l1CoverageMask, _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF)) == 1;
 		}
 		
 

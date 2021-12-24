@@ -46,7 +46,7 @@ namespace culling
 		/// </summary>
 		void RasterizeBinnedTriangles(const size_t cameraIndex, culling::Tile* const tile);
 		
-		culling::Tile* GetNextDepthBufferTileChunk(const size_t cameraIndex);
+		culling::Tile* GetNextDepthBufferTile(const size_t cameraIndex);
 
 	public:
 
