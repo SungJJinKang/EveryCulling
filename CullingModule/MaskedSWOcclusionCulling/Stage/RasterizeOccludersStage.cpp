@@ -121,7 +121,7 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 		);
 
 		culling::M256I CoverageMask[8];
-
+		culling::M256F subTileMaxDepth[8];
 
 		{
 			{
@@ -240,7 +240,7 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 				TriPointC_Z
 			);
 
-			culling::M256F subTileMaxDepth[8];
+			
 
 			for (size_t triangleIndex = 0; triangleIndex < 8 ; triangleIndex++)
 			{
@@ -271,8 +271,38 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 			// 6 : subTileMaxDepth ( 192 ~ 224 )
 			// 7 : subTileMaxDepth ( 224 ~ 256 )
 
+
+			
 		}
-		
+
+		for (size_t triangleIndex = 0; triangleIndex < 8; triangleIndex++)
+		{
+
+			/*
+			// clamp
+			subTileMaxDepth[triangleIndex] = _mm256_min_ps(subTileMaxDepth[triangleIndex], _mm256_set1_ps(1.0f));
+			subTileMaxDepth[triangleIndex] = _mm256_max_ps(subTileMaxDepth[triangleIndex], _mm256_set1_ps(-1.0f));
+			*/
+
+
+			tile->mHizDatas.l1MaxDepthValue = _mm256_max_ps(tile->mHizDatas.l1MaxDepthValue, subTileMaxDepth[triangleIndex]);
+			tile->mHizDatas.l1CoverageMask = _mm256_or_si256(tile->mHizDatas.l1CoverageMask, CoverageMask[triangleIndex]);
+
+			for (size_t subTileIndex = 0; subTileIndex < 8; subTileIndex++)
+			{
+				if (tile->mHizDatas.IsCoverageMaskFullByOne(subTileIndex) == true)
+				{
+					reinterpret_cast<std::uint32_t*>(&(tile->mHizDatas.l0MaxDepthValue))[subTileIndex] = 
+						MIN(reinterpret_cast<std::uint32_t*>(&(tile->mHizDatas.l0MaxDepthValue))[subTileIndex], reinterpret_cast<std::uint32_t*>(&(tile->mHizDatas.l1MaxDepthValue))[subTileIndex]);
+
+					tile->mHizDatas.ClearCoverageMask(subTileIndex);
+					tile->mHizDatas.ClearL1MaxDepthValue(subTileIndex);
+				}
+
+			}
+			
+		}
+
 		/*
 		// for coverage mask testing
 		for (size_t triangleIndex = triangleBatchIndex; triangleIndex < triangleBatchIndex + 8 && triangleIndex < tile->mBinnedTriangles.mCurrentTriangleCount; triangleIndex++)

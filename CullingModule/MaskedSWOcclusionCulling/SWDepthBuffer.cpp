@@ -5,10 +5,10 @@ void culling::HizData::Reset()
 	depthPosition = _mm256_set1_epi32(0);
 	l0MaxDepthValue = _mm256_set1_ps(1.0f);
 	l1MaxDepthValue = _mm256_set1_ps(0.0f);
-	ClearCoverageMask();
+	ClearCoverageMaskAllSubTile();
 }
 
-void culling::HizData::ClearCoverageMask()
+void culling::HizData::ClearCoverageMaskAllSubTile()
 {
 	l1CoverageMask = _mm256_setzero_si256();
 }

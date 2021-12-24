@@ -19,7 +19,8 @@ namespace culling
 		/// 8 floating-point = SubTile Count ( 8 )
 		/// 
 		/// A floating-point value represent Z0 Max DepthValue of A Subtile
-		/// 
+		///
+		///
 		/// </summary>
 		culling::M256F l0MaxDepthValue;
 
@@ -45,36 +46,96 @@ namespace culling
 		/// </summary>
 		culling::M256I depthPosition;
 
-		/// <summary>
-		/// Coverage mask
-		///
-		/// index 0 : (0, 0) fragment is covered by L1 triangle
-		/// index 1 : (1, 0) fragment is covered by L1 triangle
-		/// index 2 : (2, 0) fragment is covered by L1 triangle
-		///	.
-		///	.
-		///	.
-		/// index 255 : (31, 7) fragment is covered by L1 triangle
-		///
-		///	1 bit mean 1 fragment is covered by L1 triangle
-		/// </summary>
+
+		/*
+		 
+		// 44444444 55555555 66666666 77777777
+		// 44444444 55555555 66666666 77777777
+		// 44444444 55555555 66666666 77777777
+		// 44444444 55555555 66666666 77777777
+		// 
+		// 00000000 11111111 22222222 33333333
+		// 00000000 11111111 22222222 33333333
+		// 00000000 11111111 22222222 33333333
+		// 00000000 11111111 22222222 33333333
+		//
+		// --> 256bit
+		//
+		//
+		//
+		// 0 : CoverageMask ( 0 ~ 32 )
+		// 1 : CoverageMask ( 32 ~ 64 )
+		// 2 : CoverageMask ( 64 ~ 96 )
+		// 3 : CoverageMask ( 96 ~ 128 )
+		// 4 : CoverageMask ( 128 ~ 160 )
+		// 5 : CoverageMask ( 160 ~ 192 )
+		// 6 : CoverageMask ( 192 ~ 224 )
+		// 7 : CoverageMask ( 224 ~ 256 )
+			
+		 */
 		culling::M256I l1CoverageMask;
 
 		void Reset();
 
-		void ClearCoverageMask();
+		void ClearCoverageMaskAllSubTile();
+		FORCE_INLINE void ClearCoverageMask(const size_t subTileIndex)
+		{
+			(reinterpret_cast<std::uint32_t*>(&l1CoverageMask))[subTileIndex] = 0x00000000;
+		}
 		void FillCoverageMask();
 
-		FORCE_INLINE void ClearL1MaxDepthValue()
+		FORCE_INLINE void ClearL1MaxDepthValueAllSubTile()
 		{
 			l1MaxDepthValue = _mm256_set1_ps(0.0f);
 		}
 
-		FORCE_INLINE bool IsCoverageMaskFullByOne() const
+		FORCE_INLINE void ClearL1MaxDepthValue(const size_t subTileIndex)
 		{
-			return _mm256_testc_si256(l1CoverageMask, _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF)) == 1;
+			(reinterpret_cast<std::uint32_t*>(&l1MaxDepthValue))[subTileIndex] = 0x00000000;
+		}
+
+		
+
+		/// <summary>
+		///
+		// 44444444 55555555 66666666 77777777
+		// 44444444 55555555 66666666 77777777
+		// 44444444 55555555 66666666 77777777
+		// 44444444 55555555 66666666 77777777
+		// 
+		// 00000000 11111111 22222222 33333333
+		// 00000000 11111111 22222222 33333333
+		// 00000000 11111111 22222222 33333333
+		// 00000000 11111111 22222222 33333333
+		//
+		//
+		// --> 256bit
+		//
+		//
+		//
+		// 0 : CoverageMask ( 0 ~ 32 )
+		// 1 : CoverageMask ( 32 ~ 64 )
+		// 2 : CoverageMask ( 64 ~ 96 )
+		// 3 : CoverageMask ( 96 ~ 128 )
+		// 4 : CoverageMask ( 128 ~ 160 )
+		// 5 : CoverageMask ( 160 ~ 192 )
+		// 6 : CoverageMask ( 192 ~ 224 )
+		// 7 : CoverageMask ( 224 ~ 256 )
+		//
+		/// </summary>
+		/// <param name="subTileIndex"></param>
+		/// <returns></returns>
+		FORCE_INLINE bool IsCoverageMaskFullByOne(const size_t subTileIndex) const
+		{
+			return reinterpret_cast<const std::uint32_t*>(&l1CoverageMask)[subTileIndex] == 0xFFFFFFFF;
 		}
 		
+		/*
+		FORCE_INLINE void OverriteCoverageMask(const size_t subTileIndex, const std::uint32_t tileCoverage)
+		{
+			reinterpret_cast<std::uint32_t*>(&l1CoverageMask)[subTileIndex] = tileCoverage;
+		}
+		*/
 
 	};
 	
