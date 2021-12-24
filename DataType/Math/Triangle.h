@@ -196,7 +196,7 @@ namespace culling
 	)
 	{
 		culling::M256F MASK;
-
+		
 		MASK = _mm256_cmp_ps(TriPointA_Y, TriPointB_Y, _CMP_LT_OQ);
 		culling::M256F_SWAP(TriPointA_X, TriPointB_X, MASK);
 		culling::M256F_SWAP(TriPointA_Y, TriPointB_Y, MASK);

@@ -250,14 +250,15 @@ namespace culling
 
 	FORCE_INLINE extern culling::M256F M256F_SELECT(const culling::M256F& M256_A, const culling::M256F& M256_B, const culling::M256F& MASK)
 	{
-		return _mm256_blendv_ps(M256_B, M256_A, MASK);
+		return _mm256_blendv_ps(M256_A, M256_B, MASK);
 	}
 
 	FORCE_INLINE extern void M256F_SWAP(culling::M256F& M256_A, culling::M256F& M256_B, const culling::M256F& MASK)
 	{
-		culling::M256F TEMP = M256_A;
-		M256_A = culling::M256F_SELECT(M256_A, M256_B, MASK);
-		M256_B = culling::M256F_SELECT(M256_A, TEMP, MASK);
+		const culling::M256F TEMP_A = M256_A;
+		const culling::M256F TEMP_B = M256_B;
+		M256_A = culling::M256F_SELECT(TEMP_A, TEMP_B, MASK);
+		M256_B = culling::M256F_SELECT(TEMP_B, TEMP_A, MASK);
 	}
 
 	/*

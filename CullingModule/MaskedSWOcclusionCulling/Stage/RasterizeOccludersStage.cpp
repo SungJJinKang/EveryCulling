@@ -59,8 +59,18 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 
 	const culling::Vec2 tileOriginPoint{ static_cast<float>(tile->GetLeftBottomTileOrginX()), static_cast<float>(tile->GetLeftBottomTileOrginY()) };
 
-
-
+	/*
+	for (size_t triangleIndex = 0; triangleIndex < tile->mBinnedTriangles.mCurrentTriangleCount; triangleIndex++)
+	{
+		culling::TwoDTriangle twoDTriangle;
+		twoDTriangle.Points[0] = { tile->mBinnedTriangles.VertexX[0][triangleIndex], tile->mBinnedTriangles.VertexY[0][triangleIndex] };
+		twoDTriangle.Points[1] = { tile->mBinnedTriangles.VertexX[1][triangleIndex], tile->mBinnedTriangles.VertexY[1][triangleIndex] };
+		twoDTriangle.Points[2] = { tile->mBinnedTriangles.VertexX[2][triangleIndex], tile->mBinnedTriangles.VertexY[2][triangleIndex] };
+		culling::M256I result = culling::CoverageRasterizer::FillTriangle(tileOriginPoint, twoDTriangle);
+		tile->mHizDatas.l1CoverageMask = _mm256_or_si256(tile->mHizDatas.l1CoverageMask, result);
+	}
+	*/
+	
 	for(size_t triangleBatchIndex = 0 ; triangleBatchIndex < tile->mBinnedTriangles.mCurrentTriangleCount ; triangleBatchIndex+=8)
 	{
 		TwoDTriangle twoDTriangle;
@@ -79,7 +89,7 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 			*reinterpret_cast<culling::M256F*>(&(tile->mBinnedTriangles.VertexY[2][triangleBatchIndex]))
 		);
 
-		for(size_t triangleIndex = triangleBatchIndex ; triangleIndex < triangleBatchIndex + 8 && triangleIndex < BIN_TRIANGLE_CAPACITY_PER_TILE ; triangleIndex++)
+		for(size_t triangleIndex = triangleBatchIndex ; triangleIndex < triangleBatchIndex + 8 && triangleIndex < tile->mBinnedTriangles.mCurrentTriangleCount ; triangleIndex++)
 		{
 			tile->mHizDatas.l1CoverageMask = _mm256_or_si256(tile->mHizDatas.l1CoverageMask, CoverageMask[triangleIndex - triangleBatchIndex]);
 		}
@@ -92,7 +102,7 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 		//Rasterization operations also refer to a fragment��s center, which is offset by ( 1/2, 1/2 )
 		//from its lower left corner(and so lies on half - integer coordinates).
 	}
-
+	
 	tile->mHizDatas.l1CoverageMask = ShuffleCoverageMask(tile->mHizDatas.l1CoverageMask);
 
 

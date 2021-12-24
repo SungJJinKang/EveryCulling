@@ -342,18 +342,30 @@ void culling::CoverageRasterizer::FillTriangleBatch
     culling::M256I Result1[8], Result2[8];
     
 
-    FillBottomFlatTriangleBatch
+    const culling::M256F B4_MASK = _mm256_cmp_ps(TriPointB_X, point4X, _CMP_LE_OQ);
+    const culling::M256I B4_MASK_INV_M256I = _mm256_xor_si256(_mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF), *reinterpret_cast<const culling::M256I*>(&B4_MASK));
+    const culling::M256F B4_MASK_INV = *reinterpret_cast<const culling::M256F*>(&B4_MASK_INV_M256I);
+
+    const culling::M256F B4_MIN_X = culling::M256F_SELECT(TriPointB_X, point4X, B4_MASK_INV);
+    const culling::M256F B4_MIN_Y = culling::M256F_SELECT(TriPointB_Y, point4Y, B4_MASK_INV);
+
+    const culling::M256F B4_MAX_X = culling::M256F_SELECT(TriPointB_X, point4X, B4_MASK);
+    const culling::M256F B4_MAX_Y = culling::M256F_SELECT(TriPointB_Y, point4Y, B4_MASK);
+
+
+	FillBottomFlatTriangleBatch
     (
         Result1,
         TileLeftBottomOriginPoint,
+
         TriPointA_X,
         TriPointA_Y,
 
-        _mm256_min_ps(TriPointB_X, point4X),
-        _mm256_min_ps(TriPointB_Y, point4Y),
+        B4_MIN_X,
+        B4_MIN_Y,
 
-        _mm256_max_ps(TriPointB_X, point4X),
-        _mm256_max_ps(TriPointB_Y, point4Y)
+        B4_MAX_X,
+        B4_MAX_Y
     );
 
     
@@ -362,11 +374,11 @@ void culling::CoverageRasterizer::FillTriangleBatch
         Result2,
         TileLeftBottomOriginPoint,
 
-        _mm256_min_ps(TriPointB_X, point4X),
-        _mm256_min_ps(TriPointB_Y, point4Y),
+        B4_MIN_X,
+        B4_MIN_Y,
 
-        _mm256_max_ps(TriPointB_X, point4X),
-        _mm256_max_ps(TriPointB_Y, point4Y),
+        B4_MAX_X,
+        B4_MAX_Y,
 
         TriPointC_X,
         TriPointC_Y
