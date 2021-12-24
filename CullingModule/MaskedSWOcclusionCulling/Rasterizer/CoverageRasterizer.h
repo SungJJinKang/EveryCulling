@@ -82,14 +82,24 @@ namespace culling
 		/// </summary>
 		static void FillTriangle
 		(
-			culling::Tile& tile, 
+			culling::M256I& coverageMask,
 			const Vec2& TileLeftBottomOriginPoint, 
 			const culling::Vec2& triangleVertex1,
 			const culling::Vec2& triangleVertex2,
 			const culling::Vec2& triangleVertex3
 		);
-		static void FillTriangle(culling::Tile& tile, const Vec2& LeftBottomPoint, TwoDTriangle& triangle);
-		static void FillTriangle(culling::Tile& tile, const Vec2& LeftBottomPoint, ThreeDTriangle& triangle);
+		static void FillTriangle
+		(
+			culling::M256I& coverageMask,
+			const Vec2& LeftBottomPoint, 
+			TwoDTriangle& triangle
+		);
+		static void FillTriangle
+		(
+			culling::M256I& coverageMask,
+			const Vec2& LeftBottomPoint, 
+			ThreeDTriangle& triangle
+		);
 
 		static void FillTriangleBatch
 		(

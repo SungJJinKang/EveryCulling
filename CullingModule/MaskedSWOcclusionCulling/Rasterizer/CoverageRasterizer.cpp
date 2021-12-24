@@ -90,7 +90,7 @@ FORCE_INLINE culling::M256I culling::CoverageRasterizer::FillTopFlatTriangle
 
 void culling::CoverageRasterizer::FillTriangle
 (
-    culling::Tile& tile, 
+    culling::M256I& coverageMask,
     const Vec2& TileLeftBottomOriginPoint,
 	const culling::Vec2& triangleVertex1, 
     const culling::Vec2& triangleVertex2, 
@@ -161,8 +161,8 @@ void culling::CoverageRasterizer::FillTriangle
         result = _mm256_or_si256(Result1, Result2);
     }
 
-    culling::M256I TEMP = tile.mHizDatas.l1CoverageMask;
-    tile.mHizDatas.l1CoverageMask = _mm256_or_si256(TEMP, result);
+    culling::M256I TEMP = coverageMask;
+    coverageMask = _mm256_or_si256(TEMP, result);
 }
 
 
@@ -172,19 +172,29 @@ void culling::CoverageRasterizer::FillTriangle
 /// <param name="coverageMask"></param>
 /// <param name="LeftBottomPoint"></param>
 /// <param name="triangle"></param>
-void culling::CoverageRasterizer::FillTriangle(culling::Tile& tile, const Vec2& LeftBottomPoint, TwoDTriangle& triangle)
+void culling::CoverageRasterizer::FillTriangle
+(
+    culling::M256I& coverageMask,
+    const Vec2& LeftBottomPoint, 
+    TwoDTriangle& triangle
+)
 {
     SortTriangle(triangle);
 
-    FillTriangle(tile, LeftBottomPoint, triangle.Points[0], triangle.Points[1], triangle.Points[2]);
+    FillTriangle(coverageMask, LeftBottomPoint, triangle.Points[0], triangle.Points[1], triangle.Points[2]);
 
 }
 
-void culling::CoverageRasterizer::FillTriangle(culling::Tile& tile, const Vec2& LeftBottomPoint, ThreeDTriangle& triangle)
+void culling::CoverageRasterizer::FillTriangle
+(
+    culling::M256I& coverageMask,
+    const Vec2& LeftBottomPoint, 
+    ThreeDTriangle& triangle
+)
 {
     SortTriangle(triangle);
 
-    FillTriangle(tile, LeftBottomPoint, *reinterpret_cast<culling::Vec2*>(triangle.Points + 0), *reinterpret_cast<culling::Vec2*>(triangle.Points + 1), *reinterpret_cast<culling::Vec2*>(triangle.Points + 2));
+    FillTriangle(coverageMask, LeftBottomPoint, *reinterpret_cast<culling::Vec2*>(triangle.Points + 0), *reinterpret_cast<culling::Vec2*>(triangle.Points + 1), *reinterpret_cast<culling::Vec2*>(triangle.Points + 2));
 
 }
 

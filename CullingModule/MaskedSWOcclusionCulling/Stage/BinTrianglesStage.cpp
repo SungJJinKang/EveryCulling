@@ -345,7 +345,7 @@ FORCE_INLINE void culling::BinTrianglesStage::GatherVertices
 	}
 }
 
-FORCE_INLINE void culling::BinTrianglesStage::ConvertToPlatformDepth(culling::M256F* const depth)
+void culling::BinTrianglesStage::ConvertToPlatformDepth(culling::M256F* const depth)
 {
 
 #if (NDC_RANGE == MINUS_ONE_TO_POSITIVE_ONE)

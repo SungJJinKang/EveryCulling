@@ -23,6 +23,18 @@ namespace culling
 		void ComputeTrianglesDepthValueInTile();
 
 		/// <summary>
+		/// https://www.slideshare.net/IntelSoftware/masked-software-occlusion-culling 46p
+		///
+		///	Shuffle CoverageMask
+		///
+		///	Original : One Row is configous 32bit ( 4byte )
+		///	After shuffled : One 8 x 4 tile is configous 32bit ( 4byte )
+		/// </summary>
+		/// <param name="coverageMask"></param>
+		/// <returns></returns>
+		culling::M256I ShuffleCoverageMask(const culling::M256I& coverageMask) const;
+
+		/// <summary>
 		/// Compute Depth in Bin of Tile(Sub Tile)
 		/// 
 		/// CoverageMask, z0DepthMax, z1DepthMax, Triangle Max Depth
@@ -33,7 +45,6 @@ namespace culling
 		/// https://www.comp.nus.edu.sg/~lowkl/publications/lowk_persp_interp_techrep.pdf
 		/// </summary>
 		void RasterizeBinnedTriangles(const size_t cameraIndex, culling::Tile* const tile);
-
 		
 		culling::Tile* GetNextDepthBufferTileChunk(const size_t cameraIndex);
 

@@ -193,7 +193,7 @@ namespace culling
 			const float* const modelToClipspaceMatrix
 		);
 
-		FORCE_INLINE void ConvertToPlatformDepth(culling::M256F* const depth);
+		void ConvertToPlatformDepth(culling::M256F* const depth);
 
 	public:
 

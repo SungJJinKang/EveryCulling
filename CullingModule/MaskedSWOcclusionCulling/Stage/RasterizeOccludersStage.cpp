@@ -30,6 +30,27 @@ void culling::RasterizeOccludersStage::ComputeTrianglesDepthValueInTile()
 {
 }
 
+
+culling::M256I culling::RasterizeOccludersStage::ShuffleCoverageMask(const culling::M256I& coverageMask) const
+{
+	static const culling::M256I shuffleMask
+	=
+	_mm256_setr_epi8
+	(
+		0, 4, 8, 12,
+		1, 5, 9, 13,
+		2, 6, 10, 14,
+		3, 7, 11, 15,
+
+		0, 4, 8, 12,
+		1, 5, 9, 13,
+		2, 6, 10, 14,
+		3, 7, 11, 15
+	);
+
+	return _mm256_shuffle_epi8(coverageMask, shuffleMask);
+}
+
 void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 (
 	const size_t cameraIndex, 
@@ -42,7 +63,7 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 
 	for(size_t triangleIndex = 0 ; triangleIndex < tile->mBinnedTriangles.mCurrentTriangleCount ; triangleIndex++)
 	{
-		culling::CoverageRasterizer::FillTriangle(*tile, tileOriginPoint, tile->mBinnedTriangles.mTriangleList[triangleIndex]);
+		culling::CoverageRasterizer::FillTriangle(tile->mHizDatas.l1CoverageMask, tileOriginPoint, tile->mBinnedTriangles.mTriangleList[triangleIndex]);
 
 
 
@@ -53,6 +74,44 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 		//Rasterization operations also refer to a fragment��s center, which is offset by ( 1/2, 1/2 )
 		//from its lower left corner(and so lies on half - integer coordinates).
 	}
+
+	tile->mHizDatas.l1CoverageMask = ShuffleCoverageMask(tile->mHizDatas.l1CoverageMask);
+
+
+	
+	/*
+	const culling::M256I test
+		=
+		_mm256_setr_epi8
+		(
+			0, 4, 8, 12,
+			1, 5, 9, 13,
+			2, 6, 10, 14,
+			3, 7, 11, 15,
+			0, 4, 8, 12,
+			1, 5, 9, 13,
+			2, 6, 10, 14,
+			3, 7, 11, 15
+		);
+
+	const culling::M256I correctTestResult
+		=
+		_mm256_setr_epi8
+		(
+			0, 1, 2, 3,
+			4, 5, 6, 7,
+			8, 9, 10, 11,
+			12, 13, 14, 15,
+			0, 1, 2, 3,
+			4, 5, 6, 7,
+			8, 9, 10, 11,
+			12, 13, 14, 15
+		);
+	
+	const culling::M256I testResult = ShuffleCoverageMask(test);
+
+	assert(_mm256_testc_si256(correctTestResult, testResult) == 1);
+	*/
 	
 }
 
