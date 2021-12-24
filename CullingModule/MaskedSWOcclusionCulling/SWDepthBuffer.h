@@ -85,16 +85,16 @@ namespace culling
 	/// </summary>
 	struct TriangleList
 	{
-		alignas(32) float VertexX[3][INITIAL_ENTITY_BLOCK_RESERVED_SIZE]; // VertexX[0] : Point1 of Triangle, VertexX[1] : Point2 of Triangle, VertexX[2] : 3 of Triangle
-		alignas(32) float VertexY[3][INITIAL_ENTITY_BLOCK_RESERVED_SIZE];
-		alignas(32) float VertexZ[3][INITIAL_ENTITY_BLOCK_RESERVED_SIZE];
+		alignas(32) float VertexX[3][BIN_TRIANGLE_CAPACITY_PER_TILE]; // VertexX[0] : Point1 of Triangle, VertexX[1] : Point2 of Triangle, VertexX[2] : 3 of Triangle
+		alignas(32) float VertexY[3][BIN_TRIANGLE_CAPACITY_PER_TILE];
+		alignas(32) float VertexZ[3][BIN_TRIANGLE_CAPACITY_PER_TILE];
 
 		size_t mCurrentTriangleCount = 0;
 
 		void Reset();
 	};
 
-	static_assert(INITIAL_ENTITY_BLOCK_RESERVED_SIZE % 8 == 0);
+	static_assert(BIN_TRIANGLE_CAPACITY_PER_TILE % 8 == 0);
 
 	/// <summary>
 	/// 32 X 8 Tile

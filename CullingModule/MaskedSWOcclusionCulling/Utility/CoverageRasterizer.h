@@ -23,9 +23,7 @@ namespace culling
 			const Vec2& TileLeftBottomOriginPoint, 
 			const Vec2& point1, 
 			const Vec2& point2, 
-			const Vec2& point3,
-			const float floatFaceXOffset,
-			const float floatFaceYOffset
+			const Vec2& point3
 		);
 		
 		/// <summary>
@@ -38,10 +36,40 @@ namespace culling
 			const Vec2& TileLeftBottomOriginPoint, 
 			const Vec2& point1, 
 			const Vec2& point2, 
-			const Vec2& point3,
-			const float floatFaceXOffset,
-			const float floatFaceYOffset
+			const Vec2& point3
 		);
+
+		
+
+	public:
+		/// <summary>
+		/// https://dl.acm.org/doi/pdf/10.1145/800250.807490?casa_token=alcaBmG1OpoAAAAA:a7Wktjv1YCEp-IODF_dRPbZNDVkRQxPGz67vvDGBfseW6UayupLQM8JizEuMdHT22ymouD-ExDVNPmU
+		/// 4page
+		/// 
+		/// 
+		/// </summary>
+		static culling::M256I FillTriangle
+		(
+			const Vec2& TileLeftBottomOriginPoint, 
+			const culling::Vec2& triangleVertex1,
+			const culling::Vec2& triangleVertex2,
+			const culling::Vec2& triangleVertex3
+		);
+		static culling::M256I FillTriangle
+		(
+			const Vec2& LeftBottomPoint, 
+			TwoDTriangle& triangle
+		);
+		static culling::M256I FillTriangle
+		(
+			const Vec2& LeftBottomPoint, 
+			ThreeDTriangle& triangle
+		);
+
+
+		
+
+	private:
 
 		/// <summary>
 		/// Assume TwoDTriangle intersect with mask
@@ -52,10 +80,14 @@ namespace culling
 		(
 			culling::M256I* const outCoverageMask, // 8 coverage mask. array size should be 8
 			const Vec2& LeftBottomPoint,
-			const culling::M256F* const triangleVertex1,
-			// [0] : First Vertex of Triangle, [1] : Second Vertex of Triangle, [2] : Third Vertex of Triangle
-			const culling::M256F* const triangleVertex2,
-			const culling::M256F* const triangleVertex3
+			const culling::M256F& TriPointA_X,
+			const culling::M256F& TriPointA_Y,
+
+			const culling::M256F& TriPointB_X,
+			const culling::M256F& TriPointB_Y,
+
+			const culling::M256F& TriPointC_X,
+			const culling::M256F& TriPointC_Y
 		);
 
 		/// <summary>
@@ -67,49 +99,33 @@ namespace culling
 		(
 			culling::M256I* const outCoverageMask, // 8 coverage mask. array size should be 8
 			const Vec2& LeftBottomPoint,
-			const culling::M256F* const triangleVertex1,
-			// [0] : First Vertex of Triangle, [1] : Second Vertex of Triangle, [2] : Third Vertex of Triangle
-			const culling::M256F* const triangleVertex2,
-			const culling::M256F* const triangleVertex3
+			const culling::M256F& TriPointA_X,
+			const culling::M256F& TriPointA_Y,
+
+			const culling::M256F& TriPointB_X,
+			const culling::M256F& TriPointB_Y,
+
+			const culling::M256F& TriPointC_X,
+			const culling::M256F& TriPointC_Y
 		);
 
 	public:
-		/// <summary>
-		/// https://dl.acm.org/doi/pdf/10.1145/800250.807490?casa_token=alcaBmG1OpoAAAAA:a7Wktjv1YCEp-IODF_dRPbZNDVkRQxPGz67vvDGBfseW6UayupLQM8JizEuMdHT22ymouD-ExDVNPmU
-		/// 4page
-		/// 
-		/// 
-		/// </summary>
-		static void FillTriangle
-		(
-			culling::M256I& coverageMask,
-			const Vec2& TileLeftBottomOriginPoint, 
-			const culling::Vec2& triangleVertex1,
-			const culling::Vec2& triangleVertex2,
-			const culling::Vec2& triangleVertex3
-		);
-		static void FillTriangle
-		(
-			culling::M256I& coverageMask,
-			const Vec2& LeftBottomPoint, 
-			TwoDTriangle& triangle
-		);
-		static void FillTriangle
-		(
-			culling::M256I& coverageMask,
-			const Vec2& LeftBottomPoint, 
-			ThreeDTriangle& triangle
-		);
 
 		static void FillTriangleBatch
 		(
 			culling::M256I* const outCoverageMask, // 8 coverage mask. array size should be 8
 			const Vec2& LeftBottomPoint,
-			const culling::M256F* const triangleVertex1,
-			// [0] : First Vertex of Triangle, [1] : Second Vertex of Triangle, [2] : Third Vertex of Triangle
-			const culling::M256F* const triangleVertex2,
-			const culling::M256F* const triangleVertex3
+			culling::M256F& TriPointA_X,
+			culling::M256F& TriPointA_Y,
+
+			culling::M256F& TriPointB_X,
+			culling::M256F& TriPointB_Y,
+
+			culling::M256F& TriPointC_X,
+			culling::M256F& TriPointC_Y
 		);
+
+		
 	};
 }
 

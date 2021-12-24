@@ -1,7 +1,7 @@
 ﻿#include "RasterizeOccludersStage.h"
 
 #include "../MaskedSWOcclusionCulling.h"
-#include "../Rasterizer/CoverageRasterizer.h"
+#include "../Utility/CoverageRasterizer.h"
 
 
 void culling::RasterizeOccludersStage::UpdateHierarchicalDepthBuffer()
@@ -59,10 +59,30 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 
 	const culling::Vec2 tileOriginPoint{ static_cast<float>(tile->GetLeftBottomTileOrginX()), static_cast<float>(tile->GetLeftBottomTileOrginY()) };
 
-	for(size_t triangleIndex = 0 ; triangleIndex < tile->mBinnedTriangles.mCurrentTriangleCount ; triangleIndex++)
-	{
-		culling::CoverageRasterizer::FillTriangle(tile->mHizDatas.l1CoverageMask, tileOriginPoint, tile->mBinnedTriangles.mTriangleList[triangleIndex]);
 
+
+	for(size_t triangleBatchIndex = 0 ; triangleBatchIndex < tile->mBinnedTriangles.mCurrentTriangleCount ; triangleBatchIndex+=8)
+	{
+		TwoDTriangle twoDTriangle;
+		
+		culling::M256I CoverageMask[8];
+
+		culling::CoverageRasterizer::FillTriangleBatch
+		(
+			CoverageMask,
+			tileOriginPoint, 
+			*reinterpret_cast<culling::M256F*>(&(tile->mBinnedTriangles.VertexX[0][triangleBatchIndex])),
+			*reinterpret_cast<culling::M256F*>(&(tile->mBinnedTriangles.VertexY[0][triangleBatchIndex])),
+			*reinterpret_cast<culling::M256F*>(&(tile->mBinnedTriangles.VertexX[1][triangleBatchIndex])),
+			*reinterpret_cast<culling::M256F*>(&(tile->mBinnedTriangles.VertexY[1][triangleBatchIndex])),
+			*reinterpret_cast<culling::M256F*>(&(tile->mBinnedTriangles.VertexX[2][triangleBatchIndex])),
+			*reinterpret_cast<culling::M256F*>(&(tile->mBinnedTriangles.VertexY[2][triangleBatchIndex]))
+		);
+
+		for(size_t triangleIndex = triangleBatchIndex ; triangleIndex < triangleBatchIndex + 8 && triangleIndex < BIN_TRIANGLE_CAPACITY_PER_TILE ; triangleIndex++)
+		{
+			tile->mHizDatas.l1CoverageMask = _mm256_or_si256(tile->mHizDatas.l1CoverageMask, CoverageMask[triangleIndex - triangleBatchIndex]);
+		}
 
 
 		//Snap Screen Space Coordinates To Integer Coordinate In ScreenBuffer(or DepthBuffer)

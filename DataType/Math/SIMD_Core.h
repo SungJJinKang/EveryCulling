@@ -259,6 +259,18 @@ namespace culling
 		M256_A = culling::M256F_SELECT(M256_A, M256_B, MASK);
 		M256_B = culling::M256F_SELECT(M256_A, TEMP, MASK);
 	}
+
+	/*
+	FORCE_INLINE extern culling::M256F M256F_MIN(culling::M256F& M256_A, culling::M256F& M256_B)
+	{
+		return _mm256_min_ps(M256_A, M256_B);
+	}
+
+	FORCE_INLINE extern culling::M256F M256F_MAX(culling::M256F& M256_A, culling::M256F& M256_B)
+	{
+		return _mm256_max_ps(M256_A, M256_B);
+	}
+	*/
 	
 }
 
