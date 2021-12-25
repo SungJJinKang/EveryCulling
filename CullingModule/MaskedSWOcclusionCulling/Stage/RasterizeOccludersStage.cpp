@@ -327,9 +327,11 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 		
 		for (size_t triangleIndex = 0; triangleIndex < triangleCount; triangleIndex++)
 		{
-			//tile->mHizDatas.L0MaxDepthValue = _mm256_min_ps(tile->mHizDatas.L0MaxDepthValue, subTileMaxDepth[triangleIndex]);
+			// for testing
+			tile->mHizDatas.L0MaxDepthValue = _mm256_min_ps(tile->mHizDatas.L0MaxDepthValue, subTileMaxDepth[triangleIndex]);
 
-			
+
+			/*
 			tile->mHizDatas.L1MaxDepthValue = _mm256_max_ps(tile->mHizDatas.L1MaxDepthValue, subTileMaxDepth[triangleIndex]);
 			tile->mHizDatas.l1CoverageMask = _mm256_or_si256(tile->mHizDatas.l1CoverageMask, CoverageMask[triangleIndex]);
 
@@ -337,11 +339,11 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 			const culling::M256I coverageMaskFullByOne = _mm256_cmpeq_epi32(tile->mHizDatas.l1CoverageMask, _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF));
 
 			tile->mHizDatas.L0MaxDepthValue = _mm256_blendv_ps(tile->mHizDatas.L0MaxDepthValue, _mm256_min_ps(tile->mHizDatas.L0MaxDepthValue, tile->mHizDatas.L1MaxDepthValue), *reinterpret_cast<const culling::M256F*>(&coverageMaskFullByOne));
-			tile->mHizDatas.L1MaxDepthValue = _mm256_blendv_ps(tile->mHizDatas.L1MaxDepthValue, _mm256_setzero_ps(), *reinterpret_cast<const culling::M256F*>(&coverageMaskFullByOne));
+			tile->mHizDatas.L1MaxDepthValue = _mm256_blendv_ps(tile->mHizDatas.L1MaxDepthValue, _mm256_set1_ps((float)MIN_DEPTH_VALUE), *reinterpret_cast<const culling::M256F*>(&coverageMaskFullByOne));
 
 			const culling::M256F coverageMaskBlendResult = _mm256_blendv_ps(*reinterpret_cast<const culling::M256F*>(&tile->mHizDatas.l1CoverageMask), _mm256_setzero_ps(), *reinterpret_cast<const culling::M256F*>(&coverageMaskFullByOne));
 			tile->mHizDatas.l1CoverageMask = *reinterpret_cast<const culling::M256I*>(&coverageMaskBlendResult);
-			
+			*/
 
 		}
 
