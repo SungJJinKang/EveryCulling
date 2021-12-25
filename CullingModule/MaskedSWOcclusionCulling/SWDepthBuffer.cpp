@@ -2,9 +2,9 @@
 
 void culling::HizData::Reset()
 {
-	depthPosition = _mm256_set1_epi32(0);
-	l0MaxDepthValue = _mm256_set1_ps(1.0f);
-	l1MaxDepthValue = _mm256_set1_ps(0.0f);
+	//depthPosition = _mm256_set1_epi32(0);
+	L0MaxDepthValue = _mm256_set1_ps(1.0f);
+	L1MaxDepthValue = _mm256_set1_ps(0.0f);
 	ClearCoverageMaskAllSubTile();
 }
 
@@ -55,13 +55,13 @@ culling::SWDepthBuffer::SWDepthBuffer(std::uint32_t width, std::uint32_t height)
 	assert(mResolution.mHeight % TILE_HEIGHT == 0);
 
 	
-	const size_t tileCount = static_cast<size_t>(mResolution.mRowCount) * static_cast<size_t>(mResolution.mColumnCount);
+	const size_t tileCount = static_cast<size_t>(mResolution.mRowTileCount) * static_cast<size_t>(mResolution.mColumnTileCount);
 	mTiles = new Tile[tileCount];
 	mTileCount = tileCount;
 
-	for(size_t y = 0 ; y < mResolution.mRowCount ; y++)
+	for(size_t y = 0 ; y < mResolution.mRowTileCount ; y++)
 	{
-		for (size_t x = 0; x < mResolution.mColumnCount; x++)
+		for (size_t x = 0; x < mResolution.mColumnTileCount; x++)
 		{
 			culling::Tile* const tile = GetTile(y, x);
 			tile->mLeftBottomTileOrginX = x * TILE_WIDTH;
@@ -109,20 +109,20 @@ const culling::Tile* culling::SWDepthBuffer::GetTiles() const
 
 const culling::Tile* culling::SWDepthBuffer::GetTile(const size_t rowIndex, const size_t colIndex) const
 {
-	assert(rowIndex < mResolution.mRowCount);
-	assert(colIndex < mResolution.mColumnCount);
+	assert(rowIndex < mResolution.mRowTileCount);
+	assert(colIndex < mResolution.mColumnTileCount);
 
-	const size_t tileIndex = (mResolution.mRowCount - rowIndex - 1) * mResolution.mColumnCount + colIndex;
+	const size_t tileIndex = (mResolution.mRowTileCount - rowIndex - 1) * mResolution.mColumnTileCount + colIndex;
 	assert(tileIndex < mTileCount);
 	return mTiles + tileIndex;
 }
 
 culling::Tile* culling::SWDepthBuffer::GetTile(const size_t rowIndex, const size_t colIndex)
 {
-	assert(rowIndex < mResolution.mRowCount);
-	assert(colIndex < mResolution.mColumnCount);
+	assert(rowIndex < mResolution.mRowTileCount);
+	assert(colIndex < mResolution.mColumnTileCount);
 
-	const size_t tileIndex = (mResolution.mRowCount - rowIndex - 1) * mResolution.mColumnCount + colIndex;
+	const size_t tileIndex = (mResolution.mRowTileCount - rowIndex - 1) * mResolution.mColumnTileCount + colIndex;
 	assert(tileIndex < mTileCount);
 	return mTiles + tileIndex;
 }

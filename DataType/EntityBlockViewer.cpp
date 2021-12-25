@@ -49,7 +49,9 @@ void culling::EntityBlockViewer::SetMeshVertexData
 	const size_t verticeCount,
 	const std::uint32_t* const indices,
 	const size_t indiceCount,
-	const size_t verticeStride
+	const size_t verticeStride,
+	const culling::Vec3 aabbMinLocalPoint,
+	const culling::Vec3 aabbMaxLocalPoint
 )
 {
 	if (GetIsActive() == true)
@@ -59,6 +61,8 @@ void culling::EntityBlockViewer::SetMeshVertexData
 		mTargetEntityBlock->mVertexDatas[mEntityIndexInBlock].mIndices = indices;
 		mTargetEntityBlock->mVertexDatas[mEntityIndexInBlock].mIndiceCount = indiceCount;
 		mTargetEntityBlock->mVertexDatas[mEntityIndexInBlock].mVertexStride = verticeStride;
+		mTargetEntityBlock->mVertexDatas[mEntityIndexInBlock].mAABBMinLocalPoint = aabbMinLocalPoint;
+		mTargetEntityBlock->mVertexDatas[mEntityIndexInBlock].mAABBMaxLocalPoint = aabbMaxLocalPoint;
 	}
 }
 

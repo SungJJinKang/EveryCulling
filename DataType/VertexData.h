@@ -18,6 +18,9 @@ namespace culling
 		///		-> Stride is 8byte!
 		/// </summary>
 		size_t mVertexStride;
+
+		culling::Vec3 mAABBMinLocalPoint;
+		culling::Vec3 mAABBMaxLocalPoint;
 	};
 
 }

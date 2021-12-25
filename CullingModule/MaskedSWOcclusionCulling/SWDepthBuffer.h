@@ -22,7 +22,7 @@ namespace culling
 		///
 		///
 		/// </summary>
-		culling::M256F l0MaxDepthValue;
+		culling::M256F L0MaxDepthValue;
 
 		/// <summary>
 		/// Depth value of subtiles
@@ -31,7 +31,7 @@ namespace culling
 		/// A floating-point value represent Z0 Max DepthValue of A Subtile
 		/// 
 		/// </summary>
-		culling::M256F l1MaxDepthValue;
+		culling::M256F L1MaxDepthValue;
 
 		/// <summary>
 		/// Posion where Current Z1 Depth MaxValue come from
@@ -44,7 +44,7 @@ namespace culling
 		/// 8 byte -> Subtile Count in A Tile
 		/// 
 		/// </summary>
-		culling::M256I depthPosition;
+		//culling::M256I depthPosition;
 
 
 		/*
@@ -87,13 +87,13 @@ namespace culling
 
 		FORCE_INLINE void ClearL1MaxDepthValueAllSubTile()
 		{
-			l1MaxDepthValue = _mm256_set1_ps(0.0f);
+			L1MaxDepthValue = _mm256_set1_ps(0.0f);
 		}
 
 		FORCE_INLINE void ClearL1MaxDepthValue(const size_t subTileIndex)
 		{
 			assert(subTileIndex < 8);
-			(reinterpret_cast<std::uint32_t*>(&l1MaxDepthValue))[subTileIndex] = 0x00000000;
+			(reinterpret_cast<std::uint32_t*>(&L1MaxDepthValue))[subTileIndex] = 0x00000000;
 		}
 
 		
@@ -194,8 +194,10 @@ namespace culling
 	{
 		const std::uint32_t mWidth;
 		const std::uint32_t mHeight;
-		const std::uint32_t mRowCount;
-		const std::uint32_t mColumnCount;
+		const std::uint32_t mRowTileCount;
+		const std::uint32_t mColumnTileCount;
+		const std::uint32_t mRowSubTileCount;
+		const std::uint32_t mColumnSubTileCount;
 
 		/// <summary>
 		/// 0
@@ -245,14 +247,17 @@ namespace culling
 			:
 			mWidth(width),
 			mHeight(height),
-			mRowCount(rowCount),
-			mColumnCount(columnCount),
+			mRowTileCount(rowCount),
+			mColumnTileCount(columnCount),
 			mLeftBottomTileOrginX(leftBottomTileOrginX),
 			mLeftBottomTileOrginY(leftBottomTileOrginY),
 			mRightTopTileOrginX(rightTopTileOrginX),
 			mRightTopTileOrginY(rightTopTileOrginY),
 			mReplicatedScreenHalfWidth(replicatedScreenHalfWidth),
-			mReplicatedScreenHalfHeight(replicatedScreenHeight)
+			mReplicatedScreenHalfHeight(replicatedScreenHeight),
+
+			mRowSubTileCount(mRowTileCount * (TILE_HEIGHT / SUB_TILE_HEIGHT)),
+			mColumnSubTileCount(mColumnTileCount * (TILE_WIDTH / SUB_TILE_WIDTH))
 		{
 		}
 	};

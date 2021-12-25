@@ -58,7 +58,9 @@ namespace culling
 			const size_t verticeCount,
 			const std::uint32_t* const indices,
 			const size_t indiceCount,
-			const size_t verticeStride
+			const size_t verticeStride,
+			const culling::Vec3 aabbMinLocalPoint,
+			const culling::Vec3 aabbMaxLocalPoint
 		);
 		
 		void SetModelMatrix(const float* const modelMatrix);
