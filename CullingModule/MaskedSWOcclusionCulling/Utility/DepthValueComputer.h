@@ -6,7 +6,7 @@ namespace culling
 {
 	namespace DepthValueComputer
 	{
-		extern void ComputeFloatBottomDepthValue
+		extern void ComputeFlatBottomDepthValue
 		(
 			culling::M256F* const subTileMaxValues,
 			const std::uint32_t tileOriginX, // 32x8 tile

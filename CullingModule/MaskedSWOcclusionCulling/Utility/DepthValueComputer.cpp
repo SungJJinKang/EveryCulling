@@ -3,21 +3,21 @@
 #include "depthUtility.h"
 
 
-void culling::DepthValueComputer::ComputeFloatBottomDepthValue
+void culling::DepthValueComputer::ComputeFlatBottomDepthValue
 (
 	culling::M256F* const subTileMaxValues,
 	const std::uint32_t tileOriginX, // 32x8 tile
 	const std::uint32_t tileOriginY, // 32x8 tile
 
-	const culling::M256F& vertexPoint1X,
+	const culling::M256F& vertexPoint1X, // top point
 	const culling::M256F& vertexPoint1Y,
 	const culling::M256F& vertexPoint1Z,
 
-	const culling::M256F& vertexPoint2X,
+	const culling::M256F& vertexPoint2X, // bottom flat left point 
 	const culling::M256F& vertexPoint2Y,
 	const culling::M256F& vertexPoint2Z,
 
-	const culling::M256F& vertexPoint3X,
+	const culling::M256F& vertexPoint3X, // bottom flat right point
 	const culling::M256F& vertexPoint3Y,
 	const culling::M256F& vertexPoint3Z
 )
@@ -80,15 +80,15 @@ void culling::DepthValueComputer::ComputeFlatTopDepthValue
 	const std::uint32_t tileOriginX, // 32x8 tile
 	const std::uint32_t tileOriginY, // 32x8 tile
 
-	const culling::M256F& vertexPoint1X,
+	const culling::M256F& vertexPoint1X, // top flat left point 
 	const culling::M256F& vertexPoint1Y,
 	const culling::M256F& vertexPoint1Z,
 
-	const culling::M256F& vertexPoint2X,
+	const culling::M256F& vertexPoint2X, // top flat right point 
 	const culling::M256F& vertexPoint2Y,
 	const culling::M256F& vertexPoint2Z,
 
-	const culling::M256F& vertexPoint3X,
+	const culling::M256F& vertexPoint3X, // bottom point
 	const culling::M256F& vertexPoint3Y,
 	const culling::M256F& vertexPoint3Z
 )
