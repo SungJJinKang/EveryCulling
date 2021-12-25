@@ -6,8 +6,16 @@ namespace culling
 {
 	namespace DepthValueComputer
 	{
+		enum class eDepthType
+		{
+			MinDepth,
+			MaxDepth
+		};
+
 		extern void ComputeFlatBottomDepthValue
 		(
+			const size_t triangleCount,
+			const eDepthType targetDepthType,
 			culling::M256F* const subTileMaxValues,
 			const std::uint32_t tileOriginX, // 32x8 tile
 			const std::uint32_t tileOriginY, // 32x8 tile
@@ -22,11 +30,16 @@ namespace culling
 
 			const culling::M256F& pVtx3X,
 			const culling::M256F& pVtx3Y,
-			const culling::M256F& pVtx3Z
+			const culling::M256F& pVtx3Z,
+
+			const culling::M256I* const leftFaceEvent,
+			const culling::M256I* const rightFaceEvent
 		);
 
 		extern void ComputeFlatTopDepthValue
 		(
+			const size_t triangleCount,
+			const eDepthType targetDepthType,
 			culling::M256F* const subTileMaxValues,
 			const std::uint32_t tileOriginX, // 32x8 tile
 			const std::uint32_t tileOriginY, // 32x8 tile
@@ -41,7 +54,10 @@ namespace culling
 
 			const culling::M256F& pVtx3X,
 			const culling::M256F& pVtx3Y,
-			const culling::M256F& pVtx3Z
+			const culling::M256F& pVtx3Z,
+
+			const culling::M256I* const leftFaceEvent,
+			const culling::M256I* const rightFaceEvent
 		);
 		
 		/*

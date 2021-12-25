@@ -4,6 +4,7 @@
 #include "../Utility/CoverageRasterizer.h"
 #include "../Utility/DepthValueComputer.h"
 #include "../Utility/RasterizerHelper.h"
+#include "../Utility/triangleSlopeEventGetter.h"
 
 void culling::RasterizeOccludersStage::UpdateHierarchicalDepthBuffer()
 {
@@ -74,7 +75,8 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 	
 	for (size_t triangleBatchIndex = 0; triangleBatchIndex < tile->mBinnedTriangles.mCurrentTriangleCount; triangleBatchIndex += 8)
 	{
-		const size_t triangleCount = MAX(8, tile->mBinnedTriangles.mCurrentTriangleCount - triangleBatchIndex);
+		const size_t triangleCount = MIN(8, tile->mBinnedTriangles.mCurrentTriangleCount - triangleBatchIndex);
+		assert(triangleCount <= 8);
 
 		TwoDTriangle twoDTriangle;
 
@@ -122,6 +124,46 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 			RIGHT_MIDDLE_POINT_Z
 		);
 
+		culling::M256I LeftSlopeEventOfBottomFlatTriangle[8];
+		culling::M256I RightSlopeEventOfBottomFlatTriangle[8];
+
+		culling::M256I LeftSlopeEventOfTopFlatTriangle[8];
+		culling::M256I RightSlopeEventOfTopFlatTriangle[8];
+
+		culling::triangleSlopeHelper::GatherBottomFlatTriangleSlopeEvent
+		(
+			triangleCount,
+			tileOriginPoint,
+			LeftSlopeEventOfBottomFlatTriangle,
+			RightSlopeEventOfBottomFlatTriangle,
+
+			TriPointA_X,
+			TriPointA_Y,
+
+			LEFT_MIDDLE_POINT_X,
+			LEFT_MIDDLE_POINT_Y,
+
+			RIGHT_MIDDLE_POINT_X,
+			RIGHT_MIDDLE_POINT_Y
+		);
+
+		culling::triangleSlopeHelper::GatherTopFlatTriangleSlopeEvent
+		(
+			triangleCount,
+			tileOriginPoint,
+			LeftSlopeEventOfTopFlatTriangle,
+			RightSlopeEventOfTopFlatTriangle,
+			
+			LEFT_MIDDLE_POINT_X,
+			LEFT_MIDDLE_POINT_Y,
+
+			RIGHT_MIDDLE_POINT_X,
+			RIGHT_MIDDLE_POINT_Y,
+
+			TriPointC_X,
+			TriPointC_Y
+		);
+
 		culling::M256I CoverageMask[8];
 		culling::M256F subTileMaxDepth[8];
 
@@ -130,33 +172,25 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 				culling::M256I Result1[8], Result2[8];
 				culling::CoverageRasterizer::FillBottomFlatTriangleBatch
 				(
+					triangleCount,
 					Result1,
 					tileOriginPoint,
 
-					TriPointA_X,
-					TriPointA_Y,
-
-					LEFT_MIDDLE_POINT_X,
-					LEFT_MIDDLE_POINT_Y,
-
-					RIGHT_MIDDLE_POINT_X,
-					RIGHT_MIDDLE_POINT_Y
+					LeftSlopeEventOfBottomFlatTriangle,
+					RightSlopeEventOfBottomFlatTriangle,
+					LEFT_MIDDLE_POINT_Y
 				);
 
 
 				culling::CoverageRasterizer::FillTopFlatTriangleBatch
 				(
+					triangleCount,
 					Result2,
 					tileOriginPoint,
 
-					LEFT_MIDDLE_POINT_X,
-					LEFT_MIDDLE_POINT_Y,
-
-					RIGHT_MIDDLE_POINT_X,
-					RIGHT_MIDDLE_POINT_Y,
-
-					TriPointC_X,
-					TriPointC_Y
+					LeftSlopeEventOfTopFlatTriangle,
+					RightSlopeEventOfTopFlatTriangle,
+					LEFT_MIDDLE_POINT_Y
 				);
 
 				for (size_t triangleIndex = 0; triangleIndex < triangleCount; triangleIndex++)
@@ -207,6 +241,8 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 
 			culling::DepthValueComputer::ComputeFlatBottomDepthValue
 			(
+				triangleCount,
+				DepthValueComputer::eDepthType::MaxDepth,
 				_subTileMaxDepth1,
 				tileOriginPoint.x,
 				tileOriginPoint.y,
@@ -221,12 +257,17 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 
 				RIGHT_MIDDLE_POINT_X,
 				RIGHT_MIDDLE_POINT_Y,
-				RIGHT_MIDDLE_POINT_Z
+				RIGHT_MIDDLE_POINT_Z,
+
+				LeftSlopeEventOfBottomFlatTriangle,
+				RightSlopeEventOfBottomFlatTriangle
 			);
 
 
 			culling::DepthValueComputer::ComputeFlatTopDepthValue
 			(
+				triangleCount,
+				DepthValueComputer::eDepthType::MaxDepth,
 				_subTileMaxDepth2,
 				tileOriginPoint.x,
 				tileOriginPoint.y,
@@ -241,7 +282,10 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 
 				TriPointC_X,
 				TriPointC_Y,
-				TriPointC_Z
+				TriPointC_Z,
+
+				LeftSlopeEventOfTopFlatTriangle,
+				RightSlopeEventOfTopFlatTriangle
 			);
 
 			
@@ -279,6 +323,8 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 			
 		}
 
+
+		
 		for (size_t triangleIndex = 0; triangleIndex < triangleCount; triangleIndex++)
 		{
 
@@ -303,6 +349,7 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 			
 			
 		}
+		
 
 		
 		

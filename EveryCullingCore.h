@@ -96,6 +96,18 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 //Masked SW Occlusion Culling
 
+#if NDC_RANGE == MINUS_ONE_TO_POSITIVE_ONE
+
+#define MIN_DEPTH_VALUE -1
+#define MAX_DEPTH_VALUE 1
+
+#elif NDC_RANGE == ZERO_TO_POSITIVE_ONE
+
+#define MIN_DEPTH_VALUE 0
+#define MAX_DEPTH_VALUE 1
+
+#endif
+
 #ifndef TILE_WIDTH
 #define TILE_WIDTH 32
 #endif

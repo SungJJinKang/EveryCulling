@@ -72,16 +72,14 @@ namespace culling
 		/// <param name="triangle"></param>
 		extern void FillBottomFlatTriangleBatch
 		(
+			const size_t triangleCount,
 			culling::M256I* const outCoverageMask, // 8 coverage mask. array size should be 8
 			const Vec2& LeftBottomPoint,
-			const culling::M256F& TriPointA_X,
-			const culling::M256F& TriPointA_Y,
 
-			const culling::M256F& TriPointB_X,
-			const culling::M256F& TriPointB_Y,
+			const culling::M256I* const leftFaceEvent,
+			const culling::M256I* const rightFaceEvent,
 
-			const culling::M256F& TriPointC_X,
-			const culling::M256F& TriPointC_Y
+			const culling::M256F& bottomEdgeY
 		);
 
 		/// <summary>
@@ -91,20 +89,20 @@ namespace culling
 		/// <param name="triangle"></param>
 		extern void FillTopFlatTriangleBatch
 		(
+			const size_t triangleCount,
 			culling::M256I* const outCoverageMask, // 8 coverage mask. array size should be 8
 			const Vec2& LeftBottomPoint,
-			const culling::M256F& TriPointA_X,
-			const culling::M256F& TriPointA_Y,
 
-			const culling::M256F& TriPointB_X,
-			const culling::M256F& TriPointB_Y,
+			const culling::M256I* const leftFaceEvent,
+			const culling::M256I* const rightFaceEvent,
 
-			const culling::M256F& TriPointC_X,
-			const culling::M256F& TriPointC_Y
+			const culling::M256F& topEdgeY
 		);
 		
+		/*
 		extern void FillTriangleBatch
 		(
+			const size_t triangleCount,
 			culling::M256I* const outCoverageMask, // 8 coverage mask. array size should be 8
 			const Vec2& LeftBottomPoint,
 			culling::M256F& TriPointA_X,
@@ -116,6 +114,7 @@ namespace culling
 			culling::M256F& TriPointC_X,
 			culling::M256F& TriPointC_Y
 		);
+		*/
 
 		
 	};

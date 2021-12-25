@@ -519,7 +519,7 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 		//Clip Space Cull
 
 		
-
+		// TODO : Early split triangle at here
 		
 		
 
