@@ -10,12 +10,12 @@ void culling::HizData::Reset()
 
 void culling::HizData::ClearCoverageMaskAllSubTile()
 {
-	l1CoverageMask = _mm256_setzero_si256();
+	L1CoverageMask = _mm256_setzero_si256();
 }
 
 void culling::HizData::FillCoverageMask()
 {
-	l1CoverageMask = _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF);
+	L1CoverageMask = _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF);
 }
 
 void culling::TriangleList::Reset()

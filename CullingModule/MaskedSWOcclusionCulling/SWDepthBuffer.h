@@ -73,7 +73,7 @@ namespace culling
 		// 7 : CoverageMask ( 224 ~ 256 )
 			
 		 */
-		culling::M256I l1CoverageMask;
+		culling::M256I L1CoverageMask;
 
 		void Reset();
 
@@ -81,7 +81,7 @@ namespace culling
 		FORCE_INLINE void ClearCoverageMask(const size_t subTileIndex)
 		{
 			assert(subTileIndex < 8);
-			(reinterpret_cast<std::uint32_t*>(&l1CoverageMask))[subTileIndex] = 0x00000000;
+			(reinterpret_cast<std::uint32_t*>(&L1CoverageMask))[subTileIndex] = 0x00000000;
 		}
 		void FillCoverageMask();
 
@@ -130,13 +130,13 @@ namespace culling
 		FORCE_INLINE bool IsCoverageMaskFullByOne(const size_t subTileIndex) const
 		{
 			assert(subTileIndex < 8);
-			return reinterpret_cast<const std::uint32_t*>(&l1CoverageMask)[subTileIndex] == 0xFFFFFFFF;
+			return reinterpret_cast<const std::uint32_t*>(&L1CoverageMask)[subTileIndex] == 0xFFFFFFFF;
 		}
 		
 		/*
 		FORCE_INLINE void OverriteCoverageMask(const size_t subTileIndex, const std::uint32_t tileCoverage)
 		{
-			reinterpret_cast<std::uint32_t*>(&l1CoverageMask)[subTileIndex] = tileCoverage;
+			reinterpret_cast<std::uint32_t*>(&L1CoverageMask)[subTileIndex] = tileCoverage;
 		}
 		*/
 
