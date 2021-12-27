@@ -22,11 +22,11 @@ culling::M256I culling::CoverageRasterizer::FillBottomFlatTriangle
     const float curx1 = point1.x + (TileLeftBottomOriginPoint.y + 0.5f - point1.y) * inverseSlope1 - TileLeftBottomOriginPoint.x + 0.5f;
     const float curx2 = point1.x + (TileLeftBottomOriginPoint.y + 0.5f - point1.y) * inverseSlope2 - TileLeftBottomOriginPoint.x + 0.5f;
 
-    const culling::M256F leftFaceEventFloat = _mm256_round_ps(_mm256_set_ps(curx1, curx1 + inverseSlope1 * 1.0f, curx1 + inverseSlope1 * 2.0f, curx1 + inverseSlope1 * 3.0f, curx1 + inverseSlope1 * 4.0f, curx1 + inverseSlope1 * 5.0f, curx1 + inverseSlope1 * 6.0f, curx1 + inverseSlope1 * 7.0f), (_MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC));
+    const culling::M256F leftFaceEventFloat = _mm256_round_ps(_mm256_setr_ps(curx1, curx1 + inverseSlope1 * 1.0f, curx1 + inverseSlope1 * 2.0f, curx1 + inverseSlope1 * 3.0f, curx1 + inverseSlope1 * 4.0f, curx1 + inverseSlope1 * 5.0f, curx1 + inverseSlope1 * 6.0f, curx1 + inverseSlope1 * 7.0f), (_MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC));
     culling::M256I leftFaceEvent = _mm256_cvtps_epi32(leftFaceEventFloat);
     leftFaceEvent = _mm256_max_epi32(leftFaceEvent, _mm256_set1_epi32(0));
 
-    const culling::M256F rightFaceEventFloat = _mm256_round_ps(_mm256_set_ps(curx2, curx2 + inverseSlope2 * 1.0f, curx2 + inverseSlope2 * 2.0f, curx2 + inverseSlope2 * 3.0f, curx2 + inverseSlope2 * 4.0f, curx2 + inverseSlope2 * 5.0f, curx2 + inverseSlope2 * 6.0f, curx2 + inverseSlope2 * 7.0f), (_MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC));
+    const culling::M256F rightFaceEventFloat = _mm256_round_ps(_mm256_setr_ps(curx2, curx2 + inverseSlope2 * 1.0f, curx2 + inverseSlope2 * 2.0f, curx2 + inverseSlope2 * 3.0f, curx2 + inverseSlope2 * 4.0f, curx2 + inverseSlope2 * 5.0f, curx2 + inverseSlope2 * 6.0f, curx2 + inverseSlope2 * 7.0f), (_MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC));
     culling::M256I rightFaceEvent = _mm256_cvtps_epi32(rightFaceEventFloat);
     rightFaceEvent = _mm256_max_epi32(rightFaceEvent, _mm256_set1_epi32(0));
 
@@ -35,7 +35,7 @@ culling::M256I culling::CoverageRasterizer::FillBottomFlatTriangle
     
     culling::M256I Result = _mm256_and_si256(Mask1, _mm256_xor_si256(Mask2, _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF)));
 
-    const culling::M256F aboveFlatBottomTriangleFace = _mm256_cmp_ps(_mm256_set_ps(TileLeftBottomOriginPoint.y, TileLeftBottomOriginPoint.y + 1.0f, TileLeftBottomOriginPoint.y + 2.0f, TileLeftBottomOriginPoint.y + 3.0f, TileLeftBottomOriginPoint.y + 4.0f, TileLeftBottomOriginPoint.y + 5.0f, TileLeftBottomOriginPoint.y + 6.0f, TileLeftBottomOriginPoint.y + 7.0f), _mm256_set1_ps(point2.y), _CMP_GE_OQ);
+    const culling::M256F aboveFlatBottomTriangleFace = _mm256_cmp_ps(_mm256_setr_ps(TileLeftBottomOriginPoint.y, TileLeftBottomOriginPoint.y + 1.0f, TileLeftBottomOriginPoint.y + 2.0f, TileLeftBottomOriginPoint.y + 3.0f, TileLeftBottomOriginPoint.y + 4.0f, TileLeftBottomOriginPoint.y + 5.0f, TileLeftBottomOriginPoint.y + 6.0f, TileLeftBottomOriginPoint.y + 7.0f), _mm256_set1_ps(point2.y), _CMP_GE_OQ);
 
     Result = _mm256_and_si256(Result, *reinterpret_cast<const culling::M256I*>(&aboveFlatBottomTriangleFace));
 
@@ -61,11 +61,11 @@ culling::M256I culling::CoverageRasterizer::FillTopFlatTriangle
     const float curx1 = point3.x + (TileLeftBottomOriginPoint.y + 0.5f - point3.y) * inverseSlope1 - TileLeftBottomOriginPoint.x + 0.5f;
     const float curx2 = point3.x + (TileLeftBottomOriginPoint.y + 0.5f - point3.y) * inverseSlope2 - TileLeftBottomOriginPoint.x + 0.5f;
 
-    const culling::M256F leftFaceEventFloat = _mm256_round_ps(_mm256_set_ps(curx1, curx1 + inverseSlope1 * 1.0f, curx1 + inverseSlope1 * 2.0f, curx1 + inverseSlope1 * 3.0f, curx1 + inverseSlope1 * 4.0f, curx1 + inverseSlope1 * 5.0f, curx1 + inverseSlope1 * 6.0f, curx1 + inverseSlope1 * 7.0f), (_MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC));
+    const culling::M256F leftFaceEventFloat = _mm256_round_ps(_mm256_setr_ps(curx1, curx1 + inverseSlope1 * 1.0f, curx1 + inverseSlope1 * 2.0f, curx1 + inverseSlope1 * 3.0f, curx1 + inverseSlope1 * 4.0f, curx1 + inverseSlope1 * 5.0f, curx1 + inverseSlope1 * 6.0f, curx1 + inverseSlope1 * 7.0f), (_MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC));
     culling::M256I leftFaceEvent = _mm256_cvtps_epi32(leftFaceEventFloat);
     leftFaceEvent = _mm256_max_epi32(leftFaceEvent, _mm256_set1_epi32(0));
 
-    const culling::M256F rightFaceEventFloat = _mm256_round_ps(_mm256_set_ps(curx2, curx2 + inverseSlope2 * 1.0f, curx2 + inverseSlope2 * 2.0f, curx2 + inverseSlope2 * 3.0f, curx2 + inverseSlope2 * 4.0f, curx2 + inverseSlope2 * 5.0f, curx2 + inverseSlope2 * 6.0f, curx2 + inverseSlope2 * 7.0f), (_MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC));
+    const culling::M256F rightFaceEventFloat = _mm256_round_ps(_mm256_setr_ps(curx2, curx2 + inverseSlope2 * 1.0f, curx2 + inverseSlope2 * 2.0f, curx2 + inverseSlope2 * 3.0f, curx2 + inverseSlope2 * 4.0f, curx2 + inverseSlope2 * 5.0f, curx2 + inverseSlope2 * 6.0f, curx2 + inverseSlope2 * 7.0f), (_MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC));
     culling::M256I rightFaceEvent = _mm256_cvtps_epi32(rightFaceEventFloat);
     rightFaceEvent = _mm256_max_epi32(rightFaceEvent, _mm256_set1_epi32(0));
 
@@ -74,7 +74,7 @@ culling::M256I culling::CoverageRasterizer::FillTopFlatTriangle
     
     culling::M256I Result = _mm256_and_si256(Mask1, _mm256_xor_si256(Mask2, _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF)));
 
-    const culling::M256F belowFlatTopTriangleFace = _mm256_cmp_ps(_mm256_set_ps(TileLeftBottomOriginPoint.y, TileLeftBottomOriginPoint.y + 1.0f, TileLeftBottomOriginPoint.y + 2.0f, TileLeftBottomOriginPoint.y + 3.0f, TileLeftBottomOriginPoint.y + 4.0f, TileLeftBottomOriginPoint.y + 5.0f, TileLeftBottomOriginPoint.y + 6.0f, TileLeftBottomOriginPoint.y + 7.0f), _mm256_set1_ps(point1.y), _CMP_LE_OQ);
+    const culling::M256F belowFlatTopTriangleFace = _mm256_cmp_ps(_mm256_setr_ps(TileLeftBottomOriginPoint.y, TileLeftBottomOriginPoint.y + 1.0f, TileLeftBottomOriginPoint.y + 2.0f, TileLeftBottomOriginPoint.y + 3.0f, TileLeftBottomOriginPoint.y + 4.0f, TileLeftBottomOriginPoint.y + 5.0f, TileLeftBottomOriginPoint.y + 6.0f, TileLeftBottomOriginPoint.y + 7.0f), _mm256_set1_ps(point1.y), _CMP_LE_OQ);
 
     Result = _mm256_and_si256(Result, *reinterpret_cast<const culling::M256I*>(&belowFlatTopTriangleFace));
 
@@ -196,20 +196,21 @@ void culling::CoverageRasterizer::FillBottomFlatTriangleBatch
 
     for (size_t triIndex = 0; triIndex < triangleCount; triIndex++)
     {
-        Mask1[triIndex] = _mm256_srlv_epi32(_mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF), leftFaceEvent[triIndex]);
-        Mask2[triIndex] = _mm256_srlv_epi32(_mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF), rightFaceEvent[triIndex]);
+        Mask1[triIndex] = _mm256_sllv_epi32(_mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF), leftFaceEvent[triIndex]);
+        Mask2[triIndex] = _mm256_sllv_epi32(_mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF), rightFaceEvent[triIndex]);
     }
     culling::M256I Result[8];
 
     for (size_t triIndex = 0; triIndex < triangleCount; triIndex++)
     {
-        Result[triIndex] = _mm256_and_si256(Mask1[triIndex], _mm256_xor_si256(Mask2[triIndex], _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF)));
+        const culling::M256F blend = _mm256_andnot_ps(*reinterpret_cast<const culling::M256F*>(Mask2 + triIndex), *reinterpret_cast<const culling::M256F*>(Mask1 + triIndex));
+        Result[triIndex] = *reinterpret_cast<const culling::M256I*>(&blend);
     }
 
     culling::M256F aboveFlatBottomTriangleFace[8];
     for (size_t triIndex = 0; triIndex < triangleCount; triIndex++)
     {
-        aboveFlatBottomTriangleFace[triIndex] = _mm256_cmp_ps(_mm256_set_ps(TileLeftBottomOriginPoint.y, TileLeftBottomOriginPoint.y + 1.0f, TileLeftBottomOriginPoint.y + 2.0f, TileLeftBottomOriginPoint.y + 3.0f, TileLeftBottomOriginPoint.y + 4.0f, TileLeftBottomOriginPoint.y + 5.0f, TileLeftBottomOriginPoint.y + 6.0f, TileLeftBottomOriginPoint.y + 7.0f), _mm256_set1_ps(reinterpret_cast<const float*>(&bottomEdgeY)[triIndex]), _CMP_GE_OQ);
+        aboveFlatBottomTriangleFace[triIndex] = _mm256_cmp_ps(_mm256_setr_ps(TileLeftBottomOriginPoint.y + 0.5f, TileLeftBottomOriginPoint.y + 1.5f, TileLeftBottomOriginPoint.y + 2.5f, TileLeftBottomOriginPoint.y + 3.5f, TileLeftBottomOriginPoint.y + 4.5f, TileLeftBottomOriginPoint.y + 5.5f, TileLeftBottomOriginPoint.y + 6.5f, TileLeftBottomOriginPoint.y + 7.5f), _mm256_set1_ps(reinterpret_cast<const float*>(&bottomEdgeY)[triIndex]), _CMP_GE_OQ);
     }
 
     for(size_t triIndex = 0 ; triIndex < triangleCount; triIndex++)
@@ -237,25 +238,26 @@ void culling::CoverageRasterizer::FillTopFlatTriangleBatch
 
     for (size_t triIndex = 0; triIndex < triangleCount; triIndex++)
     {
-        Mask1[triIndex] = _mm256_srlv_epi32(_mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF), leftFaceEvent[triIndex]);
-        Mask2[triIndex] = _mm256_srlv_epi32(_mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF), rightFaceEvent[triIndex]);
+        Mask1[triIndex] = _mm256_sllv_epi32(_mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF), leftFaceEvent[triIndex]);
+        Mask2[triIndex] = _mm256_sllv_epi32(_mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF), rightFaceEvent[triIndex]);
     }
     culling::M256I Result[8];
 
     for (size_t triIndex = 0; triIndex < triangleCount; triIndex++)
     {
-        Result[triIndex] = _mm256_and_si256(Mask1[triIndex], _mm256_xor_si256(Mask2[triIndex], _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF)));
+        const culling::M256F blend = _mm256_andnot_ps(*reinterpret_cast<const culling::M256F*>(Mask2 + triIndex), *reinterpret_cast<const culling::M256F*>(Mask1 + triIndex));
+        Result[triIndex] = *reinterpret_cast<const culling::M256I*>(&blend);
     }
 
-    culling::M256F aboveFlatBottomTriangleFace[8];
+    culling::M256F belowFlatTopTriangleFace[8];
     for (size_t triIndex = 0; triIndex < triangleCount; triIndex++)
     {
-        aboveFlatBottomTriangleFace[triIndex] = _mm256_cmp_ps(_mm256_set_ps(TileLeftBottomOriginPoint.y, TileLeftBottomOriginPoint.y + 1.0f, TileLeftBottomOriginPoint.y + 2.0f, TileLeftBottomOriginPoint.y + 3.0f, TileLeftBottomOriginPoint.y + 4.0f, TileLeftBottomOriginPoint.y + 5.0f, TileLeftBottomOriginPoint.y + 6.0f, TileLeftBottomOriginPoint.y + 7.0f), _mm256_set1_ps(reinterpret_cast<const float*>(&topEdgeY)[triIndex]), _CMP_LE_OQ);
+        belowFlatTopTriangleFace[triIndex] = _mm256_cmp_ps(_mm256_setr_ps(TileLeftBottomOriginPoint.y + 0.5f, TileLeftBottomOriginPoint.y + 1.5f, TileLeftBottomOriginPoint.y + 2.5f, TileLeftBottomOriginPoint.y + 3.5f, TileLeftBottomOriginPoint.y + 4.5f, TileLeftBottomOriginPoint.y + 5.5f, TileLeftBottomOriginPoint.y + 6.5f, TileLeftBottomOriginPoint.y + 7.5f), _mm256_set1_ps(reinterpret_cast<const float*>(&topEdgeY)[triIndex]), _CMP_LE_OQ);
     }
 
     for (size_t triIndex = 0; triIndex < triangleCount; triIndex++)
     {
-        outCoverageMask[triIndex] = _mm256_and_si256(Result[triIndex], *reinterpret_cast<const culling::M256I*>(aboveFlatBottomTriangleFace + triIndex));
+        outCoverageMask[triIndex] = _mm256_and_si256(Result[triIndex], *reinterpret_cast<const culling::M256I*>(belowFlatTopTriangleFace + triIndex));
     }
 }
 
