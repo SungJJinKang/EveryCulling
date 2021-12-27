@@ -28,11 +28,16 @@ void culling::DepthValueComputer::ComputeFlatBottomDepthValue
 )
 {
 #ifdef DEBUG_CULLING
-	const culling::M256F LE_12Y = _mm256_cmp_ps(vertexPoint1Y, vertexPoint2Y, _CMP_GE_OQ);
-	const culling::M256F LE_13Y = _mm256_cmp_ps(vertexPoint1Y, vertexPoint3Y, _CMP_GE_OQ);
+	for (size_t triIndex = 0; triIndex < triangleCount; triIndex++)
+	{
+		assert(reinterpret_cast<const float*>(&vertexPoint1Y)[triIndex] >= reinterpret_cast<const float*>(&vertexPoint2Y)[triIndex]);
+		assert(reinterpret_cast<const float*>(&vertexPoint1Y)[triIndex] >= reinterpret_cast<const float*>(&vertexPoint3Y)[triIndex]);
+	}
 
-	assert(_mm256_testc_si256(*reinterpret_cast<const culling::M256I*>(&LE_12Y), _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF)) == 1);
-	assert(_mm256_testc_si256(*reinterpret_cast<const culling::M256I*>(&LE_13Y), _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF)) == 1);
+	for (size_t triIndex = 0; triIndex < triangleCount; triIndex++)
+	{
+		assert(reinterpret_cast<const float*>(&vertexPoint2X)[triIndex] <= reinterpret_cast<const float*>(&vertexPoint3X)[triIndex]);
+	}
 #endif
 
 	culling::M256F zPixelDx, zPixelDy;
@@ -126,11 +131,16 @@ void culling::DepthValueComputer::ComputeFlatTopDepthValue
 )
 {
 #ifdef DEBUG_CULLING
-	const culling::M256F LE_13Y = _mm256_cmp_ps(vertexPoint1Y, vertexPoint3Y, _CMP_GE_OQ);
-	const culling::M256F LE_23Y = _mm256_cmp_ps(vertexPoint2Y, vertexPoint3Y, _CMP_GE_OQ);
+	for (size_t triIndex = 0; triIndex < triangleCount; triIndex++)
+	{
+		assert(reinterpret_cast<const float*>(&vertexPoint1Y)[triIndex] >= reinterpret_cast<const float*>(&vertexPoint3Y)[triIndex]);
+		assert(reinterpret_cast<const float*>(&vertexPoint2Y)[triIndex] >= reinterpret_cast<const float*>(&vertexPoint3Y)[triIndex]);
+	}
 
-	assert(_mm256_testc_si256(*reinterpret_cast<const culling::M256I*>(&LE_13Y), _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF)) == 1);
-	assert(_mm256_testc_si256(*reinterpret_cast<const culling::M256I*>(&LE_23Y), _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF)) == 1);
+	for (size_t triIndex = 0; triIndex < triangleCount; triIndex++)
+	{
+		assert(reinterpret_cast<const float*>(&vertexPoint1X)[triIndex] <= reinterpret_cast<const float*>(&vertexPoint2X)[triIndex]);
+	}
 #endif
 
 	culling::M256F zPixelDx, zPixelDy;

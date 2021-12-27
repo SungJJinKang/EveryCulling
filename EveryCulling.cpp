@@ -135,7 +135,7 @@ void culling::EveryCulling::CullBlockEntityJob(const size_t cameraIndex)
 
 				while (cullingModule->GetFinishedThreadCount(cameraIndex) < mThreadCount)
 				{
-					std::this_thread::yield();
+					//std::this_thread::yield();
 				}
 			}			
 		}
