@@ -96,6 +96,11 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 //Masked SW Occlusion Culling
 
+//HAAM16
+#ifndef QUICK_MASK
+#define QUICK_MASK 1
+#endif
+
 #ifndef FETCH_OBJECT_SORT_FROM_DOOMS_ENGINE_IN_BIN_TRIANGLE_STAGE
 #define FETCH_OBJECT_SORT_FROM_DOOMS_ENGINE_IN_BIN_TRIANGLE_STAGE 1
 #endif
@@ -104,13 +109,13 @@
 
 #if NDC_RANGE == MINUS_ONE_TO_POSITIVE_ONE
 
-#define MIN_DEPTH_VALUE -1
-#define MAX_DEPTH_VALUE 1
+#define MIN_DEPTH_VALUE -1.0f
+#define MAX_DEPTH_VALUE 1.0f
 
 #elif NDC_RANGE == ZERO_TO_POSITIVE_ONE
 
-#define MIN_DEPTH_VALUE 0
-#define MAX_DEPTH_VALUE 1
+#define MIN_DEPTH_VALUE 0.0f
+#define MAX_DEPTH_VALUE 1.0f
 
 #endif
 

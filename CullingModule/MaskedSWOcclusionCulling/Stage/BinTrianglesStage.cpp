@@ -412,7 +412,7 @@ void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t 
 	{
 		const std::vector<dooms::Renderer*>& renderersInLayer = dooms::RendererComponentStaticIterator::GetSingleton()->GetWorkingRendererInLayer(cameraIndex, layerIndex);
 
-		for(INT64 rendererIndex = renderersInLayer.size() - 1 ; rendererIndex >= 0 ; rendererIndex--)
+		for(INT64 rendererIndex = 0 ; rendererIndex < renderersInLayer.size() ; rendererIndex++)
 		{
 			dooms::Renderer* const renderer = renderersInLayer[rendererIndex];
 			if
