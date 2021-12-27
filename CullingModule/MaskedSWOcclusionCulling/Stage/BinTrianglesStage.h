@@ -17,22 +17,6 @@ namespace culling
 		std::atomic<bool> IsWorkingByAThread;
 
 	
-		/// <summary>
-		/// Project Vertex To ScreenSpace
-		/// X, Y, Z, W -> X/W , Y/W, Z/W, W/1
-		/// </summary>
-		/// <param name="outClipVertexX"></param>
-		/// <param name="outClipVertexY"></param>
-		/// <param name="outClipVertexZ"></param>
-		/// <param name="outClipVertexW"></param>
-		FORCE_INLINE void ConvertClipSpaceToNDCSpace
-		(
-			culling::M256F* outClipVertexX, 
-			culling::M256F* outClipVertexY, 
-			culling::M256F* outClipVertexZ, 
-			const culling::M256F* oneDividedByW, 
-			std::uint32_t& triangleCullMask
-		);
 
 		/// <summary>
 		/// frustum culling in clip space
@@ -48,41 +32,9 @@ namespace culling
 			const culling::M256F* const clipspaceVertexW,
 			std::uint32_t& triangleCullMask
 		);
+		
 
-		/// <summary>
-		/// Convert NDC Space X,Y To Screen Space X,Y according to Graphics API
-		/// And Snap Screen Space X,Y To Pixel Coordinate in Buffer
-		/// 
-		/// Pixel Coordinate have integer value
-		/// </summary>
-		/// <param name="ndcSpaceVertexX"></param>
-		/// <param name="ndcSpaceVertexY"></param>
-		/// <param name="triangleCullMask"></param>
-		/// <param name="outScreenPixelSpaceX"></param>
-		/// <param name="outScreenPixelSpaceY"></param>
-		FORCE_INLINE void ConvertNDCSpaceToScreenPixelSpace
-		(
-			const culling::M256F* ndcSpaceVertexX, const culling::M256F* ndcSpaceVertexY,
-			culling::M256F* outScreenPixelSpaceX, culling::M256F* outScreenPixelSpaceY, std::uint32_t& triangleCullMask
-		);
-
-		/// <summary>
-		/// Convert 4 TriangSles's Model Vertex to ClipSpace
-		/// </summary>
-		/// <param name="vertX">three culling::M256F -> 12 floating-point value</param>
-		/// <param name="vertY">three culling::M256F -> 12 floating-point value</param>
-		/// <param name="vertW">"W" !!!!!!!!! three culling::M256F -> 12 floating-point value</param>
-		/// <param name="modelToClipspaceMatrix">column major 4x4 matrix</param>
-		FORCE_INLINE void TransformVertexsToClipSpace
-		(
-			culling::M256F* outClipVertexX, 
-			culling::M256F* outClipVertexY, 
-			culling::M256F* outClipVertexZ,
-			culling::M256F* outClipVertexW, 
-			const float* const toClipspaceMatrix,
-			std::uint32_t& triangleCullMask
-		);
-
+		
 		/// <summary>
 		/// BackFace Culling
 		/// Result is stored in triangleCullMask
@@ -100,28 +52,6 @@ namespace culling
 		);
 
 		
-		
-		/// <summary>
-		/// Compute BoudingBox intersecting with triangles
-		/// 
-		/// if boudingBox intersect with multiple tiles,
-		/// Min, Max coorridate of unioned bouding is returned.
-		/// </summary>
-		/// <param name="screenPixelX"></param>
-		/// <param name="screenPixelY"></param>
-		/// <param name="outBinBoundingBoxMinX">MinX of bounding box intersecting with 8 Triangles, Not Index. ex) 0, 32, 64, ..</param>
-		/// <param name="outBinBoundingBoxMinY">MinY of bounding box intersecting with 8 Triangles, Not Index. ex) 0, 32, 64, ..</param>
-		/// <param name="outBinBoundingBoxMaxX">MaxX of bounding box intersecting with 8 Triangles, Not Index. ex) 0, 32, 64, ..</param>
-		/// <param name="outBinBoundingBoxMaxY">MaxY of bounding box intersecting with 8 Triangles, Not Index. ex) 0, 32, 64, ..</param>
-		FORCE_INLINE void ComputeBinBoundingBox
-		(
-			const culling::M256F* screenPixelX,
-			const culling::M256F* screenPixelY,
-			culling::M256I& outBinBoundingBoxMinX,
-			culling::M256I& outBinBoundingBoxMinY,
-			culling::M256I& outBinBoundingBoxMaxX, 
-			culling::M256I& outBinBoundingBoxMaxY
-		);
 
 		FORCE_INLINE void PassTrianglesToTileBin
 		(

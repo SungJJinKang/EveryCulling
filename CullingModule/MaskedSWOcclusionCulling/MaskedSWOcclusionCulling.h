@@ -11,6 +11,7 @@
 #include "Stage/BinTrianglesStage.h"
 #include "Stage/RasterizeOccludersStage.h"
 #include "Stage/SolveMeshRoleStage.h"
+#include "Stage/QueryOccludeeStage.h"
 
 
 namespace culling
@@ -52,6 +53,7 @@ namespace culling
 		SolveMeshRoleStage mSolveMeshRoleStage;
 		BinTrianglesStage mBinTrianglesStage;
 		RasterizeOccludersStage mRasterizeTrianglesStage;
+		QueryOccludeeStage mQueryOccludeeStage;
 
 		SWDepthBuffer mDepthBuffer;
 

@@ -15,6 +15,11 @@ namespace culling
 	struct HizData
 	{
 		/// <summary>
+		/// Max value of L0SubTileMaxDepthValues
+		/// </summary>
+		float L0MaxDepthValue;
+
+		/// <summary>
 		/// Depth value of subtiles
 		/// 8 floating-point = SubTile Count ( 8 )
 		/// 
@@ -22,7 +27,7 @@ namespace culling
 		///
 		///
 		/// </summary>
-		culling::M256F L0MaxDepthValue;
+		culling::M256F L0SubTileMaxDepthValue;
 
 		/// <summary>
 		/// Depth value of subtiles
@@ -31,7 +36,7 @@ namespace culling
 		/// A floating-point value represent Z0 Max DepthValue of A Subtile
 		/// 
 		/// </summary>
-		culling::M256F L1MaxDepthValue;
+		culling::M256F L1SubTileMaxDepthValue;
 
 		/// <summary>
 		/// Posion where Current Z1 Depth MaxValue come from
@@ -87,13 +92,13 @@ namespace culling
 
 		FORCE_INLINE void ClearL1MaxDepthValueAllSubTile()
 		{
-			L1MaxDepthValue = _mm256_set1_ps(0.0f);
+			L1SubTileMaxDepthValue = _mm256_set1_ps(0.0f);
 		}
 
 		FORCE_INLINE void ClearL1MaxDepthValue(const size_t subTileIndex)
 		{
 			assert(subTileIndex < 8);
-			(reinterpret_cast<std::uint32_t*>(&L1MaxDepthValue))[subTileIndex] = 0x00000000;
+			(reinterpret_cast<std::uint32_t*>(&L1SubTileMaxDepthValue))[subTileIndex] = 0x00000000;
 		}
 
 		

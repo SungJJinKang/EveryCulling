@@ -128,12 +128,12 @@ Thread 2 : Check Frustum of Entity Block 2, 5, 8
 To minimize waiting time(wait calculating cull finish) , Passing cull job to thread should be placed at foremost of rendering loop.      
 In My experiment, Waiting time is near to zero.
 
-## Masked SW ( CPU ) Occlusion Culling ( 80%, Implemented stage : Draw Occluder to DepthBuffer )             
+## Masked SW ( CPU ) Occlusion Culling ( 95%, require more optimization )             
              
 Stage 1 : Solve Mesh Role Stage ( Decide if object is occluder based on object's bouding sphere )             
 Stage 2 : Bin Occluder Triangle Stage ( Dispatch triangles to screen tiles based on triangle's screen space vertex data for following rasterizer stage )             
 Stage 3 : Multithread Rasterize Occluder Triangles ( Rasterize tile's binned triangles, resolve max depth value of tile )             
-Stage 4 : Multithread Query depth buffer ( Compare occludee's depth value to depth buffer )             
+Stage 4 : Multithread Query depth buffer ( Compare aabb of occludee min depth value with tile depth buffer. check 52p https://www.ea.com/frostbite/news/culling-the-battlefield-data-oriented-design-in-practice )             
              
 Read This : ["Masked Software Occlusion Culling"는 어떻게 작동하는가?](https://github.com/SungJJinKang/EveryCulling/blob/main/CullingModule/MaskedSWOcclusionCulling/MaskedSWOcclusionCulling_HowWorks.md)           
 references : https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf         

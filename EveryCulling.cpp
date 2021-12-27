@@ -271,7 +271,7 @@ culling::EveryCulling::EveryCulling(const std::uint32_t resolutionWidth, const s
 			&(mMaskedSWOcclusionCulling->mSolveMeshRoleStage), // Choose Role Stage
 			&(mMaskedSWOcclusionCulling->mBinTrianglesStage), // BinTriangles
 			&(mMaskedSWOcclusionCulling->mRasterizeTrianglesStage), // DrawOccluderStage
-			//&(mMaskedSWOcclusionCulling) // QueryOccludeeStage
+			&(mMaskedSWOcclusionCulling->mQueryOccludeeStage) // QueryOccludeeStage
 		}
 {
 	//to protect 

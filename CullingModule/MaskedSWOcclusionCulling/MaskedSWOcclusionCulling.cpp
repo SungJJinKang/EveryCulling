@@ -24,7 +24,8 @@ culling::MaskedSWOcclusionCulling::MaskedSWOcclusionCulling
 	binCountInColumn{ depthBufferheight / SUB_TILE_HEIGHT },
 	mBinTrianglesStage{this},
 	mRasterizeTrianglesStage{this},
-	mSolveMeshRoleStage{ this }
+	mSolveMeshRoleStage{ this },
+	mQueryOccludeeStage{this}
 {
 	assert(depthBufferWidth% TILE_WIDTH == 0);
 	assert(depthBufferheight% TILE_HEIGHT == 0);

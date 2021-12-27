@@ -11,16 +11,8 @@ namespace culling
 	private:
 
 		std::array<std::atomic<size_t>, MAX_CAMERA_COUNT> mFinishedTileCount;
-
-		/// <summary>
-		/// 
-		/// </summary>
-		void UpdateHierarchicalDepthBuffer();
-
-		/// <summary>
-		/// Real Time Redering 3rd ( 873p )
-		/// </summary>
-		void ComputeTrianglesDepthValueInTile();
+		
+		
 
 		/// <summary>
 		/// https://www.slideshare.net/IntelSoftware/masked-software-occlusion-culling 46p

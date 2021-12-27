@@ -6,30 +6,6 @@
 #include "../Utility/RasterizerHelper.h"
 #include "../Utility/triangleSlopeEventGetter.h"
 
-void culling::RasterizeOccludersStage::UpdateHierarchicalDepthBuffer()
-{
-	/*
-			// Discard working layer heuristic
-			dist1t = tile.zMax1 - tri.zMax
-			dist01 = tile.zMax0 - tile.zMax1
-			if (dist1t > dist01)
-				tile.zMax1 = 0
-				tile.mask = 0
-			// Merge current triangle into working layer
-			tile.zMax1 = max(tile.zMax1, tri.zMax)
-			tile.mask |= tri.coverageMask
-			// Overwrite ref. layer if working layer full
-			if (tile.mask == ~0)
-				tile.zMax0 = tile.zMax1
-				tile.zMax1 = 0
-				tile.mask = 0
-			*/
-}
-
-void culling::RasterizeOccludersStage::ComputeTrianglesDepthValueInTile()
-{
-}
-
 
 culling::M256I culling::RasterizeOccludersStage::ShuffleCoverageMask(const culling::M256I& coverageMask) const
 {
@@ -333,32 +309,32 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 
 #if QUICK_MASK == 1
 
-			tile->mHizDatas.L1MaxDepthValue = _mm256_max_ps(tile->mHizDatas.L1MaxDepthValue, subTileMaxDepth[triangleIndex]);
+			tile->mHizDatas.L1SubTileMaxDepthValue = _mm256_max_ps(tile->mHizDatas.L1SubTileMaxDepthValue, subTileMaxDepth[triangleIndex]);
 			tile->mHizDatas.L1CoverageMask = _mm256_or_si256(tile->mHizDatas.L1CoverageMask, CoverageMask[triangleIndex]);
 
 			const culling::M256I maskCoveredByOne = _mm256_cmpeq_epi32(tile->mHizDatas.L1CoverageMask, _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF));
-			tile->mHizDatas.L0MaxDepthValue = _mm256_blendv_ps(tile->mHizDatas.L0MaxDepthValue, _mm256_min_ps(tile->mHizDatas.L0MaxDepthValue, tile->mHizDatas.L1MaxDepthValue), *reinterpret_cast<const culling::M256F*>(&maskCoveredByOne));
-			tile->mHizDatas.L1MaxDepthValue = _mm256_blendv_ps(tile->mHizDatas.L1MaxDepthValue, _mm256_set1_ps((float)MIN_DEPTH_VALUE), *reinterpret_cast<const culling::M256F*>(&maskCoveredByOne));
+			tile->mHizDatas.L0SubTileMaxDepthValue = _mm256_blendv_ps(tile->mHizDatas.L0SubTileMaxDepthValue, _mm256_min_ps(tile->mHizDatas.L0SubTileMaxDepthValue, tile->mHizDatas.L1SubTileMaxDepthValue), *reinterpret_cast<const culling::M256F*>(&maskCoveredByOne));
+			tile->mHizDatas.L1SubTileMaxDepthValue = _mm256_blendv_ps(tile->mHizDatas.L1SubTileMaxDepthValue, _mm256_set1_ps((float)MIN_DEPTH_VALUE), *reinterpret_cast<const culling::M256F*>(&maskCoveredByOne));
 			const culling::M256F maskBlendResult = _mm256_blendv_ps(*reinterpret_cast<const culling::M256F*>(&(tile->mHizDatas.L1CoverageMask)), _mm256_setzero_ps(), *reinterpret_cast<const culling::M256F*>(&maskCoveredByOne));
 			tile->mHizDatas.L1CoverageMask = *reinterpret_cast<const culling::M256I*>(&maskBlendResult);
 
 #else
 
-			const culling::M256F dist1t = _mm256_sub_ps(tile->mHizDatas.L1MaxDepthValue, subTileMaxDepth[triangleIndex]);
-			const culling::M256F dist01 = _mm256_sub_ps(tile->mHizDatas.L0MaxDepthValue, tile->mHizDatas.L1MaxDepthValue);
+			const culling::M256F dist1t = _mm256_sub_ps(tile->mHizDatas.L1SubTileMaxDepthValue, subTileMaxDepth[triangleIndex]);
+			const culling::M256F dist01 = _mm256_sub_ps(tile->mHizDatas.L0SubTileMaxDepthValue, tile->mHizDatas.L1SubTileMaxDepthValue);
 
 			const culling::M256F cmpMask = _mm256_cmp_ps(dist1t, dist01, _CMP_GT_OQ);
 
-			tile->mHizDatas.L1MaxDepthValue = _mm256_blendv_ps(tile->mHizDatas.L1MaxDepthValue, _mm256_set1_ps((float)MIN_DEPTH_VALUE), cmpMask);
+			tile->mHizDatas.L1SubTileMaxDepthValue = _mm256_blendv_ps(tile->mHizDatas.L1SubTileMaxDepthValue, _mm256_set1_ps((float)MIN_DEPTH_VALUE), cmpMask);
 			const culling::M256F blendedMask = _mm256_blendv_ps(*reinterpret_cast<const culling::M256F*>(&(tile->mHizDatas.L1CoverageMask)), _mm256_setzero_ps(), cmpMask);
 			tile->mHizDatas.L1CoverageMask = *reinterpret_cast<const culling::M256I*>(&blendedMask);
 
-			tile->mHizDatas.L1MaxDepthValue = _mm256_max_ps(tile->mHizDatas.L1MaxDepthValue, subTileMaxDepth[triangleIndex]);
+			tile->mHizDatas.L1SubTileMaxDepthValue = _mm256_max_ps(tile->mHizDatas.L1SubTileMaxDepthValue, subTileMaxDepth[triangleIndex]);
 			tile->mHizDatas.L1CoverageMask = _mm256_or_si256(tile->mHizDatas.L1CoverageMask, CoverageMask[triangleIndex]);
 
 			const culling::M256I maskCoveredByOne = _mm256_cmpeq_epi32(tile->mHizDatas.L1CoverageMask, _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF));
-			tile->mHizDatas.L0MaxDepthValue = _mm256_blendv_ps(tile->mHizDatas.L0MaxDepthValue, tile->mHizDatas.L1MaxDepthValue, *reinterpret_cast<const culling::M256F*>(&maskCoveredByOne));
-			tile->mHizDatas.L1MaxDepthValue = _mm256_blendv_ps(tile->mHizDatas.L1MaxDepthValue, _mm256_set1_ps((float)MIN_DEPTH_VALUE), *reinterpret_cast<const culling::M256F*>(&maskCoveredByOne));
+			tile->mHizDatas.L0SubTileMaxDepthValue = _mm256_blendv_ps(tile->mHizDatas.L0SubTileMaxDepthValue, tile->mHizDatas.L1SubTileMaxDepthValue, *reinterpret_cast<const culling::M256F*>(&maskCoveredByOne));
+			tile->mHizDatas.L1SubTileMaxDepthValue = _mm256_blendv_ps(tile->mHizDatas.L1SubTileMaxDepthValue, _mm256_set1_ps((float)MIN_DEPTH_VALUE), *reinterpret_cast<const culling::M256F*>(&maskCoveredByOne));
 			const culling::M256F maskBlendResult = _mm256_blendv_ps(*reinterpret_cast<const culling::M256F*>(&(tile->mHizDatas.L1CoverageMask)), _mm256_setzero_ps(), *reinterpret_cast<const culling::M256F*>(&maskCoveredByOne));
 			tile->mHizDatas.L1CoverageMask = *reinterpret_cast<const culling::M256I*>(&maskBlendResult);
 			
@@ -395,10 +371,17 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 		}
 
 
-		// algo : if coverage mask is full, overrite tile->mHizDatas.L1MaxDepthValue to tile->mHizDatas.lMaxDepthValue and clear coverage mask
+		// algo : if coverage mask is full, overrite tile->mHizDatas.L1SubTileMaxDepthValue to tile->mHizDatas.lMaxDepthValue and clear coverage mask
 	}
-	
-	
+
+
+	// Compute max depth value of subtiles's L0 max depth value
+	float maxDepthValue = -1.0f;
+	for(size_t i = 0 ; i < 8 ; i++)
+	{
+		maxDepthValue = MAX(maxDepthValue, reinterpret_cast<const float*>(&(tile->mHizDatas.L0SubTileMaxDepthValue))[i]);
+	}
+	tile->mHizDatas.L0MaxDepthValue = maxDepthValue;
 
 
 	

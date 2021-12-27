@@ -4,8 +4,9 @@
 
 void culling::HizData::Reset()
 {
-	L0MaxDepthValue = _mm256_set1_ps((float)MAX_DEPTH_VALUE);
-	L1MaxDepthValue = _mm256_set1_ps((float)MIN_DEPTH_VALUE);
+	L0MaxDepthValue = (float)MAX_DEPTH_VALUE;
+	L0SubTileMaxDepthValue = _mm256_set1_ps((float)MAX_DEPTH_VALUE);
+	L1SubTileMaxDepthValue = _mm256_set1_ps((float)MIN_DEPTH_VALUE);
 	ClearCoverageMaskAllSubTile();
 }
 
