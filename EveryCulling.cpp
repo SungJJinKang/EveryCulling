@@ -147,11 +147,13 @@ void culling::EveryCulling::CullBlockEntityJob(const size_t cameraIndex)
 
 void culling::EveryCulling::WaitToFinishCullJob(const std::uint32_t cameraIndex) const
 {
-	const size_t lastModuleIndex = mUpdatedCullingModules.size() - 1;
-	const CullingModule* lastCullingModule = mUpdatedCullingModules[lastModuleIndex];
-	while (lastCullingModule->GetFinishedThreadCount(cameraIndex) < mThreadCount)
+	const CullingModule* lastEnabledCullingModule = GetLastEnabledCullingModule();
+	if(lastEnabledCullingModule != nullptr)
 	{
-		std::this_thread::yield();
+		while (lastEnabledCullingModule->GetFinishedThreadCount(cameraIndex) < mThreadCount)
+		{
+			std::this_thread::yield();
+		}
 	}
 }
 
@@ -171,6 +173,20 @@ void culling::EveryCulling::ResetCullJobState()
 
 	//release!
 	std::atomic_thread_fence(std::memory_order_release);
+}
+
+const culling::CullingModule* culling::EveryCulling::GetLastEnabledCullingModule() const
+{
+	culling::CullingModule* lastEnabledCullingModule = nullptr;
+	for(int cullingModuleIndex = mUpdatedCullingModules.size() - 1 ; cullingModuleIndex >= 0 ; cullingModuleIndex--)
+	{
+		if(mUpdatedCullingModules[cullingModuleIndex]->IsEnabled == true)
+		{
+			lastEnabledCullingModule = mUpdatedCullingModules[cullingModuleIndex];
+			break;
+		}
+	}
+	return lastEnabledCullingModule;
 }
 
 void culling::EveryCulling::SetEnabledCullingModule(const CullingModuleType cullingModuleType, const bool isEnabled)

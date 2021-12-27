@@ -232,7 +232,7 @@ namespace culling
 			};
 		}
 
-
+		const culling::CullingModule* GetLastEnabledCullingModule() const;
 		void SetEnabledCullingModule(const CullingModuleType cullingModuleType, const bool isEnabled);
 	};
 }
