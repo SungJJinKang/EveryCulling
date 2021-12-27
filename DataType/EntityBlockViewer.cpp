@@ -61,8 +61,8 @@ void culling::EntityBlockViewer::SetMeshVertexData
 		mTargetEntityBlock->mVertexDatas[mEntityIndexInBlock].mIndices = indices;
 		mTargetEntityBlock->mVertexDatas[mEntityIndexInBlock].mIndiceCount = indiceCount;
 		mTargetEntityBlock->mVertexDatas[mEntityIndexInBlock].mVertexStride = verticeStride;
-		mTargetEntityBlock->mVertexDatas[mEntityIndexInBlock].mAABBMinLocalPoint = aabbMinLocalPoint;
-		mTargetEntityBlock->mVertexDatas[mEntityIndexInBlock].mAABBMaxLocalPoint = aabbMaxLocalPoint;
+		mTargetEntityBlock->mAABBMinLocalPoint[mEntityIndexInBlock] = culling::Vec4{ aabbMinLocalPoint.x, aabbMinLocalPoint.y, aabbMinLocalPoint.z, 1.0f};
+		mTargetEntityBlock->mAABBMaxLocalPoint[mEntityIndexInBlock] = culling::Vec4{ aabbMaxLocalPoint.x, aabbMaxLocalPoint.y, aabbMaxLocalPoint.z, 1.0f};
 	}
 }
 

@@ -8,13 +8,8 @@ namespace culling
 	{
 	
 	private:
-
-		/// <summary>
-		/// Depth Test Multiple Occludees
-		/// </summary>
-		/// <param name="worldAABBs"></param>
-		//void DepthTestOccludee(const AABB* worldAABBs, size_t aabbCount, char* visibleBitFlags);
-
+		
+		void QueryOccludee(const size_t cameraIndex, culling::EntityBlock* const entityBlock);
 
 	public:
 

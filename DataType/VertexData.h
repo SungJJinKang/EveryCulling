@@ -19,8 +19,7 @@ namespace culling
 		/// </summary>
 		size_t mVertexStride;
 
-		culling::Vec3 mAABBMinLocalPoint;
-		culling::Vec3 mAABBMaxLocalPoint;
+		
 	};
 
 }

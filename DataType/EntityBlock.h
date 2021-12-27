@@ -73,6 +73,10 @@ namespace culling
 		void* mTransform[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 		VertexData mVertexDatas[ENTITY_COUNT_IN_ENTITY_BLOCK];
+
+		culling::Vec4 mAABBMinLocalPoint[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		culling::Vec4 mAABBMaxLocalPoint[ENTITY_COUNT_IN_ENTITY_BLOCK];
+
 		char mIsOccluder[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 		/// <summary>
@@ -97,6 +101,17 @@ namespace culling
 			return ( mIsVisibleBitflag[entityIndex] & (1 << cameraIndex) ) == 0;
 		}
 
+		FORCE_INLINE void SetCulled(const size_t entityIndex, const size_t cameraIndex)
+		{
+			mIsVisibleBitflag[entityIndex] &= ~(1 << cameraIndex);
+		}
+
+		FORCE_INLINE void SetNotCulled(const size_t entityIndex, const size_t cameraIndex)
+		{
+			mIsVisibleBitflag[entityIndex] |= (1 << cameraIndex);
+		}
+
+		
 		FORCE_INLINE bool GetIsOccluder(const size_t entityIndex, const size_t cameraIndex) const
 		{
 			return (mIsOccluder[entityIndex] & (1 << cameraIndex)) != 0;

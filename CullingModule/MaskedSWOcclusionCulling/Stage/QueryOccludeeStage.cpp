@@ -1,5 +1,26 @@
 #include "QueryOccludeeStage.h"
 
+#include "../MaskedSWOcclusionCulling.h"
+
+
+void culling::QueryOccludeeStage::QueryOccludee
+(
+	const size_t cameraIndex, 
+	culling::EntityBlock* const entityBlock
+)
+{
+	for(size_t entityIndex = 0 ; entityIndex < entityBlock->mCurrentEntityCount ; entityIndex++)
+	{
+		if
+		(
+			entityBlock->GetIsCulled(entityIndex, cameraIndex) == false &&
+			entityBlock->GetIsOccluder(entityIndex, cameraIndex) == false
+		)
+		{
+			
+		}
+	}
+}
 
 /*
 void culling::QueryOccludeeStage::DepthTestOccludee
@@ -45,5 +66,18 @@ culling::QueryOccludeeStage::QueryOccludeeStage
 
 void culling::QueryOccludeeStage::CullBlockEntityJob(const size_t cameraIndex)
 {
+	while (true)
+	{
+		culling::EntityBlock* const nextEntityBlock = GetNextEntityBlock(cameraIndex);;
+
+		if (nextEntityBlock != nullptr)
+		{
+			QueryOccludee(cameraIndex, nextEntityBlock);
+		}
+		else
+		{
+			break;
+		}
+	}
 }
 
