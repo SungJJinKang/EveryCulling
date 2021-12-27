@@ -127,41 +127,17 @@ void culling::EveryCulling::CullBlockEntityJob(const size_t cameraIndex)
 	{
 		for (size_t moduleIndex = 0; moduleIndex < mUpdatedCullingModules.size(); moduleIndex++)
 		{
-			// TODO : Don't use pointer, Just use specific object(3 module) 
-			// Why? : virtual funtion call should reference virtual function table,
-			// We need really fast computation at here, 
-			// referencing virtual function table make it slow
+			culling::CullingModule* cullingModule = mUpdatedCullingModules[moduleIndex];
 
-			CullingModule* cullingModule = mUpdatedCullingModules[moduleIndex];
-			//TODO : ON X64, X84, memory_order_relaxed also do acquire memory
-			//So This codes is too slow, FIX IT!!!!!!!!!!!
-			//
-			//
-			//
-
-			//TODO:
-			//HOW works? 
-			//
-			//Each module is executed after other module
-			//At each module, Every threads works on a EntityBlock
-			//
-			//EntityBlock a thread works on is decided by thread index
-			//If a thread finished all assigned blocks, it steal block from other unfinished thread
-			//
-			//Example : 5 Threads
-			//
-			//Thread 1 : EntityBlock 1, 6, 11
-			//Thread 2 : EntityBlock 2, 7, 12
-			//Thread 3 : EntityBlock 3, 8, 13
-			//Thread 4 : EntityBlock 4, 9, 14
-			//Thread 5 : EntityBlock 5, 10, 14
-			
-			cullingModule->ThreadCullJob(cameraIndex);
-
-			while(cullingModule->GetFinishedThreadCount(cameraIndex) < mThreadCount)
+			if(cullingModule->IsEnabled == true)
 			{
-				std::this_thread::yield();
-			}
+				cullingModule->ThreadCullJob(cameraIndex);
+
+				while (cullingModule->GetFinishedThreadCount(cameraIndex) < mThreadCount)
+				{
+					std::this_thread::yield();
+				}
+			}			
 		}
 
 
@@ -195,6 +171,36 @@ void culling::EveryCulling::ResetCullJobState()
 
 	//release!
 	std::atomic_thread_fence(std::memory_order_release);
+}
+
+void culling::EveryCulling::SetEnabledCullingModule(const CullingModuleType cullingModuleType, const bool isEnabled)
+{
+	switch (cullingModuleType)
+	{
+
+	case CullingModuleType::_ViewFrustumCulling:
+
+		mViewFrustumCulling->IsEnabled = isEnabled;
+
+		break;
+
+
+	case CullingModuleType::_MaskedSWOcclusionCulling:
+
+		mMaskedSWOcclusionCulling->mSolveMeshRoleStage.IsEnabled = isEnabled;
+		mMaskedSWOcclusionCulling->mBinTrianglesStage.IsEnabled = isEnabled;
+		mMaskedSWOcclusionCulling->mRasterizeTrianglesStage.IsEnabled = isEnabled;
+		mMaskedSWOcclusionCulling->mQueryOccludeeStage.IsEnabled = isEnabled;
+
+		break;
+
+	case CullingModuleType::_HwQueryOcclusionCulling:
+
+		mQueryOcclusionCulling->IsEnabled = isEnabled;
+
+		break;
+
+	}
 }
 
 culling::EntityBlock* culling::EveryCulling::AllocateNewEntityBlockFromPool()

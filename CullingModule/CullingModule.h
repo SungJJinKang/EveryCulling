@@ -45,7 +45,7 @@ namespace culling
 		culling::EntityBlock* GetNextEntityBlock(const size_t cameraIndex, const bool forceOrdering = true);
 
 		CullingModule(EveryCulling* frotbiteCullingSystem)
-			:mCullingSystem{ frotbiteCullingSystem }
+			:mCullingSystem{ frotbiteCullingSystem }, IsEnabled(true)
 		{
 
 		}
@@ -54,6 +54,7 @@ namespace culling
 
 	public:
 
+		bool IsEnabled;
 
 		virtual void ResetCullingModule();
 		std::uint32_t GetFinishedThreadCount(const size_t cameraIndex) const;

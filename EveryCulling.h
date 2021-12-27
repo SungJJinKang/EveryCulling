@@ -117,6 +117,13 @@ namespace culling
 
 	public:
 
+		enum class CullingModuleType
+		{
+			_ViewFrustumCulling,
+			_MaskedSWOcclusionCulling,
+			_HwQueryOcclusionCulling
+		};
+
 		EveryCulling() = delete;
 		EveryCulling(const std::uint32_t resolutionWidth, const std::uint32_t resolutionHeight);
 		EveryCulling(const EveryCulling&) = delete;
@@ -224,6 +231,9 @@ namespace culling
 				this->CullBlockEntityJob(cameraIndex);
 			};
 		}
+
+
+		void SetEnabledCullingModule(const CullingModuleType cullingModuleType, const bool isEnabled);
 	};
 }
 
