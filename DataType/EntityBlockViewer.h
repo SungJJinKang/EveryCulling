@@ -64,6 +64,17 @@ namespace culling
 		);
 		
 		void SetModelMatrix(const float* const modelMatrix);
-
+		FORCE_INLINE const float* GetModelMatrix() const
+		{
+			return mTargetEntityBlock->mModelMatrixes[mEntityIndexInBlock];
+		}
+		FORCE_INLINE const culling::VertexData& GetVertexData() const
+		{
+			return mTargetEntityBlock->mVertexDatas[mEntityIndexInBlock];
+		}
+		FORCE_INLINE bool GetIsOccluder(const size_t cameraIndex) const
+		{
+			return mTargetEntityBlock->GetIsOccluder(mEntityIndexInBlock, cameraIndex);
+		}
 	};
 }

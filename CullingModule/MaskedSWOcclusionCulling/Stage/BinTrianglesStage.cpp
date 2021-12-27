@@ -1,9 +1,12 @@
 #include "BinTrianglesStage.h"
-#include "../MaskedSWOcclusionCulling.h"
 
+#include <vector>
+
+#include "../MaskedSWOcclusionCulling.h"
 #include "../SWDepthBuffer.h"
 
-#include <Graphics/DebugGraphics/DebugDrawer.h>
+#include <Rendering/Renderer/Renderer.h>
+#include <Rendering/Renderer/RendererStaticIterator.h>
 
 FORCE_INLINE void culling::BinTrianglesStage::ConvertClipSpaceToNDCSpace
 (
@@ -145,12 +148,19 @@ FORCE_INLINE void culling::BinTrianglesStage::TransformVertexsToClipSpace
 
 FORCE_INLINE void culling::BinTrianglesStage::BackfaceCulling
 (
-	const culling::M256F* screenPixelX, 
-	const culling::M256F* screenPixelY, 
+	culling::M256F* const screenPixelX,
+	culling::M256F* const screenPixelY,
+	culling::M256F* const ndcSpaceVertexZ,
 	std::uint32_t& triangleCullMask
 )
 {
-	triangleCullMask &= culling::TestTrianglesIsFrontFaceUsingSIMD(screenPixelX, screenPixelY);
+	culling::M256F triArea1 = _mm256_mul_ps(_mm256_sub_ps(screenPixelX[1], screenPixelX[0]), _mm256_sub_ps(screenPixelY[2], screenPixelY[0]));
+	culling::M256F triArea2 = _mm256_mul_ps(_mm256_sub_ps(screenPixelX[0], screenPixelX[2]), _mm256_sub_ps(screenPixelY[0], screenPixelY[1]));
+	culling::M256F triArea = _mm256_sub_ps(triArea1, triArea2);
+	culling::M256F ccwMask = _mm256_cmp_ps(triArea, _mm256_setzero_ps(), _CMP_GT_OQ);
+	
+	// Return a lane mask with all front faces set
+	triangleCullMask &= _mm256_movemask_ps(ccwMask);
 }
 
 void culling::BinTrianglesStage::ComputeBinBoundingBox
@@ -357,6 +367,79 @@ void culling::BinTrianglesStage::ConvertToPlatformDepth(culling::M256F* const de
 	
 }
 
+void culling::BinTrianglesStage::BinTriangleThreadJob(const size_t cameraIndex)
+{
+	while (true)
+	{
+		culling::EntityBlock* const nextEntityBlock = GetNextEntityBlock(cameraIndex, false);
+
+		if (nextEntityBlock != nullptr)
+		{
+			for (size_t entityIndex = 0; entityIndex < nextEntityBlock->mCurrentEntityCount; entityIndex++)
+			{
+				if
+					(
+						(nextEntityBlock->GetIsCulled(entityIndex, cameraIndex) == false) &&
+						(nextEntityBlock->GetIsOccluder(entityIndex, cameraIndex) == true)
+						)
+				{
+					const culling::Mat4x4 modelToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex) * (*reinterpret_cast<const culling::Mat4x4*>(nextEntityBlock->GetModelMatrix(entityIndex)));
+					const VertexData& vertexData = nextEntityBlock->mVertexDatas[entityIndex];
+
+					BinTriangles
+					(
+						reinterpret_cast<const float*>(vertexData.mVertices),
+						vertexData.mVerticeCount,
+						vertexData.mIndices,
+						vertexData.mIndiceCount,
+						vertexData.mVertexStride,
+						modelToClipSpaceMatrix.data()
+					);
+				}
+			}
+
+		}
+		else
+		{
+			break;
+		}
+	}
+}
+
+void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t cameraIndex)
+{
+	for (UINT32 layerIndex = 0; layerIndex < MAX_LAYER_COUNT; layerIndex++)
+	{
+		const std::vector<dooms::Renderer*>& renderersInLayer = dooms::RendererComponentStaticIterator::GetSingleton()->GetWorkingRendererInLayer(cameraIndex, layerIndex);
+
+		for(INT64 rendererIndex = renderersInLayer.size() - 1 ; rendererIndex >= 0 ; rendererIndex--)
+		{
+			dooms::Renderer* const renderer = renderersInLayer[rendererIndex];
+			if
+			(
+				dooms::IsValid(renderer) == true &&
+				renderer->mCullingEntityBlockViewer.GetIsCulled(cameraIndex) == false &&
+				renderer->mCullingEntityBlockViewer.GetIsOccluder(cameraIndex) == true
+			)
+			{
+				
+				const culling::Mat4x4 modelToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex) * (*reinterpret_cast<const culling::Mat4x4*>(renderer->mCullingEntityBlockViewer.GetModelMatrix()));
+				const VertexData& vertexData = renderer->mCullingEntityBlockViewer.GetVertexData();
+
+				BinTriangles
+				(
+					reinterpret_cast<const float*>(vertexData.mVertices),
+					vertexData.mVerticeCount,
+					vertexData.mIndices,
+					vertexData.mIndiceCount,
+					vertexData.mVertexStride,
+					modelToClipSpaceMatrix.data()
+				);
+			}
+		}
+	}
+}
+
 culling::BinTrianglesStage::BinTrianglesStage(MaskedSWOcclusionCulling* mMOcclusionCulling)
 	: MaskedSWOcclusionCullingStage{ mMOcclusionCulling }
 {
@@ -376,41 +459,12 @@ void culling::BinTrianglesStage::CullBlockEntityJob(const size_t cameraIndex)
 	// Only one thread can work on this stage
 	if(canWorkable == true)
 	{
-		while (true)
-		{
-			culling::EntityBlock* const nextEntityBlock = GetNextEntityBlock(cameraIndex, false);
-
-			if (nextEntityBlock != nullptr)
-			{
-				for (size_t entityIndex = 0; entityIndex < nextEntityBlock->mCurrentEntityCount; entityIndex++)
-				{
-					if
-						(
-							(nextEntityBlock->GetIsCulled(entityIndex, cameraIndex) == false) &&
-							(nextEntityBlock->GetIsOccluder(entityIndex, cameraIndex) == true)
-							)
-					{
-						const culling::Mat4x4 modelToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex) * (*reinterpret_cast<const culling::Mat4x4*>(nextEntityBlock->GetModelMatrix(entityIndex)));
-						const VertexData& vertexData = nextEntityBlock->mVertexDatas[entityIndex];
-
-						BinTriangles
-						(
-							reinterpret_cast<const float*>(vertexData.mVertices),
-							vertexData.mVerticeCount,
-							vertexData.mIndices,
-							vertexData.mIndiceCount,
-							vertexData.mVertexStride,
-							modelToClipSpaceMatrix.data()
-						);
-					}
-				}
-
-			}
-			else
-			{
-				break;
-			}
-		}
+#ifdef FETCH_OBJECT_SORT_FROM_DOOMS_ENGINE_IN_BIN_TRIANGLE_STAGE
+		BinTriangleThreadJobByObjectOrder(cameraIndex);
+#else
+		BinTriangleThreadJob(cameraIndex);
+#endif
+			
 	}
 }
 
@@ -475,19 +529,7 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 		//WE ARRIVE AT CLIP SPACE COORDINATE. W IS NOT 1
 		TransformVertexsToClipSpace(ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, oneDividedByW, modelToClipspaceMatrix, triangleCullMask);
 
-		//BackFace Cull
-		// 
-		BackfaceCulling(ndcSpaceVertexX, ndcSpaceVertexY, triangleCullMask);
-
-		//Do not Sort Triangle in binning stage
-		//because Culled triangles is also sorted
-		//Sort triangle in drawing depth stage/
-		//In that stage, all triangles is valid
-
-		if (triangleCullMask == 0x00000000)
-		{
-			continue;
-		}
+		
 
 		FrustumCulling(ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, oneDividedByW, triangleCullMask);
 
@@ -516,9 +558,22 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 		//ScreenPixelPos : 0 ~ mDepthBuffer.Width, Height
 		culling::M256F screenPixelPosX[3], screenPixelPosY[3];
 		ConvertNDCSpaceToScreenPixelSpace(ndcSpaceVertexX, ndcSpaceVertexY, screenPixelPosX, screenPixelPosY, triangleCullMask);
-		//Clip Space Cull
-
 		
+
+		//BackFace Cull
+		// 
+		BackfaceCulling(screenPixelPosX, screenPixelPosY, ndcSpaceVertexZ, triangleCullMask);
+
+		//Do not Sort Triangle in binning stage
+		//because Culled triangles is also sorted
+		//Sort triangle in drawing depth stage/
+		//In that stage, all triangles is valid
+
+		if (triangleCullMask == 0x00000000)
+		{
+			continue;
+		}
+
 		// TODO : Early split triangle at here
 		
 		

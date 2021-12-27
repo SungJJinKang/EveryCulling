@@ -89,8 +89,15 @@ namespace culling
 		/// </summary>
 		/// <param name="screenPixelX"></param>
 		/// <param name="screenPixelY"></param>
+		/// <param name="ndcSpaceVertexZ"></param>
 		/// <param name="triangleCullMask"></param>
-		FORCE_INLINE void BackfaceCulling(const culling::M256F* screenPixelX, const culling::M256F* screenPixelY, std::uint32_t& triangleCullMask);
+		FORCE_INLINE void BackfaceCulling
+		(
+			culling::M256F* const screenPixelX, 
+			culling::M256F* const screenPixelY, 
+			culling::M256F* const ndcSpaceVertexZ,
+			std::uint32_t& triangleCullMask
+		);
 
 		
 		
@@ -194,6 +201,9 @@ namespace culling
 		);
 
 		void ConvertToPlatformDepth(culling::M256F* const depth);
+
+		void BinTriangleThreadJob(const size_t cameraIndex);
+		void BinTriangleThreadJobByObjectOrder(const size_t cameraIndex);
 
 	public:
 

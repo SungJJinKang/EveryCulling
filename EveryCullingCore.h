@@ -96,6 +96,12 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 //Masked SW Occlusion Culling
 
+#ifndef FETCH_OBJECT_SORT_FROM_DOOMS_ENGINE_IN_BIN_TRIANGLE_STAGE
+#define FETCH_OBJECT_SORT_FROM_DOOMS_ENGINE_IN_BIN_TRIANGLE_STAGE 1
+#endif
+
+#define BACK_FACE_WINDING BACK_FACE_CCW
+
 #if NDC_RANGE == MINUS_ONE_TO_POSITIVE_ONE
 
 #define MIN_DEPTH_VALUE -1
