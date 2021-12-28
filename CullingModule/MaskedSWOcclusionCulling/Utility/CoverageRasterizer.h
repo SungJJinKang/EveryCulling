@@ -79,9 +79,16 @@ namespace culling
 			const culling::M256I* const leftFaceEvent,
 			const culling::M256I* const rightFaceEvent,
 
-			const culling::M256F& bottomEdgeY
+			const culling::M256F& bottomEdgeY,
+			const culling::M256F& topEdgeY
 		)
 		{
+#ifdef DEBUG_CULLING
+			for(size_t i = 0 ; i < triangleCount; i++)
+			{
+				assert(reinterpret_cast<const float*>(&bottomEdgeY)[i] < reinterpret_cast<const float*>(&topEdgeY)[i]);
+			}
+#endif
 			culling::M256I Mask1[8];
 			culling::M256I Mask2[8];
 
@@ -104,9 +111,16 @@ namespace culling
 				aboveFlatBottomTriangleFace[triIndex] = _mm256_cmp_ps(_mm256_setr_ps(TileLeftBottomOriginPoint.y + 0.5f, TileLeftBottomOriginPoint.y + 1.5f, TileLeftBottomOriginPoint.y + 2.5f, TileLeftBottomOriginPoint.y + 3.5f, TileLeftBottomOriginPoint.y + 4.5f, TileLeftBottomOriginPoint.y + 5.5f, TileLeftBottomOriginPoint.y + 6.5f, TileLeftBottomOriginPoint.y + 7.5f), _mm256_set1_ps(reinterpret_cast<const float*>(&bottomEdgeY)[triIndex]), _CMP_GE_OQ);
 			}
 
+			culling::M256F belowFlatTopTriangleFace[8];
 			for (size_t triIndex = 0; triIndex < triangleCount; triIndex++)
 			{
-				outCoverageMask[triIndex] = _mm256_and_si256(Result[triIndex], *reinterpret_cast<const culling::M256I*>(aboveFlatBottomTriangleFace + triIndex));
+				belowFlatTopTriangleFace[triIndex] = _mm256_cmp_ps(_mm256_setr_ps(TileLeftBottomOriginPoint.y + 0.5f, TileLeftBottomOriginPoint.y + 1.5f, TileLeftBottomOriginPoint.y + 2.5f, TileLeftBottomOriginPoint.y + 3.5f, TileLeftBottomOriginPoint.y + 4.5f, TileLeftBottomOriginPoint.y + 5.5f, TileLeftBottomOriginPoint.y + 6.5f, TileLeftBottomOriginPoint.y + 7.5f), _mm256_set1_ps(reinterpret_cast<const float*>(&topEdgeY)[triIndex]), _CMP_LE_OQ);
+			}
+
+			for (size_t triIndex = 0; triIndex < triangleCount; triIndex++)
+			{
+				Result[triIndex] = _mm256_and_si256(Result[triIndex], *reinterpret_cast<const culling::M256I*>(aboveFlatBottomTriangleFace + triIndex));
+				outCoverageMask[triIndex] = _mm256_and_si256(Result[triIndex], *reinterpret_cast<const culling::M256I*>(belowFlatTopTriangleFace + triIndex));
 			}
 		}
 

@@ -55,9 +55,18 @@ namespace culling
 
 		FORCE_INLINE void PassTrianglesToTileBin
 		(
-			const culling::M256F* screenPixelPosX,
-			const culling::M256F* screenPixelPosY,
-			const culling::M256F* ndcSpaceVertexZ,
+			const culling::M256F& pointAScreenPixelPosX,
+			const culling::M256F& pointAScreenPixelPosY,
+			const culling::M256F& pointANdcSpaceVertexZ,
+
+			const culling::M256F& pointBScreenPixelPosX,
+			const culling::M256F& pointBScreenPixelPosY,
+			const culling::M256F& pointBNdcSpaceVertexZ,
+
+			const culling::M256F& pointCScreenPixelPosX,
+			const culling::M256F& pointCScreenPixelPosY,
+			const culling::M256F& pointCNdcSpaceVertexZ,
+
 			std::uint32_t& triangleCullMask,
 			const size_t triangleCountPerLoop,
 			const culling::M256I& outBinBoundingBoxMinX,

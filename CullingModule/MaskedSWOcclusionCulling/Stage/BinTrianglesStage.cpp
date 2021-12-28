@@ -10,6 +10,8 @@
 #include <Rendering/Renderer/Renderer.h>
 #include <Rendering/Renderer/RendererStaticIterator.h>
 
+#include "../Utility/RasterizerHelper.h"
+
 
 #define CONVERT_TO_M256I(_M256F) *reinterpret_cast<const culling::M256I*>(&_M256F)
 
@@ -78,9 +80,18 @@ FORCE_INLINE void culling::BinTrianglesStage::BackfaceCulling
 
 FORCE_INLINE void culling::BinTrianglesStage::PassTrianglesToTileBin
 (
-	const culling::M256F* screenPixelPosX,
-	const culling::M256F* screenPixelPosY,
-	const culling::M256F* ndcSpaceVertexZ,
+	const culling::M256F& pointAScreenPixelPosX,
+	const culling::M256F& pointAScreenPixelPosY,
+	const culling::M256F& pointANdcSpaceVertexZ,
+
+	const culling::M256F& pointBScreenPixelPosX,
+	const culling::M256F& pointBScreenPixelPosY,
+	const culling::M256F& pointBNdcSpaceVertexZ,
+
+	const culling::M256F& pointCScreenPixelPosX,
+	const culling::M256F& pointCScreenPixelPosY,
+	const culling::M256F& pointCNdcSpaceVertexZ,
+
 	std::uint32_t& triangleCullMask, 
 	const size_t triangleCountPerLoop,
 	const culling::M256I& outBinBoundingBoxMinX, 
@@ -126,12 +137,17 @@ FORCE_INLINE void culling::BinTrianglesStage::PassTrianglesToTileBin
 						return;
 					}
 
-					for(size_t pointIndex = 0 ; pointIndex < 3 ; pointIndex++)
-					{
-						targetTile->mBinnedTriangles.VertexX[pointIndex][triListIndex] = (reinterpret_cast<const float*>(screenPixelPosX + pointIndex))[triangleIndex];
-						targetTile->mBinnedTriangles.VertexY[pointIndex][triListIndex] = (reinterpret_cast<const float*>(screenPixelPosY + pointIndex))[triangleIndex];
-						targetTile->mBinnedTriangles.VertexZ[pointIndex][triListIndex] = (reinterpret_cast<const float*>(ndcSpaceVertexZ + pointIndex))[triangleIndex];
-					}
+					targetTile->mBinnedTriangles.VertexX[0][triListIndex] = (reinterpret_cast<const float*>(&pointAScreenPixelPosX))[triangleIndex];
+					targetTile->mBinnedTriangles.VertexY[0][triListIndex] = (reinterpret_cast<const float*>(&pointAScreenPixelPosY))[triangleIndex];
+					targetTile->mBinnedTriangles.VertexZ[0][triListIndex] = (reinterpret_cast<const float*>(&pointANdcSpaceVertexZ))[triangleIndex];
+
+					targetTile->mBinnedTriangles.VertexX[1][triListIndex] = (reinterpret_cast<const float*>(&pointBScreenPixelPosX))[triangleIndex];
+					targetTile->mBinnedTriangles.VertexY[1][triListIndex] = (reinterpret_cast<const float*>(&pointBScreenPixelPosY))[triangleIndex];
+					targetTile->mBinnedTriangles.VertexZ[1][triListIndex] = (reinterpret_cast<const float*>(&pointBNdcSpaceVertexZ))[triangleIndex];
+
+					targetTile->mBinnedTriangles.VertexX[2][triListIndex] = (reinterpret_cast<const float*>(&pointCScreenPixelPosX))[triangleIndex];
+					targetTile->mBinnedTriangles.VertexY[2][triListIndex] = (reinterpret_cast<const float*>(&pointCScreenPixelPosY))[triangleIndex];
+					targetTile->mBinnedTriangles.VertexZ[2][triListIndex] = (reinterpret_cast<const float*>(&pointCNdcSpaceVertexZ))[triangleIndex];
 					
 				}
 			}
@@ -436,40 +452,163 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 			continue;
 		}
 
+		Sort_8_3DTriangles
+		(
+			screenPixelPosX[0], 
+			screenPixelPosY[0], 
+			ndcSpaceVertexZ[0],
+
+			screenPixelPosX[1],
+			screenPixelPosY[1],
+			ndcSpaceVertexZ[1],
+
+			screenPixelPosX[2],
+			screenPixelPosY[2],
+			ndcSpaceVertexZ[2]
+		);
+
+
 		// TODO : Early split triangle at here
-		
-		
 
-		culling::M256I outBinBoundingBoxMinX, outBinBoundingBoxMinY, outBinBoundingBoxMaxX, outBinBoundingBoxMaxY;
-		//Bin Triangles to tiles
+		culling::M256F LEFT_MIDDLE_POINT_X;
+		culling::M256F LEFT_MIDDLE_POINT_Y;
+		culling::M256F LEFT_MIDDLE_POINT_Z;
 
-		//Compute Bin Bounding Box
-		//Get Intersecting Bin List
-		culling::depthBufferTileHelper::ComputeBinBoundingBoxFromThreeVertices
+		culling::M256F RIGHT_MIDDLE_POINT_X;
+		culling::M256F RIGHT_MIDDLE_POINT_Y;
+		culling::M256F RIGHT_MIDDLE_POINT_Z;
+
+
+		// TODO : Don't split triangle. check paper 3.1 https://www.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf 
+
+		// split triangle
+		culling::rasterizerHelper::GetMiddlePointOfTriangle
 		(
-			screenPixelPosX, 
-			screenPixelPosY, 
-			outBinBoundingBoxMinX, 
-			outBinBoundingBoxMinY, 
-			outBinBoundingBoxMaxX, 
-			outBinBoundingBoxMaxY,
-			mMaskedOcclusionCulling->mDepthBuffer
+			screenPixelPosX[0],
+			screenPixelPosY[0],
+			ndcSpaceVertexZ[0],
+
+			screenPixelPosX[1],
+			screenPixelPosY[1],
+			ndcSpaceVertexZ[1],
+
+			screenPixelPosX[2],
+			screenPixelPosY[2],
+			ndcSpaceVertexZ[2],
+
+			LEFT_MIDDLE_POINT_X,
+			LEFT_MIDDLE_POINT_Y,
+			LEFT_MIDDLE_POINT_Z,
+
+			RIGHT_MIDDLE_POINT_X,
+			RIGHT_MIDDLE_POINT_Y,
+			RIGHT_MIDDLE_POINT_Z
 		);
 
 
-		PassTrianglesToTileBin
-		(
-			screenPixelPosX,
-			screenPixelPosY,
-			ndcSpaceVertexZ,
-			triangleCullMask,
-			triangleCountPerLoop,
-			outBinBoundingBoxMinX,
-			outBinBoundingBoxMinY,
-			outBinBoundingBoxMaxX,
-			outBinBoundingBoxMaxY
-		);
 
+		{
+			//Bin Bottom Flat Triangle
+
+
+			culling::M256I outBinBoundingBoxMinX, outBinBoundingBoxMinY, outBinBoundingBoxMaxX, outBinBoundingBoxMaxY;
+			//Bin Triangles to tiles
+
+			//Compute Bin Bounding Box
+			//Get Intersecting Bin List
+			culling::depthBufferTileHelper::ComputeBinBoundingBoxFromThreeVertices
+			(
+				screenPixelPosX[0],
+				screenPixelPosY[0],
+
+				LEFT_MIDDLE_POINT_X,
+				LEFT_MIDDLE_POINT_Y,
+
+				RIGHT_MIDDLE_POINT_X,
+				RIGHT_MIDDLE_POINT_Y,
+
+				outBinBoundingBoxMinX,
+				outBinBoundingBoxMinY,
+				outBinBoundingBoxMaxX,
+				outBinBoundingBoxMaxY,
+				mMaskedOcclusionCulling->mDepthBuffer
+			);
+
+
+			PassTrianglesToTileBin
+			(
+				screenPixelPosX[0],
+				screenPixelPosY[0],
+				ndcSpaceVertexZ[0],
+
+				LEFT_MIDDLE_POINT_X,
+				LEFT_MIDDLE_POINT_Y,
+				LEFT_MIDDLE_POINT_Z,
+
+				RIGHT_MIDDLE_POINT_X,
+				RIGHT_MIDDLE_POINT_Y,
+				RIGHT_MIDDLE_POINT_Z,
+
+				triangleCullMask,
+				triangleCountPerLoop,
+				outBinBoundingBoxMinX,
+				outBinBoundingBoxMinY,
+				outBinBoundingBoxMaxX,
+				outBinBoundingBoxMaxY
+			);
+		}
+
+
+		{
+			//Bin Top Flat Triangle
+
+			culling::M256I outBinBoundingBoxMinX, outBinBoundingBoxMinY, outBinBoundingBoxMaxX, outBinBoundingBoxMaxY;
+			//Bin Triangles to tiles
+
+			//Compute Bin Bounding Box
+			//Get Intersecting Bin List
+			culling::depthBufferTileHelper::ComputeBinBoundingBoxFromThreeVertices
+			(
+				LEFT_MIDDLE_POINT_X,
+				LEFT_MIDDLE_POINT_Y,
+
+				RIGHT_MIDDLE_POINT_X,
+				RIGHT_MIDDLE_POINT_Y,
+
+				screenPixelPosX[2],
+				screenPixelPosY[2],
+
+				outBinBoundingBoxMinX,
+				outBinBoundingBoxMinY,
+				outBinBoundingBoxMaxX,
+				outBinBoundingBoxMaxY,
+				mMaskedOcclusionCulling->mDepthBuffer
+			);
+
+
+			PassTrianglesToTileBin
+			(
+				LEFT_MIDDLE_POINT_X,
+				LEFT_MIDDLE_POINT_Y,
+				LEFT_MIDDLE_POINT_Z,
+
+				RIGHT_MIDDLE_POINT_X,
+				RIGHT_MIDDLE_POINT_Y,
+				RIGHT_MIDDLE_POINT_Z,
+
+				screenPixelPosX[2],
+				screenPixelPosY[2],
+				ndcSpaceVertexZ[2],
+
+				triangleCullMask,
+				triangleCountPerLoop,
+				outBinBoundingBoxMinX,
+				outBinBoundingBoxMinY,
+				outBinBoundingBoxMaxX,
+				outBinBoundingBoxMaxY
+			);
+		}
+		
 		
 	}
 }

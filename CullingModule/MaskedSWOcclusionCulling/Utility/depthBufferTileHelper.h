@@ -9,8 +9,15 @@ namespace culling
 	{
 		FORCE_INLINE extern void ComputeBinBoundingBoxFromThreeVertices
 		(
-			const culling::M256F* screenPixelX,
-			const culling::M256F* screenPixelY,
+			const culling::M256F& pointAScreenPixelX,
+			const culling::M256F& pointAScreenPixelY,
+
+			const culling::M256F& pointBScreenPixelX,
+			const culling::M256F& pointBScreenPixelY,
+
+			const culling::M256F& pointCScreenPixelX,
+			const culling::M256F& pointCScreenPixelY,
+
 			culling::M256I& outBinBoundingBoxMinX,
 			culling::M256I& outBinBoundingBoxMinY,
 			culling::M256I& outBinBoundingBoxMaxX,
@@ -28,10 +35,10 @@ namespace culling
 			static const culling::M256I WIDTH_MASK = _mm256_set1_epi32(~(TILE_WIDTH - 1));
 			static const culling::M256I HEIGHT_MASK = _mm256_set1_epi32(~(TILE_HEIGHT - 1));
 
-			minScreenPixelX = _mm256_cvttps_epi32(_mm256_floor_ps(_mm256_min_ps(screenPixelX[0], _mm256_min_ps(screenPixelX[1], screenPixelX[2]))));
-			minScreenPixelY = _mm256_cvttps_epi32(_mm256_floor_ps(_mm256_min_ps(screenPixelY[0], _mm256_min_ps(screenPixelY[1], screenPixelY[2]))));
-			maxScreenPixelX = _mm256_cvttps_epi32(_mm256_floor_ps(_mm256_max_ps(screenPixelX[0], _mm256_max_ps(screenPixelX[1], screenPixelX[2]))));
-			maxScreenPixelY = _mm256_cvttps_epi32(_mm256_floor_ps(_mm256_max_ps(screenPixelY[0], _mm256_max_ps(screenPixelY[1], screenPixelY[2]))));
+			minScreenPixelX = _mm256_cvttps_epi32(_mm256_floor_ps(_mm256_min_ps(pointAScreenPixelX, _mm256_min_ps(pointBScreenPixelX, pointCScreenPixelX))));
+			minScreenPixelY = _mm256_cvttps_epi32(_mm256_floor_ps(_mm256_min_ps(pointAScreenPixelY, _mm256_min_ps(pointBScreenPixelY, pointCScreenPixelY))));
+			maxScreenPixelX = _mm256_cvttps_epi32(_mm256_floor_ps(_mm256_max_ps(pointAScreenPixelX, _mm256_max_ps(pointBScreenPixelX, pointCScreenPixelX))));
+			maxScreenPixelY = _mm256_cvttps_epi32(_mm256_floor_ps(_mm256_max_ps(pointAScreenPixelY, _mm256_max_ps(pointBScreenPixelY, pointCScreenPixelY))));
 
 			// How "and" works?
 			// 0000 0000 0110 0011 <- 96 = 32 * 3 + 3
