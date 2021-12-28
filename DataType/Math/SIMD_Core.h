@@ -226,7 +226,7 @@ namespace culling
 
 	FORCE_INLINE extern culling::M256F M256F_MUL_AND_ADD(const culling::M256F& M256_A, const culling::M256F& M256_B, const culling::M256F& M256_C)
 	{
-		return culling::M256F_ADD(culling::M256F_MUL(M256_A, M256_B), M256_C);
+		return _mm256_fmadd_ps(M256_A, M256_B, M256_C);
 	}
 
 	/*FORCE_INLINE extern culling::M128F M128F_CROSS(const culling::M128F& M128_A, const culling::M128F& M128_B)

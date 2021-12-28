@@ -22,9 +22,19 @@ FORCE_INLINE void culling::BinTrianglesStage::FrustumCulling
 	std::uint32_t& triangleCullMask
 )
 {
-	const culling::M256F pointANdcW = _mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexW[0]);
-	const culling::M256F pointBNdcW = _mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexW[1]);
-	const culling::M256F pointCNdcW = _mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexW[2]);
+#ifdef DEBUG_CULLING
+
+	for(size_t i = 0 ; i < 3 ; i++)
+	{
+		const culling::M256F isWGreaterThanZero = _mm256_cmp_ps(clipspaceVertexW[i], _mm256_set1_ps(0.0f), _CMP_GE_OQ);
+		assert(_mm256_test_all_ones(*reinterpret_cast<const culling::M256I*>(&isWGreaterThanZero)));
+	}
+	
+#endif
+
+	const culling::M256F pointANdcW = clipspaceVertexW[0];
+	const culling::M256F pointBNdcW = clipspaceVertexW[1];
+	const culling::M256F pointCNdcW = clipspaceVertexW[2];
 
 	const culling::M256F pointANdcX = _mm256_cmp_ps(_mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexX[0]), pointANdcW, _CMP_LE_OQ); // make positive values ( https://stackoverflow.com/questions/23847377/how-does-this-function-compute-the-absolute-value-of-a-float-through-a-not-and-a )
 	const culling::M256F pointBNdcX = _mm256_cmp_ps(_mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexX[1]), pointBNdcW, _CMP_LE_OQ);

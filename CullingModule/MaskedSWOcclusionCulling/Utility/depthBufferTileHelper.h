@@ -52,9 +52,7 @@ namespace culling
 			outBinBoundingBoxMinY = _mm256_min_epi32(_mm256_set1_epi32(depthBuffer.mResolution.mRightTopTileOrginY), _mm256_max_epi32(outBinBoundingBoxMinY, _mm256_set1_epi32(depthBuffer.mResolution.mLeftBottomTileOrginY)));
 			outBinBoundingBoxMaxX = _mm256_max_epi32(_mm256_set1_epi32(depthBuffer.mResolution.mLeftBottomTileOrginX), _mm256_min_epi32(outBinBoundingBoxMaxX, _mm256_set1_epi32(depthBuffer.mResolution.mRightTopTileOrginX)));
 			outBinBoundingBoxMaxY = _mm256_max_epi32(_mm256_set1_epi32(depthBuffer.mResolution.mLeftBottomTileOrginY), _mm256_min_epi32(outBinBoundingBoxMaxY, _mm256_set1_epi32(depthBuffer.mResolution.mRightTopTileOrginY)));
-
-			assert(_mm256_testc_si256(_mm256_cmpgt_epi32(outBinBoundingBoxMinX, outBinBoundingBoxMaxX), _mm256_set1_epi64x(0x0000000000000000)) == 1);
-			assert(_mm256_testc_si256(_mm256_cmpgt_epi32(outBinBoundingBoxMinY, outBinBoundingBoxMaxY), _mm256_set1_epi64x(0x0000000000000000)) == 1);
+			
 
 		}
 
