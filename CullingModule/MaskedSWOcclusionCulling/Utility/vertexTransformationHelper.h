@@ -32,6 +32,28 @@ namespace culling
 			}
 		}
 
+		FORCE_INLINE extern void TransformThreeVerticesToClipSpace
+		(
+			culling::M256F* outClipVertexX,
+			culling::M256F* outClipVertexY,
+			culling::M256F* outClipVertexZ,
+			const float* const toClipspaceMatrix
+		)
+		{
+			assert(toClipspaceMatrix != nullptr);
+			for (size_t i = 0; i < 3; ++i)
+			{
+				const culling::M256F tmpX = culling::M256F_MUL_AND_ADD(outClipVertexX[i], _mm256_set1_ps(toClipspaceMatrix[0]), culling::M256F_MUL_AND_ADD(outClipVertexY[i], _mm256_set1_ps(toClipspaceMatrix[4]), culling::M256F_MUL_AND_ADD(outClipVertexZ[i], _mm256_set1_ps(toClipspaceMatrix[8]), _mm256_set1_ps(toClipspaceMatrix[12]))));
+				const culling::M256F tmpY = culling::M256F_MUL_AND_ADD(outClipVertexX[i], _mm256_set1_ps(toClipspaceMatrix[1]), culling::M256F_MUL_AND_ADD(outClipVertexY[i], _mm256_set1_ps(toClipspaceMatrix[5]), culling::M256F_MUL_AND_ADD(outClipVertexZ[i], _mm256_set1_ps(toClipspaceMatrix[9]), _mm256_set1_ps(toClipspaceMatrix[13]))));
+				const culling::M256F tmpZ = culling::M256F_MUL_AND_ADD(outClipVertexX[i], _mm256_set1_ps(toClipspaceMatrix[2]), culling::M256F_MUL_AND_ADD(outClipVertexY[i], _mm256_set1_ps(toClipspaceMatrix[6]), culling::M256F_MUL_AND_ADD(outClipVertexZ[i], _mm256_set1_ps(toClipspaceMatrix[10]), _mm256_set1_ps(toClipspaceMatrix[14]))));
+				
+				outClipVertexX[i] = tmpX;
+				outClipVertexY[i] = tmpY;
+				outClipVertexZ[i] = tmpZ;
+
+			}
+		}
+
 		FORCE_INLINE extern void TransformVertexToClipSpace
 		(
 			culling::M256F& outClipVertexX,

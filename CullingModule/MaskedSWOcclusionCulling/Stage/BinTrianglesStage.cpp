@@ -24,33 +24,44 @@ FORCE_INLINE void culling::BinTrianglesStage::Clipping
 	std::uint32_t& triangleCullMask
 )
 {
-	const culling::M256F pointANdcW = clipspaceVertexW[0];
-	const culling::M256F pointANdcNegativeW = _mm256_xor_ps(_mm256_set1_ps(-0.0f), clipspaceVertexW[0]);
-	const culling::M256F pointBNdcW = clipspaceVertexW[1];
-	const culling::M256F pointBNdcNegativeW = _mm256_xor_ps(_mm256_set1_ps(-0.0f), clipspaceVertexW[1]);
-	const culling::M256F pointCNdcW = clipspaceVertexW[2];
-	const culling::M256F pointCNdcNegativeW = _mm256_xor_ps(_mm256_set1_ps(-0.0f), clipspaceVertexW[2]);
+	const culling::M256F pointANdcPositiveW = _mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexW[0]);
+	const culling::M256F pointBNdcPositiveW = _mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexW[1]);
+	const culling::M256F pointCNdcPositiveW = _mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexW[2]);
 
-	const culling::M256F pointANdcX = _mm256_and_ps(_mm256_cmp_ps(clipspaceVertexX[0], pointANdcNegativeW, _CMP_GE_OQ), _mm256_cmp_ps(clipspaceVertexX[0], pointANdcW, _CMP_LE_OQ)); // make positive values ( https://stackoverflow.com/questions/23847377/how-does-this-function-compute-the-absolute-value-of-a-float-through-a-not-and-a )
-	const culling::M256F pointBNdcX = _mm256_and_ps(_mm256_cmp_ps(clipspaceVertexX[1], pointBNdcNegativeW, _CMP_GE_OQ), _mm256_cmp_ps(clipspaceVertexX[1], pointBNdcW, _CMP_LE_OQ));
-	const culling::M256F pointCNdcX = _mm256_and_ps(_mm256_cmp_ps(clipspaceVertexX[2], pointCNdcNegativeW, _CMP_GE_OQ), _mm256_cmp_ps(clipspaceVertexX[2], pointCNdcW, _CMP_LE_OQ));
-	const culling::M256F pointANdcY = _mm256_and_ps(_mm256_cmp_ps(clipspaceVertexY[0], pointANdcNegativeW, _CMP_GE_OQ), _mm256_cmp_ps(clipspaceVertexY[0], pointANdcW, _CMP_LE_OQ));
-	const culling::M256F pointBNdcY = _mm256_and_ps(_mm256_cmp_ps(clipspaceVertexY[1], pointBNdcNegativeW, _CMP_GE_OQ), _mm256_cmp_ps(clipspaceVertexY[1], pointBNdcW, _CMP_LE_OQ));
-	const culling::M256F pointCNdcY = _mm256_and_ps(_mm256_cmp_ps(clipspaceVertexY[2], pointCNdcNegativeW, _CMP_GE_OQ), _mm256_cmp_ps(clipspaceVertexY[2], pointCNdcW, _CMP_LE_OQ));
-	const culling::M256F pointANdcZ = _mm256_and_ps(_mm256_cmp_ps(clipspaceVertexZ[0], pointANdcNegativeW, _CMP_GE_OQ), _mm256_cmp_ps(clipspaceVertexZ[0], pointANdcW, _CMP_LE_OQ));
-	const culling::M256F pointBNdcZ = _mm256_and_ps(_mm256_cmp_ps(clipspaceVertexZ[1], pointBNdcNegativeW, _CMP_GE_OQ), _mm256_cmp_ps(clipspaceVertexZ[1], pointBNdcW, _CMP_LE_OQ));
-	const culling::M256F pointCNdcZ = _mm256_and_ps(_mm256_cmp_ps(clipspaceVertexZ[2], pointCNdcNegativeW, _CMP_GE_OQ), _mm256_cmp_ps(clipspaceVertexZ[2], pointCNdcW, _CMP_LE_OQ));
+	const culling::M256F pointANdcX = _mm256_cmp_ps(_mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexX[0]), pointANdcPositiveW, _CMP_LE_OQ); // make positive values ( https://stackoverflow.com/questions/23847377/how-does-this-function-compute-the-absolute-value-of-a-float-through-a-not-and-a )
+	const culling::M256F pointBNdcX = _mm256_cmp_ps(_mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexX[1]), pointBNdcPositiveW, _CMP_LE_OQ);
+	const culling::M256F pointCNdcX = _mm256_cmp_ps(_mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexX[2]), pointCNdcPositiveW, _CMP_LE_OQ);
+	const culling::M256F pointANdcY = _mm256_cmp_ps(_mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexY[0]), pointANdcPositiveW, _CMP_LE_OQ);
+	const culling::M256F pointBNdcY = _mm256_cmp_ps(_mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexY[1]), pointBNdcPositiveW, _CMP_LE_OQ);
+	const culling::M256F pointCNdcY = _mm256_cmp_ps(_mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexY[2]), pointCNdcPositiveW, _CMP_LE_OQ);
+	const culling::M256F pointANdcZ = _mm256_cmp_ps(_mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexZ[0]), pointANdcPositiveW, _CMP_LE_OQ);
+	const culling::M256F pointBNdcZ = _mm256_cmp_ps(_mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexZ[1]), pointBNdcPositiveW, _CMP_LE_OQ);
+	const culling::M256F pointCNdcZ = _mm256_cmp_ps(_mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexZ[2]), pointCNdcPositiveW, _CMP_LE_OQ);
 	
 	culling::M256I pointAInFrustum = _mm256_and_si256(_mm256_and_si256(*reinterpret_cast<const culling::M256I*>(&pointANdcX), *reinterpret_cast<const culling::M256I*>(&pointANdcY)), *reinterpret_cast<const culling::M256I*>(&pointANdcZ));
 	culling::M256I pointBInFrustum = _mm256_and_si256(_mm256_and_si256(*reinterpret_cast<const culling::M256I*>(&pointBNdcX), *reinterpret_cast<const culling::M256I*>(&pointBNdcY)), *reinterpret_cast<const culling::M256I*>(&pointBNdcZ));
 	culling::M256I pointCInFrustum = _mm256_and_si256(_mm256_and_si256(*reinterpret_cast<const culling::M256I*>(&pointCNdcX), *reinterpret_cast<const culling::M256I*>(&pointCNdcY)), *reinterpret_cast<const culling::M256I*>(&pointCNdcZ));
-
+	
 	// TODO : implemnet Clipping
 	// Currently when w value is negative, it produce weird screen space value. https://stackoverflow.com/a/20180585
 	// So i exclude triangle that any vertex is out of bound ( -w ~ w )
 	const culling::M256I verticesInFrustum = _mm256_and_si256(_mm256_and_si256(*reinterpret_cast<const culling::M256I*>(&pointAInFrustum), *reinterpret_cast<const culling::M256I*>(&pointBInFrustum)), *reinterpret_cast<const culling::M256I*>(&pointCInFrustum));
 
 	triangleCullMask &= _mm256_movemask_ps(*reinterpret_cast<const culling::M256F*>(&verticesInFrustum));
+}
+
+FORCE_INLINE void culling::BinTrianglesStage::CheckWIsNegativeValue
+(
+	const culling::M256F* const clipspaceVertexW,
+	std::uint32_t& triangleCullMask
+)
+{
+	const culling::M256F pointA_W_IsNegativeValue = _mm256_cmp_ps(clipspaceVertexW[0], _mm256_setzero_ps(), _CMP_GT_OQ);
+	const culling::M256F pointB_W_IsNegativeValue = _mm256_cmp_ps(clipspaceVertexW[1], _mm256_setzero_ps(), _CMP_GT_OQ);
+	const culling::M256F pointC_W_IsNegativeValue = _mm256_cmp_ps(clipspaceVertexW[2], _mm256_setzero_ps(), _CMP_GT_OQ);
+
+	const culling::M256F points_w_isNegativeValue = _mm256_and_ps(pointA_W_IsNegativeValue, _mm256_and_ps(pointB_W_IsNegativeValue, pointC_W_IsNegativeValue));
+	triangleCullMask &= _mm256_movemask_ps(*reinterpret_cast<const culling::M256F*>(&points_w_isNegativeValue));
 }
 
 
@@ -388,23 +399,58 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 		//Gather Vertex with indice
 		//WE ARRIVE AT MODEL SPACE COORDINATE!
 		GatherVertices(vertices, verticeCount, vertexIndices, indiceCount, currentIndiceIndex, vertexStrideByte, fetchTriangleCount, ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ);
-		
-		//Convert Model space Vertex To Clip space Vertex
-		//WE ARRIVE AT CLIP SPACE COORDINATE. W IS NOT 1
-		culling::vertexTransformationHelper::TransformThreeVerticesToClipSpace(ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, oneDividedByW, modelToClipspaceMatrix);
-		
-		// Clipping befor ndc https://stackoverflow.com/questions/41085117/why-does-gl-divide-gl-position-by-w-for-you-rather-than-letting-you-do-it-your
-		Clipping(ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, oneDividedByW, triangleCullMask);
 
+
+		//////////////////////////////////////////////////
+
+
+		for(int i = 0 ; i < 3 ; i++)
+		{
+			oneDividedByW[i] = culling::M256F_MUL_AND_ADD(ndcSpaceVertexX[i], _mm256_set1_ps(modelToClipspaceMatrix[3]), culling::M256F_MUL_AND_ADD(ndcSpaceVertexY[i], _mm256_set1_ps(modelToClipspaceMatrix[7]), culling::M256F_MUL_AND_ADD(ndcSpaceVertexZ[i], _mm256_set1_ps(modelToClipspaceMatrix[11]), _mm256_set1_ps(modelToClipspaceMatrix[15]))));
+		}
+
+		CheckWIsNegativeValue(oneDividedByW, triangleCullMask);
 		if (triangleCullMask == 0x00000000)
 		{
 			continue;
 		}
 
-		oneDividedByW[0] = culling::M256F_DIV(_mm256_set1_ps(1.0f), oneDividedByW[0]);
-		oneDividedByW[1] = culling::M256F_DIV(_mm256_set1_ps(1.0f), oneDividedByW[1]);
-		oneDividedByW[2] = culling::M256F_DIV(_mm256_set1_ps(1.0f), oneDividedByW[2]);
+
+		//////////////////////////////////////////////////
+
+
+		//Convert Model space Vertex To Clip space Vertex
+		//WE ARRIVE AT CLIP SPACE COORDINATE. W IS NOT 1
+		culling::vertexTransformationHelper::TransformThreeVerticesToClipSpace
+		(
+			ndcSpaceVertexX, 
+			ndcSpaceVertexY, 
+			ndcSpaceVertexZ, 
+			modelToClipspaceMatrix
+		);
 		
+		// Clipping befor ndc https://stackoverflow.com/questions/41085117/why-does-gl-divide-gl-position-by-w-for-you-rather-than-letting-you-do-it-your
+		Clipping(ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, oneDividedByW, triangleCullMask);
+		if (triangleCullMask == 0x00000000)
+		{
+			continue;
+		}
+
+		for (int i = 0; i < 3; i++)
+		{
+			oneDividedByW[i] = culling::M256F_DIV(_mm256_set1_ps(1.0f), oneDividedByW[i]);
+		}
+
+		//////////////////////////////////////////////////
+
+		// Now Z value is on NDC coordinate
+		for (int i = 0; i < 3; i++)
+		{
+			ndcSpaceVertexZ[i] = culling::M256F_MUL(ndcSpaceVertexZ[i], oneDividedByW[i]);
+		}
+
+		//////////////////////////////////////////////////
+
 		culling::M256F screenPixelPosX[3], screenPixelPosY[3];
 		culling::vertexTransformationHelper::ConvertClipSpaceThreeVerticesToScreenPixelSpace(ndcSpaceVertexX, ndcSpaceVertexY, oneDividedByW, screenPixelPosX, screenPixelPosY, mMaskedOcclusionCulling->mDepthBuffer);
 
@@ -415,6 +461,9 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 			continue;
 		}
 		
+
+		//////////////////////////////////////////////////
+
 
 		Sort_8_3DTriangles
 		(
@@ -465,6 +514,14 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 			RIGHT_MIDDLE_POINT_Z
 		);
 
+#ifdef DEBUG_CULLING
+
+		for(size_t i = 0 ; i < 8 ; i++)
+		{
+			assert(reinterpret_cast<const float*>(&LEFT_MIDDLE_POINT_X)[i] <= reinterpret_cast<const float*>(&RIGHT_MIDDLE_POINT_X)[i]);
+		}
+
+#endif
 
 
 		{
