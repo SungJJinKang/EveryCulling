@@ -6,6 +6,81 @@
 #include "../Utility/vertexTransformationHelper.h"
 #include "../Utility/depthBufferTileHelper.h"
 
+FORCE_INLINE float culling::QueryOccludeeStage::MinFloatFromM256F(const culling::M256F& data)
+{
+	float min = FLT_MAX;
+	for (size_t i = 0; i < 8; i++)
+	{
+		min = MIN(min, reinterpret_cast<const float*>(&data)[i]);
+	}
+	return min;
+}
+
+FORCE_INLINE float culling::QueryOccludeeStage::MaxFloatFromM256F(const culling::M256F& data)
+{
+	float max = -FLT_MAX;
+	for (size_t i = 0; i < 8; i++)
+	{
+		max = MAX(max, reinterpret_cast<const float*>(&data)[i]);
+	}
+	return max;
+}
+
+FORCE_INLINE void culling::QueryOccludeeStage::ComputeBinBoundingBoxFromVertex
+(
+	const culling::M256F& screenPixelX,
+	const culling::M256F& screenPixelY,
+	int& outBinBoundingBoxMinX,
+	int& outBinBoundingBoxMinY,
+	int& outBinBoundingBoxMaxX,
+	int& outBinBoundingBoxMaxY,
+	SWDepthBuffer& depthBuffer
+)
+{
+	int minScreenPixelX, minScreenPixelY, maxScreenPixelX, maxScreenPixelY;
+
+	static const int WIDTH_MASK = ~(TILE_WIDTH - 1);
+	static const int HEIGHT_MASK = ~(TILE_HEIGHT - 1);
+
+	minScreenPixelX = MAX(0, (int)MinFloatFromM256F(screenPixelX));
+	minScreenPixelY = MAX(0, (int)MinFloatFromM256F(screenPixelY));
+	maxScreenPixelX = MAX(0, (int)MaxFloatFromM256F(screenPixelX));
+	maxScreenPixelY = MAX(0, (int)MaxFloatFromM256F(screenPixelY));
+
+	outBinBoundingBoxMinX = minScreenPixelX & WIDTH_MASK;
+	outBinBoundingBoxMinY = minScreenPixelY & HEIGHT_MASK;
+	outBinBoundingBoxMaxX = maxScreenPixelX & WIDTH_MASK;
+	outBinBoundingBoxMaxY = maxScreenPixelY & HEIGHT_MASK;
+
+	outBinBoundingBoxMinX = MIN(depthBuffer.mResolution.mRightTopTileOrginX, MAX(outBinBoundingBoxMinX, depthBuffer.mResolution.mLeftBottomTileOrginX));
+	outBinBoundingBoxMinY = MIN(depthBuffer.mResolution.mRightTopTileOrginY, MAX(outBinBoundingBoxMinY, depthBuffer.mResolution.mLeftBottomTileOrginY));
+	outBinBoundingBoxMaxX = MAX(depthBuffer.mResolution.mLeftBottomTileOrginX, MIN(outBinBoundingBoxMaxX, depthBuffer.mResolution.mRightTopTileOrginX));
+	outBinBoundingBoxMaxY = MAX(depthBuffer.mResolution.mLeftBottomTileOrginY, MIN(outBinBoundingBoxMaxY, depthBuffer.mResolution.mRightTopTileOrginY));
+
+	assert(outBinBoundingBoxMinX <= outBinBoundingBoxMaxX);
+	assert(outBinBoundingBoxMinY <= outBinBoundingBoxMaxY);
+}
+
+FORCE_INLINE void culling::QueryOccludeeStage::Clipping
+(
+	const culling::M256F& clipspaceVertexX,
+	const culling::M256F& clipspaceVertexY,
+	const culling::M256F& clipspaceVertexZ,
+	const culling::M256F& clipspaceVertexW,
+	std::uint32_t& triangleCullMask
+)
+{
+	const culling::M256F pointNdcPositiveW = _mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexW);
+
+	const culling::M256F pointNdcX = _mm256_cmp_ps(_mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexX), pointNdcPositiveW, _CMP_LE_OQ);
+	const culling::M256F pointNdcY = _mm256_cmp_ps(_mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexY), pointNdcPositiveW, _CMP_LE_OQ);
+	const culling::M256F pointNdcZ = _mm256_cmp_ps(_mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexZ), pointNdcPositiveW, _CMP_LE_OQ);
+
+	culling::M256I pointAInFrustum = _mm256_and_si256(_mm256_and_si256(*reinterpret_cast<const culling::M256I*>(&pointNdcX), *reinterpret_cast<const culling::M256I*>(&pointNdcY)), *reinterpret_cast<const culling::M256I*>(&pointNdcZ));
+	
+	triangleCullMask &= _mm256_movemask_ps(*reinterpret_cast<const culling::M256F*>(&pointAInFrustum));
+}
+
 void culling::QueryOccludeeStage::QueryOccludee
 (
 	const size_t cameraIndex, 
@@ -35,14 +110,15 @@ void culling::QueryOccludeeStage::QueryOccludee
 
 
 			//Transform To ClipSpace !!
-			
+
+			std::uint32_t aabbPointMask = (1 << 8) - 1;
+
 
 			aabbVertexW = culling::M256F_MUL_AND_ADD(aabbVertexX, _mm256_set1_ps(modelToClipSpaceMatrix.data()[3]), culling::M256F_MUL_AND_ADD(aabbVertexY, _mm256_set1_ps(modelToClipSpaceMatrix.data()[7]), culling::M256F_MUL_AND_ADD(aabbVertexZ, _mm256_set1_ps(modelToClipSpaceMatrix.data()[11]), _mm256_set1_ps(modelToClipSpaceMatrix.data()[15]))));
-			const int isWLessThanZero = _mm256_movemask_ps(_mm256_cmp_ps(aabbVertexW, _mm256_setzero_ps(), _CMP_LE_OQ));
-			if(isWLessThanZero != 0x00000000)
+			aabbPointMask &= _mm256_movemask_ps(_mm256_cmp_ps(aabbVertexW, _mm256_setzero_ps(), _CMP_GT_OQ));
+			if(aabbPointMask != 0x000000FF)
 			{
-				// TODO : We need cllipping...
-				// If any vertex of aabb's w value is negative. 
+				// if any vertex is out of volume, object is never culled.
 				continue;
 			}
 
@@ -55,6 +131,12 @@ void culling::QueryOccludeeStage::QueryOccludee
 			);
 			//Now ClipSpace !!
 
+			Clipping(aabbVertexX, aabbVertexY, aabbVertexZ, aabbVertexW, aabbPointMask);
+			if (aabbPointMask != 0x000000FF)
+			{
+				// if any vertex is out of volume, object is never culled.
+				continue;
+			}
 			//oneDividedByW finally become oneDividedByW
 			
 			const culling::M256F oneDividedByW = culling::M256F_DIV(_mm256_set1_ps(1.0f), aabbVertexW);
@@ -74,7 +156,10 @@ void culling::QueryOccludeeStage::QueryOccludee
 
 			for(size_t i = 0 ; i < 8 ; i++)
 			{
-				aabbMinDepthValue = MIN(aabbMinDepthValue, reinterpret_cast<const float*>(&aabbVertexZ)[i]);
+				if ((aabbPointMask & (1 << i)) != 0x00000000)
+				{
+					aabbMinDepthValue = MIN(aabbMinDepthValue, reinterpret_cast<const float*>(&aabbVertexZ)[i]);
+				}
 			}
 
 			culling::M256F aabbScreenSpaceVertexX;
@@ -91,7 +176,7 @@ void culling::QueryOccludeeStage::QueryOccludee
 
 			int outBinBoundingBoxMinX, outBinBoundingBoxMinY, outBinBoundingBoxMaxX, outBinBoundingBoxMaxY;
 				
-			culling::depthBufferTileHelper::ComputeBinBoundingBoxFromVertex
+			ComputeBinBoundingBoxFromVertex
 			(
 				aabbScreenSpaceVertexX,
 				aabbScreenSpaceVertexY,

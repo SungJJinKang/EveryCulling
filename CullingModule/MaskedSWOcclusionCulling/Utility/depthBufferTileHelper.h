@@ -58,60 +58,9 @@ namespace culling
 
 		}
 
-		FORCE_INLINE extern float MinFloatFromM256F(const culling::M256F& data)
-		{
-			float min = FLT_MAX;
-			for (size_t i = 0; i < 8; i++)
-			{
-				min = MIN(min, reinterpret_cast<const float*>(&data)[i]);
-			}
-			return min;
-		}
+		
 
-		FORCE_INLINE extern float MaxFloatFromM256F(const culling::M256F& data)
-		{
-			float max = -FLT_MAX;
-			for (size_t i = 0; i < 8; i++)
-			{
-				max = MAX(max, reinterpret_cast<const float*>(&data)[i]);
-			}
-			return max;
-		}
-
-		FORCE_INLINE extern void ComputeBinBoundingBoxFromVertex
-		(
-			const culling::M256F& screenPixelX,
-			const culling::M256F& screenPixelY,
-			int& outBinBoundingBoxMinX,
-			int& outBinBoundingBoxMinY,
-			int& outBinBoundingBoxMaxX,
-			int& outBinBoundingBoxMaxY,
-			SWDepthBuffer& depthBuffer
-		)
-		{
-			int minScreenPixelX, minScreenPixelY, maxScreenPixelX, maxScreenPixelY;
-			
-			static const int WIDTH_MASK = ~(TILE_WIDTH - 1);
-			static const int HEIGHT_MASK = ~(TILE_HEIGHT - 1);
-
-			minScreenPixelX = MAX(0, (int)MinFloatFromM256F(screenPixelX));
-			minScreenPixelY = MAX(0, (int)MinFloatFromM256F(screenPixelY));
-			maxScreenPixelX = MAX(0, (int)MaxFloatFromM256F(screenPixelX));
-			maxScreenPixelY = MAX(0, (int)MaxFloatFromM256F(screenPixelY));
-			
-			outBinBoundingBoxMinX = minScreenPixelX & WIDTH_MASK;
-			outBinBoundingBoxMinY = minScreenPixelY & HEIGHT_MASK;
-			outBinBoundingBoxMaxX = maxScreenPixelX & WIDTH_MASK;
-			outBinBoundingBoxMaxY = maxScreenPixelY & HEIGHT_MASK;
-
-			outBinBoundingBoxMinX = MIN(depthBuffer.mResolution.mRightTopTileOrginX, MAX(outBinBoundingBoxMinX, depthBuffer.mResolution.mLeftBottomTileOrginX));
-			outBinBoundingBoxMinY = MIN(depthBuffer.mResolution.mRightTopTileOrginY, MAX(outBinBoundingBoxMinY, depthBuffer.mResolution.mLeftBottomTileOrginY));
-			outBinBoundingBoxMaxX = MAX(depthBuffer.mResolution.mLeftBottomTileOrginX, MIN(outBinBoundingBoxMaxX, depthBuffer.mResolution.mRightTopTileOrginX));
-			outBinBoundingBoxMaxY = MAX(depthBuffer.mResolution.mLeftBottomTileOrginY, MIN(outBinBoundingBoxMaxY, depthBuffer.mResolution.mRightTopTileOrginY));
-
-			assert(outBinBoundingBoxMinX <= outBinBoundingBoxMaxX);
-			assert(outBinBoundingBoxMinY <= outBinBoundingBoxMaxY);
-		}
+		
 	};
 }
 
