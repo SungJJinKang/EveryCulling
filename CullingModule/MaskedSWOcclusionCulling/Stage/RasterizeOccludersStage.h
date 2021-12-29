@@ -24,7 +24,7 @@ namespace culling
 		/// </summary>
 		/// <param name="coverageMask"></param>
 		/// <returns></returns>
-		culling::M256I ShuffleCoverageMask(const culling::M256I& coverageMask) const;
+		FORCE_INLINE culling::M256I ShuffleCoverageMask(const culling::M256I& coverageMask) const;
 
 		/// <summary>
 		/// Compute Depth in Bin of Tile(Sub Tile)

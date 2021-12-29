@@ -35,8 +35,10 @@ namespace culling
 			const culling::M256F& vertexPoint3Y,
 			const culling::M256F& vertexPoint3Z,
 
-			const culling::M256I* const leftFaceEvent,
-			const culling::M256I* const rightFaceEvent
+			const culling::M256I* const leftFaceEvent, // eight _mm256i
+			const culling::M256I* const rightFaceEvent, // eight _mm256i
+
+			const std::uint32_t triangleMask
 		)
 		{
 			culling::M256F zPixelDx, zPixelDy;
@@ -73,17 +75,26 @@ namespace culling
 			const culling::M256F zMaxOfTriangle = _mm256_max_ps(vertexPoint1Z, _mm256_max_ps(vertexPoint2Z, vertexPoint3Z));
 
 
-			for (size_t triIndex = 0; triIndex < triangleCount; triIndex++)
+			for (size_t triangleIndex = 0; triangleIndex < triangleCount; triangleIndex++)
 			{
-				const culling::M256F zTriMax = _mm256_set1_ps((reinterpret_cast<const float*>(&zMaxOfTriangle))[triIndex]);
-				const culling::M256F zTriMin = _mm256_set1_ps((reinterpret_cast<const float*>(&zMinOfTriangle))[triIndex]);
+				if ((triangleMask & (1 << triangleIndex)) != 0x00000000)
+				{
+					const culling::M256F zTriMax = _mm256_set1_ps((reinterpret_cast<const float*>(&zMaxOfTriangle))[triangleIndex]);
+					const culling::M256F zTriMin = _mm256_set1_ps((reinterpret_cast<const float*>(&zMinOfTriangle))[triangleIndex]);
 
-				// depth value at subtiles
-				culling::M256F z0 = _mm256_fmadd_ps(_mm256_set1_ps((reinterpret_cast<const float*>(&zPixelDx))[triIndex]), _mm256_setr_ps(0, SUB_TILE_WIDTH, SUB_TILE_WIDTH * 2, SUB_TILE_WIDTH * 3, 0, SUB_TILE_WIDTH, SUB_TILE_WIDTH * 2, SUB_TILE_WIDTH * 3),
-					_mm256_fmadd_ps(_mm256_set1_ps((reinterpret_cast<const float*>(&zPixelDy))[triIndex]), _mm256_setr_ps(0, 0, 0, 0, SUB_TILE_HEIGHT, SUB_TILE_HEIGHT, SUB_TILE_HEIGHT, SUB_TILE_HEIGHT), _mm256_set1_ps((reinterpret_cast<const float*>(&zPlaneOffset))[triIndex])));
+					// depth value at subtiles
+					culling::M256F z0 = _mm256_fmadd_ps(_mm256_set1_ps((reinterpret_cast<const float*>(&zPixelDx))[triangleIndex]), _mm256_setr_ps(0, SUB_TILE_WIDTH, SUB_TILE_WIDTH * 2, SUB_TILE_WIDTH * 3, 0, SUB_TILE_WIDTH, SUB_TILE_WIDTH * 2, SUB_TILE_WIDTH * 3),
+						_mm256_fmadd_ps(_mm256_set1_ps((reinterpret_cast<const float*>(&zPixelDy))[triangleIndex]), _mm256_setr_ps(0, 0, 0, 0, SUB_TILE_HEIGHT, SUB_TILE_HEIGHT, SUB_TILE_HEIGHT, SUB_TILE_HEIGHT), _mm256_set1_ps((reinterpret_cast<const float*>(&zPlaneOffset))[triangleIndex])));
 
-				z0 = _mm256_max_ps(_mm256_min_ps(z0, zTriMax), zTriMin);
-				subTileMaxValues[triIndex] = z0;
+					z0 = _mm256_max_ps(_mm256_min_ps(z0, zTriMax), zTriMin);
+					subTileMaxValues[triangleIndex] = z0;
+
+
+					// TODO : ScanLine DepthValue based on left, right event.
+					//leftFaceEvent[triangleIndex]
+					//rightFaceEvent[triangleIndex]
+				}
+				
 
 			}
 
