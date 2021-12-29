@@ -72,6 +72,11 @@ namespace culling
 		void* mRenderer[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		void* mTransform[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
+		/// <summary>
+		/// Whether renderer component is enabled.
+		/// </summary>
+		bool mIsObjectEnabled[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		
 		VertexData mVertexDatas[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 		culling::Vec4 mAABBMinLocalPoint[ENTITY_COUNT_IN_ENTITY_BLOCK];
@@ -111,6 +116,10 @@ namespace culling
 			mIsVisibleBitflag[entityIndex] |= (1 << cameraIndex);
 		}
 
+		FORCE_INLINE bool SetIsObjectEnabled(const size_t entityIndex, const bool isEnabled)
+		{
+			mIsObjectEnabled[entityIndex] = isEnabled;
+		}
 		
 		FORCE_INLINE bool GetIsOccluder(const size_t entityIndex, const size_t cameraIndex) const
 		{
