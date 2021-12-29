@@ -40,14 +40,11 @@ culling::SWDepthBuffer::SWDepthBuffer(std::uint32_t width, std::uint32_t height)
 	0, 0,
 	( (width % TILE_WIDTH) > 0 ? width + (width - width % TILE_WIDTH) : width ) - TILE_WIDTH,
 	( (height % TILE_HEIGHT) > 0 ? height + (height - height % TILE_HEIGHT) : height ) - TILE_HEIGHT,
-
-#if NDC_RANGE == MINUS_ONE_TO_POSITIVE_ONE
+	
 	_mm256_set1_ps(static_cast<float>(width * 0.5f)),
-	_mm256_set1_ps(static_cast<float>(height * 0.5f))
-#elif NDC_RANGE == ZERO_TO_POSITIVE_ONE
+	_mm256_set1_ps(static_cast<float>(height * 0.5f)),
 	_mm256_set1_ps(static_cast<float>(width)),
 	_mm256_set1_ps(static_cast<float>(height))
-#endif
 	},
 	mTiles(nullptr)
 {

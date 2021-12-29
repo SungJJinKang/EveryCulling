@@ -24,7 +24,7 @@ namespace culling
 		/// <param name="clipspaceVertexX"></param>
 		/// <param name="clipspaceVertexY"></param>
 		/// <param name="triangleCullMask"></param>
-		FORCE_INLINE void FrustumCulling
+		FORCE_INLINE void Clipping
 		(
 			const culling::M256F* const clipspaceVertexX,
 			const culling::M256F* const clipspaceVertexY,
@@ -33,7 +33,6 @@ namespace culling
 			std::uint32_t& triangleCullMask
 		);
 		
-
 		
 		/// <summary>
 		/// BackFace Culling

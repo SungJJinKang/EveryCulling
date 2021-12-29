@@ -231,7 +231,11 @@ namespace culling
 #if NDC_RANGE == MINUS_ONE_TO_POSITIVE_ONE
 		culling::M256F mReplicatedScreenHalfWidth;
 		culling::M256F mReplicatedScreenHalfHeight;
+		culling::M256F mReplicatedScreenWidth;
+		culling::M256F mReplicatedScreenHeight;
 #elif NDC_RANGE == ZERO_TO_POSITIVE_ONE
+		culling::M256F mReplicatedScreenHalfWidth;
+		culling::M256F mReplicatedScreenHalfHeight;
 		culling::M256F mReplicatedScreenWidth;
 		culling::M256F mReplicatedScreenHeight;
 #endif
@@ -247,6 +251,8 @@ namespace culling
 			const std::uint32_t rightTopTileOrginX,
 			const std::uint32_t rightTopTileOrginY,
 			const culling::M256F replicatedScreenHalfWidth,
+			const culling::M256F replicatedScreenHalfHeight,
+			const culling::M256F replicatedScreenWidth,
 			const culling::M256F replicatedScreenHeight
 		)
 			:
@@ -259,7 +265,9 @@ namespace culling
 			mRightTopTileOrginX(rightTopTileOrginX),
 			mRightTopTileOrginY(rightTopTileOrginY),
 			mReplicatedScreenHalfWidth(replicatedScreenHalfWidth),
-			mReplicatedScreenHalfHeight(replicatedScreenHeight),
+			mReplicatedScreenHalfHeight(replicatedScreenHalfHeight),
+			mReplicatedScreenWidth(replicatedScreenWidth),
+			mReplicatedScreenHeight(replicatedScreenHeight),
 
 			mRowSubTileCount(mRowTileCount * (TILE_HEIGHT / SUB_TILE_HEIGHT)),
 			mColumnSubTileCount(mColumnTileCount * (TILE_WIDTH / SUB_TILE_WIDTH))
