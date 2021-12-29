@@ -19,6 +19,7 @@ namespace culling
 	class ScreenSpaceBoundingSphereCulling;
 	class MaskedSWOcclusionCulling;
 	class QueryOcclusionCulling;
+	class EarlyOutDisabledObject;
 	/// <summary>
 	/// 
 	/// This is implementation of Data Oriented ViewFrustumCulling of Frostbite in 2011
@@ -94,6 +95,7 @@ namespace culling
 
 	public:
 
+		std::unique_ptr<EarlyOutDisabledObject> mEarlyOutDisabledObject;
 		std::unique_ptr<ViewFrustumCulling> mViewFrustumCulling;
 #ifdef ENABLE_SCREEN_SAPCE_BOUDING_SPHERE_CULLING
 		std::unique_ptr<ScreenSpaceBoundingSphereCulling> mScreenSpaceBoudingSphereCulling;

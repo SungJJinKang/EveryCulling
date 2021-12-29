@@ -30,7 +30,7 @@ namespace culling
 		//TODO : Add AVX2(__m256) version of this function
 		char CheckInFrustumSIMDWithTwoPoint(const Vec4* eightPlanes, const Position_BoundingSphereRadius* twoPoint);
 
-		void CullBlockEntityJob
+		void DoViewFrustumCulling
 		(
 			const size_t cameraIndex,
 			culling::EntityBlock* const entityBlock

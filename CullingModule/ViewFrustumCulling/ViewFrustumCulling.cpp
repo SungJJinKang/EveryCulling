@@ -16,7 +16,7 @@ culling::ViewFrustumCulling::ViewFrustumCulling(EveryCulling* frotbiteCullingSys
 }
 
 
-void culling::ViewFrustumCulling::CullBlockEntityJob
+void culling::ViewFrustumCulling::DoViewFrustumCulling
 (
 	const size_t cameraIndex,
 	culling::EntityBlock* const entityBlock
@@ -27,18 +27,21 @@ void culling::ViewFrustumCulling::CullBlockEntityJob
 	assert(entityBlock->mCurrentEntityCount != 0);
 	for (size_t entityIndex = 0; entityIndex < entityBlock->mCurrentEntityCount; entityIndex++)
 	{
-		dooms::Transform* const transform = reinterpret_cast<dooms::Transform*>(entityBlock->mTransform[entityIndex]);
-		dooms::Renderer* const renderer = reinterpret_cast<dooms::Renderer*>(entityBlock->mRenderer[entityIndex]);
-
-		if (dooms::IsValid(renderer) == true)
+		if(entityBlock->GetIsCulled(entityIndex, cameraIndex) == false)
 		{
-			Position_BoundingSphereRadius* const posBoundingSphereRadius = entityBlock->mPositionAndBoundingSpheres + entityIndex;
+			dooms::Transform* const transform = reinterpret_cast<dooms::Transform*>(entityBlock->mTransform[entityIndex]);
+			dooms::Renderer* const renderer = reinterpret_cast<dooms::Renderer*>(entityBlock->mRenderer[entityIndex]);
 
-			const float worldRadius = renderer->dooms::ColliderUpdater<dooms::physics::Sphere>::GetWorldCollider()->mRadius;
+			if (dooms::IsValid(renderer) == true)
+			{
+				Position_BoundingSphereRadius* const posBoundingSphereRadius = entityBlock->mPositionAndBoundingSpheres + entityIndex;
 
-			const culling::Vec3* const entityPos = reinterpret_cast<const culling::Vec3*>(&transform->GetPosition());
-			*reinterpret_cast<culling::M128F*>(posBoundingSphereRadius) = *reinterpret_cast<const culling::M128F*>(entityPos);
-			posBoundingSphereRadius->SetBoundingSphereRadius(worldRadius);
+				const float worldRadius = renderer->dooms::ColliderUpdater<dooms::physics::Sphere>::GetWorldCollider()->mRadius;
+
+				const culling::Vec3* const entityPos = reinterpret_cast<const culling::Vec3*>(&transform->GetPosition());
+				*reinterpret_cast<culling::M128F*>(posBoundingSphereRadius) = *reinterpret_cast<const culling::M128F*>(entityPos);
+				posBoundingSphereRadius->SetBoundingSphereRadius(worldRadius);
+			}
 		}
 	}
 
@@ -58,16 +61,18 @@ void culling::ViewFrustumCulling::CullBlockEntityJob
 	assert(entityBlock->mCurrentEntityCount != 0);
 	for (size_t entityIndex = 0; entityIndex < entityBlock->mCurrentEntityCount ; entityIndex = entityIndex + 2)
 	{
-		char result = CheckInFrustumSIMDWithTwoPoint(frustumPlane, entityBlock->mPositionAndBoundingSpheres + entityIndex);
-		// if first low bit has 1 value, Pos A is In Frustum
-		// if second low bit has 1 value, Pos A is In Frustum
+		if (entityBlock->GetIsCulled(entityIndex, cameraIndex) == false || entityBlock->GetIsCulled(entityIndex + 1, cameraIndex) == false)
+		{
+			char result = CheckInFrustumSIMDWithTwoPoint(frustumPlane, entityBlock->mPositionAndBoundingSpheres + entityIndex);
+			// if first low bit has 1 value, Pos A is In Frustum
+			// if second low bit has 1 value, Pos A is In Frustum
 
-		//for maximizing cache hit, Don't set Entity's IsVisiable at here
-		assert(entityIndex < cullingMaskSize);
-		assert(entityIndex + 1 < cullingMaskSize);
-		cullingMask[entityIndex] |= (result | ~1) << cameraIndex;
-		cullingMask[entityIndex + 1] |= ((result | ~2) >> 1) << cameraIndex;
-
+			//for maximizing cache hit, Don't set Entity's IsVisiable at here
+			assert(entityIndex < cullingMaskSize);
+			assert(entityIndex + 1 < cullingMaskSize);
+			cullingMask[entityIndex] |= (result | ~1) << cameraIndex;
+			cullingMask[entityIndex + 1] |= ((result | ~2) >> 1) << cameraIndex;
+		}
 	}
 
 	//TODO : If CullingMask is True, Do Calculate ScreenSpace AABB Area And Check Is Culled
@@ -98,7 +103,7 @@ void culling::ViewFrustumCulling::CullBlockEntityJob
 
 		if(nextEntityBlock != nullptr)
 		{
-			CullBlockEntityJob(cameraIndex, nextEntityBlock);
+			DoViewFrustumCulling(cameraIndex, nextEntityBlock);
 		}
 		else
 		{

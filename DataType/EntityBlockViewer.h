@@ -77,11 +77,11 @@ namespace culling
 			return mTargetEntityBlock->GetIsOccluder(mEntityIndexInBlock, cameraIndex);
 		}
 
-		FORCE_INLINE bool SetIsObjectEnabled(const bool isEnabled) const
+		FORCE_INLINE void SetIsObjectEnabled(const bool isEnabled)
 		{
 			if (GetIsActive() == true)
 			{
-				return mTargetEntityBlock->SetIsObjectEnabled(mEntityIndexInBlock, isEnabled);
+				mTargetEntityBlock->SetIsObjectEnabled(mEntityIndexInBlock, isEnabled);
 			}
 		}
 	};

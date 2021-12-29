@@ -7,6 +7,7 @@
 #include <vector_erase_move_lastelement/vector_swap_popback.h>
 
 #include "CullingModule/ViewFrustumCulling/ViewFrustumCulling.h"
+#include "CullingModule/EarlyOutDisabledObject/EarlyOutDisabledObject.h"
 
 #ifdef ENABLE_SCREEN_SAPCE_BOUDING_SPHERE_CULLING
 #include "CullingModule/ScreenSpaceBoundingSphereCulling/ScreenSpaceBoundingSphereCulling.h"
@@ -277,6 +278,7 @@ void culling::EveryCulling::RemoveEntityFromBlock(EntityBlockViewer& entityBlock
 
 culling::EveryCulling::EveryCulling(const std::uint32_t resolutionWidth, const std::uint32_t resolutionHeight)
 	:
+	mEarlyOutDisabledObject{ std::make_unique<EarlyOutDisabledObject>(this) },
 	mViewFrustumCulling{ std::make_unique<ViewFrustumCulling>(this) }
 #ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
 	, mScreenSpaceBoudingSphereCulling{ std::make_unique<ScreenSpaceBoundingSphereCulling>(this) }
@@ -285,6 +287,7 @@ culling::EveryCulling::EveryCulling(const std::uint32_t resolutionWidth, const s
 	, mQueryOcclusionCulling{ std::make_unique<QueryOcclusionCulling>(this) }
 	, mUpdatedCullingModules
 		{
+			mEarlyOutDisabledObject.get(),
 			mViewFrustumCulling.get(),
 	#ifdef ENABLE_SCREEN_SAPCE_BOUDING_SPHERE_CULLING
 			& (mScreenSpaceBoudingSphereCulling),

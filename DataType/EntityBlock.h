@@ -116,9 +116,13 @@ namespace culling
 			mIsVisibleBitflag[entityIndex] |= (1 << cameraIndex);
 		}
 
-		FORCE_INLINE bool SetIsObjectEnabled(const size_t entityIndex, const bool isEnabled)
+		FORCE_INLINE void SetIsObjectEnabled(const size_t entityIndex, const bool isEnabled)
 		{
 			mIsObjectEnabled[entityIndex] = isEnabled;
+		}
+		FORCE_INLINE bool GetIsObjectEnabled(const size_t entityIndex) const
+		{
+			return mIsObjectEnabled[entityIndex];
 		}
 		
 		FORCE_INLINE bool GetIsOccluder(const size_t entityIndex, const size_t cameraIndex) const
