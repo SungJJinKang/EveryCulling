@@ -104,11 +104,21 @@ namespace culling
 			{
 				//Convert NDC Space Coordinates To Screen Space Coordinates 
 #if NDC_RANGE == MINUS_ONE_TO_POSITIVE_ONE
+
 				outScreenPixelSpaceX[i] = culling::M256F_MUL(culling::M256F_ADD(ndcSpaceVertexX[i], _mm256_set1_ps(1.0f)), depthBuffer.mResolution.mReplicatedScreenHalfWidth);
+				outScreenPixelSpaceX[i] = _mm256_ceil_ps(outScreenPixelSpaceX[i]);
+
 				outScreenPixelSpaceY[i] = culling::M256F_MUL(culling::M256F_ADD(ndcSpaceVertexY[i], _mm256_set1_ps(1.0f)), depthBuffer.mResolution.mReplicatedScreenHalfHeight);
+				outScreenPixelSpaceY[i] = _mm256_floor_ps(outScreenPixelSpaceY[i]);
+
 #elif NDC_RANGE == ZERO_TO_POSITIVE_ONE
+
 				outScreenPixelSpaceX[i] = culling::M256F_MUL(ndcSpaceVertexX[i], mDepthBuffer.mResolution.mReplicatedScreenWidth);
+				outScreenPixelSpaceX[i] = _mm256_ceil_ps(outScreenPixelSpaceX[i]);
+
 				outScreenPixelSpaceY[i] = culling::M256F_MUL(ndcSpaceVertexY[i], mDepthBuffer.mResolution.mReplicatedScreenHeight);
+				outScreenPixelSpaceY[i] = _mm256_floor_ps(outScreenPixelSpaceY[i]);
+
 #else 
 				assert(0); //NEVER HAPPEN
 #endif
