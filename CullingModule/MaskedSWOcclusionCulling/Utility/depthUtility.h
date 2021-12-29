@@ -21,6 +21,8 @@ namespace culling
 			culling::M256F& outZPixelDy
 		)
 		{
+			// Point1, 2, 3 should be counter clock wise!!!
+
 			const culling::M256F x2 = culling::M256F_SUB(vertexPoint3X, vertexPoint1X);
 			const culling::M256F x1 = culling::M256F_SUB(vertexPoint2X, vertexPoint1X);
 			const culling::M256F y1 = culling::M256F_SUB(vertexPoint2Y, vertexPoint1Y);

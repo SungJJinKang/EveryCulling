@@ -1,5 +1,7 @@
 #include "QueryOccludeeStage.h"
 
+#include <limits>
+
 #include "../MaskedSWOcclusionCulling.h"
 #include "../Utility/vertexTransformationHelper.h"
 #include "../Utility/depthBufferTileHelper.h"
@@ -68,7 +70,7 @@ void culling::QueryOccludeeStage::QueryOccludee
 
 			// Get Min Z
 			// if min z of occludee is larger than depth buffer, it's culled!!
-			float aabbMinDepthValue = 1.0f;
+			float aabbMinDepthValue = std::numeric_limits<float>::max();
 
 			for(size_t i = 0 ; i < 8 ; i++)
 			{
