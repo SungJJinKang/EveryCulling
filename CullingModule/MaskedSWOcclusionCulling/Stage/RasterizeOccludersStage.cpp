@@ -68,7 +68,7 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 
 		// sort triangle by y descending
 		// PointA has highest y value
-		Sort_8_3DTriangles(TriPointA_X, TriPointA_Y, TriPointA_Z, TriPointB_X, TriPointB_Y, TriPointB_Z, TriPointC_X, TriPointC_Y, TriPointC_Z);
+		//Sort_8_3DTriangles(TriPointA_X, TriPointA_Y, TriPointA_Z, TriPointB_X, TriPointB_Y, TriPointB_Z, TriPointC_X, TriPointC_Y, TriPointC_Z);
 		
 		culling::M256I LeftSlopeEventOfTriangle[8];
 		culling::M256I RightSlopeEventOfTriangle[8];
@@ -96,8 +96,11 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 
 		{
 			{
+				culling::M256F minY = _mm256_min_ps(_mm256_min_ps(TriPointA_Y, TriPointB_Y), TriPointC_Y);
+				culling::M256F maxY = _mm256_max_ps(_mm256_max_ps(TriPointA_Y, TriPointB_Y), TriPointC_Y);
+
 				culling::M256I coverageMaskResult[8];
-				culling::CoverageRasterizer::FillBottomFlatTriangleBatch
+				culling::CoverageRasterizer::FillFlatTriangleBatch
 				(
 					triangleCount,
 					coverageMaskResult,
@@ -105,8 +108,8 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 
 					LeftSlopeEventOfTriangle,
 					RightSlopeEventOfTriangle,
-					TriPointC_Y,
-					TriPointA_Y
+					minY,
+					maxY
 				);
 				
 
@@ -149,7 +152,7 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 
 
 		
-
+		/*
 		{
 		
 
@@ -214,7 +217,7 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 
 			
 		}
-
+		*/
 
 		
 		for (size_t triangleIndex = 0; triangleIndex < triangleCount; triangleIndex++)
