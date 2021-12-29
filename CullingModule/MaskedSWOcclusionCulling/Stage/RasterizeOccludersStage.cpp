@@ -144,7 +144,7 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 		
 		
 		{
-			culling::DepthValueComputer::ComputeFlatTriangleDepthValue
+			culling::DepthValueComputer::ComputeFlatTriangleMaxDepthValue
 			(
 				triangleCount,
 				DepthValueComputer::eDepthType::MaxDepth,
