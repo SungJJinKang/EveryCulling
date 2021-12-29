@@ -26,19 +26,14 @@ namespace culling
 		)
 		{
 			culling::M256I minScreenPixelX, minScreenPixelY, maxScreenPixelX, maxScreenPixelY;
-
-			//A grid square, including its (x, y) window coordinates, z (depth), and associated data which may be added by fragment shaders, is called a fragment. A
-			//fragment is located by its lower left corner, which lies on integer grid coordinates.
-			//Rasterization operations also refer to a fragment��s center, which is offset by ( 1/2, 1/2 )
-			//from its lower left corner(and so lies on half - integer coordinates).
-
+			
 			static const culling::M256I WIDTH_MASK = _mm256_set1_epi32(~(TILE_WIDTH - 1));
 			static const culling::M256I HEIGHT_MASK = _mm256_set1_epi32(~(TILE_HEIGHT - 1));
 
 			minScreenPixelX = _mm256_cvttps_epi32(_mm256_floor_ps(_mm256_min_ps(pointAScreenPixelX, _mm256_min_ps(pointBScreenPixelX, pointCScreenPixelX))));
 			minScreenPixelY = _mm256_cvttps_epi32(_mm256_floor_ps(_mm256_min_ps(pointAScreenPixelY, _mm256_min_ps(pointBScreenPixelY, pointCScreenPixelY))));
-			maxScreenPixelX = _mm256_cvttps_epi32(_mm256_floor_ps(_mm256_max_ps(pointAScreenPixelX, _mm256_max_ps(pointBScreenPixelX, pointCScreenPixelX))));
-			maxScreenPixelY = _mm256_cvttps_epi32(_mm256_floor_ps(_mm256_max_ps(pointAScreenPixelY, _mm256_max_ps(pointBScreenPixelY, pointCScreenPixelY))));
+			maxScreenPixelX = _mm256_cvttps_epi32(_mm256_ceil_ps(_mm256_max_ps(pointAScreenPixelX, _mm256_max_ps(pointBScreenPixelX, pointCScreenPixelX))));
+			maxScreenPixelY = _mm256_cvttps_epi32(_mm256_ceil_ps(_mm256_max_ps(pointAScreenPixelY, _mm256_max_ps(pointBScreenPixelY, pointCScreenPixelY))));
 
 			// How "and" works?
 			// 0000 0000 0110 0011 <- 96 = 32 * 3 + 3

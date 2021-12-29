@@ -30,17 +30,31 @@ void culling::QueryOccludeeStage::QueryOccludee
 			culling::M256F aabbVertexZ = _mm256_setr_ps(aabbMinPoint.values[2], aabbMaxPoint.values[2], aabbMinPoint.values[2], aabbMaxPoint.values[2], aabbMinPoint.values[2], aabbMaxPoint.values[2], aabbMinPoint.values[2], aabbMaxPoint.values[2]);
 			culling::M256F aabbVertexW;
 
+
+
+			//Transform To ClipSpace !!
+			
+
+			aabbVertexW = culling::M256F_MUL_AND_ADD(aabbVertexX, _mm256_set1_ps(modelToClipSpaceMatrix.data()[3]), culling::M256F_MUL_AND_ADD(aabbVertexY, _mm256_set1_ps(modelToClipSpaceMatrix.data()[7]), culling::M256F_MUL_AND_ADD(aabbVertexZ, _mm256_set1_ps(modelToClipSpaceMatrix.data()[11]), _mm256_set1_ps(modelToClipSpaceMatrix.data()[15]))));
+			const int isWLessThanZero = _mm256_movemask_ps(_mm256_cmp_ps(aabbVertexW, _mm256_setzero_ps(), _CMP_LE_OQ));
+			if(isWLessThanZero != 0x00000000)
+			{
+				// TODO : We need cllipping...
+				// If any vertex of aabb's w value is negative. 
+				continue;
+			}
+
 			culling::vertexTransformationHelper::TransformVertexToClipSpace
 			(
 				aabbVertexX,
 				aabbVertexY,
 				aabbVertexZ,
-				aabbVertexW,
 				modelToClipSpaceMatrix.data()
 			);
 			//Now ClipSpace !!
 
 			//oneDividedByW finally become oneDividedByW
+			
 			const culling::M256F oneDividedByW = culling::M256F_DIV(_mm256_set1_ps(1.0f), aabbVertexW);
 
 			culling::vertexTransformationHelper::ConvertClipSpaceVertexToNDCSpace
@@ -52,7 +66,7 @@ void culling::QueryOccludeeStage::QueryOccludee
 			);
 			//Now NDC!!
 
-			//Get Min Z
+			// Get Min Z
 			// if min z of occludee is larger than depth buffer, it's culled!!
 			float aabbMinDepthValue = 1.0f;
 

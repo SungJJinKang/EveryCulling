@@ -44,8 +44,11 @@ FORCE_INLINE void culling::BinTrianglesStage::Clipping
 	culling::M256I pointAInFrustum = _mm256_and_si256(_mm256_and_si256(*reinterpret_cast<const culling::M256I*>(&pointANdcX), *reinterpret_cast<const culling::M256I*>(&pointANdcY)), *reinterpret_cast<const culling::M256I*>(&pointANdcZ));
 	culling::M256I pointBInFrustum = _mm256_and_si256(_mm256_and_si256(*reinterpret_cast<const culling::M256I*>(&pointBNdcX), *reinterpret_cast<const culling::M256I*>(&pointBNdcY)), *reinterpret_cast<const culling::M256I*>(&pointBNdcZ));
 	culling::M256I pointCInFrustum = _mm256_and_si256(_mm256_and_si256(*reinterpret_cast<const culling::M256I*>(&pointCNdcX), *reinterpret_cast<const culling::M256I*>(&pointCNdcY)), *reinterpret_cast<const culling::M256I*>(&pointCNdcZ));
-	
-	const culling::M256I verticesInFrustum = _mm256_or_si256(_mm256_or_si256(*reinterpret_cast<const culling::M256I*>(&pointAInFrustum), *reinterpret_cast<const culling::M256I*>(&pointBInFrustum)), *reinterpret_cast<const culling::M256I*>(&pointCInFrustum));
+
+	// TODO : implemnet Clipping
+	// Currently when w value is negative, it produce weird screen space value. https://stackoverflow.com/a/20180585
+	// So i exclude triangle that any vertex is out of bound ( -w ~ w )
+	const culling::M256I verticesInFrustum = _mm256_and_si256(_mm256_and_si256(*reinterpret_cast<const culling::M256I*>(&pointAInFrustum), *reinterpret_cast<const culling::M256I*>(&pointBInFrustum)), *reinterpret_cast<const culling::M256I*>(&pointCInFrustum));
 
 	triangleCullMask &= _mm256_movemask_ps(*reinterpret_cast<const culling::M256F*>(&verticesInFrustum));
 }
@@ -381,10 +384,7 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 		// Triangle's Second Vertex X is in ndcSpaceVertexX[0][1]
 		// Triangle's Third Vertex X is in ndcSpaceVertexX[0][2]
 		culling::M256F ndcSpaceVertexX[3], ndcSpaceVertexY[3], ndcSpaceVertexZ[3], oneDividedByW[3];
-
-
-		//TODO : Why use 1/w for depth test, not z -> Check this : https://github.com/GameTechDev/MaskedOcclusionCulling/issues/23
-
+		
 		//Gather Vertex with indice
 		//WE ARRIVE AT MODEL SPACE COORDINATE!
 		GatherVertices(vertices, verticeCount, vertexIndices, indiceCount, currentIndiceIndex, vertexStrideByte, fetchTriangleCount, ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ);
@@ -392,7 +392,6 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 		//Convert Model space Vertex To Clip space Vertex
 		//WE ARRIVE AT CLIP SPACE COORDINATE. W IS NOT 1
 		culling::vertexTransformationHelper::TransformThreeVerticesToClipSpace(ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, oneDividedByW, modelToClipspaceMatrix);
-
 		
 		// Clipping befor ndc https://stackoverflow.com/questions/41085117/why-does-gl-divide-gl-position-by-w-for-you-rather-than-letting-you-do-it-your
 		Clipping(ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, oneDividedByW, triangleCullMask);
@@ -401,24 +400,11 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 		{
 			continue;
 		}
+
+		oneDividedByW[0] = culling::M256F_DIV(_mm256_set1_ps(1.0f), oneDividedByW[0]);
+		oneDividedByW[1] = culling::M256F_DIV(_mm256_set1_ps(1.0f), oneDividedByW[1]);
+		oneDividedByW[2] = culling::M256F_DIV(_mm256_set1_ps(1.0f), oneDividedByW[2]);
 		
-
-		oneDividedByW[0] = culling::M256F_DIV(_mm256_set1_ps(1.0f), _mm256_andnot_ps(_mm256_set1_ps(-0.0f), oneDividedByW[0]));
-		oneDividedByW[1] = culling::M256F_DIV(_mm256_set1_ps(1.0f), _mm256_andnot_ps(_mm256_set1_ps(-0.0f), oneDividedByW[1]));
-		oneDividedByW[2] = culling::M256F_DIV(_mm256_set1_ps(1.0f), _mm256_andnot_ps(_mm256_set1_ps(-0.0f), oneDividedByW[2]));
-
-		//WE ARRIVE AT NDC SPACE COORDINATE. 
-		//If you use Opengl, Vertexs have value from -1 to 1
-		//if you use DirectX, Vertexs have value from 0 to 1 
-		//W BECOME USELESS, IGNORE IT
-		//culling::vertexTransformationHelper::ConvertClipSpaceThreeVerticesToNDCSpace(ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, oneDividedByW);
-		
-		// we don't linearize depth value
-		//ConvertToPlatformDepth(ndcSpaceVertexZ);
-
-		// TODO : Set triangleCullMask about NDC x, y, z is in -1 ~ 1
-
-		//ScreenPixelPos : 0 ~ mDepthBuffer.Width, Height
 		culling::M256F screenPixelPosX[3], screenPixelPosY[3];
 		culling::vertexTransformationHelper::ConvertClipSpaceThreeVerticesToScreenPixelSpace(ndcSpaceVertexX, ndcSpaceVertexY, oneDividedByW, screenPixelPosX, screenPixelPosY, mMaskedOcclusionCulling->mDepthBuffer);
 
@@ -445,9 +431,7 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 			ndcSpaceVertexZ[2]
 		);
 
-
-		// TODO : Early split triangle at here
-
+		
 		culling::M256F LEFT_MIDDLE_POINT_X;
 		culling::M256F LEFT_MIDDLE_POINT_Y;
 		culling::M256F LEFT_MIDDLE_POINT_Z;
@@ -456,9 +440,7 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 		culling::M256F RIGHT_MIDDLE_POINT_Y;
 		culling::M256F RIGHT_MIDDLE_POINT_Z;
 
-
-		// TODO : Don't split triangle. check paper 3.1 https://www.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf 
-
+		
 		// split triangle
 		culling::rasterizerHelper::GetMiddlePointOfTriangle
 		(
@@ -512,7 +494,7 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 				mMaskedOcclusionCulling->mDepthBuffer
 			);
 
-
+			// Pass triangle in counter clock wise
 			PassTrianglesToTileBin
 			(
 				screenPixelPosX[0],
@@ -541,21 +523,18 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 			//Bin Top Flat Triangle
 
 			culling::M256I outBinBoundingBoxMinX, outBinBoundingBoxMinY, outBinBoundingBoxMaxX, outBinBoundingBoxMaxY;
-			//Bin Triangles to tiles
-
-			//Compute Bin Bounding Box
-			//Get Intersecting Bin List
+		
 			culling::depthBufferTileHelper::ComputeBinBoundingBoxFromThreeVertices
 			(
 				screenPixelPosX[2],
 				screenPixelPosY[2],
 
-				LEFT_MIDDLE_POINT_X,
-				LEFT_MIDDLE_POINT_Y,
-
 				RIGHT_MIDDLE_POINT_X,
 				RIGHT_MIDDLE_POINT_Y,
-						
+
+				LEFT_MIDDLE_POINT_X,
+				LEFT_MIDDLE_POINT_Y,
+				
 				outBinBoundingBoxMinX,
 				outBinBoundingBoxMinY,
 				outBinBoundingBoxMaxX,
@@ -563,20 +542,20 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 				mMaskedOcclusionCulling->mDepthBuffer
 			);
 
-
+			// Pass triangle in counter clock wise
 			PassTrianglesToTileBin
 			(
 				screenPixelPosX[2],
 				screenPixelPosY[2],
 				ndcSpaceVertexZ[2],
 
-				LEFT_MIDDLE_POINT_X,
-				LEFT_MIDDLE_POINT_Y,
-				LEFT_MIDDLE_POINT_Z,
-
 				RIGHT_MIDDLE_POINT_X,
 				RIGHT_MIDDLE_POINT_Y,
 				RIGHT_MIDDLE_POINT_Z,
+
+				LEFT_MIDDLE_POINT_X,
+				LEFT_MIDDLE_POINT_Y,
+				LEFT_MIDDLE_POINT_Z,
 				
 				triangleCullMask,
 				triangleCountPerLoop,

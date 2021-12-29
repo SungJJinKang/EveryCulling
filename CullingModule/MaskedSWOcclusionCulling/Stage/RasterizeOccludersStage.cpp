@@ -36,18 +36,6 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 	assert(tile != nullptr);
 
 	const culling::Vec2 tileOriginPoint{ static_cast<float>(tile->GetLeftBottomTileOrginX()), static_cast<float>(tile->GetLeftBottomTileOrginY()) };
-
-	/*
-	for (size_t triangleIndex = 0; triangleIndex < tile->mBinnedTriangles.mCurrentTriangleCount; triangleIndex++)
-	{
-		culling::TwoDTriangle twoDTriangle;
-		twoDTriangle.Points[0] = { tile->mBinnedTriangles.VertexX[0][triangleIndex], tile->mBinnedTriangles.VertexY[0][triangleIndex] };
-		twoDTriangle.Points[1] = { tile->mBinnedTriangles.VertexX[1][triangleIndex], tile->mBinnedTriangles.VertexY[1][triangleIndex] };
-		twoDTriangle.Points[2] = { tile->mBinnedTriangles.VertexX[2][triangleIndex], tile->mBinnedTriangles.VertexY[2][triangleIndex] };
-		culling::M256I result = culling::CoverageRasterizer::FillTriangle(tileOriginPoint, twoDTriangle);
-		tile->mHizDatas.L1CoverageMask = _mm256_or_si256(tile->mHizDatas.L1CoverageMask, result);
-	}
-	*/
 	
 	for (size_t triangleBatchIndex = 0; triangleBatchIndex < tile->mBinnedTriangles.mCurrentTriangleCount; triangleBatchIndex += 8)
 	{
@@ -56,6 +44,7 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 
 		TwoDTriangle twoDTriangle;
 
+		//Triangle is already counter clock wise, and front facing
 		culling::M256F& TriPointA_X = *reinterpret_cast<culling::M256F*>(&(tile->mBinnedTriangles.VertexX[0][triangleBatchIndex]));
 		culling::M256F& TriPointA_Y = *reinterpret_cast<culling::M256F*>(&(tile->mBinnedTriangles.VertexY[0][triangleBatchIndex]));
 		culling::M256F& TriPointA_Z = *reinterpret_cast<culling::M256F*>(&(tile->mBinnedTriangles.VertexZ[0][triangleBatchIndex]));
@@ -65,30 +54,40 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 		culling::M256F& TriPointC_X = *reinterpret_cast<culling::M256F*>(&(tile->mBinnedTriangles.VertexX[2][triangleBatchIndex]));
 		culling::M256F& TriPointC_Y = *reinterpret_cast<culling::M256F*>(&(tile->mBinnedTriangles.VertexY[2][triangleBatchIndex]));
 		culling::M256F& TriPointC_Z = *reinterpret_cast<culling::M256F*>(&(tile->mBinnedTriangles.VertexZ[2][triangleBatchIndex]));
-
-		// sort triangle by y descending
-		// PointA has highest y value
-		//Sort_8_3DTriangles(TriPointA_X, TriPointA_Y, TriPointA_Z, TriPointB_X, TriPointB_Y, TriPointB_Z, TriPointC_X, TriPointC_Y, TriPointC_Z);
 		
 		culling::M256I LeftSlopeEventOfTriangle[8];
 		culling::M256I RightSlopeEventOfTriangle[8];
+
+
+		//second point ( pointB ) should be left(x) of third point ( pointA )
+
+		{
+			const culling::M256F leftBCCmpResult = _mm256_cmp_ps(TriPointB_X, TriPointC_X, _CMP_LT_OS);
+
+			const culling::M256F sortedTriPointB_X = _mm256_blendv_ps(TriPointC_X, TriPointB_X, leftBCCmpResult);
+			const culling::M256F sortedTriPointB_Y = _mm256_blendv_ps(TriPointC_Y, TriPointB_Y, leftBCCmpResult);
+
+			const culling::M256F sortedTriPointC_X = _mm256_blendv_ps(TriPointB_X, TriPointC_X, leftBCCmpResult);
+			const culling::M256F sortedTriPointC_Y = _mm256_blendv_ps(TriPointB_Y, TriPointC_Y, leftBCCmpResult);
+
+			culling::triangleSlopeHelper::GatherBottomFlatTriangleSlopeEvent
+			(
+				triangleCount,
+				tileOriginPoint,
+				LeftSlopeEventOfTriangle,
+				RightSlopeEventOfTriangle,
+
+				TriPointA_X,
+				TriPointA_Y,
+
+				sortedTriPointB_X,
+				sortedTriPointB_Y,
+
+				sortedTriPointC_X,
+				sortedTriPointC_Y
+			);
+		}
 		
-		culling::triangleSlopeHelper::GatherBottomFlatTriangleSlopeEvent
-		(
-			triangleCount,
-			tileOriginPoint,
-			LeftSlopeEventOfTriangle,
-			RightSlopeEventOfTriangle,
-
-			TriPointA_X,
-			TriPointA_Y,
-
-			TriPointB_X,
-			TriPointB_Y,
-
-			TriPointC_X,
-			TriPointC_Y
-		);
 		
 
 		culling::M256I CoverageMask[8];
@@ -98,12 +97,11 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 			{
 				culling::M256F minY = _mm256_min_ps(_mm256_min_ps(TriPointA_Y, TriPointB_Y), TriPointC_Y);
 				culling::M256F maxY = _mm256_max_ps(_mm256_max_ps(TriPointA_Y, TriPointB_Y), TriPointC_Y);
-
-				culling::M256I coverageMaskResult[8];
+				
 				culling::CoverageRasterizer::FillFlatTriangleBatch
 				(
 					triangleCount,
-					coverageMaskResult,
+					CoverageMask,
 					tileOriginPoint,
 
 					LeftSlopeEventOfTriangle,
@@ -111,12 +109,6 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 					minY,
 					maxY
 				);
-				
-
-				for (size_t triangleIndex = 0; triangleIndex < triangleCount; triangleIndex++)
-				{
-					CoverageMask[triangleIndex] = coverageMaskResult[triangleIndex];
-				}
 			}
 
 			
@@ -152,17 +144,13 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 
 
 		
-		/*
-		{
 		
-
-			culling::M256F _subTileMaxDepth[8]; 
-
-			culling::DepthValueComputer::ComputeFlatBottomDepthValue
+		{
+			culling::DepthValueComputer::ComputeFlatTriangleDepthValue
 			(
 				triangleCount,
 				DepthValueComputer::eDepthType::MaxDepth,
-				_subTileMaxDepth,
+				subTileMaxDepth,
 				tileOriginPoint.x,
 				tileOriginPoint.y,
 
@@ -180,50 +168,14 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 
 				LeftSlopeEventOfTriangle,
 				RightSlopeEventOfTriangle
-			);
-
-			
-			
-
-			for (size_t triangleIndex = 0; triangleIndex < triangleCount; triangleIndex++)
-			{
-				subTileMaxDepth[triangleIndex] = _subTileMaxDepth[triangleIndex];
-			}
-			
-
-			// 44444444 55555555 66666666 77777777
-			// 44444444 55555555 66666666 77777777
-			// 44444444 55555555 66666666 77777777
-			// 44444444 55555555 66666666 77777777
-			// 
-			// 00000000 11111111 22222222 33333333
-			// 00000000 11111111 22222222 33333333
-			// 00000000 11111111 22222222 33333333
-			// 00000000 11111111 22222222 33333333
-			//
-			// --> 256bit
-			//
-			//
-			//
-			// 0 : subTileMaxDepth ( 0 ~ 32 )
-			// 1 : subTileMaxDepth ( 32 ~ 64 )
-			// 2 : subTileMaxDepth ( 64 ~ 96 )
-			// 3 : subTileMaxDepth ( 96 ~ 128 )
-			// 4 : subTileMaxDepth ( 128 ~ 160 )
-			// 5 : subTileMaxDepth ( 160 ~ 192 )
-			// 6 : subTileMaxDepth ( 192 ~ 224 )
-			// 7 : subTileMaxDepth ( 224 ~ 256 )
-
-
-			
+			);			
 		}
-		*/
+		
 
 		
 		for (size_t triangleIndex = 0; triangleIndex < triangleCount; triangleIndex++)
 		{
-			/*
-			 
+			
 #if QUICK_MASK == 1
 
 			tile->mHizDatas.L1SubTileMaxDepthValue = _mm256_max_ps(tile->mHizDatas.L1SubTileMaxDepthValue, subTileMaxDepth[triangleIndex]);
@@ -257,8 +209,7 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 			
 #endif
 
-			*/
-			
+
 			/*
 			 * dist1t = tile.zMax1 - tri.zMax
 			 * dist01 = tile.zMax0 - tile.zMax1
@@ -285,7 +236,7 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 
 
 			//coverage mask test codes
-			tile->mHizDatas.L1CoverageMask = _mm256_or_si256(tile->mHizDatas.L1CoverageMask, CoverageMask[triangleIndex]);
+			//tile->mHizDatas.L1CoverageMask = _mm256_or_si256(tile->mHizDatas.L1CoverageMask, CoverageMask[triangleIndex]);
 		}
 
 
