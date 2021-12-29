@@ -63,7 +63,6 @@ FORCE_INLINE void culling::BinTrianglesStage::BackfaceCulling
 (
 	culling::M256F* const screenPixelX,
 	culling::M256F* const screenPixelY,
-	culling::M256F* const ndcSpaceVertexZ,
 	std::uint32_t& triangleCullMask
 )
 {
@@ -92,7 +91,7 @@ FORCE_INLINE void culling::BinTrianglesStage::PassTrianglesToTileBin
 	const culling::M256F& pointCScreenPixelPosY,
 	const culling::M256F& pointCNdcSpaceVertexZ,
 
-	std::uint32_t& triangleCullMask, 
+	const std::uint32_t& triangleCullMask, 
 	const size_t triangleCountPerLoop,
 	const culling::M256I& outBinBoundingBoxMinX, 
 	const culling::M256I& outBinBoundingBoxMinY,
@@ -169,8 +168,7 @@ FORCE_INLINE void culling::BinTrianglesStage::GatherVertices
 	const size_t fetchTriangleCount,
 	culling::M256F* outVerticesX, 
 	culling::M256F* outVerticesY, 
-	culling::M256F* outVerticesZ, 
-	std::uint32_t& triangleCullMask
+	culling::M256F* outVerticesZ
 )
 {
 	assert(indiceCount % 3 == 0);
@@ -396,25 +394,22 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 
 		//Gather Vertex with indice
 		//WE ARRIVE AT MODEL SPACE COORDINATE!
-		GatherVertices(vertices, verticeCount, vertexIndices, indiceCount, currentIndiceIndex, vertexStrideByte, fetchTriangleCount, ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, triangleCullMask);
-
-		if (triangleCullMask == 0x00000000)
-		{
-			continue;
-		}
-
+		GatherVertices(vertices, verticeCount, vertexIndices, indiceCount, currentIndiceIndex, vertexStrideByte, fetchTriangleCount, ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ);
+		
 		//Convert Model space Vertex To Clip space Vertex
 		//WE ARRIVE AT CLIP SPACE COORDINATE. W IS NOT 1
 		culling::vertexTransformationHelper::TransformThreeVerticesToClipSpace(ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, oneDividedByW, modelToClipspaceMatrix);
 
 		
-
+		
 		FrustumCulling(ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, oneDividedByW, triangleCullMask);
-
+	
 		if (triangleCullMask == 0x00000000)
 		{
 			continue;
 		}
+
+		
 
 		for (size_t i = 0; i < 3; i++)
 		{
@@ -428,6 +423,13 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 		//W BECOME USELESS, IGNORE IT
 		culling::vertexTransformationHelper::ConvertClipSpaceThreeVerticesToNDCSpace(ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, oneDividedByW);
 
+		BackfaceCulling(ndcSpaceVertexX, ndcSpaceVertexY, triangleCullMask);
+
+		if (triangleCullMask == 0x00000000)
+		{
+			continue;
+		}
+
 		// we don't linearize depth value
 		ConvertToPlatformDepth(ndcSpaceVertexZ);
 
@@ -437,20 +439,8 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 		culling::M256F screenPixelPosX[3], screenPixelPosY[3];
 		culling::vertexTransformationHelper::ConvertNDCSpaceThreeVerticesToScreenPixelSpace(ndcSpaceVertexX, ndcSpaceVertexY, screenPixelPosX, screenPixelPosY, mMaskedOcclusionCulling->mDepthBuffer);
 		
-
-		//BackFace Cull
-		// 
-		BackfaceCulling(screenPixelPosX, screenPixelPosY, ndcSpaceVertexZ, triangleCullMask);
-
-		//Do not Sort Triangle in binning stage
-		//because Culled triangles is also sorted
-		//Sort triangle in drawing depth stage/
-		//In that stage, all triangles is valid
-
-		if (triangleCullMask == 0x00000000)
-		{
-			continue;
-		}
+		
+		
 
 		Sort_8_3DTriangles
 		(
@@ -569,15 +559,15 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 			//Get Intersecting Bin List
 			culling::depthBufferTileHelper::ComputeBinBoundingBoxFromThreeVertices
 			(
+				screenPixelPosX[2],
+				screenPixelPosY[2],
+
 				LEFT_MIDDLE_POINT_X,
 				LEFT_MIDDLE_POINT_Y,
 
 				RIGHT_MIDDLE_POINT_X,
 				RIGHT_MIDDLE_POINT_Y,
-
-				screenPixelPosX[2],
-				screenPixelPosY[2],
-
+						
 				outBinBoundingBoxMinX,
 				outBinBoundingBoxMinY,
 				outBinBoundingBoxMaxX,
@@ -588,6 +578,10 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 
 			PassTrianglesToTileBin
 			(
+				screenPixelPosX[2],
+				screenPixelPosY[2],
+				ndcSpaceVertexZ[2],
+
 				LEFT_MIDDLE_POINT_X,
 				LEFT_MIDDLE_POINT_Y,
 				LEFT_MIDDLE_POINT_Z,
@@ -595,11 +589,7 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 				RIGHT_MIDDLE_POINT_X,
 				RIGHT_MIDDLE_POINT_Y,
 				RIGHT_MIDDLE_POINT_Z,
-
-				screenPixelPosX[2],
-				screenPixelPosY[2],
-				ndcSpaceVertexZ[2],
-
+				
 				triangleCullMask,
 				triangleCountPerLoop,
 				outBinBoundingBoxMinX,

@@ -47,7 +47,6 @@ namespace culling
 		(
 			culling::M256F* const screenPixelX, 
 			culling::M256F* const screenPixelY, 
-			culling::M256F* const ndcSpaceVertexZ,
 			std::uint32_t& triangleCullMask
 		);
 
@@ -67,7 +66,7 @@ namespace culling
 			const culling::M256F& pointCScreenPixelPosY,
 			const culling::M256F& pointCNdcSpaceVertexZ,
 
-			std::uint32_t& triangleCullMask,
+			const std::uint32_t& triangleCullMask,
 			const size_t triangleCountPerLoop,
 			const culling::M256I& outBinBoundingBoxMinX,
 			const culling::M256I& outBinBoundingBoxMinY,
@@ -112,8 +111,7 @@ namespace culling
 			const size_t fetchTriangleCount,
 			culling::M256F* outVerticesX, 
 			culling::M256F* outVerticesY, 
-			culling::M256F* outVerticesZ, 
-			std::uint32_t& triangleCullMask
+			culling::M256F* outVerticesZ
 		);
 		
 		/// <summary>

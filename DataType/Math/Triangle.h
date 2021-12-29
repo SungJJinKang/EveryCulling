@@ -243,4 +243,38 @@ namespace culling
 		culling::M256F_SWAP(TriPointB_Z, TriPointC_Z, MASK);
 	}
 
+	FORCE_INLINE extern void Sort_8_3DTriangles
+	(
+		culling::M256F& TriPointA_X,
+		culling::M256F& TriPointA_Y,
+		culling::M256F& TriPointA_Z,
+		
+		culling::M256F& TriPointB_X,
+		culling::M256F& TriPointB_Y,
+		culling::M256F& TriPointB_Z,
+		
+		culling::M256F& TriPointC_X,
+		culling::M256F& TriPointC_Y,
+		culling::M256F& TriPointC_Z,
+
+		culling::M256I& mask
+	)
+	{
+		culling::M256F MASK;
+
+		MASK = _mm256_cmp_ps(TriPointA_Y, TriPointB_Y, _CMP_LT_OQ);
+		culling::M256F_SWAP(TriPointA_X, TriPointB_X, MASK);
+		culling::M256F_SWAP(TriPointA_Y, TriPointB_Y, MASK);
+		culling::M256F_SWAP(TriPointA_Z, TriPointB_Z, MASK);
+		
+		MASK = _mm256_cmp_ps(TriPointA_Y, TriPointC_Y, _CMP_LT_OQ);
+		culling::M256F_SWAP(TriPointA_X, TriPointC_X, MASK);
+		culling::M256F_SWAP(TriPointA_Y, TriPointC_Y, MASK);
+		culling::M256F_SWAP(TriPointA_Z, TriPointC_Z, MASK);
+
+		MASK = _mm256_cmp_ps(TriPointB_Y, TriPointC_Y, _CMP_LT_OQ);
+		culling::M256F_SWAP(TriPointB_X, TriPointC_X, MASK);
+		culling::M256F_SWAP(TriPointB_Y, TriPointC_Y, MASK);
+		culling::M256F_SWAP(TriPointB_Z, TriPointC_Z, MASK);
+	}
 }
