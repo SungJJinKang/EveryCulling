@@ -219,13 +219,12 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 
 
 
-		for (size_t triangleIndex = 0; triangleIndex < triangleCount; triangleIndex++)
+		for (size_t triangleIndex = 0; triangleIndex < 8; triangleIndex++)
 		{
 			if ((triangleMask & (1 << triangleIndex)) != 0x00000000)
 			{
 				// algo : if coverage mask is full, overrite tile->mHizDatas.L1SubTileMaxDepthValue to tile->mHizDatas.lMaxDepthValue and clear coverage mask
 
-				
 				
 				
 				// exclude L1 depth of sub tile with zero coverage mask 
@@ -240,7 +239,6 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 				tile->mHizDatas.L1SubTileMaxDepthValue = _mm256_blendv_ps(tile->mHizDatas.L1SubTileMaxDepthValue, _mm256_set1_ps((float)MIN_DEPTH_VALUE), *reinterpret_cast<const culling::M256F*>(&maskCoveredByOne));
 				const culling::M256F maskBlendResult = _mm256_blendv_ps(*reinterpret_cast<const culling::M256F*>(&(tile->mHizDatas.L1CoverageMask)), _mm256_setzero_ps(), *reinterpret_cast<const culling::M256F*>(&maskCoveredByOne));
 				tile->mHizDatas.L1CoverageMask = *reinterpret_cast<const culling::M256I*>(&maskBlendResult);
-				
 				
 				
 				
