@@ -46,8 +46,8 @@ namespace culling
 			const std::uint32_t triangleMask
 		)
 		{
-			const culling::M256I minYIntOfTriangles = _mm256_cvtps_epi32(_mm256_floor_ps(_mm256_add_ps(minYOfTriangle, _mm256_set1_ps(0.5f))));
-			const culling::M256I maxYIntOfTriangles = _mm256_cvtps_epi32(_mm256_floor_ps(_mm256_add_ps(maxYOfTriangle, _mm256_set1_ps(0.5f))));
+			//const culling::M256I minYIntOfTriangles = _mm256_cvtps_epi32(_mm256_floor_ps(_mm256_add_ps(minYOfTriangle, _mm256_set1_ps(0.5f))));
+			//const culling::M256I maxYIntOfTriangles = _mm256_cvtps_epi32(_mm256_floor_ps(_mm256_add_ps(maxYOfTriangle, _mm256_set1_ps(0.5f))));
 
 			//const culling::M256I tileStartRowIndex = _mm256_max_epi32(_mm256_sub_epi32(minYIntOfTriangles, _mm256_set1_epi32(tileOriginY)), _mm256_set1_epi32(0));
 			//const culling::M256I tileEndRowIndex = _mm256_sub_epi32(_mm256_set1_epi32(TILE_HEIGHT), _mm256_max_epi32(_mm256_sub_epi32(_mm256_set1_epi32(tileOriginY + TILE_HEIGHT), maxYIntOfTriangles), _mm256_set1_epi32(0)));
@@ -108,25 +108,36 @@ namespace culling
 					// FaceEventOfSubTiles
 					//
 					// face event in each subtile
-					culling::M256I leftFaceEventInSubTiles[SUB_TILE_HEIGHT]; // array 4 -> row index in subtile
-					culling::M256I rightFaceEventInSubTiles[SUB_TILE_HEIGHT]; // array 4 -> row index in subtile
-
 					for (int rowIndexInSubtiles = 0; rowIndexInSubtiles < SUB_TILE_HEIGHT; rowIndexInSubtiles++)
 					{
 						const culling::M256I leftFaceEventOfRowIndexInSubTiles = _mm256_setr_epi32(reinterpret_cast<const int*>(&leftFaceEvent)[rowIndexInSubtiles], reinterpret_cast<const int*>(&leftFaceEvent)[rowIndexInSubtiles], reinterpret_cast<const int*>(&leftFaceEvent)[rowIndexInSubtiles], reinterpret_cast<const int*>(&leftFaceEvent)[rowIndexInSubtiles], reinterpret_cast<const int*>(&leftFaceEvent)[SUB_TILE_HEIGHT + rowIndexInSubtiles], reinterpret_cast<const int*>(&leftFaceEvent)[SUB_TILE_HEIGHT + rowIndexInSubtiles], reinterpret_cast<const int*>(&leftFaceEvent)[SUB_TILE_HEIGHT + rowIndexInSubtiles], reinterpret_cast<const int*>(&leftFaceEvent)[SUB_TILE_HEIGHT + rowIndexInSubtiles]);
-						leftFaceEventInSubTiles[rowIndexInSubtiles] = _mm256_sub_epi32(leftFaceEventOfRowIndexInSubTiles, _mm256_setr_epi32(SUB_TILE_WIDTH * 0, SUB_TILE_WIDTH * 1, SUB_TILE_WIDTH * 2, SUB_TILE_WIDTH * 3, SUB_TILE_WIDTH * 0, SUB_TILE_WIDTH * 1, SUB_TILE_WIDTH * 2, SUB_TILE_WIDTH * 3));
+						const culling::M256I leftFaceEventInSubTiles = _mm256_sub_epi32(leftFaceEventOfRowIndexInSubTiles, _mm256_setr_epi32(SUB_TILE_WIDTH * 0, SUB_TILE_WIDTH * 1, SUB_TILE_WIDTH * 2, SUB_TILE_WIDTH * 3, SUB_TILE_WIDTH * 0, SUB_TILE_WIDTH * 1, SUB_TILE_WIDTH * 2, SUB_TILE_WIDTH * 3));
+						const culling::M256I clampedLeftFaceEventInSubTiles = _mm256_min_epi32(_mm256_max_epi32(leftFaceEventInSubTiles, _mm256_set1_epi32(0)), _mm256_set1_epi32(SUB_TILE_WIDTH));
 
 						const culling::M256I rightFaceEventOfRowIndexInSubTiles = _mm256_setr_epi32(reinterpret_cast<const int*>(&rightFaceEvent)[rowIndexInSubtiles], reinterpret_cast<const int*>(&rightFaceEvent)[rowIndexInSubtiles], reinterpret_cast<const int*>(&rightFaceEvent)[rowIndexInSubtiles], reinterpret_cast<const int*>(&rightFaceEvent)[rowIndexInSubtiles], reinterpret_cast<const int*>(&rightFaceEvent)[SUB_TILE_HEIGHT + rowIndexInSubtiles], reinterpret_cast<const int*>(&rightFaceEvent)[SUB_TILE_HEIGHT + rowIndexInSubtiles], reinterpret_cast<const int*>(&rightFaceEvent)[SUB_TILE_HEIGHT + rowIndexInSubtiles], reinterpret_cast<const int*>(&rightFaceEvent)[SUB_TILE_HEIGHT + rowIndexInSubtiles]);
-						rightFaceEventInSubTiles[rowIndexInSubtiles] = _mm256_sub_epi32(rightFaceEventOfRowIndexInSubTiles, _mm256_setr_epi32(SUB_TILE_WIDTH * 0, SUB_TILE_WIDTH * 1, SUB_TILE_WIDTH * 2, SUB_TILE_WIDTH * 3, SUB_TILE_WIDTH * 0, SUB_TILE_WIDTH * 1, SUB_TILE_WIDTH * 2, SUB_TILE_WIDTH * 3));
-				
+						const culling::M256I rightFaceEventInSubTiles = _mm256_sub_epi32(rightFaceEventOfRowIndexInSubTiles, _mm256_setr_epi32(SUB_TILE_WIDTH * 0, SUB_TILE_WIDTH * 1, SUB_TILE_WIDTH * 2, SUB_TILE_WIDTH * 3, SUB_TILE_WIDTH * 0, SUB_TILE_WIDTH * 1, SUB_TILE_WIDTH * 2, SUB_TILE_WIDTH * 3));
+						const culling::M256I clampedRightFaceEventInSubTiles = _mm256_min_epi32(_mm256_max_epi32(rightFaceEventInSubTiles, _mm256_set1_epi32(0)), _mm256_set1_epi32(SUB_TILE_WIDTH));
+
 						const culling::M256F leftFaceDepthValueOfRowIndexInSubTiles =
-							_mm256_add_ps(_mm256_add_ps(_mm256_set1_ps(zPixelDy * rowIndexInSubtiles), zValueAtOriginPointOfSubTiles), _mm256_mul_ps(_mm256_cvtepi32_ps(leftFaceEventInSubTiles[rowIndexInSubtiles]), _mm256_set1_ps(zPixelDx)));
+							_mm256_add_ps(_mm256_add_ps(_mm256_set1_ps(zPixelDy * rowIndexInSubtiles), zValueAtOriginPointOfSubTiles), _mm256_mul_ps(_mm256_cvtepi32_ps(clampedLeftFaceEventInSubTiles), _mm256_set1_ps(zPixelDx)));
 
 						const culling::M256F rightFaceDepthValueOfRowIndexInSubTiles =
-							_mm256_add_ps(_mm256_add_ps(_mm256_set1_ps(zPixelDy * rowIndexInSubtiles), zValueAtOriginPointOfSubTiles), _mm256_mul_ps(_mm256_cvtepi32_ps(rightFaceEventInSubTiles[rowIndexInSubtiles]), _mm256_set1_ps(zPixelDx)));
+							_mm256_add_ps(_mm256_add_ps(_mm256_set1_ps(zPixelDy * rowIndexInSubtiles), zValueAtOriginPointOfSubTiles), _mm256_mul_ps(_mm256_cvtepi32_ps(clampedRightFaceEventInSubTiles), _mm256_set1_ps(zPixelDx)));
 						
-						const culling::M256F maxZValueAtRowOfSubTiles = _mm256_max_ps(leftFaceDepthValueOfRowIndexInSubTiles, rightFaceDepthValueOfRowIndexInSubTiles);
-						
+
+						culling::M256F maxZValueAtRowOfSubTiles = _mm256_max_ps(leftFaceDepthValueOfRowIndexInSubTiles, rightFaceDepthValueOfRowIndexInSubTiles);
+
+						// if left, right event is both 0 or both SUB_TILE_WIDTH, exclude the row
+						const culling::M256I mashWhenLeftRightSlopeIsLocatedAtLeftOfSubTiles = _mm256_and_si256(_mm256_cmpeq_epi32(clampedLeftFaceEventInSubTiles, _mm256_set1_epi32(0)), _mm256_cmpeq_epi32(clampedRightFaceEventInSubTiles, _mm256_set1_epi32(0)));
+						const culling::M256I mashWhenLeftRightSlopeIsLocatedAtRightOfSubTiles = _mm256_and_si256(_mm256_cmpeq_epi32(clampedLeftFaceEventInSubTiles, _mm256_set1_epi32(SUB_TILE_WIDTH)), _mm256_cmpeq_epi32(clampedRightFaceEventInSubTiles, _mm256_set1_epi32(SUB_TILE_WIDTH)));
+						const culling::M256I maskWhenLeftRightSlopeIsOutOfSubTiles = _mm256_or_si256(mashWhenLeftRightSlopeIsLocatedAtLeftOfSubTiles, mashWhenLeftRightSlopeIsLocatedAtRightOfSubTiles);
+
+						// when left event is grater than right event, the row is invalid
+						const culling::M256I maskWhenLeftEventIsGraterThanRightEvent = _mm256_cmpgt_epi32(leftFaceEventInSubTiles, rightFaceEventInSubTiles);
+
+						maxZValueAtRowOfSubTiles = _mm256_blendv_ps(maxZValueAtRowOfSubTiles, _mm256_set1_ps((float)MIN_DEPTH_VALUE), *reinterpret_cast<const culling::M256F*>(&maskWhenLeftRightSlopeIsOutOfSubTiles));
+						maxZValueAtRowOfSubTiles = _mm256_blendv_ps(maxZValueAtRowOfSubTiles, _mm256_set1_ps((float)MIN_DEPTH_VALUE), *reinterpret_cast<const culling::M256F*>(&maskWhenLeftEventIsGraterThanRightEvent));
+
 						subTileMaxValues[triangleIndex] = _mm256_max_ps(subTileMaxValues[triangleIndex], maxZValueAtRowOfSubTiles);
 					}
 				}

@@ -114,6 +114,8 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 				sortedTriPointC_Y
 			);
 
+
+			// Clamp slope event 0 ~ TILE_WIDTH
 			for (size_t triangleIndex = 0; triangleIndex < 8; triangleIndex++)
 			{
 				LeftSlopeEventOfTriangle[triangleIndex] = _mm256_max_epi32(_mm256_min_epi32(LeftSlopeEventOfTriangle[triangleIndex], _mm256_set1_epi32(TILE_WIDTH)), _mm256_set1_epi32(0));
