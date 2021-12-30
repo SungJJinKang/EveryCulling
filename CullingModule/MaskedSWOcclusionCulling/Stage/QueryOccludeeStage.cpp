@@ -89,11 +89,7 @@ void culling::QueryOccludeeStage::QueryOccludee
 {
 	for(size_t entityIndex = 0 ; entityIndex < entityBlock->mCurrentEntityCount ; entityIndex++)
 	{
-		if
-		(
-			entityBlock->GetIsCulled(entityIndex, cameraIndex) == false &&
-			entityBlock->GetIsOccluder(entityIndex, cameraIndex) == false
-		)
+		if(entityBlock->GetIsCulled(entityIndex, cameraIndex) == false)
 		{
 			const culling::Vec4& aabbMinPoint = entityBlock->mAABBMinLocalPoint[entityIndex];
 			const culling::Vec4& aabbMaxPoint = entityBlock->mAABBMaxLocalPoint[entityIndex];
