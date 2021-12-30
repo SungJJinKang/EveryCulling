@@ -46,6 +46,13 @@ namespace culling
 			const std::uint32_t triangleMask
 		)
 		{
+
+#ifdef DEBUG_CULLING
+			for(int i = 0 ; i < triangleCount ; i++)
+			{
+				assert(reinterpret_cast<const float*>(&maxYOfTriangle)[i] >= reinterpret_cast<const float*>(&minYOfTriangle)[i]);
+			}
+#endif
 			//const culling::M256I minYIntOfTriangles = _mm256_cvtps_epi32(_mm256_floor_ps(_mm256_add_ps(minYOfTriangle, _mm256_set1_ps(0.5f))));
 			//const culling::M256I maxYIntOfTriangles = _mm256_cvtps_epi32(_mm256_floor_ps(_mm256_add_ps(maxYOfTriangle, _mm256_set1_ps(0.5f))));
 
@@ -71,8 +78,8 @@ namespace culling
 				zPixelDyOfTriangles
 			);
 
-			const culling::M256F bbMinXV0 = _mm256_sub_ps(_mm256_cvtepi32_ps(_mm256_set1_epi32(tileOriginX)), vertexPoint3X);
-			const culling::M256F bbMinYV0 = _mm256_sub_ps(_mm256_cvtepi32_ps(_mm256_set1_epi32(tileOriginY)), vertexPoint3Y);
+			const culling::M256F bbMinXV0 = _mm256_sub_ps(_mm256_cvtepi32_ps(_mm256_set1_epi32(tileOriginX + 0.5f)), vertexPoint3X);
+			const culling::M256F bbMinYV0 = _mm256_sub_ps(_mm256_cvtepi32_ps(_mm256_set1_epi32(tileOriginY + 0.5f)), vertexPoint3Y);
 
 			// depth value at tile origin ( 0, 0 )
 			culling::M256F depthValueAtTileOriginPoint = _mm256_fmadd_ps(zPixelDxOfTriangles, bbMinXV0, _mm256_fmadd_ps(zPixelDyOfTriangles, bbMinYV0, vertexPoint3Z)); 
@@ -132,11 +139,12 @@ namespace culling
 						const culling::M256I mashWhenLeftRightSlopeIsLocatedAtRightOfSubTiles = _mm256_and_si256(_mm256_cmpeq_epi32(clampedLeftFaceEventInSubTiles, _mm256_set1_epi32(SUB_TILE_WIDTH)), _mm256_cmpeq_epi32(clampedRightFaceEventInSubTiles, _mm256_set1_epi32(SUB_TILE_WIDTH)));
 						const culling::M256I maskWhenLeftRightSlopeIsOutOfSubTiles = _mm256_or_si256(mashWhenLeftRightSlopeIsLocatedAtLeftOfSubTiles, mashWhenLeftRightSlopeIsLocatedAtRightOfSubTiles);
 
-						// when left event is grater than right event, the row is invalid
-						const culling::M256I maskWhenLeftEventIsGraterThanRightEvent = _mm256_cmpgt_epi32(leftFaceEventInSubTiles, rightFaceEventInSubTiles);
+						// when row is greater than max y or less than min y, row is invalid row
+						const culling::M256I screenYOfRowInSubTiles = _mm256_setr_epi32(tileOriginY + 0.5f + rowIndexInSubtiles, tileOriginY + 0.5f + rowIndexInSubtiles, tileOriginY + 0.5f + rowIndexInSubtiles, tileOriginY + 0.5f + rowIndexInSubtiles, tileOriginY + 0.5f + rowIndexInSubtiles + SUB_TILE_HEIGHT, tileOriginY + 0.5f + rowIndexInSubtiles + SUB_TILE_HEIGHT, tileOriginY + 0.5f + rowIndexInSubtiles + SUB_TILE_HEIGHT, tileOriginY + 0.5f + rowIndexInSubtiles + SUB_TILE_HEIGHT);
+						const culling::M256I maskWhenRowIsOutOfMinMaxY = _mm256_or_si256(_mm256_cmpgt_epi32(screenYOfRowInSubTiles, _mm256_set1_epi32(static_cast<int>(reinterpret_cast<const float*>(&maxYOfTriangle)[triangleIndex]))), _mm256_cmpgt_epi32(_mm256_set1_epi32(static_cast<int>(reinterpret_cast<const float*>(&minYOfTriangle)[triangleIndex])), screenYOfRowInSubTiles));
 
 						maxZValueAtRowOfSubTiles = _mm256_blendv_ps(maxZValueAtRowOfSubTiles, _mm256_set1_ps((float)MIN_DEPTH_VALUE), *reinterpret_cast<const culling::M256F*>(&maskWhenLeftRightSlopeIsOutOfSubTiles));
-						maxZValueAtRowOfSubTiles = _mm256_blendv_ps(maxZValueAtRowOfSubTiles, _mm256_set1_ps((float)MIN_DEPTH_VALUE), *reinterpret_cast<const culling::M256F*>(&maskWhenLeftEventIsGraterThanRightEvent));
+						maxZValueAtRowOfSubTiles = _mm256_blendv_ps(maxZValueAtRowOfSubTiles, _mm256_set1_ps((float)MIN_DEPTH_VALUE), *reinterpret_cast<const culling::M256F*>(&maskWhenRowIsOutOfMinMaxY));
 
 						subTileMaxValues[triangleIndex] = _mm256_max_ps(subTileMaxValues[triangleIndex], maxZValueAtRowOfSubTiles);
 					}
