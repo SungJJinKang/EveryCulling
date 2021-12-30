@@ -76,14 +76,7 @@ namespace culling
 
 			// depth value at tile origin ( 0, 0 )
 			culling::M256F depthValueAtTileOriginPoint = _mm256_fmadd_ps(zPixelDxOfTriangles, bbMinXV0, _mm256_fmadd_ps(zPixelDyOfTriangles, bbMinYV0, vertexPoint3Z)); 
-
-			//const culling::M256F zTileDx = _mm256_mul_ps(zPixelDx, _mm256_set1_ps((float)TILE_WIDTH));
-			//const culling::M256F zTileDy = _mm256_mul_ps(zPixelDy, _mm256_set1_ps((float)TILE_HEIGHT));
-
-			//zPlaneOffset = _mm256_add_ps(zPlaneOffset, _mm256_max_ps(_mm256_setzero_ps(), _mm256_mul_ps(zPixelDx, _mm256_set1_ps(SUB_TILE_WIDTH))));
-			//zPlaneOffset = _mm256_add_ps(zPlaneOffset, _mm256_max_ps(_mm256_setzero_ps(), _mm256_mul_ps(zPixelDy, _mm256_set1_ps(SUB_TILE_HEIGHT))));
 			
-
 			// Compute Zmin and Zmax for the triangle (used to narrow the range for difficult tiles)
 			const culling::M256F zMinOfTriangle = _mm256_min_ps(vertexPoint1Z, _mm256_min_ps(vertexPoint2Z, vertexPoint3Z));
 			const culling::M256F zMaxOfTriangle = _mm256_max_ps(vertexPoint1Z, _mm256_max_ps(vertexPoint2Z, vertexPoint3Z));
@@ -102,9 +95,12 @@ namespace culling
 					const culling::M256F zTriMax = _mm256_set1_ps((reinterpret_cast<const float*>(&zMaxOfTriangle))[triangleIndex]);
 					const culling::M256F zTriMin = _mm256_set1_ps((reinterpret_cast<const float*>(&zMinOfTriangle))[triangleIndex]);
 
+					//
+					// 4 5 6 7   <-- _mm256i
+					// 0 1 2 3
 					// depth value at (0, 0) of subtiles
-					culling::M256F zValueAtOriginPointOfSubTiles = _mm256_fmadd_ps(_mm256_set1_ps((reinterpret_cast<const float*>(&zPixelDxOfTriangles))[triangleIndex]), _mm256_setr_ps(0, SUB_TILE_WIDTH, SUB_TILE_WIDTH * 2, SUB_TILE_WIDTH * 3, 0, SUB_TILE_WIDTH, SUB_TILE_WIDTH * 2, SUB_TILE_WIDTH * 3),
-						_mm256_fmadd_ps(_mm256_set1_ps((reinterpret_cast<const float*>(&zPixelDyOfTriangles))[triangleIndex]), _mm256_setr_ps(0, 0, 0, 0, SUB_TILE_HEIGHT, SUB_TILE_HEIGHT, SUB_TILE_HEIGHT, SUB_TILE_HEIGHT), _mm256_set1_ps((reinterpret_cast<const float*>(&depthValueAtTileOriginPoint))[triangleIndex])));
+					culling::M256F zValueAtOriginPointOfSubTiles = _mm256_fmadd_ps(_mm256_set1_ps(zPixelDx), _mm256_setr_ps(0, SUB_TILE_WIDTH, SUB_TILE_WIDTH * 2, SUB_TILE_WIDTH * 3, 0, SUB_TILE_WIDTH, SUB_TILE_WIDTH * 2, SUB_TILE_WIDTH * 3),
+						_mm256_fmadd_ps(_mm256_set1_ps(zPixelDy), _mm256_setr_ps(0, 0, 0, 0, SUB_TILE_HEIGHT, SUB_TILE_HEIGHT, SUB_TILE_HEIGHT, SUB_TILE_HEIGHT), _mm256_set1_ps((reinterpret_cast<const float*>(&depthValueAtTileOriginPoint))[triangleIndex])));
 
 					//
 					// 4 5 6 7   <-- _mm256i
@@ -122,6 +118,17 @@ namespace culling
 
 						const culling::M256I rightFaceEventOfRowIndexInSubTiles = _mm256_setr_epi32(reinterpret_cast<const int*>(&rightFaceEvent)[rowIndexInSubtiles], reinterpret_cast<const int*>(&rightFaceEvent)[rowIndexInSubtiles], reinterpret_cast<const int*>(&rightFaceEvent)[rowIndexInSubtiles], reinterpret_cast<const int*>(&rightFaceEvent)[rowIndexInSubtiles], reinterpret_cast<const int*>(&rightFaceEvent)[SUB_TILE_HEIGHT + rowIndexInSubtiles], reinterpret_cast<const int*>(&rightFaceEvent)[SUB_TILE_HEIGHT + rowIndexInSubtiles], reinterpret_cast<const int*>(&rightFaceEvent)[SUB_TILE_HEIGHT + rowIndexInSubtiles], reinterpret_cast<const int*>(&rightFaceEvent)[SUB_TILE_HEIGHT + rowIndexInSubtiles]);
 						rightFaceEventInSubTiles[rowIndexInSubtiles] = _mm256_sub_epi32(rightFaceEventOfRowIndexInSubTiles, _mm256_setr_epi32(SUB_TILE_WIDTH * 0, SUB_TILE_WIDTH * 1, SUB_TILE_WIDTH * 2, SUB_TILE_WIDTH * 3, SUB_TILE_WIDTH * 0, SUB_TILE_WIDTH * 1, SUB_TILE_WIDTH * 2, SUB_TILE_WIDTH * 3));
+
+#ifdef DEBUG_CULLING
+						for (int i = 0; i < 8; i++)
+						{
+							const int leftFaceEventValue = reinterpret_cast<const int*>(leftFaceEventInSubTiles + rowIndexInSubtiles)[i];
+							assert(leftFaceEventValue >= 0 && leftFaceEventValue < SUB_TILE_WIDTH);
+
+							const int rightFaceEventValue = reinterpret_cast<const int*>(rightFaceEventInSubTiles + rowIndexInSubtiles)[i];
+							assert(rightFaceEventValue >= 0 && rightFaceEventValue < SUB_TILE_WIDTH);
+						}
+#endif
 					}
 
 					for (int rowIndexInSubtiles = 0; rowIndexInSubtiles < SUB_TILE_HEIGHT; rowIndexInSubtiles++)
@@ -131,6 +138,8 @@ namespace culling
 
 						const culling::M256F rightFaceDepthValueOfRowIndexInSubTiles =
 							_mm256_add_ps(_mm256_add_ps(_mm256_set1_ps(zPixelDy * rowIndexInSubtiles), zValueAtOriginPointOfSubTiles), _mm256_mul_ps(_mm256_cvtepi32_ps(rightFaceEventInSubTiles[rowIndexInSubtiles]), _mm256_set1_ps(zPixelDx)));
+
+						// exclude row from depth buffer computation if left,
 
 						const culling::M256F maxZValueAtRowOfSubTiles = _mm256_max_ps(leftFaceDepthValueOfRowIndexInSubTiles, rightFaceDepthValueOfRowIndexInSubTiles);
 
