@@ -57,7 +57,11 @@ namespace culling
 		bool IsEnabled;
 
 		virtual void ResetCullingModule();
-		std::uint32_t GetFinishedThreadCount(const size_t cameraIndex) const;
+		FORCE_INLINE std::uint32_t GetFinishedThreadCount(const size_t cameraIndex) const
+		{
+			return mCullJobState.mFinishedThreadCount[cameraIndex];
+		}
+
 
 		virtual void OnSetViewProjectionMatrix(const size_t cameraIndex, const culling::Mat4x4& cameraViewProjectionMatrix)
 		{
