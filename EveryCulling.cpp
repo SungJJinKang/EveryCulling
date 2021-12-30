@@ -1,7 +1,7 @@
 #include "EveryCulling.h"
 
 #include <cstring>
-#include <utility>
+#include <chrono>
 
 #include "DataType/EntityBlock.h"
 #include <vector_erase_move_lastelement/vector_swap_popback.h>
@@ -138,7 +138,7 @@ void culling::EveryCulling::CullBlockEntityJob(const size_t cameraIndex)
 				{
 					//std::this_thread::yield();
 				}
-			}			
+			}
 		}
 
 
@@ -153,7 +153,7 @@ void culling::EveryCulling::WaitToFinishCullJob(const std::uint32_t cameraIndex)
 	{
 		while (lastEnabledCullingModule->GetFinishedThreadCount(cameraIndex) < mThreadCount)
 		{
-			std::this_thread::yield();
+			//std::this_thread::yield();
 		}
 	}
 }

@@ -10,3 +10,8 @@ culling::MaskedSWOcclusionCullingStage::MaskedSWOcclusionCullingStage
 {
 
 }
+
+const char* culling::MaskedSWOcclusionCullingStage::GetCullingModuleName() const
+{
+	return "MaskedSWOcclusionCullingStage";
+}

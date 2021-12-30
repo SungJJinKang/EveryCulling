@@ -46,6 +46,7 @@ namespace culling
 
 		void ResetCullingModule() override;
 		void CullBlockEntityJob(const size_t cameraIndex) override;
+		const char* GetCullingModuleName() const override;
 
 		// TODO : Use linear depth!! ( float linearDepth = (2.0 * near * far) / (far + near - z * (far - near)) )
 	};

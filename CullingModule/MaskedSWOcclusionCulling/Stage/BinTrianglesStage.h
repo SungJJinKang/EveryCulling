@@ -159,6 +159,7 @@ namespace culling
 		void ResetCullingModule() override;
 
 		void CullBlockEntityJob(const size_t cameraIndex) override;
+		const char* GetCullingModuleName() const override;
 	};
 }
 

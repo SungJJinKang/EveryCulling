@@ -37,3 +37,8 @@ void culling::EarlyOutDisabledObject::CullBlockEntityJob(const size_t cameraInde
 	}
 
 }
+
+const char* culling::EarlyOutDisabledObject::GetCullingModuleName() const
+{
+	return "EarlyOutDisabledObject";
+}

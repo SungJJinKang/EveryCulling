@@ -19,6 +19,7 @@ namespace culling
 		(
 			const size_t cameraIndex
 		) = 0;
+		const char* GetCullingModuleName() const override;
 	};
 }
 

@@ -290,3 +290,8 @@ void culling::QueryOccludeeStage::CullBlockEntityJob(const size_t cameraIndex)
 	}
 }
 
+const char* culling::QueryOccludeeStage::GetCullingModuleName() const
+{
+	return "QueryOccludeeStage";
+}
+

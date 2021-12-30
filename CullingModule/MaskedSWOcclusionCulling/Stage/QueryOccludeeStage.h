@@ -39,6 +39,7 @@ namespace culling
 		QueryOccludeeStage(MaskedSWOcclusionCulling* mOcclusionCulling);
 
 		void CullBlockEntityJob(const size_t cameraIndex) override;
+		const char* GetCullingModuleName() const override;
 	};
 }
 

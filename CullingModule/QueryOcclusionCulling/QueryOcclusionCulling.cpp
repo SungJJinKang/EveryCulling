@@ -321,6 +321,11 @@ void culling::QueryOcclusionCulling::CullBlockEntityJob(const size_t cameraIndex
 {
 }
 
+const char* culling::QueryOcclusionCulling::GetCullingModuleName() const
+{
+	return "QueryOcclusionCulling";
+}
+
 /// <summary>
 /// Use Query Result After a frame
 /// == Do ConditionalRendering on previous frame's query ( Maybe I need Two Query )

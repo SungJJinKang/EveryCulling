@@ -95,6 +95,7 @@ namespace culling
 		(
 			const size_t cameraIndex
 		);
+		const char* GetCullingModuleName() const override;
 
 		/*
 		/// <summary>

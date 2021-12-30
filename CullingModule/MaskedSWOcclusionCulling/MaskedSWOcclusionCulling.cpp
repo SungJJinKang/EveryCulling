@@ -40,6 +40,11 @@ void culling::MaskedSWOcclusionCulling::CullBlockEntityJob(const size_t cameraIn
 {
 }
 
+const char* culling::MaskedSWOcclusionCulling::GetCullingModuleName() const
+{
+	return "MaskedSWOcclusionCulling";
+}
+
 
 	
 

@@ -351,6 +351,11 @@ void culling::BinTrianglesStage::CullBlockEntityJob(const size_t cameraIndex)
 	}
 }
 
+const char* culling::BinTrianglesStage::GetCullingModuleName() const
+{
+	return "BinTrianglesStage";
+}
+
 FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 (
 	const float* const vertices, 

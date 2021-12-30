@@ -20,6 +20,7 @@ namespace culling
 
 		EarlyOutDisabledObject(EveryCulling* frotbiteCullingSystem);
 		void CullBlockEntityJob(const size_t cameraIndex) override;
+		const char* GetCullingModuleName() const override;
 	};
 }
 

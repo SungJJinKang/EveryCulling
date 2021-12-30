@@ -114,6 +114,11 @@ void culling::ViewFrustumCulling::CullBlockEntityJob
 	
 }
 
+const char* culling::ViewFrustumCulling::GetCullingModuleName() const
+{
+	return "ViewFrustumCulling";
+}
+
 FORCE_INLINE char culling::ViewFrustumCulling::CheckInFrustumSIMDWithTwoPoint
 (
 	const Vec4* eightPlanes,

@@ -83,3 +83,8 @@ void culling::SolveMeshRoleStage::CullBlockEntityJob(const size_t cameraIndex)
 		}
 	}
 }
+
+const char* culling::SolveMeshRoleStage::GetCullingModuleName() const
+{
+	return "SolveMeshRoleStage";
+}

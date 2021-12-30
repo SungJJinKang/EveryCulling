@@ -49,7 +49,7 @@ namespace culling
 
 		void AddCullDistanceVolume(culling::CullDistanceVolume cullDistanceVolume);
 		void DeleteCullDistanceVolume(size_t index);
-
+		const char* GetCullingModuleName() const override;
 	};
 }
 

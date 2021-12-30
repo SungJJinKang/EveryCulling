@@ -22,3 +22,8 @@ void culling::DistanceCulling::DeleteCullDistanceVolume(size_t index)
 
 	mCullDistanceVolumes.erase(mCullDistanceVolumes.begin() + index);
 }
+
+const char* culling::DistanceCulling::GetCullingModuleName() const
+{
+	return "DistanceCulling";
+}

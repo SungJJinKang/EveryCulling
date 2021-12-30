@@ -100,6 +100,8 @@ namespace culling
 		) = 0;
 		
 		void ThreadCullJob(const size_t cameraIndex);
+
+		virtual const char* GetCullingModuleName() const = 0;
 	};
 
 }
