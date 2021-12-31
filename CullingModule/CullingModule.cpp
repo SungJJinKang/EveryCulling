@@ -30,10 +30,15 @@ void culling::CullingModule::ResetCullingModule()
 	}
 }
 
+std::uint32_t culling::CullingModule::GetFinishedThreadCount(const size_t cameraIndex) const
+{
+	return mCullJobState.mFinishedThreadCount[cameraIndex];
+}
+
 void culling::CullingModule::ThreadCullJob(const size_t cameraIndex)
 {
 	std::atomic_thread_fence(std::memory_order_acquire);
 	CullBlockEntityJob(cameraIndex);
 	++(mCullJobState.mFinishedThreadCount[cameraIndex]);
-	std::atomic_thread_fence(std::memory_order_release);
+	//std::atomic_thread_fence(std::memory_order_release);
 }
