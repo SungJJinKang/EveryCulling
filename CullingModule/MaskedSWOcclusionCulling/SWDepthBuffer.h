@@ -161,6 +161,10 @@ namespace culling
 		size_t mCurrentTriangleCount = 0;
 
 		void Reset();
+		FORCE_INLINE bool GetIsBinFull() const
+		{
+			return mCurrentTriangleCount >= BIN_TRIANGLE_CAPACITY_PER_TILE;
+		}
 	};
 
 	static_assert(BIN_TRIANGLE_CAPACITY_PER_TILE % 8 == 0);

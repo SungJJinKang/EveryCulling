@@ -135,26 +135,24 @@ FORCE_INLINE void culling::BinTrianglesStage::PassTrianglesToTileBin
 				{
 					Tile* const targetTile = mMaskedOcclusionCulling->mDepthBuffer.GetTile(y, x);
 
-					const size_t triListIndex = targetTile->mBinnedTriangles.mCurrentTriangleCount++;
-
-					//assert(triListIndex < BIN_TRIANGLE_CAPACITY_PER_TILE);
-					if(triListIndex >= BIN_TRIANGLE_CAPACITY_PER_TILE)
+					assert(targetTile->mBinnedTriangles.GetIsBinFull() == false);
+					if(targetTile->mBinnedTriangles.GetIsBinFull() == false)
 					{
-						return;
+						const size_t triListIndex = targetTile->mBinnedTriangles.mCurrentTriangleCount++;
+						
+						targetTile->mBinnedTriangles.VertexX[0][triListIndex] = (reinterpret_cast<const float*>(&pointAScreenPixelPosX))[triangleIndex];
+						targetTile->mBinnedTriangles.VertexY[0][triListIndex] = (reinterpret_cast<const float*>(&pointAScreenPixelPosY))[triangleIndex];
+						targetTile->mBinnedTriangles.VertexZ[0][triListIndex] = (reinterpret_cast<const float*>(&pointANdcSpaceVertexZ))[triangleIndex];
+
+						targetTile->mBinnedTriangles.VertexX[1][triListIndex] = (reinterpret_cast<const float*>(&pointBScreenPixelPosX))[triangleIndex];
+						targetTile->mBinnedTriangles.VertexY[1][triListIndex] = (reinterpret_cast<const float*>(&pointBScreenPixelPosY))[triangleIndex];
+						targetTile->mBinnedTriangles.VertexZ[1][triListIndex] = (reinterpret_cast<const float*>(&pointBNdcSpaceVertexZ))[triangleIndex];
+
+						targetTile->mBinnedTriangles.VertexX[2][triListIndex] = (reinterpret_cast<const float*>(&pointCScreenPixelPosX))[triangleIndex];
+						targetTile->mBinnedTriangles.VertexY[2][triListIndex] = (reinterpret_cast<const float*>(&pointCScreenPixelPosY))[triangleIndex];
+						targetTile->mBinnedTriangles.VertexZ[2][triListIndex] = (reinterpret_cast<const float*>(&pointCNdcSpaceVertexZ))[triangleIndex];
+
 					}
-
-					targetTile->mBinnedTriangles.VertexX[0][triListIndex] = (reinterpret_cast<const float*>(&pointAScreenPixelPosX))[triangleIndex];
-					targetTile->mBinnedTriangles.VertexY[0][triListIndex] = (reinterpret_cast<const float*>(&pointAScreenPixelPosY))[triangleIndex];
-					targetTile->mBinnedTriangles.VertexZ[0][triListIndex] = (reinterpret_cast<const float*>(&pointANdcSpaceVertexZ))[triangleIndex];
-
-					targetTile->mBinnedTriangles.VertexX[1][triListIndex] = (reinterpret_cast<const float*>(&pointBScreenPixelPosX))[triangleIndex];
-					targetTile->mBinnedTriangles.VertexY[1][triListIndex] = (reinterpret_cast<const float*>(&pointBScreenPixelPosY))[triangleIndex];
-					targetTile->mBinnedTriangles.VertexZ[1][triListIndex] = (reinterpret_cast<const float*>(&pointBNdcSpaceVertexZ))[triangleIndex];
-
-					targetTile->mBinnedTriangles.VertexX[2][triListIndex] = (reinterpret_cast<const float*>(&pointCScreenPixelPosX))[triangleIndex];
-					targetTile->mBinnedTriangles.VertexY[2][triListIndex] = (reinterpret_cast<const float*>(&pointCScreenPixelPosY))[triangleIndex];
-					targetTile->mBinnedTriangles.VertexZ[2][triListIndex] = (reinterpret_cast<const float*>(&pointCNdcSpaceVertexZ))[triangleIndex];
-					
 				}
 			}
 		}
