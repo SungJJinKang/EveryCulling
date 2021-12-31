@@ -135,7 +135,8 @@ Stage 1 : Solve Mesh Role Stage ( Decide occluder based on object's screen space
 Stage 2 : Bin Occluder Triangle Stage ( Dispatch(Bin) triangles to screen tiles based on triangle's screen space vertex data for following rasterizer stage )             
 Stage 3 : Multithread Rasterize Occluder Triangles ( Threads do job rasterizing each tile's binned triangles, calculate max depth value of tile )             
 Stage 4 : Multithread Query depth buffer ( Compare aabb of occludee's min depth value with tile depth buffer. check 52p https://www.ea.com/frostbite/news/culling-the-battlefield-data-oriented-design-in-practice )              
-             
+
+개발 일지 : https://sungjjinkang.github.io/computerscience/computergraphics/2021/12/31/masked_sw_occlusion_culling.html            
 Video : [https://youtu.be/tMgokVljvAY](https://youtu.be/tMgokVljvAY), [https://youtu.be/1IKTXsSLJ5g](https://youtu.be/1IKTXsSLJ5g)                       
 Code directory : [https://github.com/SungJJinKang/EveryCulling/tree/doom_engine_version/CullingModule/MaskedSWOcclusionCulling](https://github.com/SungJJinKang/EveryCulling/tree/doom_engine_version/CullingModule/MaskedSWOcclusionCulling)         
 동작 원리 한국어 설명 : ["Masked Software Occlusion Culling"는 어떻게 작동하는가?](https://github.com/SungJJinKang/EveryCulling/blob/main/CullingModule/MaskedSWOcclusionCulling/MaskedSWOcclusionCulling_HowWorks.md)                 
