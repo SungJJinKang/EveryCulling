@@ -127,6 +127,11 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 
 		culling::M256I CoverageMask[8];
 		culling::M256F subTileMaxDepth[8];
+		for (size_t triangleIndex = 0; triangleIndex < 8; triangleIndex++)
+		{
+			CoverageMask[triangleIndex] = _mm256_setzero_si256(); // clear coverage mask
+			subTileMaxDepth[triangleIndex] = _mm256_set1_ps((float)MIN_DEPTH_VALUE); // clear subTileMaxDepth
+		}
 
 		culling::M256F minY = _mm256_min_ps(_mm256_min_ps(TriPointA_Y, TriPointB_Y), TriPointC_Y);
 		culling::M256F maxY = _mm256_max_ps(_mm256_max_ps(TriPointA_Y, TriPointB_Y), TriPointC_Y);

@@ -135,9 +135,9 @@ namespace culling
 						culling::M256F maxZValueAtRowOfSubTiles = _mm256_max_ps(leftFaceDepthValueOfRowIndexInSubTiles, rightFaceDepthValueOfRowIndexInSubTiles);
 
 						// if left, right event is both 0 or both SUB_TILE_WIDTH, exclude the row
-						const culling::M256I mashWhenLeftRightSlopeIsLocatedAtLeftOfSubTiles = _mm256_and_si256(_mm256_cmpeq_epi32(clampedLeftFaceEventInSubTiles, _mm256_set1_epi32(0)), _mm256_cmpeq_epi32(clampedRightFaceEventInSubTiles, _mm256_set1_epi32(0)));
-						const culling::M256I mashWhenLeftRightSlopeIsLocatedAtRightOfSubTiles = _mm256_and_si256(_mm256_cmpeq_epi32(clampedLeftFaceEventInSubTiles, _mm256_set1_epi32(SUB_TILE_WIDTH)), _mm256_cmpeq_epi32(clampedRightFaceEventInSubTiles, _mm256_set1_epi32(SUB_TILE_WIDTH)));
-						const culling::M256I maskWhenLeftRightSlopeIsOutOfSubTiles = _mm256_or_si256(mashWhenLeftRightSlopeIsLocatedAtLeftOfSubTiles, mashWhenLeftRightSlopeIsLocatedAtRightOfSubTiles);
+						const culling::M256I maskWhenLeftRightSlopeIsLocatedAtLeftOfSubTiles = _mm256_and_si256(_mm256_cmpeq_epi32(clampedLeftFaceEventInSubTiles, _mm256_set1_epi32(0)), _mm256_cmpeq_epi32(clampedRightFaceEventInSubTiles, _mm256_set1_epi32(0)));
+						const culling::M256I maskWhenLeftRightSlopeIsLocatedAtRightOfSubTiles = _mm256_and_si256(_mm256_cmpeq_epi32(clampedLeftFaceEventInSubTiles, _mm256_set1_epi32(SUB_TILE_WIDTH)), _mm256_cmpeq_epi32(clampedRightFaceEventInSubTiles, _mm256_set1_epi32(SUB_TILE_WIDTH)));
+						const culling::M256I maskWhenLeftRightSlopeIsOutOfSubTiles = _mm256_or_si256(maskWhenLeftRightSlopeIsLocatedAtLeftOfSubTiles, maskWhenLeftRightSlopeIsLocatedAtRightOfSubTiles);
 
 						// when row is greater than max y or less than min y, row is invalid row
 						const culling::M256I screenYOfRowInSubTiles = _mm256_setr_epi32(tileOriginY + 0.5f + rowIndexInSubtiles, tileOriginY + 0.5f + rowIndexInSubtiles, tileOriginY + 0.5f + rowIndexInSubtiles, tileOriginY + 0.5f + rowIndexInSubtiles, tileOriginY + 0.5f + rowIndexInSubtiles + SUB_TILE_HEIGHT, tileOriginY + 0.5f + rowIndexInSubtiles + SUB_TILE_HEIGHT, tileOriginY + 0.5f + rowIndexInSubtiles + SUB_TILE_HEIGHT, tileOriginY + 0.5f + rowIndexInSubtiles + SUB_TILE_HEIGHT);
