@@ -17,7 +17,7 @@ This library is targeting Maximing SIMD, Cache hit, Multi Threading.
 
 #### Currently Supported
 - View Frustum Culling using SIMD ( video : [https://youtu.be/G-IFukD2bNg](https://youtu.be/G-IFukD2bNg) )
-- Masked SW Occlusion Culling ( video : [https://youtu.be/QUOYzizIezE](https://youtu.be/QUOYzizIezE), [https://youtu.be/J7rHb8NV9z0](https://youtu.be/J7rHb8NV9z0) , reference paper : https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf )  
+- Masked SW Occlusion Culling ( video : [https://youtu.be/tMgokVljvAY](https://youtu.be/tMgokVljvAY), reference paper : https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf )  
 - HW Query Occlusion Culling ( + Conditional Rendering, https://www.khronos.org/registry/OpenGL/extensions/NV/NV_conditional_render.txt )  
 - Support AVX1, AVX2 
 
@@ -136,7 +136,7 @@ Stage 2 : Bin Occluder Triangle Stage ( Dispatch(Bin) triangles to screen tiles 
 Stage 3 : Multithread Rasterize Occluder Triangles ( Threads do job rasterizing each tile's binned triangles, calculate max depth value of tile )             
 Stage 4 : Multithread Query depth buffer ( Compare aabb of occludee's min depth value with tile depth buffer. check 52p https://www.ea.com/frostbite/news/culling-the-battlefield-data-oriented-design-in-practice )              
              
-Video : https://youtu.be/QUOYzizIezE, https://youtu.be/J7rHb8NV9z0                       
+Video : https://youtu.be/tMgokVljvAY                  
 동작 원리 한국어 설명 : ["Masked Software Occlusion Culling"는 어떻게 작동하는가?](https://github.com/SungJJinKang/EveryCulling/blob/main/CullingModule/MaskedSWOcclusionCulling/MaskedSWOcclusionCulling_HowWorks.md)                 
 references : https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf, https://www.slideshare.net/IntelSoftware/masked-software-occlusion-culling, https://www.slideshare.net/IntelSoftware/masked-occlusion-culling         
 
