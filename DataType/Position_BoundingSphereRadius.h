@@ -27,12 +27,12 @@ namespace culling
 			std::memcpy(&Position, vec3, sizeof(culling::Vec3));
 		}
 
-		FORCE_INLINE void SetBoundingSphereRadius(const float _boundingSphereRadius)
+		FORCE_INLINE void SetBoundingSphereRadius(const float boundingSphereRadius)
 		{
 			// why minus?
 			// Calculated distance between frustum plane and object is positive when object is in frustum
-
-			Position.values[3] = _boundingSphereRadius;
+			assert(boundingSphereRadius > 0.0f);
+			Position.values[3] = boundingSphereRadius;
 		}
 
 		FORCE_INLINE float GetBoundingSphereRadius() const

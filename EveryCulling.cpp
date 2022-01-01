@@ -204,12 +204,13 @@ void culling::EveryCulling::SetEnabledCullingModule(const CullingModuleType cull
 
 		break;
 
+#ifdef ENABLE_QUERY_OCCLUSION
 	case CullingModuleType::_HwQueryOcclusionCulling:
 
 		mQueryOcclusionCulling->IsEnabled = isEnabled;
 
 		break;
-
+#endif
 	}
 }
 
@@ -274,7 +275,9 @@ culling::EveryCulling::EveryCulling(const std::uint32_t resolutionWidth, const s
 	, mScreenSpaceBoudingSphereCulling{ std::make_unique<ScreenSpaceBoundingSphereCulling>(this) }
 #endif
 	, mMaskedSWOcclusionCulling{ std::make_unique<MaskedSWOcclusionCulling>(this, resolutionWidth, resolutionHeight) }
+#ifdef ENABLE_QUERY_OCCLUSION
 	, mQueryOcclusionCulling{ std::make_unique<QueryOcclusionCulling>(this) }
+#endif
 	, mUpdatedCullingModules
 		{
 			mEarlyOutDisabledObject.get(),

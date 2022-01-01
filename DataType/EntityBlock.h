@@ -4,19 +4,22 @@
 
 #include "Math/Vector.h"
 #include "Position_BoundingSphereRadius.h"
+#include "VertexData.h"
+#include "Math/Matrix.h"
 
 #ifdef ENABLE_QUERY_OCCLUSION
 #include "QueryObject.h"
 
 #define QUERY_OBJECT_PTR_SIZE sizeof(culling::QueryObject*)
 
-#elif
+#else
+
 #define QUERY_OBJECT_PTR_SIZE 0
 
 #endif
 
 
-#include "VertexData.h"
+
 
 #define CACHE_LINE_SIZE 64
 

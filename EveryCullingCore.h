@@ -148,12 +148,12 @@
 
 // Distance Culling
 #ifndef ENABLE_DISTANCE_CULLING
-#define ENABLE_DISTANCE_CULLING
+//#define ENABLE_DISTANCE_CULLING
 #endif
 
 // Query Occlusion
 #if !defined(ENABLE_QUERY_OCCLUSION) && defined(CULLING_OPENGL)
-#define ENABLE_QUERY_OCCLUSION
+//#define ENABLE_QUERY_OCCLUSION
 #endif
 
 #ifndef IS_ALIGNED_ASSERT
