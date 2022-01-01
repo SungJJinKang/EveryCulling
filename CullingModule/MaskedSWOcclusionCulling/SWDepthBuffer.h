@@ -311,9 +311,33 @@ namespace culling
 		
 		const Tile* GetTiles() const;
 
-		const Tile* GetTile(const size_t rowIndex, const size_t colIndex) const;
-		Tile* GetTile(const size_t rowIndex, const size_t colIndex);
-		const Tile* GetTile(const size_t tileIndex) const;
-		Tile* GetTile(const size_t tileIndex);
+		FORCE_INLINE const Tile* GetTile(const size_t rowIndex, const size_t colIndex) const
+		{
+			assert(rowIndex < mResolution.mRowTileCount);
+			assert(colIndex < mResolution.mColumnTileCount);
+
+			const size_t tileIndex = (mResolution.mRowTileCount - rowIndex - 1) * mResolution.mColumnTileCount + colIndex;
+			assert(tileIndex < mTileCount);
+			return mTiles + tileIndex;
+		}
+		FORCE_INLINE Tile* GetTile(const size_t rowIndex, const size_t colIndex)
+		{
+			assert(rowIndex < mResolution.mRowTileCount);
+			assert(colIndex < mResolution.mColumnTileCount);
+
+			const size_t tileIndex = (mResolution.mRowTileCount - rowIndex - 1) * mResolution.mColumnTileCount + colIndex;
+			assert(tileIndex < mTileCount);
+			return mTiles + tileIndex;
+		}
+		FORCE_INLINE const Tile* GetTile(const size_t tileIndex) const
+		{
+			assert(tileIndex < mTileCount);
+			return mTiles + tileIndex;
+		}
+		FORCE_INLINE Tile* GetTile(const size_t tileIndex)
+		{
+			assert(tileIndex < mTileCount);
+			return mTiles + tileIndex;
+		}
 	};
 }

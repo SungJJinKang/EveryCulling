@@ -215,15 +215,19 @@ void culling::QueryOccludeeStage::QueryOccludee
 					{
 						// occludee is not culled!
 						isCullded = false;
-						break;
+
+						goto escapeNestedLoop;
 					}
 				}
 			}
+			
+			entityBlock->SetCulled(entityIndex, cameraIndex);
 
-			if(isCullded == true)
-			{
-				entityBlock->SetCulled(entityIndex, cameraIndex);
-			}
+			escapeNestedLoop:
+
+			do 
+			{}
+			while (false);
 		}
 	}
 }
