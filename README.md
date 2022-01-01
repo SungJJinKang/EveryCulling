@@ -17,7 +17,7 @@ This library is targeting Maximing **SIMD, Cache hit, Multi Threading.**
 
 #### Currently Supported
 - View Frustum Culling from Frostbite Engine of EA Dice ( video : [https://youtu.be/G-IFukD2bNg](https://youtu.be/G-IFukD2bNg) )
-- Masked SW Occlusion Culling ( video : [https://youtu.be/tMgokVljvAY](https://youtu.be/tMgokVljvAY), [https://youtu.be/1IKTXsSLJ5g](https://youtu.be/1IKTXsSLJ5g), reference paper : https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf )  
+- Masked SW Occlusion Culling from Intel ( video : [https://youtu.be/tMgokVljvAY](https://youtu.be/tMgokVljvAY), [https://youtu.be/1IKTXsSLJ5g](https://youtu.be/1IKTXsSLJ5g), reference paper : https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf )  
 - HW Query Occlusion Culling ( + Conditional Rendering, https://www.khronos.org/registry/OpenGL/extensions/NV/NV_conditional_render.txt )  
 - Support AVX1, AVX2 
 
@@ -129,7 +129,7 @@ Thread 2 : Check Frustum of Entity Block 2, 5, 8
 To minimize waiting time(wait calculating cull finish) , Passing cull job to thread should be placed at foremost of rendering loop.      
 In My experiment, Waiting time is near to zero.
 
-## Masked SW ( CPU ) Occlusion Culling ( 95%, require more optimization )             
+## Masked SW ( CPU ) Occlusion Culling From Intel ( 95%, require more optimization )             
              
 Stage 1 : Solve Mesh Role Stage ( Decide occluder based on object's screen space bouding sphere's size )             
 Stage 2 : Bin Occluder Triangle Stage ( Dispatch(Bin) triangles to screen tiles based on triangle's screen space vertex data for following rasterizer stage )             
