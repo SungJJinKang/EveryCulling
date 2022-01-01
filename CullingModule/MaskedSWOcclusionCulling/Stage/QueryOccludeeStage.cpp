@@ -6,6 +6,8 @@
 #include "../Utility/vertexTransformationHelper.h"
 #include "../Utility/depthBufferTileHelper.h"
 
+#include <Rendering/Renderer/Renderer.h>
+
 FORCE_INLINE float culling::QueryOccludeeStage::MinFloatFromM256F(const culling::M256F& data)
 {
 	float min = FLT_MAX;
@@ -87,20 +89,22 @@ void culling::QueryOccludeeStage::QueryOccludee
 	culling::EntityBlock* const entityBlock
 )
 {
+	// TODO : Query with spatial splits aabb
+
 	for(size_t entityIndex = 0 ; entityIndex < entityBlock->mCurrentEntityCount ; entityIndex++)
 	{
 		if(entityBlock->GetIsCulled(entityIndex, cameraIndex) == false)
 		{
-			const culling::Vec4& aabbMinPoint = entityBlock->mAABBMinLocalPoint[entityIndex];
-			const culling::Vec4& aabbMaxPoint = entityBlock->mAABBMaxLocalPoint[entityIndex];
+			const culling::Vec4& aabbMinWorldPoint = entityBlock->mAABBMinWorldPoint[entityIndex];
+			const culling::Vec4& aabbMaxWorldPoint = entityBlock->mAABBMaxWorldPoint[entityIndex];
 
-			const culling::Mat4x4 modelToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex) * *reinterpret_cast<const culling::Mat4x4*>(entityBlock->GetModelMatrix(entityIndex));
+			const culling::Mat4x4 worldToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex);
 
 
 
-			culling::M256F aabbVertexX = _mm256_setr_ps(aabbMinPoint.values[0], aabbMinPoint.values[0], aabbMinPoint.values[0], aabbMinPoint.values[0], aabbMaxPoint.values[0], aabbMaxPoint.values[0], aabbMaxPoint.values[0], aabbMaxPoint.values[0]);
-			culling::M256F aabbVertexY = _mm256_setr_ps(aabbMinPoint.values[1], aabbMinPoint.values[1], aabbMaxPoint.values[1], aabbMaxPoint.values[1], aabbMinPoint.values[1], aabbMinPoint.values[1], aabbMaxPoint.values[1], aabbMaxPoint.values[1]);
-			culling::M256F aabbVertexZ = _mm256_setr_ps(aabbMinPoint.values[2], aabbMaxPoint.values[2], aabbMinPoint.values[2], aabbMaxPoint.values[2], aabbMinPoint.values[2], aabbMaxPoint.values[2], aabbMinPoint.values[2], aabbMaxPoint.values[2]);
+			culling::M256F aabbVertexX = _mm256_setr_ps(aabbMinWorldPoint.values[0], aabbMinWorldPoint.values[0], aabbMinWorldPoint.values[0], aabbMinWorldPoint.values[0], aabbMaxWorldPoint.values[0], aabbMaxWorldPoint.values[0], aabbMaxWorldPoint.values[0], aabbMaxWorldPoint.values[0]);
+			culling::M256F aabbVertexY = _mm256_setr_ps(aabbMinWorldPoint.values[1], aabbMinWorldPoint.values[1], aabbMaxWorldPoint.values[1], aabbMaxWorldPoint.values[1], aabbMinWorldPoint.values[1], aabbMinWorldPoint.values[1], aabbMaxWorldPoint.values[1], aabbMaxWorldPoint.values[1]);
+			culling::M256F aabbVertexZ = _mm256_setr_ps(aabbMinWorldPoint.values[2], aabbMaxWorldPoint.values[2], aabbMinWorldPoint.values[2], aabbMaxWorldPoint.values[2], aabbMinWorldPoint.values[2], aabbMaxWorldPoint.values[2], aabbMinWorldPoint.values[2], aabbMaxWorldPoint.values[2]);
 			culling::M256F aabbVertexW;
 
 			// TODO : use Line Clipping Algorithm ( Cohen-Sutherland algorithm )
@@ -111,7 +115,7 @@ void culling::QueryOccludeeStage::QueryOccludee
 			std::uint32_t aabbPointMask = (1 << 8) - 1;
 
 
-			aabbVertexW = culling::M256F_MUL_AND_ADD(aabbVertexX, _mm256_set1_ps(modelToClipSpaceMatrix.data()[3]), culling::M256F_MUL_AND_ADD(aabbVertexY, _mm256_set1_ps(modelToClipSpaceMatrix.data()[7]), culling::M256F_MUL_AND_ADD(aabbVertexZ, _mm256_set1_ps(modelToClipSpaceMatrix.data()[11]), _mm256_set1_ps(modelToClipSpaceMatrix.data()[15]))));
+			aabbVertexW = culling::M256F_MUL_AND_ADD(aabbVertexX, _mm256_set1_ps(worldToClipSpaceMatrix.data()[3]), culling::M256F_MUL_AND_ADD(aabbVertexY, _mm256_set1_ps(worldToClipSpaceMatrix.data()[7]), culling::M256F_MUL_AND_ADD(aabbVertexZ, _mm256_set1_ps(worldToClipSpaceMatrix.data()[11]), _mm256_set1_ps(worldToClipSpaceMatrix.data()[15]))));
 			aabbPointMask &= _mm256_movemask_ps(_mm256_cmp_ps(aabbVertexW, _mm256_set1_ps(std::numeric_limits<float>::epsilon()), _CMP_GE_OQ));
 			if(aabbPointMask != 0x000000FF)
 			{
@@ -124,7 +128,7 @@ void culling::QueryOccludeeStage::QueryOccludee
 				aabbVertexX,
 				aabbVertexY,
 				aabbVertexZ,
-				modelToClipSpaceMatrix.data()
+				worldToClipSpaceMatrix.data()
 			);
 			//Now ClipSpace !!
 
@@ -224,7 +228,6 @@ void culling::QueryOccludeeStage::QueryOccludee
 			entityBlock->SetCulled(entityIndex, cameraIndex);
 
 			escapeNestedLoop:
-
 			do 
 			{}
 			while (false);

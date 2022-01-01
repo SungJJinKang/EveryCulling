@@ -48,49 +48,7 @@ namespace culling
 		}
 	};
 
-	FORCE_INLINE culling::Vec2 operator+(const culling::Vec2& a, const culling::Vec2& b)
-	{
-		return culling::Vec2(a.x + b.x, a.y + b.y);
-	}
-
-	FORCE_INLINE culling::Vec2 operator-(const culling::Vec2& a, const culling::Vec2& b)
-	{
-		return culling::Vec2(a.x - b.x, a.y - b.y);
-
-	}
-
-	FORCE_INLINE culling::Vec3 operator+(const culling::Vec3& a, const culling::Vec3& b)
-	{
-		return culling::Vec3(a.x + b.x, a.y + b.y, a.z + b.z);
-	}
-
-	FORCE_INLINE culling::Vec3 operator-(const culling::Vec3& a, const culling::Vec3& b)
-	{
-		return culling::Vec3(a.x - b.x, a.y - b.y, a.z - b.z);
-	}
-
-	FORCE_INLINE float Dot(const culling::Vec2& a, const culling::Vec2& b)
-	{
-		return a.x * b.x + a.y * b.y;
-	}
-
-	FORCE_INLINE float Dot(const culling::Vec3& a, const culling::Vec3& b)
-	{
-		return a.x * b.x + a.y * b.y + a.z * b.z;
-	}
-
-	FORCE_INLINE float PerpDot(const culling::Vec2& lhs, const culling::Vec2& rhs)
-	{
-		return lhs.x * rhs.y - lhs.y * rhs.x;
-	}
-
-	FORCE_INLINE culling::Vec3 Cross(const culling::Vec3& lhs, const culling::Vec3& rhs)
-	{
-		return culling::Vec3(
-			lhs.y * rhs.z - rhs.y * lhs.z,
-			lhs.z * rhs.x - rhs.z * lhs.x,
-			lhs.x * rhs.y - rhs.x * lhs.y);
-	}
+	
 
 
 	/// <summary>
@@ -119,6 +77,19 @@ namespace culling
 		{
 			return values;
 		}
+
+		FORCE_INLINE float sqrMagnitude() const
+		{
+			const culling::M128F mul0 = _mm_mul_ps(*reinterpret_cast<const culling::M128F*>(data()), *reinterpret_cast<const culling::M128F*>(data()));
+			const culling::M128F had0 = _mm_hadd_ps(mul0, mul0);
+			const culling::M128F had1 = _mm_hadd_ps(had0, had0);
+			return _mm_cvtss_f32(had1);
+		}
+
+		FORCE_INLINE float magnitude() const
+		{
+			return std::sqrt(sqrMagnitude());
+		}
 	};
 
 	struct alignas(16) Quat
@@ -144,5 +115,81 @@ namespace culling
 		{
 			return values;
 		}
+
+		FORCE_INLINE float sqrMagnitude() const
+		{
+			const culling::M128F mul0 = _mm_mul_ps(*reinterpret_cast<const culling::M128F*>(data()), *reinterpret_cast<const culling::M128F*>(data()));
+			const culling::M128F had0 = _mm_hadd_ps(mul0, mul0);
+			const culling::M128F had1 = _mm_hadd_ps(had0, had0);
+			return _mm_cvtss_f32(had1);
+		}
+
+		FORCE_INLINE float magnitude() const
+		{
+			return std::sqrt(sqrMagnitude());
+		}
 	};
+
+	FORCE_INLINE culling::Vec2 operator+(const culling::Vec2& a, const culling::Vec2& b)
+	{
+		return culling::Vec2(a.x + b.x, a.y + b.y);
+	}
+
+	FORCE_INLINE culling::Vec2 operator-(const culling::Vec2& a, const culling::Vec2& b)
+	{
+		return culling::Vec2(a.x - b.x, a.y - b.y);
+
+	}
+
+	FORCE_INLINE culling::Vec3 operator+(const culling::Vec3& a, const culling::Vec3& b)
+	{
+		return culling::Vec3(a.x + b.x, a.y + b.y, a.z + b.z);
+	}
+
+	FORCE_INLINE culling::Vec3 operator-(const culling::Vec3& a, const culling::Vec3& b)
+	{
+		return culling::Vec3(a.x - b.x, a.y - b.y, a.z - b.z);
+	}
+
+
+	FORCE_INLINE culling::Vec4 operator+(const culling::Vec4& a, const culling::Vec4& b)
+	{
+		culling::Vec4 result;
+
+		*reinterpret_cast<culling::M128F*>(result.data()) = _mm_add_ps(*reinterpret_cast<const culling::M128F*>(a.data()), *reinterpret_cast<const culling::M128F*>(b.data()));
+
+		return result;
+	}
+
+	FORCE_INLINE culling::Vec4 operator-(const culling::Vec4& a, const culling::Vec4& b)
+	{
+		culling::Vec4 result;
+
+		*reinterpret_cast<culling::M128F*>(result.data()) = _mm_sub_ps(*reinterpret_cast<const culling::M128F*>(a.data()), *reinterpret_cast<const culling::M128F*>(b.data()));
+
+		return result;
+	}
+
+	FORCE_INLINE float Dot(const culling::Vec2& a, const culling::Vec2& b)
+	{
+		return a.x * b.x + a.y * b.y;
+	}
+
+	FORCE_INLINE float Dot(const culling::Vec3& a, const culling::Vec3& b)
+	{
+		return a.x * b.x + a.y * b.y + a.z * b.z;
+	}
+
+	FORCE_INLINE float PerpDot(const culling::Vec2& lhs, const culling::Vec2& rhs)
+	{
+		return lhs.x * rhs.y - lhs.y * rhs.x;
+	}
+
+	FORCE_INLINE culling::Vec3 Cross(const culling::Vec3& lhs, const culling::Vec3& rhs)
+	{
+		return culling::Vec3(
+			lhs.y * rhs.z - rhs.y * lhs.z,
+			lhs.z * rhs.x - rhs.z * lhs.x,
+			lhs.x * rhs.y - rhs.x * lhs.y);
+	}
 }

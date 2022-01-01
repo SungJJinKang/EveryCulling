@@ -5,9 +5,6 @@
 #include "../../DataType/Math/Common.h"
 #include "../../EveryCulling.h"
 
-#include <Rendering/Renderer/Renderer.h>
-#include <Transform.h>
-
 
 culling::ViewFrustumCulling::ViewFrustumCulling(EveryCulling* frotbiteCullingSystem)
 	: CullingModule{ frotbiteCullingSystem }
@@ -25,71 +22,26 @@ void culling::ViewFrustumCulling::DoViewFrustumCulling
 	const math::Vector3* const cameraPos = reinterpret_cast<const math::Vector3*>(&(mCullingSystem->GetCameraWorldPosition(cameraIndex)));
 
 	assert(entityBlock->mCurrentEntityCount != 0);
-	for (size_t entityIndex = 0; entityIndex < entityBlock->mCurrentEntityCount; entityIndex++)
-	{
-		if(entityBlock->GetIsCulled(entityIndex, cameraIndex) == false)
-		{
-			dooms::Transform* const transform = reinterpret_cast<dooms::Transform*>(entityBlock->mTransform[entityIndex]);
-			dooms::Renderer* const renderer = reinterpret_cast<dooms::Renderer*>(entityBlock->mRenderer[entityIndex]);
-
-			if (dooms::IsValid(renderer) == true)
-			{
-				Position_BoundingSphereRadius* const posBoundingSphereRadius = entityBlock->mPositionAndBoundingSpheres + entityIndex;
-
-				const float worldRadius = renderer->dooms::ColliderUpdater<dooms::physics::Sphere>::GetWorldCollider()->mRadius;
-
-				const culling::Vec3* const entityPos = reinterpret_cast<const culling::Vec3*>(&transform->GetPosition());
-				*reinterpret_cast<culling::M128F*>(posBoundingSphereRadius) = *reinterpret_cast<const culling::M128F*>(entityPos);
-				posBoundingSphereRadius->SetBoundingSphereRadius(worldRadius);
-			}
-		}
-	}
-
-	// this object's size should be multiples of 32
-	const size_t cullingMaskSize = ENTITY_COUNT_IN_ENTITY_BLOCK;
-	assert(cullingMaskSize % 32 == 0);
-
-	alignas(32) char cullingMask[cullingMaskSize + 1];
-	D_ASSERT(cullingMaskSize % 32 == 0);
-	for (int i = 0; i < cullingMaskSize; i += 32)
-	{
-		*reinterpret_cast<culling::M256F*>((char*)cullingMask + i) = _mm256_setzero_ps();
-	}
+	
 
 	const Vec4* frustumPlane = mSIMDFrustumPlanes[cameraIndex].mFrustumPlanes;
 
 	assert(entityBlock->mCurrentEntityCount != 0);
 	for (size_t entityIndex = 0; entityIndex < entityBlock->mCurrentEntityCount ; entityIndex = entityIndex + 2)
 	{
-		if (entityBlock->GetIsCulled(entityIndex, cameraIndex) == false || entityBlock->GetIsCulled(entityIndex + 1, cameraIndex) == false)
+		if ( (entityBlock->GetIsCulled(entityIndex, cameraIndex) == false) || (entityBlock->GetIsCulled(entityIndex + 1, cameraIndex) == false) )
 		{
-			char result = CheckInFrustumSIMDWithTwoPoint(frustumPlane, entityBlock->mPositionAndBoundingSpheres + entityIndex);
+			const char result = CheckInFrustumSIMDWithTwoPoint(frustumPlane, entityBlock->mPositionAndBoundingSpheres + entityIndex);
 			// if first low bit has 1 value, Pos A is In Frustum
 			// if second low bit has 1 value, Pos A is In Frustum
 
-			//for maximizing cache hit, Don't set Entity's IsVisiable at here
-			assert(entityIndex < cullingMaskSize);
-			assert(entityIndex + 1 < cullingMaskSize);
-			cullingMask[entityIndex] |= (result | ~1) << cameraIndex;
-			cullingMask[entityIndex + 1] |= ((result | ~2) >> 1) << cameraIndex;
+			
+
+			entityBlock->UpdateIsCulled(entityIndex, cameraIndex, !(bool)(result & 1));
+			entityBlock->UpdateIsCulled(entityIndex + 1, cameraIndex, !(bool)(result & 2));
 		}
 	}
-
-	//TODO : If CullingMask is True, Do Calculate ScreenSpace AABB Area And Check Is Culled
-	// use mCulledScreenSpaceAABBArea
-	culling::M256F* m256f_isVisible = reinterpret_cast<culling::M256F*>(entityBlock->mIsVisibleBitflag);
-	const culling::M256F* m256f_cullingMask = reinterpret_cast<const culling::M256F*>(cullingMask);
-	const std::uint32_t m256_count_isvisible = cullingMaskSize / 32;
-
-	/// <summary>
-	/// M256 = 8bit(1byte = bool size) * 32 
-	/// 
-	/// And operation with result culling mask and entityblock's visible bitflag
-	/// </summary>
-	for (std::uint32_t i = 0; i < m256_count_isvisible; i++)
-	{
-		m256f_isVisible[i] = _mm256_and_ps(m256f_isVisible[i], m256f_cullingMask[i]);
-	}
+	
 }
 
 void culling::ViewFrustumCulling::CullBlockEntityJob
@@ -183,6 +135,8 @@ FORCE_INLINE char culling::ViewFrustumCulling::CheckInFrustumSIMDWithTwoPoint
 	char IsPointABInFrustum = IsPointAInFrustum | (IsPointBInFrustum << 1);
 	return IsPointABInFrustum;
 }
+
+
 
 
 void culling::ViewFrustumCulling::OnSetViewProjectionMatrix(const size_t cameraIndex, const culling::Mat4x4& cameraViewProjectionMatrix)

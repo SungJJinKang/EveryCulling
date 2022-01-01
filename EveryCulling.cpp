@@ -7,7 +7,7 @@
 #include <vector_erase_move_lastelement/vector_swap_popback.h>
 
 #include "CullingModule/ViewFrustumCulling/ViewFrustumCulling.h"
-#include "CullingModule/EarlyOutDisabledObject/EarlyOutDisabledObject.h"
+#include "CullingModule/PreCulling/PreCulling.h"
 
 #ifdef ENABLE_SCREEN_SAPCE_BOUDING_SPHERE_CULLING
 #include "CullingModule/ScreenSpaceBoundingSphereCulling/ScreenSpaceBoundingSphereCulling.h"
@@ -104,14 +104,7 @@ void culling::EveryCulling::RemoveEntityFromBlock(EntityBlock* ownerEntityBlock,
 	{
 		cullingModule->ClearEntityData(ownerEntityBlock, entityIndexInBlock);
 	}
-
-	//Don't decrement mEntityGridCell.AllocatedEntityCountInBlocks
-	//Entities Indexs in EntityBlock should not be swapped because already allocated EntityBlockViewer can't see it
-
-	//�ӽ÷� �̷��� �ص�, ���߿� free�� ��ƼƼ�� ��ϵ� ���� ��Ƽ� ���Ҵ� ���־���Ѵ�.
-	ownerEntityBlock->mRenderer[entityIndexInBlock] = nullptr;
-	ownerEntityBlock->mTransform[entityIndexInBlock] = nullptr;
-
+	
 	assert(ownerEntityBlock->mCurrentEntityCount != 0);
 	ownerEntityBlock->mCurrentEntityCount--;
 	if (ownerEntityBlock->mCurrentEntityCount == 0)
@@ -234,7 +227,7 @@ culling::EntityBlock* culling::EveryCulling::AllocateNewEntityBlockFromPool()
 
 
 
-culling::EntityBlockViewer culling::EveryCulling::AllocateNewEntity(void* renderer, void* transform)
+culling::EntityBlockViewer culling::EveryCulling::AllocateNewEntity()
 {
 	culling::EntityBlock* targetEntityBlock;
 	if (mActiveEntityBlockList.size() == 0)
@@ -259,10 +252,7 @@ culling::EntityBlockViewer culling::EveryCulling::AllocateNewEntity(void* render
 	assert(targetEntityBlock->mCurrentEntityCount <= ENTITY_COUNT_IN_ENTITY_BLOCK); // something is weird........
 	
 	targetEntityBlock->mCurrentEntityCount++;
-
-	targetEntityBlock->mRenderer[targetEntityBlock->mCurrentEntityCount - 1] = renderer;
-	targetEntityBlock->mTransform[targetEntityBlock->mCurrentEntityCount - 1] = transform;
-
+	
 	return EntityBlockViewer(targetEntityBlock, targetEntityBlock->mCurrentEntityCount - 1);
 }
 
@@ -278,7 +268,7 @@ void culling::EveryCulling::RemoveEntityFromBlock(EntityBlockViewer& entityBlock
 
 culling::EveryCulling::EveryCulling(const std::uint32_t resolutionWidth, const std::uint32_t resolutionHeight)
 	:
-	mEarlyOutDisabledObject{ std::make_unique<EarlyOutDisabledObject>(this) },
+	mEarlyOutDisabledObject{ std::make_unique<PreCulling>(this) },
 	mViewFrustumCulling{ std::make_unique<ViewFrustumCulling>(this) }
 #ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
 	, mScreenSpaceBoudingSphereCulling{ std::make_unique<ScreenSpaceBoundingSphereCulling>(this) }
@@ -308,6 +298,10 @@ culling::EveryCulling::EveryCulling(const std::uint32_t resolutionWidth, const s
 	//CacheCullBlockEntityJobs();
 	bmIsEntityBlockPoolInitialized = true;
 
+	for(size_t cameraIndex = 0 ; cameraIndex < MAX_CAMERA_COUNT ; cameraIndex++)
+	{
+		mSortedEntityInfo[cameraIndex].resize(2);
+	}
 }
 
 
@@ -442,4 +436,15 @@ size_t culling::EveryCulling::GetActiveEntityBlockCount() const
 	return GetActiveEntityBlockList().size();
 }
 
+void culling::EveryCulling::ResetSortedEntityCount()
+{
+	mSortedEntityCount = 0;
+}
 
+std::vector<culling::EntityInfoInEntityBlock>& culling::EveryCulling::GetSortedEntityInfo
+(
+	const size_t cameraIndex
+)
+{
+	return mSortedEntityInfo[cameraIndex];
+}

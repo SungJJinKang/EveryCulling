@@ -6,11 +6,11 @@
 
 namespace culling
 {
-	class EarlyOutDisabledObject : public CullingModule
+	class PreCulling : public CullingModule
 	{
 	private:
 
-		void DoEarlyOutDisabledObject
+		void DoPreCull
 		(
 			const size_t cameraIndex,
 			culling::EntityBlock* const entityBlock
@@ -18,7 +18,7 @@ namespace culling
 
 	public:
 
-		EarlyOutDisabledObject(EveryCulling* frotbiteCullingSystem);
+		PreCulling(EveryCulling* frotbiteCullingSystem);
 		void CullBlockEntityJob(const size_t cameraIndex) override;
 		const char* GetCullingModuleName() const override;
 	};

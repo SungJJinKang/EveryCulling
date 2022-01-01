@@ -21,7 +21,7 @@ bool culling::SolveMeshRoleStage::CheckIsOccluderFromBoundingSphere
 	const float distanceFromCameraToBoundingSphere = culling::Dot(vecFromCameraToBoundingSphere, vecFromCameraToBoundingSphere);
 
 	const float disFromCameraToSphereHorizon = std::sqrt(std::abs(distanceFromCameraToBoundingSphere - sphereRadiusInWorldSpace * sphereRadiusInWorldSpace));
-	const float halfOfFieldOfView = (mCullingSystem->GetCameraFieldOfView(cameraIndex) * culling::DEGREE_TO_RADIAN ) / 2.0f;
+	const float halfOfFieldOfView = (mCullingSystem->GetCameraFieldOfView(cameraIndex) * culling::DEGREE_TO_RADIAN) * 0.5f;
 	
 	const float radiusOfViewSpaceSphere = (std::cos(halfOfFieldOfView) / std::sin(halfOfFieldOfView)) * sphereRadiusInWorldSpace / disFromCameraToSphereHorizon;
 	
@@ -31,8 +31,8 @@ bool culling::SolveMeshRoleStage::CheckIsOccluderFromBoundingSphere
 bool culling::SolveMeshRoleStage::CheckIsOccluderFromAABB
 (
 	const size_t cameraIndex,
-	const culling::Vec3& minPointInWorldSpace,
-	const culling::Vec3& maxPointInWorldSpace
+	const culling::Vec4& minPointInWorldSpace,
+	const culling::Vec4& maxPointInWorldSpace
 ) const
 {
 	return false;
@@ -53,13 +53,11 @@ void culling::SolveMeshRoleStage::SolveMeshRole
 	{
 		if(currentEntityBlock->GetIsCulled(entityIndex, cameraIndex) == false)
 		{
-			const culling::Position_BoundingSphereRadius& posAndBoundingSphere = currentEntityBlock->mPositionAndBoundingSpheres[entityIndex];
-
 			const bool isOccluder = CheckIsOccluderFromBoundingSphere
 			(
 				cameraIndex,
-				posAndBoundingSphere.Position,
-				posAndBoundingSphere.BoundingSphereRadius
+				currentEntityBlock->mPositionAndBoundingSpheres[entityIndex].GetPosition(),
+				currentEntityBlock->mPositionAndBoundingSpheres[entityIndex].GetBoundingSphereRadius()
 			);
 
 			currentEntityBlock->SetIsOccluder(entityIndex, cameraIndex, isOccluder);

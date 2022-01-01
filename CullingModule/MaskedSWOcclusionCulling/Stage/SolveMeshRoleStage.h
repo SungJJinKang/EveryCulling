@@ -21,8 +21,8 @@ namespace culling
 		bool CheckIsOccluderFromAABB
 		(
 			const size_t cameraIndex,
-			const culling::Vec3& minPointInWorldSpace,
-			const culling::Vec3& maxPointInWorldSpace
+			const culling::Vec4& minPointInWorldSpace,
+			const culling::Vec4& maxPointInWorldSpace
 		) const;
 
 		void SolveMeshRole

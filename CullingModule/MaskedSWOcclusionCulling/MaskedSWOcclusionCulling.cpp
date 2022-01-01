@@ -10,6 +10,8 @@ void culling::MaskedSWOcclusionCulling::ResetDepthBuffer()
 }
 
 
+
+
 culling::MaskedSWOcclusionCulling::MaskedSWOcclusionCulling
 (
 	EveryCulling* everyCulling, 

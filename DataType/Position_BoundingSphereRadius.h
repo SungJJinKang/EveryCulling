@@ -9,18 +9,22 @@ namespace culling
 	struct alignas(16) Position_BoundingSphereRadius
 	{
 
-		culling::Vec3 Position;
-		float BoundingSphereRadius;
+		culling::Vec4 Position;
 
 
 		FORCE_INLINE void SetPosition(const culling::Vec3& _position)
 		{
-			Position = _position;
+			std::memcpy(Position.data(), _position.data(), sizeof(culling::Vec3));
 		}
 
-		FORCE_INLINE void SetPosition(const void* vec4)
+		FORCE_INLINE const culling::Vec3& GetPosition() const
 		{
-			std::memcpy(&Position, vec4, 16);
+			return *reinterpret_cast<const culling::Vec3*>(Position.data());
+		}
+
+		FORCE_INLINE void SetPosition(const float* const vec3)
+		{
+			std::memcpy(&Position, vec3, sizeof(culling::Vec3));
 		}
 
 		FORCE_INLINE void SetBoundingSphereRadius(const float _boundingSphereRadius)
@@ -28,7 +32,12 @@ namespace culling
 			// why minus?
 			// Calculated distance between frustum plane and object is positive when object is in frustum
 
-			BoundingSphereRadius = _boundingSphereRadius;
+			Position.values[3] = _boundingSphereRadius;
+		}
+
+		FORCE_INLINE float GetBoundingSphereRadius() const
+		{
+			return Position.values[3];
 		}
 	};
 }

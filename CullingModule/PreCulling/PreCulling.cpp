@@ -1,6 +1,6 @@
-#include "EarlyOutDisabledObject.h"
+#include "PreCulling.h"
 
-void culling::EarlyOutDisabledObject::DoEarlyOutDisabledObject
+void culling::PreCulling::DoPreCull
 (
 	const size_t cameraIndex,
 	culling::EntityBlock* const entityBlock
@@ -12,15 +12,19 @@ void culling::EarlyOutDisabledObject::DoEarlyOutDisabledObject
 		{
 			entityBlock->SetCulled(entityIndex, cameraIndex);
 		}
+		else
+		{
+			entityBlock->UpdateBoundingSphereRadius(entityIndex);
+		}		
 	}
 }
 
-culling::EarlyOutDisabledObject::EarlyOutDisabledObject(EveryCulling* frotbiteCullingSystem)
+culling::PreCulling::PreCulling(EveryCulling* frotbiteCullingSystem)
 	: CullingModule(frotbiteCullingSystem)
 {
 }
 
-void culling::EarlyOutDisabledObject::CullBlockEntityJob(const size_t cameraIndex)
+void culling::PreCulling::CullBlockEntityJob(const size_t cameraIndex)
 {
 	while (true)
 	{
@@ -28,7 +32,7 @@ void culling::EarlyOutDisabledObject::CullBlockEntityJob(const size_t cameraInde
 
 		if (nextEntityBlock != nullptr)
 		{
-			DoEarlyOutDisabledObject(cameraIndex, nextEntityBlock);
+			DoPreCull(cameraIndex, nextEntityBlock);
 		}
 		else
 		{
@@ -38,7 +42,7 @@ void culling::EarlyOutDisabledObject::CullBlockEntityJob(const size_t cameraInde
 
 }
 
-const char* culling::EarlyOutDisabledObject::GetCullingModuleName() const
+const char* culling::PreCulling::GetCullingModuleName() const
 {
-	return "EarlyOutDisabledObject";
+	return "PreCulling";
 }

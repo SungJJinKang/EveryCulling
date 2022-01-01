@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <array>
 
 #include "SWDepthBuffer.h"
 
@@ -16,6 +17,8 @@
 
 namespace culling
 {
+	
+
 	class MaskedSWOcclusionCullingStage;
 	/// <summary>
 	/// 
@@ -34,13 +37,14 @@ namespace culling
 	class MaskedSWOcclusionCulling : public CullingModule
 	{
 	private:
-		
+
+
 		const std::uint32_t binCountInRow, binCountInColumn;
 
 		void ResetDepthBuffer();
 
 
-		
+
 		void GetOccluderCandidates()
 		{
 
@@ -48,6 +52,9 @@ namespace culling
 
 	public:
 
+		
+
+	
 		culling::EveryCulling* const mEveryCulling;
 
 		SolveMeshRoleStage mSolveMeshRoleStage;

@@ -19,7 +19,15 @@ namespace culling
 	class ScreenSpaceBoundingSphereCulling;
 	class MaskedSWOcclusionCulling;
 	class QueryOcclusionCulling;
-	class EarlyOutDisabledObject;
+	class PreCulling;
+	struct EntityBlock;
+
+	struct EntityInfoInEntityBlock
+	{
+		EntityBlock* mEntityBlock;
+		size_t mIndexInEntityBlock;
+	};
+
 	/// <summary>
 	/// 
 	/// This is implementation of Data Oriented ViewFrustumCulling of Frostbite in 2011
@@ -95,7 +103,7 @@ namespace culling
 
 	public:
 
-		std::unique_ptr<EarlyOutDisabledObject> mEarlyOutDisabledObject;
+		std::unique_ptr<PreCulling> mEarlyOutDisabledObject;
 		std::unique_ptr<ViewFrustumCulling> mViewFrustumCulling;
 #ifdef ENABLE_SCREEN_SAPCE_BOUDING_SPHERE_CULLING
 		std::unique_ptr<ScreenSpaceBoundingSphereCulling> mScreenSpaceBoudingSphereCulling;
@@ -106,6 +114,10 @@ namespace culling
 #endif
 
 	private:
+
+
+		size_t mSortedEntityCount;
+		std::array<std::vector<EntityInfoInEntityBlock>, MAX_CAMERA_COUNT> mSortedEntityInfo;
 
 		std::vector<culling::CullingModule*> mUpdatedCullingModules;
 
@@ -200,7 +212,7 @@ namespace culling
 		/// 
 		/// Allocating New Entity isn't thread safe
 		/// </summary>
-		EntityBlockViewer AllocateNewEntity(void* renderer, void* transform);
+		EntityBlockViewer AllocateNewEntity();
 
 		/// <summary>
 		/// You should call this function on your Transform Component or In your game engine
@@ -236,6 +248,34 @@ namespace culling
 
 		const culling::CullingModule* GetLastEnabledCullingModule() const;
 		void SetEnabledCullingModule(const CullingModuleType cullingModuleType, const bool isEnabled);
+
+
+		void ResetSortedEntityCount();
+
+		FORCE_INLINE void SetSortedEntityInfo
+		(
+			const size_t cameraIndex,
+			const size_t objectOrder,
+			EntityBlock* const entityBlock,
+			const size_t IndexInEntityBlock
+		)
+		{
+			if (mSortedEntityInfo[cameraIndex].size() <= objectOrder)
+			{
+				mSortedEntityInfo[cameraIndex].resize(MAX(objectOrder + 1, (mSortedEntityInfo[cameraIndex].size() * 2) - 1));
+			}
+
+			mSortedEntityInfo[cameraIndex][objectOrder].mEntityBlock = entityBlock;
+			mSortedEntityInfo[cameraIndex][objectOrder].mIndexInEntityBlock = IndexInEntityBlock;
+
+			mSortedEntityCount = MAX(mSortedEntityCount, objectOrder + 1);
+		}
+		FORCE_INLINE size_t GetSortedEntityCount() const
+		{
+			return mSortedEntityCount;
+		}
+		std::vector<EntityInfoInEntityBlock>& GetSortedEntityInfo(const size_t cameraIndex);
+
 	};
 }
 

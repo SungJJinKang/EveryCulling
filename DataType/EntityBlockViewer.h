@@ -23,12 +23,24 @@ namespace culling
 		/// <summary>
 		/// Entity Index in Entity Block
 		/// </summary>
-		std::uint32_t mEntityIndexInBlock;
+		size_t mEntityIndexInBlock;
 
 	public:
 
 		EntityBlockViewer();
-		EntityBlockViewer(EntityBlock* const entityBlock, const std::uint32_t entityIndexInBlock);
+		EntityBlockViewer(EntityBlock* const entityBlock, const size_t entityIndexInBlock);
+
+		FORCE_INLINE EntityBlock* GetTargetEntityBlock()
+		{
+			assert(GetIsActive() == true);
+			return mTargetEntityBlock;
+		}
+
+		FORCE_INLINE size_t GetEntityIndexInBlock() const
+		{
+			assert(GetIsActive() == true);
+			return mEntityIndexInBlock;
+		}
 
 		FORCE_INLINE bool GetIsActive() const
 		{
@@ -47,10 +59,13 @@ namespace culling
 			return mTargetEntityBlock->GetIsCulled(mEntityIndexInBlock, cameraIndex);
 		}
 
-
-		void SetEntityPosition(const float* worldPosition);
-
-		void SetSphereBoundRadius(float sphereRadius);
+		FORCE_INLINE void SetModelMatrix(const float* const modelMatrix)
+		{
+			if (GetIsActive() == true)
+			{
+				mTargetEntityBlock->SetModelMatrix(mEntityIndexInBlock, modelMatrix);
+			}
+		}
 
 		void SetMeshVertexData
 		(
@@ -58,16 +73,9 @@ namespace culling
 			const size_t verticeCount,
 			const std::uint32_t* const indices,
 			const size_t indiceCount,
-			const size_t verticeStride,
-			const culling::Vec3 aabbMinLocalPoint,
-			const culling::Vec3 aabbMaxLocalPoint
+			const size_t verticeStride
 		);
 		
-		void SetModelMatrix(const float* const modelMatrix);
-		FORCE_INLINE const float* GetModelMatrix() const
-		{
-			return mTargetEntityBlock->mModelMatrixes[mEntityIndexInBlock];
-		}
 		FORCE_INLINE const culling::VertexData& GetVertexData() const
 		{
 			return mTargetEntityBlock->mVertexDatas[mEntityIndexInBlock];
@@ -82,6 +90,22 @@ namespace culling
 			if (GetIsActive() == true)
 			{
 				mTargetEntityBlock->SetIsObjectEnabled(mEntityIndexInBlock, isEnabled);
+			}
+		}
+
+		FORCE_INLINE void SetAABBWorldPosition(const float* const minWorldPos, const float* const maxWorldPos)
+		{
+			if (GetIsActive() == true)
+			{
+				mTargetEntityBlock->SetAABBWorldPosition(mEntityIndexInBlock, minWorldPos, maxWorldPos);
+			}
+		}
+
+		FORCE_INLINE void SetObjectWorldPosition(const float* const worldPos)
+		{
+			if (GetIsActive() == true)
+			{
+				mTargetEntityBlock->mPositionAndBoundingSpheres[mEntityIndexInBlock].SetPosition(worldPos);
 			}
 		}
 	};

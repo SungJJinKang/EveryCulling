@@ -7,8 +7,6 @@
 #include "../Utility/vertexTransformationHelper.h"
 #include "../Utility/depthBufferTileHelper.h"
 
-#include <Rendering/Renderer/Renderer.h>
-#include <Rendering/Renderer/RendererStaticIterator.h>
 
 #include "../Utility/RasterizerHelper.h"
 
@@ -264,7 +262,7 @@ void culling::BinTrianglesStage::BinTriangleThreadJob(const size_t cameraIndex)
 						(nextEntityBlock->GetIsOccluder(entityIndex, cameraIndex) == true)
 						)
 				{
-					const culling::Mat4x4 modelToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex) * (*reinterpret_cast<const culling::Mat4x4*>(nextEntityBlock->GetModelMatrix(entityIndex)));
+					const culling::Mat4x4 modelToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex) * nextEntityBlock->GetModelMatrix(entityIndex);
 					const VertexData& vertexData = nextEntityBlock->mVertexDatas[entityIndex];
 
 					BinTriangles
@@ -289,34 +287,30 @@ void culling::BinTrianglesStage::BinTriangleThreadJob(const size_t cameraIndex)
 
 void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t cameraIndex)
 {
-	for (UINT32 layerIndex = 0; layerIndex < MAX_LAYER_COUNT; layerIndex++)
+	std::vector<culling::EntityInfoInEntityBlock>& sortedEntityInfos = mCullingSystem->GetSortedEntityInfo(cameraIndex);
+
+	for(size_t entityInfoIndex = 0 ; entityInfoIndex < mCullingSystem->GetSortedEntityCount() ; entityInfoIndex++)
 	{
-		const std::vector<dooms::Renderer*>& renderersInLayer = dooms::RendererComponentStaticIterator::GetSingleton()->GetWorkingRendererInLayer(cameraIndex, layerIndex);
+		culling::EntityInfoInEntityBlock& entityInfo = sortedEntityInfos[entityInfoIndex];
 
-		for(INT64 rendererIndex = 0 ; rendererIndex < renderersInLayer.size() ; rendererIndex++)
+		culling::EntityBlock* const entityBlock = entityInfo.mEntityBlock;
+		const size_t entityIndexInEntityBlock = entityInfo.mIndexInEntityBlock;
+
+		if (entityBlock->GetIsCulled(entityIndexInEntityBlock, cameraIndex) == false && entityBlock->GetIsOccluder(entityIndexInEntityBlock, cameraIndex) == true)
 		{
-			dooms::Renderer* const renderer = renderersInLayer[rendererIndex];
-			if
-			(
-				dooms::IsValid(renderer) == true &&
-				renderer->mCullingEntityBlockViewer.GetIsCulled(cameraIndex) == false &&
-				renderer->mCullingEntityBlockViewer.GetIsOccluder(cameraIndex) == true
-			)
-			{
-				
-				const culling::Mat4x4 modelToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex) * (*reinterpret_cast<const culling::Mat4x4*>(renderer->mCullingEntityBlockViewer.GetModelMatrix()));
-				const VertexData& vertexData = renderer->mCullingEntityBlockViewer.GetVertexData();
 
-				BinTriangles
-				(
-					reinterpret_cast<const float*>(vertexData.mVertices),
-					vertexData.mVerticeCount,
-					vertexData.mIndices,
-					vertexData.mIndiceCount,
-					vertexData.mVertexStride,
-					modelToClipSpaceMatrix.data()
-				);
-			}
+			const culling::Mat4x4 modelToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex) * entityBlock->GetModelMatrix(entityIndexInEntityBlock);
+			const VertexData& vertexData = entityBlock->mVertexDatas[entityIndexInEntityBlock];
+
+			BinTriangles
+			(
+				reinterpret_cast<const float*>(vertexData.mVertices),
+				vertexData.mVerticeCount,
+				vertexData.mIndices,
+				vertexData.mIndiceCount,
+				vertexData.mVertexStride,
+				modelToClipSpaceMatrix.data()
+			);
 		}
 	}
 }
