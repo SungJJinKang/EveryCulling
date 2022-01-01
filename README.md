@@ -1,9 +1,9 @@
 # EveryCulling
 
-This library integrate Multiple Culling System into One System.      
+This library integrate multiple culling system into One library.      
 
-This System contain **Multithread ViewFrustumCulling**, **Masked SW Occlusion Culling**, **Distance Culling**, **Screen Space AABB Culling**.         
-Most of Systems in this project is actually used in popular game engines.       
+This System contain **Multithread ViewFrustumCulling**, **Masked SW Occlusion Culling**, **Distance Culling**            
+Most of Systems in this library is actually used in the commercial game engines.       
 
 This project tries to integrate them into one system and make them easy to use.      
 
@@ -16,16 +16,14 @@ This library is targeting Maximing **SIMD, Cache hit, Multi Threading.**
 ## Feature
 
 #### Currently Supported
-- View Frustum Culling from Frostbite Engine of EA Dice ( video : [https://youtu.be/G-IFukD2bNg](https://youtu.be/G-IFukD2bNg) )
-- Masked SW Occlusion Culling from Intel ( video : [https://youtu.be/tMgokVljvAY](https://youtu.be/tMgokVljvAY), [https://youtu.be/1IKTXsSLJ5g](https://youtu.be/1IKTXsSLJ5g), reference paper : https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf )  
-- HW Query Occlusion Culling ( + Conditional Rendering, https://www.khronos.org/registry/OpenGL/extensions/NV/NV_conditional_render.txt )  
-- Support AVX1, AVX2 
+- View Frustum Culling from Frostbite Engine of EA Dice ( video : [https://youtu.be/G-IFukD2bNg](https://youtu.be/G-IFukD2bNg) )    
+- Masked SW Occlusion Culling from Intel ( video : [https://youtu.be/tMgokVljvAY](https://youtu.be/tMgokVljvAY), [https://youtu.be/1IKTXsSLJ5g](https://youtu.be/1IKTXsSLJ5g), reference paper : https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf )      
+- HW Query Occlusion Culling ( + Conditional Rendering, https://www.khronos.org/registry/OpenGL/extensions/NV/NV_conditional_render.txt )      
+- Support AVX1, AVX2            
 
 #### In Develop
-        
-- Screen Space Bouding Sphere Area Culling ( Project Entity's Bouding Sphere bound to Screen Space, if Aread of Projected Sphere is less than setting, Cull it )    
-- Distance Culling ( https://docs.unrealengine.com/en-US/RenderingAndGraphics/VisibilityCulling/CullDistanceVolume/index.html )  
-- Precomputed Visibility Volume ( https://docs.unrealengine.com/4.26/en-US/RenderingAndGraphics/VisibilityCulling/PrecomputedVisibilityVolume/ )                          
+         
+- Distance Culling ( https://docs.unrealengine.com/en-US/RenderingAndGraphics/VisibilityCulling/CullDistanceVolume/index.html )                         
               
 
 ## View Frustum Culling from Frostbite Engine of EA Dice ( 100% )
@@ -136,6 +134,7 @@ Stage 2 : Bin Occluder Triangle Stage ( Dispatch(Bin) triangles to screen tiles 
 Stage 3 : Multithread Rasterize Occluder Triangles ( Threads do job rasterizing each tile's binned triangles, calculate max depth value of tile )             
 Stage 4 : Multithread Query depth buffer ( Compare aabb of occludee's min depth value with tile depth buffer. check 52p https://www.ea.com/frostbite/news/culling-the-battlefield-data-oriented-design-in-practice )              
 
+Reference paper : https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf           
 개발 일지 : https://sungjjinkang.github.io/computerscience/computergraphics/2021/12/31/masked_sw_occlusion_culling.html            
 Video : [https://youtu.be/tMgokVljvAY](https://youtu.be/tMgokVljvAY), [https://youtu.be/1IKTXsSLJ5g](https://youtu.be/1IKTXsSLJ5g)                       
 Code directory : [https://github.com/SungJJinKang/EveryCulling/tree/doom_engine_version/CullingModule/MaskedSWOcclusionCulling](https://github.com/SungJJinKang/EveryCulling/tree/doom_engine_version/CullingModule/MaskedSWOcclusionCulling)         
@@ -154,13 +153,6 @@ How Work? :
 In Opengl : Use QueryObject, Conditional Rendering         
 
 references : https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_occlusion_query.txt , https://www.khronos.org/registry/OpenGL/extensions/NV/NV_conditional_render.txt       
-
-## Screen Space Bouding Sphere Area Culling
-
-This is really easy to understand.    
-When Area Size of Bouding Sphere projected to screen space is less than setting value, It will be culled.    
-I don't recommend using this feature, because The objects pops up and this is really distracting...       
-I will add Object fade out feature.    
 
 ## Distance Culling
 
