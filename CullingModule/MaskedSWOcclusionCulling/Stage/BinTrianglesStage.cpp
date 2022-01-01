@@ -56,9 +56,9 @@ FORCE_INLINE void culling::BinTrianglesStage::CheckWIsNegativeValue
 	std::uint32_t& triangleCullMask
 )
 {
-	const culling::M256F pointA_W_IsNegativeValue = _mm256_cmp_ps(clipspaceVertexW[0], _mm256_setzero_ps(), _CMP_GT_OQ);
-	const culling::M256F pointB_W_IsNegativeValue = _mm256_cmp_ps(clipspaceVertexW[1], _mm256_setzero_ps(), _CMP_GT_OQ);
-	const culling::M256F pointC_W_IsNegativeValue = _mm256_cmp_ps(clipspaceVertexW[2], _mm256_setzero_ps(), _CMP_GT_OQ);
+	const culling::M256F pointA_W_IsNegativeValue = _mm256_cmp_ps(clipspaceVertexW[0], _mm256_set1_ps(std::numeric_limits<float>::epsilon()), _CMP_GE_OQ);
+	const culling::M256F pointB_W_IsNegativeValue = _mm256_cmp_ps(clipspaceVertexW[1], _mm256_set1_ps(std::numeric_limits<float>::epsilon()), _CMP_GE_OQ);
+	const culling::M256F pointC_W_IsNegativeValue = _mm256_cmp_ps(clipspaceVertexW[2], _mm256_set1_ps(std::numeric_limits<float>::epsilon()), _CMP_GE_OQ);
 
 	const culling::M256F points_w_isNegativeValue = _mm256_and_ps(pointA_W_IsNegativeValue, _mm256_and_ps(pointB_W_IsNegativeValue, pointC_W_IsNegativeValue));
 	triangleCullMask &= _mm256_movemask_ps(*reinterpret_cast<const culling::M256F*>(&points_w_isNegativeValue));

@@ -112,7 +112,7 @@ void culling::QueryOccludeeStage::QueryOccludee
 
 
 			aabbVertexW = culling::M256F_MUL_AND_ADD(aabbVertexX, _mm256_set1_ps(modelToClipSpaceMatrix.data()[3]), culling::M256F_MUL_AND_ADD(aabbVertexY, _mm256_set1_ps(modelToClipSpaceMatrix.data()[7]), culling::M256F_MUL_AND_ADD(aabbVertexZ, _mm256_set1_ps(modelToClipSpaceMatrix.data()[11]), _mm256_set1_ps(modelToClipSpaceMatrix.data()[15]))));
-			aabbPointMask &= _mm256_movemask_ps(_mm256_cmp_ps(aabbVertexW, _mm256_setzero_ps(), _CMP_GT_OQ));
+			aabbPointMask &= _mm256_movemask_ps(_mm256_cmp_ps(aabbVertexW, _mm256_set1_ps(std::numeric_limits<float>::epsilon()), _CMP_GE_OQ));
 			if(aabbPointMask != 0x000000FF)
 			{
 				// if any vertex is out of volume, object is never culled.
