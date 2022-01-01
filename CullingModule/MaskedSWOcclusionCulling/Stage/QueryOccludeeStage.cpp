@@ -103,7 +103,8 @@ void culling::QueryOccludeeStage::QueryOccludee
 			culling::M256F aabbVertexZ = _mm256_setr_ps(aabbMinPoint.values[2], aabbMaxPoint.values[2], aabbMinPoint.values[2], aabbMaxPoint.values[2], aabbMinPoint.values[2], aabbMaxPoint.values[2], aabbMinPoint.values[2], aabbMaxPoint.values[2]);
 			culling::M256F aabbVertexW;
 
-
+			// TODO : use Line Clipping Algorithm ( Cohen-Sutherland algorithm )
+			// Interpolate z value between vertex and clipped vertex 
 
 			//Transform To ClipSpace !!
 
