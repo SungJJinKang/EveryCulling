@@ -9,7 +9,7 @@ This project tries to integrate them into one system and make them easy to use.
 
 ## Core Feature 
 This library is targeting Maximing **SIMD, Cache hit, Multi Threading.**                 
-1. SIMD : Data is stored for using SIMD Intrinsics
+1. SIMD : Data is stored for using SIMD Intrinsics ( Require AVX2 ( _mm256 ) )                       
 2. Cache Hit : SoA!! ( Structure of Arrays ) ( ex. https://github.com/SungJJinKang/EveryCulling/blob/doom_engine_version/DataType/EntityBlock.h )          
 3. Multi Threading : Data of entities is separately stored in entity block, Then Threads works on a entity block. These structure prevent data race. Don't need locking.
 
@@ -18,9 +18,8 @@ This library is targeting Maximing **SIMD, Cache hit, Multi Threading.**
 #### Currently Supported
 - View Frustum Culling from Frostbite Engine of EA Dice ( video : [https://youtu.be/G-IFukD2bNg](https://youtu.be/G-IFukD2bNg) )    
 - Masked SW Occlusion Culling from Intel ( video : [https://youtu.be/tMgokVljvAY](https://youtu.be/tMgokVljvAY), [https://youtu.be/1IKTXsSLJ5g](https://youtu.be/1IKTXsSLJ5g), reference paper : https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf )      
-- HW Query Occlusion Culling ( + Conditional Rendering, https://www.khronos.org/registry/OpenGL/extensions/NV/NV_conditional_render.txt )      
-- Support AVX1, AVX2            
-
+- HW Query Occlusion Culling ( + Conditional Rendering, https://www.khronos.org/registry/OpenGL/extensions/NV/NV_conditional_render.txt )                  
+             
 #### In Develop
          
 - Distance Culling ( https://docs.unrealengine.com/en-US/RenderingAndGraphics/VisibilityCulling/CullDistanceVolume/index.html )                         

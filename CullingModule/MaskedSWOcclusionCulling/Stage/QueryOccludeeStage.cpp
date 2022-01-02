@@ -70,8 +70,6 @@ void culling::QueryOccludeeStage::QueryOccludee
 	culling::EntityBlock* const entityBlock
 )
 {
-	// TODO : Query with spatial splits aabb
-
 	for(size_t entityIndex = 0 ; entityIndex < entityBlock->mCurrentEntityCount ; entityIndex++)
 	{
 		if(entityBlock->GetIsCulled(entityIndex, cameraIndex) == false)
@@ -87,9 +85,6 @@ void culling::QueryOccludeeStage::QueryOccludee
 			culling::M256F aabbVertexY = _mm256_setr_ps(aabbMinWorldPoint.values[1], aabbMinWorldPoint.values[1], aabbMaxWorldPoint.values[1], aabbMaxWorldPoint.values[1], aabbMinWorldPoint.values[1], aabbMinWorldPoint.values[1], aabbMaxWorldPoint.values[1], aabbMaxWorldPoint.values[1]);
 			culling::M256F aabbVertexZ = _mm256_setr_ps(aabbMinWorldPoint.values[2], aabbMaxWorldPoint.values[2], aabbMinWorldPoint.values[2], aabbMaxWorldPoint.values[2], aabbMinWorldPoint.values[2], aabbMaxWorldPoint.values[2], aabbMinWorldPoint.values[2], aabbMaxWorldPoint.values[2]);
 			culling::M256F aabbVertexW;
-
-			// TODO : use Line Clipping Algorithm ( Cohen-Sutherland algorithm )
-			// Interpolate z value between vertex and clipped vertex 
 
 			//Transform To ClipSpace !!
 
@@ -128,6 +123,7 @@ void culling::QueryOccludeeStage::QueryOccludee
 			//oneDividedByW finally become oneDividedByW
 			const culling::M256F oneDividedByW = culling::M256F_DIV(_mm256_set1_ps(1.0f), aabbVertexW);
 
+			//Covert clip space to NDC!!
 			culling::vertexTransformationHelper::ConvertClipSpaceVertexToNDCSpace
 			(
 				aabbVertexX,
@@ -135,7 +131,7 @@ void culling::QueryOccludeeStage::QueryOccludee
 				aabbVertexZ,
 				oneDividedByW
 			);
-			//Now NDC!!
+			
 
 			// Get Min Z
 			// if min z of occludee is larger than depth buffer, it's culled!!
