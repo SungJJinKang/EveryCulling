@@ -9,20 +9,20 @@ This project tries to integrate them into one system and make them easy to use.
 
 ## Core Feature 
 This library is targeting Maximing **SIMD, Cache hit, Multi Threading.**                 
-1. SIMD : Data is stored for using SIMD Intrinsics ( Object's Datas has SoA layout ) ( Require AVX2 ( _mm256 ) )                       
-2. Cache Hit : SoA!! ( Structure of Arrays ) ( ex. https://github.com/SungJJinKang/EveryCulling/blob/doom_engine_version/DataType/EntityBlock.h )          
-3. Multi Threading : Data of entities is separately stored in entity block, Then Threads works on a entity block. These structure prevent data race. Don't need locking.
+1. SIMD : Data is stored for using SIMD Intrinsics ( Object's Datas has SoA layout, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/doom_engine_version/DataType/EntityBlock.h) ) ( Require AVX2 ( _mm256 ) )                       
+2. Cache Hit : SoA!! ( Structure of Arrays, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/doom_engine_version/DataType/EntityBlock.h) )           
+3. Multi Threading : Data of entities is separately stored in entity block, Then Threads works on a entity block. These structure prevent data race and cache coherency ( false sharing, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/doom_engine_version/DataType/EntityBlock.h) ), Locking is not required.               
 
 ## Feature
 
-#### Currently Supported
+#### Fully implemented features
 - View Frustum Culling from Frostbite Engine of EA Dice ( video : [https://youtu.be/G-IFukD2bNg](https://youtu.be/G-IFukD2bNg) )    
-- Masked SW Occlusion Culling from Intel ( video : [https://youtu.be/tMgokVljvAY](https://youtu.be/tMgokVljvAY), [https://youtu.be/1IKTXsSLJ5g](https://youtu.be/1IKTXsSLJ5g), reference paper : https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf )      
-- HW Query Occlusion Culling ( + Conditional Rendering, https://www.khronos.org/registry/OpenGL/extensions/NV/NV_conditional_render.txt )                  
+- Masked SW ( CPU ) Occlusion Culling from Intel ( video : [https://youtu.be/tMgokVljvAY](https://youtu.be/tMgokVljvAY), [https://youtu.be/1IKTXsSLJ5g](https://youtu.be/1IKTXsSLJ5g), reference paper : https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf )                      
              
 #### In Develop
          
-- Distance Culling ( https://docs.unrealengine.com/en-US/RenderingAndGraphics/VisibilityCulling/CullDistanceVolume/index.html )                         
+- Distance Culling from unreal engine ( https://docs.unrealengine.com/en-US/RenderingAndGraphics/VisibilityCulling/CullDistanceVolume/index.html )        
+- HW Query Occlusion Culling ( + Conditional Rendering, https://www.khronos.org/registry/OpenGL/extensions/NV/NV_conditional_render.txt )                   
               
 
 ## View Frustum Culling from Frostbite Engine of EA Dice ( 100% )
@@ -126,7 +126,7 @@ Thread 2 : Check Frustum of Entity Block 2, 5, 8
 To minimize waiting time(wait calculating cull finish) , Passing cull job to thread should be placed at foremost of rendering loop.      
 In My experiment, Waiting time is near to zero.
 
-## Masked SW ( CPU ) Occlusion Culling From Intel ( 95%, require more optimization )             
+## Masked SW ( CPU ) Occlusion Culling From Intel ( 100% )             
              
 Stage 1 : Solve Mesh Role Stage ( Decide occluder based on object's screen space bouding sphere's size )             
 Stage 2 : Bin Occluder Triangle Stage ( Dispatch(Bin) triangles to screen tiles based on triangle's screen space vertex data for following rasterizer stage )             
