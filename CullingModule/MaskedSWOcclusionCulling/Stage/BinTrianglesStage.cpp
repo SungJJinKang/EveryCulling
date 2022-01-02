@@ -46,18 +46,17 @@ FORCE_INLINE void culling::BinTrianglesStage::Clipping
 	triangleCullMask &= _mm256_movemask_ps(*reinterpret_cast<const culling::M256F*>(&verticesInFrustum));
 }
 
-FORCE_INLINE void culling::BinTrianglesStage::CheckWIsNegativeValue
+FORCE_INLINE culling::M256F culling::BinTrianglesStage::CheckWIsNegativeValue
 (
-	const culling::M256F* const clipspaceVertexW,
-	std::uint32_t& triangleCullMask
+	const culling::M256F* const clipspaceVertexW
 )
 {
 	const culling::M256F pointA_W_IsNegativeValue = _mm256_cmp_ps(clipspaceVertexW[0], _mm256_set1_ps(std::numeric_limits<float>::epsilon()), _CMP_GE_OQ);
 	const culling::M256F pointB_W_IsNegativeValue = _mm256_cmp_ps(clipspaceVertexW[1], _mm256_set1_ps(std::numeric_limits<float>::epsilon()), _CMP_GE_OQ);
 	const culling::M256F pointC_W_IsNegativeValue = _mm256_cmp_ps(clipspaceVertexW[2], _mm256_set1_ps(std::numeric_limits<float>::epsilon()), _CMP_GE_OQ);
 
-	const culling::M256F points_w_isNegativeValue = _mm256_and_ps(pointA_W_IsNegativeValue, _mm256_and_ps(pointB_W_IsNegativeValue, pointC_W_IsNegativeValue));
-	triangleCullMask &= _mm256_movemask_ps(*reinterpret_cast<const culling::M256F*>(&points_w_isNegativeValue));
+	return _mm256_and_ps(pointA_W_IsNegativeValue, _mm256_and_ps(pointB_W_IsNegativeValue, pointC_W_IsNegativeValue));
+	
 }
 
 
@@ -404,7 +403,11 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 			oneDividedByW[i] = culling::M256F_MUL_AND_ADD(ndcSpaceVertexX[i], _mm256_set1_ps(modelToClipspaceMatrix[3]), culling::M256F_MUL_AND_ADD(ndcSpaceVertexY[i], _mm256_set1_ps(modelToClipspaceMatrix[7]), culling::M256F_MUL_AND_ADD(ndcSpaceVertexZ[i], _mm256_set1_ps(modelToClipspaceMatrix[11]), _mm256_set1_ps(modelToClipspaceMatrix[15]))));
 		}
 
-		CheckWIsNegativeValue(oneDividedByW, triangleCullMask);
+		const culling::M256F positiveWMask = CheckWIsNegativeValue(oneDividedByW);
+
+		const culling::M256I allOne = _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF);
+		const culling::M256F negativeWMask = _mm256_xor_ps(positiveWMask, *reinterpret_cast<const __m256*>(&allOne));
+		triangleCullMask &= _mm256_movemask_ps(*reinterpret_cast<const culling::M256F*>(&positiveWMask));
 		if (triangleCullMask == 0x00000000)
 		{
 			continue;
@@ -553,6 +556,7 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 				outBinBoundingBoxMinY,
 				outBinBoundingBoxMaxX,
 				outBinBoundingBoxMaxY,
+				negativeWMask,
 				mMaskedOcclusionCulling->mDepthBuffer
 			);
 
@@ -601,6 +605,7 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 				outBinBoundingBoxMinY,
 				outBinBoundingBoxMaxX,
 				outBinBoundingBoxMaxY,
+				negativeWMask,
 				mMaskedOcclusionCulling->mDepthBuffer
 			);
 

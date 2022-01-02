@@ -33,10 +33,9 @@ namespace culling
 			std::uint32_t& triangleCullMask
 		);
 
-		FORCE_INLINE void CheckWIsNegativeValue
+		FORCE_INLINE culling::M256F CheckWIsNegativeValue
 		(
-			const culling::M256F* const clipspaceVertexW,
-			std::uint32_t& triangleCullMask
+			const culling::M256F* const clipspaceVertexW
 		);
 		
 		
