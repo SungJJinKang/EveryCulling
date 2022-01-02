@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include "../MaskedSWOcclusionCulling.h"
+#include "../Utility/vertexTransformationHelper.h"
 
 bool culling::SolveMeshRoleStage::CheckIsOccluderFromBoundingSphere
 (
@@ -28,19 +29,25 @@ bool culling::SolveMeshRoleStage::CheckIsOccluderFromBoundingSphere
 	return (radiusOfViewSpaceSphere > mOccluderViewSpaceBoundingSphereRadius);
 }
 
-bool culling::SolveMeshRoleStage::CheckIsOccluderFromAABB
+FORCE_INLINE bool culling::SolveMeshRoleStage::CheckIsOccluderFromAABB
 (
-	const size_t cameraIndex,
-	const culling::Vec4& minPointInWorldSpace,
-	const culling::Vec4& maxPointInWorldSpace
+	EntityBlock* const currentEntityBlock,
+	const size_t entityIndex
 ) const
 {
-	return false;
+	const float screenSpaceAABBArea
+		= (currentEntityBlock->mAABBMaxScreenSpacePointX[entityIndex] - currentEntityBlock->mAABBMinScreenSpacePointX[entityIndex]) *
+		  (currentEntityBlock->mAABBMaxScreenSpacePointY[entityIndex] - currentEntityBlock->mAABBMinScreenSpacePointY[entityIndex]);
+
+	//assert(screenSpaceAABBArea > std::numeric_limits<float>::epsilon());
+
+	return screenSpaceAABBArea > mOccluderAABBScreenSpaceMinArea;
 }
 
 culling::SolveMeshRoleStage::SolveMeshRoleStage(MaskedSWOcclusionCulling* occlusionCulling)
 	: MaskedSWOcclusionCullingStage(occlusionCulling)
 {
+
 }
 
 void culling::SolveMeshRoleStage::SolveMeshRole
@@ -53,12 +60,7 @@ void culling::SolveMeshRoleStage::SolveMeshRole
 	{
 		if(currentEntityBlock->GetIsCulled(entityIndex, cameraIndex) == false)
 		{
-			const bool isOccluder = CheckIsOccluderFromBoundingSphere
-			(
-				cameraIndex,
-				currentEntityBlock->mPositionAndBoundingSpheres[entityIndex].GetPosition(),
-				currentEntityBlock->mPositionAndBoundingSpheres[entityIndex].GetBoundingSphereRadius()
-			);
+			const bool isOccluder = CheckIsOccluderFromAABB(currentEntityBlock, entityIndex) && currentEntityBlock->GetIsIsAABBScreenSpacePointValid(entityIndex);
 
 			currentEntityBlock->SetIsOccluder(entityIndex, cameraIndex, isOccluder);
 		}

@@ -68,14 +68,73 @@ namespace culling
 		
 		culling::Vec4 mAABBMinWorldPoint[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		culling::Vec4 mAABBMaxWorldPoint[ENTITY_COUNT_IN_ENTITY_BLOCK];
+
+		// This variable is for a camera
+		float mAABBMinScreenSpacePointX[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		float mAABBMinScreenSpacePointY[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		float mAABBMaxScreenSpacePointX[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		float mAABBMaxScreenSpacePointY[ENTITY_COUNT_IN_ENTITY_BLOCK];
+
+		/// <summary>
+		/// This values is set only when mIsAABBMinNDCZDataUsedForQuery[entityIndex] is true
+		/// </summary>
+		float mAABBMinNDCZ[ENTITY_COUNT_IN_ENTITY_BLOCK];
+
+		/// <summary>
+		/// If All vertex's homogeneous w of object aabb is negative.
+		///	So AABBScreenSpacePoint is invalid
+		/// </summary>
+		bool mIsAABBMinNDCZDataUsedForQuery[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		bool mIsAABBScreenSpacePointValid[ENTITY_COUNT_IN_ENTITY_BLOCK];
+
 		culling::Mat4x4 mModelMatrixes[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
-		char mIsOccluder[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		bool mIsOccluder[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		
 		/// <summary>
 		/// this variable is only used to decide whether to free this EntityBlock
 		/// </summary>
 		std::uint32_t mCurrentEntityCount;
+
+		FORCE_INLINE bool GetIsIsAABBScreenSpacePointValid(const size_t entityIndex) const
+		{
+			assert(entityIndex < mCurrentEntityCount);
+
+			return mIsAABBScreenSpacePointValid[entityIndex];
+		}
+		
+		FORCE_INLINE void SetIsAABBScreenSpacePointValid(const size_t entityIndex, const bool isAABBScreenSpacePointValid)
+		{
+			// Setting value to invalid index is acceptable
+			assert(entityIndex < ENTITY_COUNT_IN_ENTITY_BLOCK);
+
+			mIsAABBScreenSpacePointValid[entityIndex] = isAABBScreenSpacePointValid;
+		}
+
+		FORCE_INLINE bool GetIsMinNDCZDataUsedForQuery(const size_t entityIndex) const
+		{
+			assert(entityIndex < mCurrentEntityCount);
+
+			return mIsAABBMinNDCZDataUsedForQuery[entityIndex];
+		}
+
+		/// <summary>
+		/// Update IsMinNDCZDataUsedForQuery without branch
+		///
+		///	If isMinNDCZDataUsedForQueryMask flag is already 0, it preserve value.
+		///	If isMinNDCZDataUsedForQueryMask flag is 1, visibility flag is updated based on isMinNDCZDataUsedForQuery parameter
+		/// </summary>
+		/// <param name="entityIndex"></param>
+		/// <param name="cameraIndex"></param>
+		/// <param name="isAABBMinNDCZDataUsedForQuery"></param>
+		/// <returns></returns>
+		FORCE_INLINE void SetIsMinNDCZDataUsedForQuery(const size_t entityIndex, const bool isAABBMinNDCZDataUsedForQuery)
+		{
+			// Setting value to invalid index is acceptable
+			assert(entityIndex < ENTITY_COUNT_IN_ENTITY_BLOCK);
+			
+			mIsAABBMinNDCZDataUsedForQuery[entityIndex] = isAABBMinNDCZDataUsedForQuery;
+		}
 
 		FORCE_INLINE bool GetIsCulled(const size_t entityIndex, const size_t cameraIndex) const
 		{
@@ -135,21 +194,14 @@ namespace culling
 		{
 			assert(entityIndex < mCurrentEntityCount);
 
-			return (mIsOccluder[entityIndex] & (1 << cameraIndex)) != 0;
+			return mIsOccluder[entityIndex];
 		}
 
 		FORCE_INLINE void SetIsOccluder(const size_t entityIndex, const size_t cameraIndex, const bool isOccluder)
 		{
 			assert(entityIndex < mCurrentEntityCount);
 
-			if(isOccluder == true)
-			{
-				mIsOccluder[entityIndex] |= (1 << cameraIndex);
-			}
-			else
-			{
-				mIsOccluder[entityIndex] &= (~(1 << cameraIndex));
-			}
+			mIsOccluder[entityIndex] = isOccluder;
 		}
 
 		FORCE_INLINE void SetModelMatrix(const size_t entityIndex, const float* const modelToClipspaceMatrix)

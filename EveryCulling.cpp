@@ -75,6 +75,7 @@ void culling::EveryCulling::SetAllOneIsVisibleFlag()
 	for (auto entityBlock : mActiveEntityBlockList)
 	{
 		std::memset(entityBlock->mIsVisibleBitflag, 0xFF, sizeof(char) * ENTITY_COUNT_IN_ENTITY_BLOCK);
+		std::memset(entityBlock->mIsAABBMinNDCZDataUsedForQuery, 0xFF, sizeof(char) * ENTITY_COUNT_IN_ENTITY_BLOCK);
 	}
 }
 

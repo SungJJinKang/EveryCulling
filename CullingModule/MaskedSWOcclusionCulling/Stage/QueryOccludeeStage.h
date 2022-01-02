@@ -23,6 +23,18 @@ namespace culling
 			int& outBinBoundingBoxMaxY,
 			SWDepthBuffer& depthBuffer
 		);
+		FORCE_INLINE void ComputeBinBoundingBoxFromVertex
+		(
+			const int minScreenPixelX,
+			const int minScreenPixelY,
+			const int maxScreenPixelX,
+			const int maxScreenPixelY,
+			int& outBinBoundingBoxMinX,
+			int& outBinBoundingBoxMinY,
+			int& outBinBoundingBoxMaxX,
+			int& outBinBoundingBoxMaxY,
+			SWDepthBuffer& depthBuffer
+		);
 		FORCE_INLINE void Clipping
 		(
 			const culling::M256F& clipspaceVertexX,

@@ -100,6 +100,12 @@ namespace culling
 		b = original;
 	}
 
+	template <typename T>
+	FORCE_INLINE T CLAMP(const T& value, const T& min, const T& max) noexcept
+	{
+		return MIN(MAX(value, min), max);
+	}
+
 	inline extern float PI = 3.14159265358979323846f;
 
 	inline extern float DEGREE_TO_RADIAN = PI / 180.0f;

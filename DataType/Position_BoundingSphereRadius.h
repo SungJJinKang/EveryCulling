@@ -24,7 +24,7 @@ namespace culling
 
 		FORCE_INLINE void SetPosition(const float* const vec3)
 		{
-			std::memcpy(&Position, vec3, sizeof(culling::Vec3));
+			std::memcpy(Position.data(), vec3, sizeof(culling::Vec3));
 		}
 
 		FORCE_INLINE void SetBoundingSphereRadius(const float boundingSphereRadius)

@@ -18,11 +18,10 @@ namespace culling
 		) const;
 
 
-		bool CheckIsOccluderFromAABB
+		FORCE_INLINE bool CheckIsOccluderFromAABB
 		(
-			const size_t cameraIndex,
-			const culling::Vec4& minPointInWorldSpace,
-			const culling::Vec4& maxPointInWorldSpace
+			EntityBlock* const currentEntityBlock,
+			const size_t entityIndex
 		) const;
 
 		void SolveMeshRole
@@ -34,6 +33,7 @@ namespace culling
 	public:
 
 		float mOccluderViewSpaceBoundingSphereRadius = 0.9f;
+		float mOccluderAABBScreenSpaceMinArea = 500.0f;
 
 		SolveMeshRoleStage(MaskedSWOcclusionCulling* occlusionCulling);
 		
