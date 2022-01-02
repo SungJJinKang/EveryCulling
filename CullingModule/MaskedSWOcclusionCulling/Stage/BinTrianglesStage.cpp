@@ -524,10 +524,7 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 
 #ifdef DEBUG_CULLING
 
-		for(size_t i = 0 ; i < 8 ; i++)
-		{
-			assert(reinterpret_cast<const float*>(&LEFT_MIDDLE_POINT_X)[i] <= reinterpret_cast<const float*>(&RIGHT_MIDDLE_POINT_X)[i]);
-		}
+		
 
 #endif
 
