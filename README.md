@@ -10,7 +10,7 @@ This project tries to integrate them into one system and make them easy to use.
 ## Core Feature 
 This library is targeting Maximing **SIMD, Cache hit, Multi Threading.**                 
 1. SIMD : Data is stored for using SIMD Intrinsics
-2. Cache Hit : SoA!! ( Structure of Arrays )
+2. Cache Hit : SoA!! ( Structure of Arrays ) ( ex. https://github.com/SungJJinKang/EveryCulling/blob/doom_engine_version/DataType/EntityBlock.h )          
 3. Multi Threading : Data of entities is separately stored in entity block, Then Threads works on a entity block. These structure prevent data race. Don't need locking.
 
 ## Feature
