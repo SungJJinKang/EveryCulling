@@ -63,25 +63,6 @@ FORCE_INLINE void culling::QueryOccludeeStage::ComputeBinBoundingBoxFromVertex
 	assert(outBinBoundingBoxMinY <= outBinBoundingBoxMaxY);
 }
 
-FORCE_INLINE void culling::QueryOccludeeStage::Clipping
-(
-	const culling::M256F& clipspaceVertexX,
-	const culling::M256F& clipspaceVertexY,
-	const culling::M256F& clipspaceVertexZ,
-	const culling::M256F& clipspaceVertexW,
-	std::uint32_t& triangleCullMask
-)
-{
-	const culling::M256F pointNdcPositiveW = _mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexW);
-
-	const culling::M256F pointNdcX = _mm256_cmp_ps(_mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexX), pointNdcPositiveW, _CMP_LE_OQ);
-	const culling::M256F pointNdcY = _mm256_cmp_ps(_mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexY), pointNdcPositiveW, _CMP_LE_OQ);
-	const culling::M256F pointNdcZ = _mm256_cmp_ps(_mm256_andnot_ps(_mm256_set1_ps(-0.0f), clipspaceVertexZ), pointNdcPositiveW, _CMP_LE_OQ);
-
-	culling::M256I pointAInFrustum = _mm256_and_si256(_mm256_and_si256(*reinterpret_cast<const culling::M256I*>(&pointNdcX), *reinterpret_cast<const culling::M256I*>(&pointNdcY)), *reinterpret_cast<const culling::M256I*>(&pointNdcZ));
-	
-	triangleCullMask &= _mm256_movemask_ps(*reinterpret_cast<const culling::M256F*>(&pointAInFrustum));
-}
 
 void culling::QueryOccludeeStage::QueryOccludee
 (
@@ -115,11 +96,12 @@ void culling::QueryOccludeeStage::QueryOccludee
 			std::uint32_t aabbPointMask = (1 << 8) - 1;
 
 
+
+			// if any vertex is out of volume, we can't do accurate query. So Just draw the triangle.
 			aabbVertexW = culling::M256F_MUL_AND_ADD(aabbVertexX, _mm256_set1_ps(worldToClipSpaceMatrix.data()[3]), culling::M256F_MUL_AND_ADD(aabbVertexY, _mm256_set1_ps(worldToClipSpaceMatrix.data()[7]), culling::M256F_MUL_AND_ADD(aabbVertexZ, _mm256_set1_ps(worldToClipSpaceMatrix.data()[11]), _mm256_set1_ps(worldToClipSpaceMatrix.data()[15]))));
 			aabbPointMask &= _mm256_movemask_ps(_mm256_cmp_ps(aabbVertexW, _mm256_set1_ps(std::numeric_limits<float>::epsilon()), _CMP_GE_OQ));
 			if(aabbPointMask != 0x000000FF)
 			{
-				// if any vertex is out of volume, object is never culled.
 				continue;
 			}
 
@@ -130,16 +112,20 @@ void culling::QueryOccludeeStage::QueryOccludee
 				aabbVertexZ,
 				worldToClipSpaceMatrix.data()
 			);
-			//Now ClipSpace !!
 
+			
+			/* Clipping isn't required. Just clip only vertex with negative homogeneous w
+			//Now ClipSpace !!
 			Clipping(aabbVertexX, aabbVertexY, aabbVertexZ, aabbVertexW, aabbPointMask);
 			if (aabbPointMask != 0x000000FF)
 			{
 				// if any vertex is out of volume, object is never culled.
 				continue;
 			}
+			*/
+
+
 			//oneDividedByW finally become oneDividedByW
-			
 			const culling::M256F oneDividedByW = culling::M256F_DIV(_mm256_set1_ps(1.0f), aabbVertexW);
 
 			culling::vertexTransformationHelper::ConvertClipSpaceVertexToNDCSpace

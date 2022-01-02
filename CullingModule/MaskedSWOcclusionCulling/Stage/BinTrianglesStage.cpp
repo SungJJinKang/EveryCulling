@@ -40,10 +40,8 @@ FORCE_INLINE void culling::BinTrianglesStage::Clipping
 	culling::M256I pointBInFrustum = _mm256_and_si256(_mm256_and_si256(*reinterpret_cast<const culling::M256I*>(&pointBNdcX), *reinterpret_cast<const culling::M256I*>(&pointBNdcY)), *reinterpret_cast<const culling::M256I*>(&pointBNdcZ));
 	culling::M256I pointCInFrustum = _mm256_and_si256(_mm256_and_si256(*reinterpret_cast<const culling::M256I*>(&pointCNdcX), *reinterpret_cast<const culling::M256I*>(&pointCNdcY)), *reinterpret_cast<const culling::M256I*>(&pointCNdcZ));
 	
-	// TODO : implemnet Clipping
-	// Currently when w value is negative, it produce weird screen space value. https://stackoverflow.com/a/20180585
-	// So i exclude triangle that any vertex is out of bound ( -w ~ w )
-	const culling::M256I verticesInFrustum = _mm256_and_si256(_mm256_and_si256(*reinterpret_cast<const culling::M256I*>(&pointAInFrustum), *reinterpret_cast<const culling::M256I*>(&pointBInFrustum)), *reinterpret_cast<const culling::M256I*>(&pointCInFrustum));
+	// if All vertices of triangle is out of volume, cull the triangle
+	const culling::M256I verticesInFrustum = _mm256_or_si256(_mm256_or_si256(*reinterpret_cast<const culling::M256I*>(&pointAInFrustum), *reinterpret_cast<const culling::M256I*>(&pointBInFrustum)), *reinterpret_cast<const culling::M256I*>(&pointCInFrustum));
 
 	triangleCullMask &= _mm256_movemask_ps(*reinterpret_cast<const culling::M256F*>(&verticesInFrustum));
 }
@@ -133,7 +131,7 @@ FORCE_INLINE void culling::BinTrianglesStage::PassTrianglesToTileBin
 				{
 					Tile* const targetTile = mMaskedOcclusionCulling->mDepthBuffer.GetTile(y, x);
 
-					assert(targetTile->mBinnedTriangles.GetIsBinFull() == false);
+					//assert(targetTile->mBinnedTriangles.GetIsBinFull() == false);
 					if(targetTile->mBinnedTriangles.GetIsBinFull() == false)
 					{
 						const size_t triListIndex = targetTile->mBinnedTriangles.mCurrentTriangleCount++;
@@ -412,6 +410,14 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 			continue;
 		}
 
+		/*
+		for (int i = 0; i < 3; i++)
+		{
+			const culling::M256F point_W_IsNegativeValue = _mm256_cmp_ps(oneDividedByW[i], _mm256_set1_ps(std::numeric_limits<float>::epsilon()), _CMP_LT_OQ);
+			oneDividedByW[i] = _mm256_blendv_ps(oneDividedByW[i], _mm256_set1_ps(1.0f), point_W_IsNegativeValue);
+		}
+		*/
+
 
 		//////////////////////////////////////////////////
 
@@ -426,12 +432,17 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 			modelToClipspaceMatrix
 		);
 		
-		// Clipping befor ndc https://stackoverflow.com/questions/41085117/why-does-gl-divide-gl-position-by-w-for-you-rather-than-letting-you-do-it-your
+		
+		
+		/* Clipping isn't required. Just clip only vertex with negative homogeneous w
+		 * Computing Bounding Box may solve this.
 		Clipping(ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, oneDividedByW, triangleCullMask);
 		if (triangleCullMask == 0x00000000)
 		{
 			continue;
 		}
+		*/
+		
 
 		for (int i = 0; i < 3; i++)
 		{

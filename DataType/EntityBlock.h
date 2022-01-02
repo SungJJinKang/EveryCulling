@@ -96,7 +96,8 @@ namespace culling
 		/// <returns></returns>
 		FORCE_INLINE void UpdateIsCulled(const size_t entityIndex, const size_t cameraIndex, const bool isCullded)
 		{
-			assert(entityIndex < mCurrentEntityCount);
+			// Setting value to invalid index is acceptable
+			assert(entityIndex < ENTITY_COUNT_IN_ENTITY_BLOCK);
 
 			const char cullMask = ~(((char)isCullded) << cameraIndex);
 
