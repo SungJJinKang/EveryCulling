@@ -22,6 +22,7 @@
 
 
 #define CACHE_LINE_SIZE 64
+#define PAGE_SIZE 4096
 
 #define MAKE_EVEN_NUMBER(X) (X - (X%2))
 
@@ -35,12 +36,9 @@ namespace culling
 	/// <summary>
 	/// EntityBlock size should be less 4KB(Page size) for Block data being allocated in a page
 	/// </summary>
-	struct alignas(64) EntityBlock
+	struct alignas(CACHE_LINE_SIZE) EntityBlock
 	{
 		/// <summary>
-		/// Why align to 32byte?
-		/// To set mIsVisibleBitflag, We use _m256
-		/// 
 		/// You don't need to worry about false sharing.
 		/// void* mRenderer[ENTITY_COUNT_IN_ENTITY_BLOCK] and mCurrentEntityCount isn't read during CullJob
 		/// </summary>
@@ -48,13 +46,10 @@ namespace culling
 		
 		/// <summary>
 		/// x, y, z : components is position of entity
-		/// w : component is radius of entity's sphere bound, should be negative!!!!!!!!!!!!!!
+		/// w : component is radius of entity's sphere bound
 		/// 
 		/// This will be used for linearlly Frustum intersection check
-		/// 
-		/// Why align to 32byte?
-		/// To set mIsVisibleBitflag, We use _m256
-		/// 
+		///
 		/// If Size of mIsVisibleBitflag isn't multiples of 256bit,
 		/// Setting mIsVisibleBitflag make mPositionAndBoundingSpheres value dirty
 		/// </summary>
@@ -190,7 +185,7 @@ namespace culling
 	/// <summary>
 	/// Size of Entity block should be less than 4kb(page size)
 	/// </summary>
-	static_assert(sizeof(EntityBlock) < 4096);
+	static_assert(sizeof(EntityBlock) < PAGE_SIZE);
 
 	/// <summary>
 	/// ENTITY_COUNT_IN_ENTITY_BLOCK should be even number
