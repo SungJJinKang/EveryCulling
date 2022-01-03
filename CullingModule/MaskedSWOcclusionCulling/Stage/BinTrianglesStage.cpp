@@ -355,6 +355,8 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 	const float* const modelToClipspaceMatrix
 )
 {
+	// TODO : This stage is slowest stage in masked oc. Optimize this stage!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+
 	static constexpr std::int32_t triangleCountPerLoop = 8;
 
 	std::int32_t currentIndiceIndex = -(triangleCountPerLoop * 3);
