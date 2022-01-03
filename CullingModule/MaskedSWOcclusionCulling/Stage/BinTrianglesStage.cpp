@@ -46,7 +46,7 @@ FORCE_INLINE void culling::BinTrianglesStage::Clipping
 	triangleCullMask &= _mm256_movemask_ps(*reinterpret_cast<const culling::M256F*>(&verticesInFrustum));
 }
 
-FORCE_INLINE culling::M256F culling::BinTrianglesStage::CheckWIsNegativeValue
+FORCE_INLINE culling::M256F culling::BinTrianglesStage::ComputePositiveWMask
 (
 	const culling::M256F* const clipspaceVertexW
 )
@@ -71,7 +71,7 @@ FORCE_INLINE void culling::BinTrianglesStage::BackfaceCulling
 	culling::M256F triArea1 = _mm256_mul_ps(_mm256_sub_ps(screenPixelX[1], screenPixelX[0]), _mm256_sub_ps(screenPixelY[2], screenPixelY[0]));
 	culling::M256F triArea2 = _mm256_mul_ps(_mm256_sub_ps(screenPixelX[0], screenPixelX[2]), _mm256_sub_ps(screenPixelY[0], screenPixelY[1]));
 	culling::M256F triArea = _mm256_sub_ps(triArea1, triArea2);
-	culling::M256F ccwMask = _mm256_cmp_ps(triArea, _mm256_setzero_ps(), _CMP_GT_OQ);
+	culling::M256F ccwMask = _mm256_cmp_ps(triArea, _mm256_set1_ps(std::numeric_limits<float>::epsilon()), _CMP_GT_OQ);
 	
 	// Return a lane mask with all front faces set
 	triangleCullMask &= _mm256_movemask_ps(ccwMask);
@@ -403,7 +403,7 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 			oneDividedByW[i] = culling::M256F_MUL_AND_ADD(ndcSpaceVertexX[i], _mm256_set1_ps(modelToClipspaceMatrix[3]), culling::M256F_MUL_AND_ADD(ndcSpaceVertexY[i], _mm256_set1_ps(modelToClipspaceMatrix[7]), culling::M256F_MUL_AND_ADD(ndcSpaceVertexZ[i], _mm256_set1_ps(modelToClipspaceMatrix[11]), _mm256_set1_ps(modelToClipspaceMatrix[15]))));
 		}
 
-		const culling::M256F positiveWMask = CheckWIsNegativeValue(oneDividedByW);
+		const culling::M256F positiveWMask = ComputePositiveWMask(oneDividedByW);
 
 		const culling::M256I allOne = _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF);
 		const culling::M256F negativeWMask = _mm256_xor_ps(positiveWMask, *reinterpret_cast<const __m256*>(&allOne));
@@ -556,7 +556,6 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 				outBinBoundingBoxMinY,
 				outBinBoundingBoxMaxX,
 				outBinBoundingBoxMaxY,
-				negativeWMask,
 				mMaskedOcclusionCulling->mDepthBuffer
 			);
 
@@ -605,7 +604,6 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 				outBinBoundingBoxMinY,
 				outBinBoundingBoxMaxX,
 				outBinBoundingBoxMaxY,
-				negativeWMask,
 				mMaskedOcclusionCulling->mDepthBuffer
 			);
 
