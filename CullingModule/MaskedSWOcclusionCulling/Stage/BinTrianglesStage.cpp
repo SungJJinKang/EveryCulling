@@ -559,6 +559,17 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 				mMaskedOcclusionCulling->mDepthBuffer
 			);
 
+#ifdef DEBUG_CULLING
+			for (size_t triangleIndex = 0; triangleIndex < triangleCountPerLoop; triangleIndex++)
+			{
+				if ((triangleCullMask & (1 << triangleIndex)) != 0x00000000)
+				{
+					assert(reinterpret_cast<const int*>(&outBinBoundingBoxMinX)[triangleIndex] <= reinterpret_cast<const int*>(&outBinBoundingBoxMaxX)[triangleIndex]);
+					assert(reinterpret_cast<const int*>(&outBinBoundingBoxMinY)[triangleIndex] <= reinterpret_cast<const int*>(&outBinBoundingBoxMaxY)[triangleIndex]);
+				}
+			}
+#endif
+
 			// Pass triangle in counter clock wise
 			PassTrianglesToTileBin
 			(
@@ -606,6 +617,17 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 				outBinBoundingBoxMaxY,
 				mMaskedOcclusionCulling->mDepthBuffer
 			);
+
+#ifdef DEBUG_CULLING
+			for (size_t triangleIndex = 0; triangleIndex < triangleCountPerLoop; triangleIndex++)
+			{
+				if ((triangleCullMask & (1 << triangleIndex)) != 0x00000000)
+				{
+					assert(reinterpret_cast<const int*>(&outBinBoundingBoxMinX)[triangleIndex] <= reinterpret_cast<const int*>(&outBinBoundingBoxMaxX)[triangleIndex]);
+					assert(reinterpret_cast<const int*>(&outBinBoundingBoxMinY)[triangleIndex] <= reinterpret_cast<const int*>(&outBinBoundingBoxMaxY)[triangleIndex]);
+				}
+			}
+#endif
 
 			// Pass triangle in counter clock wise
 			PassTrianglesToTileBin
