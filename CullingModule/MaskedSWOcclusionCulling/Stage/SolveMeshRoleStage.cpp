@@ -35,9 +35,14 @@ FORCE_INLINE bool culling::SolveMeshRoleStage::CheckIsOccluderFromAABB
 	const size_t entityIndex
 ) const
 {
+	const float clampedAABBMinScreenSpacePointX = CLAMP(currentEntityBlock->mAABBMinScreenSpacePointX[entityIndex], 0.0f, (float)mMaskedOcclusionCulling->mDepthBuffer.mResolution.mWidth);
+	const float clampedAABBMinScreenSpacePointY = CLAMP(currentEntityBlock->mAABBMinScreenSpacePointY[entityIndex], 0.0f, (float)mMaskedOcclusionCulling->mDepthBuffer.mResolution.mHeight);
+	const float clampedAABBMaxScreenSpacePointX = CLAMP(currentEntityBlock->mAABBMaxScreenSpacePointX[entityIndex], 0.0f, (float)mMaskedOcclusionCulling->mDepthBuffer.mResolution.mWidth);
+	const float clampedAABBMaxScreenSpacePointY = CLAMP(currentEntityBlock->mAABBMaxScreenSpacePointY[entityIndex], 0.0f, (float)mMaskedOcclusionCulling->mDepthBuffer.mResolution.mHeight);
+
 	const float screenSpaceAABBArea
-		= (currentEntityBlock->mAABBMaxScreenSpacePointX[entityIndex] - currentEntityBlock->mAABBMinScreenSpacePointX[entityIndex]) *
-		  (currentEntityBlock->mAABBMaxScreenSpacePointY[entityIndex] - currentEntityBlock->mAABBMinScreenSpacePointY[entityIndex]);
+		= (clampedAABBMaxScreenSpacePointX - clampedAABBMinScreenSpacePointX) *
+		  (clampedAABBMaxScreenSpacePointY - clampedAABBMinScreenSpacePointY);
 
 	//assert(screenSpaceAABBArea > std::numeric_limits<float>::epsilon());
 
