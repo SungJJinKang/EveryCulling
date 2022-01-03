@@ -31,6 +31,18 @@ void culling::ViewFrustumCulling::DoViewFrustumCulling
 	{
 		if ( (entityBlock->GetIsCulled(entityIndex, cameraIndex) == false) || (entityBlock->GetIsCulled(entityIndex + 1, cameraIndex) == false) )
 		{
+
+#ifdef DEBUG_CULLING
+			if(entityBlock->GetIsCulled(entityIndex, cameraIndex) == false)
+			{
+				assert(entityBlock->mPositionAndBoundingSpheres[entityIndex].GetBoundingSphereRadius() >= 0.0f);
+			}
+			if (entityBlock->GetIsCulled(entityIndex + 1, cameraIndex) == false)
+			{
+				assert(entityBlock->mPositionAndBoundingSpheres[entityIndex + 1].GetBoundingSphereRadius() >= 0.0f);
+			}
+#endif
+
 			const char result = CheckInFrustumSIMDWithTwoPoint(frustumPlane, entityBlock->mPositionAndBoundingSpheres + entityIndex);
 			// if first low bit has 1 value, Pos A is In Frustum
 			// if second low bit has 1 value, Pos A is In Frustum
@@ -86,7 +98,7 @@ FORCE_INLINE char culling::ViewFrustumCulling::CheckInFrustumSIMDWithTwoPoint
 	const culling::M128F posA_yyyy = M128F_REPLICATE(m128f_2Point[0], 1); // yyyy of first twoPoint and yyyy of second twoPoint
 	const culling::M128F posA_zzzz = M128F_REPLICATE(m128f_2Point[0], 2); // zzzz of first twoPoint and zzzz of second twoPoint
 
-	const culling::M128F posA_rrrr = _mm_xor_ps(culling::M128F_ADD(M128F_REPLICATE(m128f_2Point[0], 3), _mm_set1_ps(BOUNDING_SPHRE_RADIUS_MARGIN)), _mm_set1_ps(-0.0)); // rrrr of first twoPoint and rrrr of second twoPoint
+	const culling::M128F posA_rrrr = _mm_or_ps(culling::M128F_ADD(M128F_REPLICATE(m128f_2Point[0], 3), _mm_set1_ps(BOUNDING_SPHRE_RADIUS_MARGIN)), _mm_set1_ps(-0.0f)); // rrrr of first twoPoint and rrrr of second twoPoint
 
 	culling::M128F dotPosA = culling::M128F_MUL_AND_ADD(posA_zzzz, m128f_eightPlanes[2], m128f_eightPlanes[3]);
 	dotPosA = culling::M128F_MUL_AND_ADD(posA_yyyy, m128f_eightPlanes[1], dotPosA);
@@ -96,7 +108,7 @@ FORCE_INLINE char culling::ViewFrustumCulling::CheckInFrustumSIMDWithTwoPoint
 	const culling::M128F posB_yyyy = M128F_REPLICATE(m128f_2Point[1], 1); // yyyy of first twoPoint and yyyy of second twoPoint
 	const culling::M128F posB_zzzz = M128F_REPLICATE(m128f_2Point[1], 2); // zzzz of first twoPoint and zzzz of second twoPoint
 
-	const culling::M128F posB_rrrr = _mm_xor_ps(culling::M128F_ADD(M128F_REPLICATE(m128f_2Point[1], 3), _mm_set1_ps(BOUNDING_SPHRE_RADIUS_MARGIN)), _mm_set1_ps(-0.0));// rrrr of first twoPoint and rrrr of second twoPoint
+	const culling::M128F posB_rrrr = _mm_or_ps(culling::M128F_ADD(M128F_REPLICATE(m128f_2Point[1], 3), _mm_set1_ps(BOUNDING_SPHRE_RADIUS_MARGIN)), _mm_set1_ps(-0.0f));// rrrr of first twoPoint and rrrr of second twoPoint
 
 	culling::M128F dotPosB = culling::M128F_MUL_AND_ADD(posB_zzzz, m128f_eightPlanes[2], m128f_eightPlanes[3]);
 	dotPosB = culling::M128F_MUL_AND_ADD(posB_yyyy, m128f_eightPlanes[1], dotPosB);
@@ -108,7 +120,7 @@ FORCE_INLINE char culling::ViewFrustumCulling::CheckInFrustumSIMDWithTwoPoint
 	const culling::M128F posAB_zzzz = _mm_shuffle_ps(m128f_2Point[0], m128f_2Point[1], SHUFFLEMASK(2, 2, 2, 2)); // z of twoPoint[0] , z of twoPoint[0], z of twoPoint[1] , z of twoPoint[1]
 
 	culling::M128F posAB_rrrr = _mm_shuffle_ps(m128f_2Point[0], m128f_2Point[1], SHUFFLEMASK(3, 3, 3, 3)); // r of twoPoint[0] , r of twoPoint[1], w of twoPoint[1] , w of twoPoint[1]
-	posAB_rrrr = _mm_xor_ps(culling::M128F_ADD(posAB_rrrr, _mm_set1_ps(BOUNDING_SPHRE_RADIUS_MARGIN)), _mm_set1_ps(-0.0)); // rrrr of first twoPoint and rrrr of second twoPoint
+	posAB_rrrr = _mm_or_ps(culling::M128F_ADD(posAB_rrrr, _mm_set1_ps(BOUNDING_SPHRE_RADIUS_MARGIN)), _mm_set1_ps(-0.0f)); // rrrr of first twoPoint and rrrr of second twoPoint
 
 	culling::M128F dotPosAB45 = culling::M128F_MUL_AND_ADD(posAB_zzzz, m128f_eightPlanes[6], m128f_eightPlanes[7]);
 	dotPosAB45 = culling::M128F_MUL_AND_ADD(posAB_yyyy, m128f_eightPlanes[5], dotPosAB45);
