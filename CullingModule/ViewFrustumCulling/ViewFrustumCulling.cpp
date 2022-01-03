@@ -29,7 +29,7 @@ void culling::ViewFrustumCulling::DoViewFrustumCulling
 	assert(entityBlock->mCurrentEntityCount != 0);
 	for (size_t entityIndex = 0; entityIndex < entityBlock->mCurrentEntityCount ; entityIndex = entityIndex + 2)
 	{
-		if ( (entityBlock->GetIsCulled(entityIndex, cameraIndex) == false) || (entityBlock->GetIsCulled(entityIndex + 1, cameraIndex) == false) )
+		if ( (entityBlock->GetIsCulled(entityIndex, cameraIndex) == false) || ((entityIndex + 1 < entityBlock->mCurrentEntityCount) && entityBlock->GetIsCulled(entityIndex + 1, cameraIndex) == false) )
 		{
 
 #ifdef DEBUG_CULLING
@@ -37,7 +37,7 @@ void culling::ViewFrustumCulling::DoViewFrustumCulling
 			{
 				assert(entityBlock->mPositionAndBoundingSpheres[entityIndex].GetBoundingSphereRadius() >= 0.0f);
 			}
-			if (entityBlock->GetIsCulled(entityIndex + 1, cameraIndex) == false)
+			if ((entityIndex + 1 < entityBlock->mCurrentEntityCount) && entityBlock->GetIsCulled(entityIndex + 1, cameraIndex) == false)
 			{
 				assert(entityBlock->mPositionAndBoundingSpheres[entityIndex + 1].GetBoundingSphereRadius() >= 0.0f);
 			}
