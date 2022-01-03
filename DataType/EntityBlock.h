@@ -221,9 +221,9 @@ namespace culling
 		{
 			assert(entityIndex < mCurrentEntityCount);
 
-			const culling::Vec4 vec = mAABBMaxWorldPoint[entityIndex] - mAABBMinWorldPoint[entityIndex];
-			
-			mPositionAndBoundingSpheres[entityIndex].SetBoundingSphereRadius(vec.magnitude());
+			culling::Vec4 vec = mAABBMaxWorldPoint[entityIndex] - mAABBMinWorldPoint[entityIndex];
+			vec[3] = 1.0f;
+			mPositionAndBoundingSpheres[entityIndex].SetBoundingSphereRadius(vec.magnitude() * 0.5f);
 		}
 
 		FORCE_INLINE void SetAABBWorldPosition(const size_t entityIndex, const float* const minWorldPos, const float* const maxWorldPos)
