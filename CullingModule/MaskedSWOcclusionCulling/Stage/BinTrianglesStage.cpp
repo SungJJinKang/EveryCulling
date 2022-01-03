@@ -256,7 +256,7 @@ void culling::BinTrianglesStage::BinTriangleThreadJob(const size_t cameraIndex)
 				if
 					(
 						(nextEntityBlock->GetIsCulled(entityIndex, cameraIndex) == false) &&
-						(nextEntityBlock->GetIsOccluder(entityIndex, cameraIndex) == true)
+						(nextEntityBlock->GetIsOccluder(entityIndex) == true)
 						)
 				{
 					const culling::Mat4x4 modelToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex) * nextEntityBlock->GetModelMatrix(entityIndex);
@@ -293,7 +293,7 @@ void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t 
 		culling::EntityBlock* const entityBlock = entityInfo.mEntityBlock;
 		const size_t entityIndexInEntityBlock = entityInfo.mIndexInEntityBlock;
 
-		if (entityBlock->GetIsCulled(entityIndexInEntityBlock, cameraIndex) == false && entityBlock->GetIsOccluder(entityIndexInEntityBlock, cameraIndex) == true)
+		if (entityBlock->GetIsCulled(entityIndexInEntityBlock, cameraIndex) == false && entityBlock->GetIsOccluder(entityIndexInEntityBlock) == true)
 		{
 
 			const culling::Mat4x4 modelToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex) * entityBlock->GetModelMatrix(entityIndexInEntityBlock);

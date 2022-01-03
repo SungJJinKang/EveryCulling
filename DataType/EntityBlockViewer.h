@@ -80,9 +80,9 @@ namespace culling
 		{
 			return mTargetEntityBlock->mVertexDatas[mEntityIndexInBlock];
 		}
-		FORCE_INLINE bool GetIsOccluder(const size_t cameraIndex) const
+		FORCE_INLINE bool GetIsOccluder() const
 		{
-			return mTargetEntityBlock->GetIsOccluder(mEntityIndexInBlock, cameraIndex);
+			return mTargetEntityBlock->GetIsOccluder(mEntityIndexInBlock);
 		}
 
 		FORCE_INLINE void SetIsObjectEnabled(const bool isEnabled)

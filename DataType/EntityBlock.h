@@ -190,14 +190,14 @@ namespace culling
 			return mIsObjectEnabled[entityIndex];
 		}
 		
-		FORCE_INLINE bool GetIsOccluder(const size_t entityIndex, const size_t cameraIndex) const
+		FORCE_INLINE bool GetIsOccluder(const size_t entityIndex) const
 		{
 			assert(entityIndex < mCurrentEntityCount);
 
 			return mIsOccluder[entityIndex];
 		}
 
-		FORCE_INLINE void SetIsOccluder(const size_t entityIndex, const size_t cameraIndex, const bool isOccluder)
+		FORCE_INLINE void SetIsOccluder(const size_t entityIndex, const bool isOccluder)
 		{
 			assert(entityIndex < mCurrentEntityCount);
 

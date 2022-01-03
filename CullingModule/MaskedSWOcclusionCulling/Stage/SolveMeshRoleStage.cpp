@@ -67,7 +67,7 @@ void culling::SolveMeshRoleStage::SolveMeshRole
 		{
 			const bool isOccluder = CheckIsOccluderFromAABB(currentEntityBlock, entityIndex) && currentEntityBlock->GetIsIsAABBScreenSpacePointValid(entityIndex);
 
-			currentEntityBlock->SetIsOccluder(entityIndex, cameraIndex, isOccluder);
+			currentEntityBlock->SetIsOccluder(entityIndex, isOccluder);
 		}
 	}	
 }
