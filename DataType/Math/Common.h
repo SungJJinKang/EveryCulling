@@ -103,6 +103,7 @@ namespace culling
 	template <typename T>
 	FORCE_INLINE T CLAMP(const T& value, const T& min, const T& max) noexcept
 	{
+		assert(min <= max);
 		return MIN(MAX(value, min), max);
 	}
 
