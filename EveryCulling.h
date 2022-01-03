@@ -4,10 +4,13 @@
 #include "DataType/EntityGridCell.h"
 #include "DataType/EntityBlockViewer.h"
 
+#ifdef PROFILING_CULLING
+#include "EveryCullingProfiler.h"
+#endif
+
 #include <array>
 #include <vector>
 #include <atomic>
-#include <functional>
 #include <thread>
 
 
@@ -113,6 +116,10 @@ namespace culling
 		std::unique_ptr<QueryOcclusionCulling> mQueryOcclusionCulling;
 #endif
 
+#ifdef PROFILING_CULLING
+		EveryCullingProfiler mEveryCullingProfiler;
+#endif
+
 	private:
 
 
@@ -121,6 +128,10 @@ namespace culling
 
 		std::vector<culling::CullingModule*> mUpdatedCullingModules;
 
+		// this function is called by multiple threads
+		FORCE_INLINE void OnStartCullingModule(const culling::CullingModule* const cullingModule);
+		// this function is called by multiple threads
+		FORCE_INLINE void OnEndCullingModule(const culling::CullingModule* const cullingModule);
 		
 		void SetViewProjectionMatrix(const size_t cameraIndex, const culling::Mat4x4& viewProjectionMatrix);
 		void SetFieldOfViewInDegree(const size_t cameraIndex, const float fov);

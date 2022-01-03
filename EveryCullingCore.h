@@ -46,6 +46,11 @@
 #define DEBUG_CULLING
 #endif
 
+#if defined(_DEBUG) || true
+#define PROFILING_CULLING
+#endif
+
+
 ///////////////////////////////////////////////////////////////////////////////////////
 //Graphics API
 

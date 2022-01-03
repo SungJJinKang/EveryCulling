@@ -123,6 +123,9 @@ void culling::EveryCulling::CullBlockEntityJob(const size_t cameraIndex)
 		for (size_t moduleIndex = 0; moduleIndex < mUpdatedCullingModules.size(); moduleIndex++)
 		{
 			culling::CullingModule* cullingModule = mUpdatedCullingModules[moduleIndex];
+			assert(cullingModule != nullptr);
+
+			OnStartCullingModule(cullingModule);
 
 			if(cullingModule->IsEnabled == true)
 			{
@@ -133,6 +136,8 @@ void culling::EveryCulling::CullBlockEntityJob(const size_t cameraIndex)
 					//std::this_thread::yield();
 				}
 			}
+
+			OnEndCullingModule(cullingModule);
 		}
 
 
@@ -292,6 +297,9 @@ culling::EveryCulling::EveryCulling(const std::uint32_t resolutionWidth, const s
 			&(mMaskedSWOcclusionCulling->mRasterizeTrianglesStage), // DrawOccluderStage
 			&(mMaskedSWOcclusionCulling->mQueryOccludeeStage) // QueryOccludeeStage
 		}
+#ifdef PROFILING_CULLING
+	, mEveryCullingProfiler{}
+#endif
 {
 	//to protect 
 	mFreeEntityBlockList.reserve(INITIAL_ENTITY_BLOCK_RESERVED_SIZE);
@@ -330,6 +338,20 @@ void culling::EveryCulling::SetCameraCount(const size_t cameraCount)
 void culling::EveryCulling::SetThreadCount(const size_t threadCount)
 {
 	mThreadCount = threadCount;
+}
+
+FORCE_INLINE void culling::EveryCulling::OnStartCullingModule(const culling::CullingModule* const cullingModule)
+{
+#ifdef PROFILING_CULLING
+	mEveryCullingProfiler.SetStartTime(cullingModule->GetCullingModuleName());
+#endif
+}
+
+FORCE_INLINE void culling::EveryCulling::OnEndCullingModule(const culling::CullingModule* const cullingModule)
+{
+#ifdef PROFILING_CULLING
+	mEveryCullingProfiler.SetEndTime(cullingModule->GetCullingModuleName());
+#endif
 }
 
 void culling::EveryCulling::SetViewProjectionMatrix(const size_t cameraIndex, const culling::Mat4x4& viewProjectionMatrix)
