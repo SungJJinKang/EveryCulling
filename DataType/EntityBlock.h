@@ -30,8 +30,7 @@ namespace culling
 {
 
 	//This code doesn't consider Memory alignment optimzation.
-	inline constexpr size_t ENTITY_COUNT_IN_ENTITY_BLOCK = 16;
-	static_assert(ENTITY_COUNT_IN_ENTITY_BLOCK % 16 == 0);
+	inline constexpr size_t ENTITY_COUNT_IN_ENTITY_BLOCK = 22;
 
 	/// <summary>
 	/// EntityBlock size should be less 4KB(Page size) for Block data being allocated in a page
