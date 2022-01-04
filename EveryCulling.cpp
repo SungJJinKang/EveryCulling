@@ -443,7 +443,7 @@ void culling::EveryCulling::SetCameraRotation(const size_t cameraIndex, const cu
 	}
 }
 
-void culling::EveryCulling::Configure(const size_t cameraIndex, const SettingParameters settingParameters)
+void culling::EveryCulling::Configure(const size_t cameraIndex, const SettingParameters& settingParameters)
 {
 	SetViewProjectionMatrix(cameraIndex, settingParameters.mViewProjectionMatrix);
 	SetFieldOfViewInDegree(cameraIndex, settingParameters.mFieldOfViewInDegree);

@@ -171,7 +171,7 @@ namespace culling
 			culling::Vec4 mCameraRotation;
 		};
 
-		void Configure(const size_t cameraIndex, const SettingParameters settingParameters);
+		void Configure(const size_t cameraIndex, const SettingParameters& settingParameters);
 
 		FORCE_INLINE size_t GetCameraCount() const
 		{
