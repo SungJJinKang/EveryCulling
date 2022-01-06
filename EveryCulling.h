@@ -85,9 +85,7 @@ namespace culling
 		/// This objects will be released at destructor
 		/// </summary>
 		std::vector<EntityBlock*> mAllocatedEntityBlockChunkList{};
-
-		std::atomic<bool> mIsCullJobFinished;
-
+		
 		void AllocateEntityBlockPool();
 		void ClearEntityBlock(culling::EntityBlock* entityBlock);
 		culling::EntityBlock* AllocateNewEntityBlockFromPool();

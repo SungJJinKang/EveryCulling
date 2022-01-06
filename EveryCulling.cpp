@@ -130,6 +130,8 @@ void culling::EveryCulling::CullBlockEntityJob(const size_t cameraIndex)
 			{
 				cullingModule->ThreadCullJob(cameraIndex);
 
+				std::atomic_thread_fence(std::memory_order_seq_cst);
+
 				while (cullingModule->GetFinishedThreadCount(cameraIndex) < mThreadCount)
 				{
 					std::this_thread::yield();
@@ -168,10 +170,9 @@ void culling::EveryCulling::ResetCullJobState()
 {
 	ResetEntityBlocks();
 	ResetCullingModules();
-	mIsCullJobFinished.store(false, std::memory_order_relaxed);
 
 	//release!
-	std::atomic_thread_fence(std::memory_order_release);
+	std::atomic_thread_fence(std::memory_order_seq_cst);
 }
 
 const culling::CullingModule* culling::EveryCulling::GetLastEnabledCullingModule() const

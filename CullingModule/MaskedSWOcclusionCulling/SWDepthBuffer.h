@@ -168,6 +168,8 @@ namespace culling
 		float PointCVertexX;
 		float PointCVertexY;
 		float PointCVertexZ;
+
+		char padding[28];
 	};
 
 	static_assert(BIN_TRIANGLE_CAPACITY_PER_TILE_PER_OBJECT % 8 == 0);
