@@ -9,9 +9,9 @@ This project tries to integrate them into one system and make them easy to use.
 
 ## Core Feature 
 This library is targeting Maximing **SIMD, Cache hit, Multi Threading.**                 
-1. SIMD : Data is stored for using SIMD Intrinsics ( Object's Datas has SoA layout, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/doom_engine_version/DataType/EntityBlock.h) ) ( Require AVX2 ( _mm256 ) )                       
-2. Cache Hit : SoA!! ( Structure of Arrays, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/doom_engine_version/DataType/EntityBlock.h) )           
-3. Multi Threading : Data of entities is separately stored in entity block, Then Threads works on a entity block. These structure prevent data race and cache coherency ( false sharing, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/doom_engine_version/DataType/EntityBlock.h) ), Locking is not required.               
+1. SIMD : Data is stored for using SIMD Intrinsics ( Object's Datas has SoA layout, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/main/DataType/EntityBlock.h) ) ( Require AVX2 ( _mm256 ) )                       
+2. Cache Hit : SoA!! ( Structure of Arrays, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/main/DataType/EntityBlock.h) )           
+3. Multi Threading : Data of entities is separately stored in entity block, Then Threads works on a entity block. These structure prevent data race and cache coherency ( false sharing, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/main/DataType/EntityBlock.h) ), Locking is not required.               
 
 ## Feature
 
@@ -136,7 +136,7 @@ Stage 4 : Multithread Query depth buffer ( Compare aabb of occludee's min depth 
 Reference paper : https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf           
 개발 일지 : https://sungjjinkang.github.io/computerscience/computergraphics/2021/12/31/masked_sw_occlusion_culling.html            
 Video : [https://youtu.be/tMgokVljvAY](https://youtu.be/tMgokVljvAY), [https://youtu.be/1IKTXsSLJ5g](https://youtu.be/1IKTXsSLJ5g)                       
-Code directory : [https://github.com/SungJJinKang/EveryCulling/tree/doom_engine_version/CullingModule/MaskedSWOcclusionCulling](https://github.com/SungJJinKang/EveryCulling/tree/doom_engine_version/CullingModule/MaskedSWOcclusionCulling)         
+Code directory : [https://github.com/SungJJinKang/EveryCulling/tree/main/CullingModule/MaskedSWOcclusionCulling](https://github.com/SungJJinKang/EveryCulling/tree/main/CullingModule/MaskedSWOcclusionCulling)         
 동작 원리 한국어 설명 : ["Masked Software Occlusion Culling"는 어떻게 작동하는가?](https://github.com/SungJJinKang/EveryCulling/blob/main/CullingModule/MaskedSWOcclusionCulling/MaskedSWOcclusionCulling_HowWorks.md)                 
 references : https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf, https://www.slideshare.net/IntelSoftware/masked-software-occlusion-culling, https://www.slideshare.net/IntelSoftware/masked-occlusion-culling         
 
