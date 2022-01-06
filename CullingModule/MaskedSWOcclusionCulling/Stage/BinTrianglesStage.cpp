@@ -10,7 +10,7 @@
 
 #include "../Utility/RasterizerHelper.h"
 
-#define BIN_VERTEX_INDICE_COUNT_PER_THREAD 960
+#define BIN_VERTEX_INDICE_COUNT_PER_THREAD 24
 #define DEFAULT_BINNED_TRIANGLE_COUNT_PER_LOOP 8
 
 #define CONVERT_TO_M256I(_M256F) *reinterpret_cast<const culling::M256I*>(&_M256F)
