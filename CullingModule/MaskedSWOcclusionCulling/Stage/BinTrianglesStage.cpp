@@ -309,34 +309,37 @@ void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t 
 		if
 		(
 			entityBlock->GetIsCulled(entityIndexInEntityBlock, cameraIndex) == false && 
-			entityBlock->GetIsOccluder(entityIndexInEntityBlock) == true &&
-			entityBlock->TrySettingIsBinnedVariable(entityIndexInEntityBlock) == true
+			entityBlock->GetIsOccluder(entityIndexInEntityBlock) == true
 		)
 		{
-			// Back object can have less value than front object.
-			const size_t binnedTriangleListIndex = mMaskedOcclusionCulling->IncreamentBinnedOccluderCountIfPossible();
-
-			if(binnedTriangleListIndex != 0)
+			if(entityBlock->TrySettingIsBinnedVariable(entityIndexInEntityBlock) == true)
 			{
-				const culling::Mat4x4 modelToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex) * entityBlock->GetModelMatrix(entityIndexInEntityBlock);
-				const VertexData& vertexData = entityBlock->mVertexDatas[entityIndexInEntityBlock];
+				// Back object can have less value than front object.
+				const std::int32_t binnedTriangleListIndex = mMaskedOcclusionCulling->IncreamentBinnedOccluderCountIfPossible();
+
+				if (binnedTriangleListIndex != INVALID_BINNED_OCCLUDER_COUNT)
+				{
+					const culling::Mat4x4 modelToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex) * entityBlock->GetModelMatrix(entityIndexInEntityBlock);
+					const VertexData& vertexData = entityBlock->mVertexDatas[entityIndexInEntityBlock];
 
 
-				BinTriangles
-				(
-					binnedTriangleListIndex,
-					reinterpret_cast<const float*>(vertexData.mVertices),
-					vertexData.mVerticeCount,
-					vertexData.mIndices,
-					vertexData.mIndiceCount,
-					vertexData.mVertexStride,
-					modelToClipSpaceMatrix.data()
-				);
+					BinTriangles
+					(
+						binnedTriangleListIndex,
+						reinterpret_cast<const float*>(vertexData.mVertices),
+						vertexData.mVerticeCount,
+						vertexData.mIndices,
+						vertexData.mIndiceCount,
+						vertexData.mVertexStride,
+						modelToClipSpaceMatrix.data()
+					);
+				}
+				else
+				{
+					break;
+				}
 			}
-			else
-			{
-				break;
-			}
+			
 		}
 		
 	}

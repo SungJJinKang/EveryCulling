@@ -66,11 +66,11 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 
 	const culling::Vec2 tileOriginPoint{ static_cast<float>(tile->GetLeftBottomTileOrginX()), static_cast<float>(tile->GetLeftBottomTileOrginY()) };
 
-	const size_t occluderCount = mMaskedOcclusionCulling->GetOccluderCount();
+	const std::int32_t occluderCount = mMaskedOcclusionCulling->GetOccluderCount();
 
-	for (size_t occluderIndex = 0; occluderIndex < occluderCount; occluderIndex++)
+	for (std::int32_t occluderIndex = 0; occluderIndex < occluderCount; occluderIndex++)
 	{
-		TriangleList* const triangleListOfOccluder = tile->GetBinnedTriangleListOfOccluder(occluderIndex);
+		TriangleList* const triangleListOfOccluder = tile->GetBinnedTriangleListOfOccluder((size_t)occluderIndex);
 		for (size_t triangleBatchIndex = 0; triangleBatchIndex < triangleListOfOccluder->mCurrentTriangleCount; triangleBatchIndex += 8)
 		{
 			const size_t triangleCount = MIN(8, triangleListOfOccluder->mCurrentTriangleCount - triangleBatchIndex);

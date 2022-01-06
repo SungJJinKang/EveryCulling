@@ -14,6 +14,7 @@
 #include "Stage/SolveMeshRoleStage.h"
 #include "Stage/QueryOccludeeStage.h"
 
+#define INVALID_BINNED_OCCLUDER_COUNT (std::int32_t)(-1)
 
 namespace culling
 {
@@ -45,7 +46,7 @@ namespace culling
 
 
 
-		std::atomic<size_t> mBinnedOccluderCount;
+		std::atomic<std::int32_t> mBinnedOccluderCount;
 
 	public:
 		
@@ -73,9 +74,9 @@ namespace culling
 		/// If fail, return 0
 		/// </summary>
 		/// <returns></returns>
-		FORCE_INLINE size_t IncreamentBinnedOccluderCountIfPossible()
+		FORCE_INLINE std::int32_t IncreamentBinnedOccluderCountIfPossible()
 		{
-			const size_t increamentedBinnedOccluderCount = mBinnedOccluderCount.fetch_add(1, std::memory_order_seq_cst);
+			const std::int32_t increamentedBinnedOccluderCount = mBinnedOccluderCount.fetch_add(1, std::memory_order_seq_cst);
 
 			if(increamentedBinnedOccluderCount < MAX_OCCLUDER_COUNT)
 			{
@@ -84,7 +85,7 @@ namespace culling
 			else
 			{
 				mBinnedOccluderCount.fetch_add(-1, std::memory_order_seq_cst);
-				return 0;
+				return INVALID_BINNED_OCCLUDER_COUNT;
 			}
 			
 		}
@@ -99,7 +100,7 @@ namespace culling
 			return mBinnedOccluderCount > 0;
 		}
 
-		FORCE_INLINE size_t GetOccluderCount() const
+		FORCE_INLINE std::int32_t GetOccluderCount() const
 		{
 			return mBinnedOccluderCount;
 		}
