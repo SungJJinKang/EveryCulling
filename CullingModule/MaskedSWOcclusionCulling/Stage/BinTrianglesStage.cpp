@@ -10,6 +10,11 @@
 
 #include "../Utility/RasterizerHelper.h"
 
+#define DEFAULT_BINNED_TRIANGLE_COUNT_PER_LOOP 8
+#define BIN_VERTEX_INDICE_COUNT_PER_THREAD 960
+
+static_assert(BIN_VERTEX_INDICE_COUNT_PER_THREAD % 3 == 0);
+static_assert((BIN_VERTEX_INDICE_COUNT_PER_THREAD / 3) % 8 == 0);
 
 #define CONVERT_TO_M256I(_M256F) *reinterpret_cast<const culling::M256I*>(&_M256F)
 
@@ -305,6 +310,7 @@ void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t 
 		culling::EntityBlock* const entityBlock = entityInfo.mEntityBlock;
 		const size_t entityIndexInEntityBlock = entityInfo.mIndexInEntityBlock;
 		
+		VertexData& vertexData = entityBlock->mVertexDatas[entityIndexInEntityBlock];
 
 		if
 		(
@@ -312,7 +318,10 @@ void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t 
 			entityBlock->GetIsOccluder(entityIndexInEntityBlock) == true
 		)
 		{
-			if(entityBlock->TrySettingIsBinnedVariable(entityIndexInEntityBlock) == true)
+			static_assert(BIN_VERTEX_INDICE_COUNT_PER_THREAD % 3 == 0);
+			const std::uint32_t currentBinnedIndiceCount = vertexData.mBinnedIndiceCount.fetch_add(BIN_VERTEX_INDICE_COUNT_PER_THREAD, std::memory_order_seq_cst);
+
+			if(currentBinnedIndiceCount < vertexData.mIndiceCount)
 			{
 				// Back object can have less value than front object.
 				const std::int32_t binnedTriangleListIndex = mMaskedOcclusionCulling->IncreamentBinnedOccluderCountIfPossible();
@@ -320,22 +329,24 @@ void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t 
 				if (binnedTriangleListIndex != INVALID_BINNED_OCCLUDER_COUNT)
 				{
 					const culling::Mat4x4 modelToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex) * entityBlock->GetModelMatrix(entityIndexInEntityBlock);
-					const VertexData& vertexData = entityBlock->mVertexDatas[entityIndexInEntityBlock];
 
+					const std::uint32_t* const startIndicePtr = vertexData.mIndices + currentBinnedIndiceCount;
+					const std::uint32_t indiceCount = MIN(BIN_VERTEX_INDICE_COUNT_PER_THREAD, vertexData.mIndiceCount - currentBinnedIndiceCount);
 
 					BinTriangles
 					(
 						binnedTriangleListIndex,
 						reinterpret_cast<const float*>(vertexData.mVertices),
 						vertexData.mVerticeCount,
-						vertexData.mIndices,
-						vertexData.mIndiceCount,
+						startIndicePtr,
+						indiceCount,
 						vertexData.mVertexStride,
 						modelToClipSpaceMatrix.data()
 					);
 				}
 				else
 				{
+					// Binned Occluder Triangle List is full. Stop binning triangle.
 					break;
 				}
 			}
@@ -380,17 +391,13 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 	const float* const modelToClipspaceMatrix
 )
 {
-	// TODO : This stage is slowest stage in masked oc. Optimize this stage!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
-
-	static constexpr std::int32_t triangleCountPerLoop = 8;
-
-	std::int32_t currentIndiceIndex = -(triangleCountPerLoop * 3);
+	std::int32_t currentIndiceIndex = -(DEFAULT_BINNED_TRIANGLE_COUNT_PER_LOOP * 3);
 
 	assert(indiceCount != 0); // check GatherVertices function
 
 	while (currentIndiceIndex < (std::int32_t)indiceCount)
 	{
-		currentIndiceIndex += (triangleCountPerLoop * 3);
+		currentIndiceIndex += (DEFAULT_BINNED_TRIANGLE_COUNT_PER_LOOP * 3);
 
 		if(currentIndiceIndex >= (std::int32_t)indiceCount)
 		{
@@ -614,7 +621,7 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 				RIGHT_MIDDLE_POINT_Z,
 
 				triangleCullMask,
-				triangleCountPerLoop,
+				fetchTriangleCount,
 				outBinBoundingBoxMinX,
 				outBinBoundingBoxMinY,
 				outBinBoundingBoxMaxX,
@@ -674,7 +681,7 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 				LEFT_MIDDLE_POINT_Z,
 				
 				triangleCullMask,
-				triangleCountPerLoop,
+				fetchTriangleCount,
 				outBinBoundingBoxMinX,
 				outBinBoundingBoxMinY,
 				outBinBoundingBoxMaxX,

@@ -19,7 +19,12 @@ namespace culling
 		/// </summary>
 		size_t mVertexStride;
 
-		
+		std::atomic<std::uint32_t> mBinnedIndiceCount;
+
+		FORCE_INLINE void Reset()
+		{
+			mBinnedIndiceCount = 0;
+		}
 	};
 
 }
