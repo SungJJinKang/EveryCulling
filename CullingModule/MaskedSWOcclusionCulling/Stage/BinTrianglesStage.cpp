@@ -244,6 +244,7 @@ void culling::BinTrianglesStage::ConvertToPlatformDepth(culling::M256F* const de
 	
 }
 
+/*
 void culling::BinTrianglesStage::BinTriangleThreadJob(const size_t cameraIndex)
 {
 	while (true)
@@ -291,6 +292,7 @@ void culling::BinTrianglesStage::BinTriangleThreadJob(const size_t cameraIndex)
 		}
 	}
 }
+*/
 
 void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t cameraIndex)
 {
@@ -311,23 +313,30 @@ void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t 
 			entityBlock->TrySettingIsBinnedVariable(entityIndexInEntityBlock) == true
 		)
 		{
-
+			// Back object can have less value than front object.
 			const size_t binnedTriangleListIndex = mMaskedOcclusionCulling->IncreamentBinnedOccluderCountIfPossible();
 
-			const culling::Mat4x4 modelToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex) * entityBlock->GetModelMatrix(entityIndexInEntityBlock);
-			const VertexData& vertexData = entityBlock->mVertexDatas[entityIndexInEntityBlock];
+			if(binnedTriangleListIndex != 0)
+			{
+				const culling::Mat4x4 modelToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex) * entityBlock->GetModelMatrix(entityIndexInEntityBlock);
+				const VertexData& vertexData = entityBlock->mVertexDatas[entityIndexInEntityBlock];
 
 
-			BinTriangles
-			(
-				binnedTriangleListIndex,
-				reinterpret_cast<const float*>(vertexData.mVertices),
-				vertexData.mVerticeCount,
-				vertexData.mIndices,
-				vertexData.mIndiceCount,
-				vertexData.mVertexStride,
-				modelToClipSpaceMatrix.data()
-			);
+				BinTriangles
+				(
+					binnedTriangleListIndex,
+					reinterpret_cast<const float*>(vertexData.mVertices),
+					vertexData.mVerticeCount,
+					vertexData.mIndices,
+					vertexData.mIndiceCount,
+					vertexData.mVertexStride,
+					modelToClipSpaceMatrix.data()
+				);
+			}
+			else
+			{
+				break;
+			}
 		}
 		
 	}

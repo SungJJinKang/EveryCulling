@@ -142,7 +142,7 @@ namespace culling
 
 		void ConvertToPlatformDepth(culling::M256F* const depth);
 
-		void BinTriangleThreadJob(const size_t cameraIndex);
+		//void BinTriangleThreadJob(const size_t cameraIndex);
 
 		/// <summary>
 		/// BinTriangle based on front to back ordering
