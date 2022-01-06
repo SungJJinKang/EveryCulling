@@ -294,6 +294,7 @@ namespace culling
 
 	public:
 
+		bool bmIsOccluderExist;
 		const Resolution mResolution;
 
 		/// <summary>
@@ -305,13 +306,16 @@ namespace culling
 
 		~SWDepthBuffer();
 
-		size_t GetTileCount() const;
+		FORCE_INLINE size_t GetTileCount() const
+		{
+			return mTileCount;
+		}
 
 		void Reset();
 		
 		const Tile* GetTiles() const;
 
-		FORCE_INLINE const Tile* GetTile(const size_t rowIndex, const size_t colIndex) const
+		FORCE_INLINE const Tile* GetTile(const std::uint32_t rowIndex, const std::uint32_t colIndex) const
 		{
 			assert(rowIndex < mResolution.mRowTileCount);
 			assert(colIndex < mResolution.mColumnTileCount);
@@ -320,7 +324,7 @@ namespace culling
 			assert(tileIndex < mTileCount);
 			return mTiles + tileIndex;
 		}
-		FORCE_INLINE Tile* GetTile(const size_t rowIndex, const size_t colIndex)
+		FORCE_INLINE Tile* GetTile(const std::uint32_t rowIndex, const std::uint32_t colIndex)
 		{
 			assert(rowIndex < mResolution.mRowTileCount);
 			assert(colIndex < mResolution.mColumnTileCount);

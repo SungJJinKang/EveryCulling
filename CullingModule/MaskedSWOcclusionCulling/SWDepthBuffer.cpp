@@ -58,13 +58,13 @@ culling::SWDepthBuffer::SWDepthBuffer(std::uint32_t width, std::uint32_t height)
 	mTiles = new Tile[tileCount];
 	mTileCount = tileCount;
 
-	for(size_t y = 0 ; y < mResolution.mRowTileCount ; y++)
+	for(std::uint32_t y = 0 ; y < mResolution.mRowTileCount ; y++)
 	{
-		for (size_t x = 0; x < mResolution.mColumnTileCount; x++)
+		for (std::uint32_t x = 0; x < mResolution.mColumnTileCount; x++)
 		{
 			culling::Tile* const tile = GetTile(y, x);
-			tile->mLeftBottomTileOrginX = x * TILE_WIDTH;
-			tile->mLeftBottomTileOrginY = y * TILE_HEIGHT;
+			tile->mLeftBottomTileOrginX = x * (std::uint32_t)TILE_WIDTH;
+			tile->mLeftBottomTileOrginY = y * (std::uint32_t)TILE_HEIGHT;
 		}
 	}
 
@@ -86,17 +86,13 @@ culling::SWDepthBuffer::~SWDepthBuffer()
 	
 }
 
-size_t culling::SWDepthBuffer::GetTileCount() const
-{
-	return mTileCount;
-}
-
 void culling::SWDepthBuffer::Reset()
 {
 	for (size_t i = 0; i < mTileCount; i++)
 	{
 		mTiles[i].Reset();
 	}
+	bmIsOccluderExist = false;
 
 	std::atomic_thread_fence(std::memory_order_release);
 }

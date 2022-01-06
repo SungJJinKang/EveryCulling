@@ -307,13 +307,22 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 
 culling::Tile* culling::RasterizeOccludersStage::GetNextDepthBufferTile(const size_t cameraIndex)
 {
+	return GetNextDepthBufferTileBatch(cameraIndex, 1);
+}
+
+culling::Tile* culling::RasterizeOccludersStage::GetNextDepthBufferTileBatch
+(
+	const size_t cameraIndex,
+	const size_t batchCount
+)
+{
 	culling::Tile* nextDepthBufferTile = nullptr;
 
-	const size_t currentTileIndex = mFinishedTileCount[cameraIndex].fetch_add(1, std::memory_order_seq_cst);
+	const size_t currentTileIndex = mFinishedTileCount[cameraIndex].fetch_add(batchCount, std::memory_order_seq_cst);
 
 	const size_t tileCount = mMaskedOcclusionCulling->mDepthBuffer.GetTileCount();
 
-	if(currentTileIndex < tileCount)
+	if (currentTileIndex < tileCount)
 	{
 		nextDepthBufferTile = mMaskedOcclusionCulling->mDepthBuffer.GetTile(currentTileIndex);
 	}
@@ -338,22 +347,25 @@ void culling::RasterizeOccludersStage::ResetCullingModule()
 
 void culling::RasterizeOccludersStage::CullBlockEntityJob(const size_t cameraIndex)
 {
-	const culling::Tile* const endTile = mMaskedOcclusionCulling->mDepthBuffer.GetTiles() + mMaskedOcclusionCulling->mDepthBuffer.GetTileCount();
-
-	while(true)
+	if (mMaskedOcclusionCulling->mDepthBuffer.bmIsOccluderExist == true)
 	{
-		culling::Tile* const nextTile = GetNextDepthBufferTile(cameraIndex);
+		const culling::Tile* const endTile = mMaskedOcclusionCulling->mDepthBuffer.GetTiles() + mMaskedOcclusionCulling->mDepthBuffer.GetTileCount();
 
-		if(nextTile != nullptr)
+		while (true)
 		{
-			if (nextTile->mBinnedTriangles.mCurrentTriangleCount > 0)
+			culling::Tile* const nextTile = GetNextDepthBufferTile(cameraIndex);
+
+			if (nextTile != nullptr)
 			{
-				RasterizeBinnedTriangles(cameraIndex, nextTile);
+				if (nextTile->mBinnedTriangles.mCurrentTriangleCount > 0)
+				{
+					RasterizeBinnedTriangles(cameraIndex, nextTile);
+				}
 			}
-		}
-		else
-		{
-			break;
+			else
+			{
+				break;
+			}
 		}
 	}
 

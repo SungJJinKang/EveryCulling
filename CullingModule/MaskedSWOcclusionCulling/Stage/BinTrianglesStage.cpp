@@ -147,6 +147,7 @@ FORCE_INLINE void culling::BinTrianglesStage::PassTrianglesToTileBin
 						targetTile->mBinnedTriangles.VertexY[2][triListIndex] = (reinterpret_cast<const float*>(&pointCScreenPixelPosY))[triangleIndex];
 						targetTile->mBinnedTriangles.VertexZ[2][triListIndex] = (reinterpret_cast<const float*>(&pointCNdcSpaceVertexZ))[triangleIndex];
 
+						mMaskedOcclusionCulling->mDepthBuffer.bmIsOccluderExist = true;
 					}
 				}
 			}

@@ -17,22 +17,22 @@ namespace culling
 		(
 			const culling::M256F& screenPixelX,
 			const culling::M256F& screenPixelY,
-			int& outBinBoundingBoxMinX,
-			int& outBinBoundingBoxMinY,
-			int& outBinBoundingBoxMaxX,
-			int& outBinBoundingBoxMaxY,
+			std::uint32_t& outBinBoundingBoxMinX,
+			std::uint32_t& outBinBoundingBoxMinY,
+			std::uint32_t& outBinBoundingBoxMaxX,
+			std::uint32_t& outBinBoundingBoxMaxY,
 			SWDepthBuffer& depthBuffer
 		);
 		FORCE_INLINE void ComputeBinBoundingBoxFromVertex
 		(
-			const int minScreenPixelX,
-			const int minScreenPixelY,
-			const int maxScreenPixelX,
-			const int maxScreenPixelY,
-			int& outBinBoundingBoxMinX,
-			int& outBinBoundingBoxMinY,
-			int& outBinBoundingBoxMaxX,
-			int& outBinBoundingBoxMaxY,
+			const float minScreenPixelX,
+			const float minScreenPixelY,
+			const float maxScreenPixelX,
+			const float maxScreenPixelY,
+			std::uint32_t& outBinBoundingBoxMinX,
+			std::uint32_t& outBinBoundingBoxMinY,
+			std::uint32_t& outBinBoundingBoxMaxX,
+			std::uint32_t& outBinBoundingBoxMaxY,
 			SWDepthBuffer& depthBuffer
 		);
 		FORCE_INLINE void Clipping

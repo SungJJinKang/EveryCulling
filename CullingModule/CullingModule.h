@@ -20,9 +20,9 @@ namespace culling
 		/// will be used at CullBlockEntityJob
 		/// </summary>
 		//std::atomic<std::uint32_t> mAtomicCurrentBlockIndex;
-		std::array<std::atomic<size_t>, MAX_CAMERA_COUNT> mCurrentCulledEntityBlockIndex;
+		std::array<std::atomic<std::uint32_t>, MAX_CAMERA_COUNT> mCurrentCulledEntityBlockIndex;
 		char padding2[64];
-		std::array<std::atomic<size_t>, MAX_CAMERA_COUNT> mFinishedThreadCount;
+		std::array<std::atomic<std::uint32_t>, MAX_CAMERA_COUNT> mFinishedThreadCount;
 		char padding4[64];
 	};
 	class CullingModule
@@ -57,7 +57,11 @@ namespace culling
 		bool IsEnabled;
 
 		virtual void ResetCullingModule();
-		std::uint32_t GetFinishedThreadCount(const size_t cameraIndex) const;
+		FORCE_INLINE std::uint32_t GetFinishedThreadCount(const size_t cameraIndex) const
+		{
+			return mCullJobState.mFinishedThreadCount[cameraIndex].load(std::memory_order_acquire);
+		}
+
 
 
 		virtual void OnSetViewProjectionMatrix(const size_t cameraIndex, const culling::Mat4x4& cameraViewProjectionMatrix)

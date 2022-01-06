@@ -78,8 +78,8 @@ namespace culling
 				zPixelDyOfTriangles
 			);
 
-			const culling::M256F bbMinXV0 = _mm256_sub_ps(_mm256_cvtepi32_ps(_mm256_set1_epi32(tileOriginX + 0.5f)), vertexPoint3X);
-			const culling::M256F bbMinYV0 = _mm256_sub_ps(_mm256_cvtepi32_ps(_mm256_set1_epi32(tileOriginY + 0.5f)), vertexPoint3Y);
+			const culling::M256F bbMinXV0 = _mm256_sub_ps(_mm256_cvtepi32_ps(_mm256_set1_epi32((int)((float)tileOriginX + 0.5f))), vertexPoint3X);
+			const culling::M256F bbMinYV0 = _mm256_sub_ps(_mm256_cvtepi32_ps(_mm256_set1_epi32((int)((float)tileOriginY + 0.5f))), vertexPoint3Y);
 
 			// depth value at tile origin ( 0, 0 )
 			culling::M256F depthValueAtTileOriginPoint = _mm256_fmadd_ps(zPixelDxOfTriangles, bbMinXV0, _mm256_fmadd_ps(zPixelDyOfTriangles, bbMinYV0, vertexPoint3Z)); 
@@ -140,7 +140,7 @@ namespace culling
 						const culling::M256I maskWhenLeftRightSlopeIsOutOfSubTiles = _mm256_or_si256(maskWhenLeftRightSlopeIsLocatedAtLeftOfSubTiles, maskWhenLeftRightSlopeIsLocatedAtRightOfSubTiles);
 
 						// when row is greater than max y or less than min y, row is invalid row
-						const culling::M256I screenYOfRowInSubTiles = _mm256_setr_epi32(tileOriginY + 0.5f + rowIndexInSubtiles, tileOriginY + 0.5f + rowIndexInSubtiles, tileOriginY + 0.5f + rowIndexInSubtiles, tileOriginY + 0.5f + rowIndexInSubtiles, tileOriginY + 0.5f + rowIndexInSubtiles + SUB_TILE_HEIGHT, tileOriginY + 0.5f + rowIndexInSubtiles + SUB_TILE_HEIGHT, tileOriginY + 0.5f + rowIndexInSubtiles + SUB_TILE_HEIGHT, tileOriginY + 0.5f + rowIndexInSubtiles + SUB_TILE_HEIGHT);
+						const culling::M256I screenYOfRowInSubTiles = _mm256_setr_epi32((int)((float)tileOriginY + 0.5f + (float)rowIndexInSubtiles), (int)((float)tileOriginY + 0.5f + (float)rowIndexInSubtiles), (int)((float)tileOriginY + 0.5f + (float)rowIndexInSubtiles), (int)((float)tileOriginY + 0.5f + (float)rowIndexInSubtiles), (int)((float)tileOriginY + 0.5f + (float)rowIndexInSubtiles + (float)SUB_TILE_HEIGHT), (int)((float)tileOriginY + 0.5f + (float)rowIndexInSubtiles + SUB_TILE_HEIGHT), (int)((float)tileOriginY + 0.5f + (float)rowIndexInSubtiles + SUB_TILE_HEIGHT), (int)((float)tileOriginY + 0.5f + (float)rowIndexInSubtiles + SUB_TILE_HEIGHT));
 						const culling::M256I maskWhenRowIsOutOfMinMaxY = _mm256_or_si256(_mm256_cmpgt_epi32(screenYOfRowInSubTiles, _mm256_set1_epi32(static_cast<int>(reinterpret_cast<const float*>(&maxYOfTriangle)[triangleIndex]))), _mm256_cmpgt_epi32(_mm256_set1_epi32(static_cast<int>(reinterpret_cast<const float*>(&minYOfTriangle)[triangleIndex])), screenYOfRowInSubTiles));
 
 						maxZValueAtRowOfSubTiles = _mm256_blendv_ps(maxZValueAtRowOfSubTiles, _mm256_set1_ps((float)MIN_DEPTH_VALUE), *reinterpret_cast<const culling::M256F*>(&maskWhenLeftRightSlopeIsOutOfSubTiles));

@@ -39,6 +39,7 @@ namespace culling
 		void RasterizeBinnedTriangles(const size_t cameraIndex, culling::Tile* const tile);
 		
 		culling::Tile* GetNextDepthBufferTile(const size_t cameraIndex);
+		culling::Tile* GetNextDepthBufferTileBatch(const size_t cameraIndex, const size_t batchCount);
 
 	public:
 

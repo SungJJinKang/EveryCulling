@@ -32,19 +32,19 @@ FORCE_INLINE void culling::QueryOccludeeStage::ComputeBinBoundingBoxFromVertex
 (
 	const culling::M256F& screenPixelX,
 	const culling::M256F& screenPixelY,
-	int& outBinBoundingBoxMinX,
-	int& outBinBoundingBoxMinY,
-	int& outBinBoundingBoxMaxX,
-	int& outBinBoundingBoxMaxY,
+	std::uint32_t& outBinBoundingBoxMinX,
+	std::uint32_t& outBinBoundingBoxMinY,
+	std::uint32_t& outBinBoundingBoxMaxX,
+	std::uint32_t& outBinBoundingBoxMaxY,
 	SWDepthBuffer& depthBuffer
 )
 {
-	int minScreenPixelX, minScreenPixelY, maxScreenPixelX, maxScreenPixelY;
+	float minScreenPixelX, minScreenPixelY, maxScreenPixelX, maxScreenPixelY;
 	
-	minScreenPixelX = MAX(0, (int)MinFloatFromM256F(screenPixelX));
-	minScreenPixelY = MAX(0, (int)MinFloatFromM256F(screenPixelY));
-	maxScreenPixelX = MAX(0, (int)MaxFloatFromM256F(screenPixelX));
-	maxScreenPixelY = MAX(0, (int)MaxFloatFromM256F(screenPixelY));
+	minScreenPixelX = MAX(0, (float)MinFloatFromM256F(screenPixelX));
+	minScreenPixelY = MAX(0, (float)MinFloatFromM256F(screenPixelY));
+	maxScreenPixelX = MAX(0, (float)MaxFloatFromM256F(screenPixelX));
+	maxScreenPixelY = MAX(0, (float)MaxFloatFromM256F(screenPixelY));
 
 	ComputeBinBoundingBoxFromVertex
 	(
@@ -62,24 +62,24 @@ FORCE_INLINE void culling::QueryOccludeeStage::ComputeBinBoundingBoxFromVertex
 
 FORCE_INLINE void culling::QueryOccludeeStage::ComputeBinBoundingBoxFromVertex
 (
-	const int minScreenPixelX,
-	const int minScreenPixelY,
-	const int maxScreenPixelX,
-	const int maxScreenPixelY,
-	int& outBinBoundingBoxMinX,
-	int& outBinBoundingBoxMinY, 
-	int& outBinBoundingBoxMaxX, 
-	int& outBinBoundingBoxMaxY, 
+	const float minScreenPixelX,
+	const float minScreenPixelY,
+	const float maxScreenPixelX,
+	const float maxScreenPixelY,
+	std::uint32_t& outBinBoundingBoxMinX,
+	std::uint32_t& outBinBoundingBoxMinY,
+	std::uint32_t& outBinBoundingBoxMaxX,
+	std::uint32_t& outBinBoundingBoxMaxY,
 	SWDepthBuffer& depthBuffer
 )
 {
 	static const int WIDTH_MASK = ~(TILE_WIDTH - 1);
 	static const int HEIGHT_MASK = ~(TILE_HEIGHT - 1);
 
-	const int clampedMinScreenPixelX = culling::CLAMP(minScreenPixelX, 0, (int)(depthBuffer.mResolution.mWidth));
-	const int clampedMinScreenPixelY = culling::CLAMP(minScreenPixelY, 0, (int)(depthBuffer.mResolution.mHeight));
-	const int clampedMaxScreenPixelX = culling::CLAMP(maxScreenPixelX, 0, (int)(depthBuffer.mResolution.mWidth));
-	const int clampedMaxScreenPixelY = culling::CLAMP(maxScreenPixelY, 0, (int)(depthBuffer.mResolution.mHeight));
+	const int clampedMinScreenPixelX = culling::CLAMP((int)minScreenPixelX, (int)0, (int)(depthBuffer.mResolution.mWidth));
+	const int clampedMinScreenPixelY = culling::CLAMP((int)minScreenPixelY, (int)0, (int)(depthBuffer.mResolution.mHeight));
+	const int clampedMaxScreenPixelX = culling::CLAMP((int)maxScreenPixelX, (int)0, (int)(depthBuffer.mResolution.mWidth));
+	const int clampedMaxScreenPixelY = culling::CLAMP((int)maxScreenPixelY, (int)0, (int)(depthBuffer.mResolution.mHeight));
 
 	outBinBoundingBoxMinX = clampedMinScreenPixelX & WIDTH_MASK;
 	outBinBoundingBoxMinY = clampedMinScreenPixelY & HEIGHT_MASK;
@@ -104,7 +104,7 @@ void culling::QueryOccludeeStage::QueryOccludee
 {
 	for(size_t entityIndex = 0 ; entityIndex < entityBlock->mCurrentEntityCount ; entityIndex++)
 	{
-		int outBinBoundingBoxMinX, outBinBoundingBoxMinY, outBinBoundingBoxMaxX, outBinBoundingBoxMaxY;
+		std::uint32_t outBinBoundingBoxMinX, outBinBoundingBoxMinY, outBinBoundingBoxMaxX, outBinBoundingBoxMaxY;
 		
 		if
 		(
@@ -125,32 +125,32 @@ void culling::QueryOccludeeStage::QueryOccludee
 				mMaskedOcclusionCulling->mDepthBuffer
 			);
 
-			const int intersectingMinBoxX = outBinBoundingBoxMinX; // this is screen space coordinate
-			const int intersectingMinBoxY = outBinBoundingBoxMinY;
-			const int intersectingMaxBoxX = outBinBoundingBoxMaxX;
-			const int intersectingMaxBoxY = outBinBoundingBoxMaxY;
+			const std::uint32_t intersectingMinBoxX = outBinBoundingBoxMinX; // this is screen space coordinate
+			const std::uint32_t intersectingMinBoxY = outBinBoundingBoxMinY;
+			const std::uint32_t intersectingMaxBoxX = outBinBoundingBoxMaxX;
+			const std::uint32_t intersectingMaxBoxY = outBinBoundingBoxMaxY;
 
 			assert(intersectingMinBoxX <= intersectingMaxBoxX);
 			assert(intersectingMinBoxY <= intersectingMaxBoxY);
 
-			const int startBoxIndexX = MIN((int)(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mColumnTileCount - 1), intersectingMinBoxX / TILE_WIDTH);
-			const int startBoxIndexY = MIN((int)(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mRowTileCount - 1), intersectingMinBoxY / TILE_HEIGHT);
-			const int endBoxIndexX = MIN((int)(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mColumnTileCount - 1), intersectingMaxBoxX / TILE_WIDTH);
-			const int endBoxIndexY = MIN((int)(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mRowTileCount - 1), intersectingMaxBoxY / TILE_HEIGHT);
+			const std::uint32_t startBoxIndexX = MIN((std::uint32_t)(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mColumnTileCount - 1), intersectingMinBoxX / (std::uint32_t)TILE_WIDTH);
+			const std::uint32_t startBoxIndexY = MIN((std::uint32_t)(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mRowTileCount - 1), intersectingMinBoxY / (std::uint32_t)TILE_HEIGHT);
+			const std::uint32_t endBoxIndexX = MIN((std::uint32_t)(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mColumnTileCount - 1), intersectingMaxBoxX / (std::uint32_t)TILE_WIDTH);
+			const std::uint32_t endBoxIndexY = MIN((std::uint32_t)(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mRowTileCount - 1), intersectingMaxBoxY / (std::uint32_t)TILE_HEIGHT);
 
-			assert(startBoxIndexX >= 0 && startBoxIndexX < (int)(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mColumnTileCount));
-			assert(startBoxIndexY >= 0 && startBoxIndexY < (int)(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mRowTileCount));
+			assert(startBoxIndexX >= 0 && startBoxIndexX < (std::uint32_t)(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mColumnTileCount));
+			assert(startBoxIndexY >= 0 && startBoxIndexY < (std::uint32_t)(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mRowTileCount));
 
-			assert(endBoxIndexX >= 0 && endBoxIndexX <= (int)(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mColumnTileCount));
-			assert(endBoxIndexY >= 0 && endBoxIndexY <= (int)(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mRowTileCount));
+			assert(endBoxIndexX >= 0 && endBoxIndexX <= (std::uint32_t)(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mColumnTileCount));
+			assert(endBoxIndexY >= 0 && endBoxIndexY <= (std::uint32_t)(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mRowTileCount));
 
 			const float aabbMinDepthValue = entityBlock->mAABBMinNDCZ[entityIndex];
 
 			bool isCullded = true;
 
-			for (size_t y = startBoxIndexY; y <= endBoxIndexY; y++)
+			for (std::uint32_t y = startBoxIndexY; y <= endBoxIndexY; y++)
 			{
-				for (size_t x = startBoxIndexX; x <= endBoxIndexX; x++)
+				for (std::uint32_t x = startBoxIndexX; x <= endBoxIndexX; x++)
 				{
 					const culling::Tile* const tile = mMaskedOcclusionCulling->mDepthBuffer.GetTile(y, x);
 
@@ -218,19 +218,22 @@ culling::QueryOccludeeStage::QueryOccludeeStage
 
 void culling::QueryOccludeeStage::CullBlockEntityJob(const size_t cameraIndex)
 {
-	while (true)
+	if(mMaskedOcclusionCulling->mDepthBuffer.bmIsOccluderExist == true)
 	{
-		culling::EntityBlock* const nextEntityBlock = GetNextEntityBlock(cameraIndex);
+		while (true)
+		{
+			culling::EntityBlock* const nextEntityBlock = GetNextEntityBlock(cameraIndex);
 
-		if (nextEntityBlock != nullptr)
-		{
-			QueryOccludee(cameraIndex, nextEntityBlock);
+			if (nextEntityBlock != nullptr)
+			{
+				QueryOccludee(cameraIndex, nextEntityBlock);
+			}
+			else
+			{
+				break;
+			}
 		}
-		else
-		{
-			break;
-		}
-	}
+	}	
 }
 
 const char* culling::QueryOccludeeStage::GetCullingModuleName() const
