@@ -5,23 +5,6 @@
 #include "../MaskedSWOcclusionCulling.h"
 #include "../Utility/vertexTransformationHelper.h"
 
-bool culling::SolveMeshRoleStage::IsOccluderCapacityFull() const
-{
-	return mOccluderCount >= MAX_OCCLUDER_COUNT;
-}
-
-size_t culling::SolveMeshRoleStage::IncreamentOccluderCount()
-{
-	const size_t currentOccluderCount = mOccluderCount.fetch_add(1, std::memory_order_seq_cst);
-	if(currentOccluderCount < MAX_OCCLUDER_COUNT)
-	{
-		return currentOccluderCount;
-	}
-	else
-	{
-		return 0;
-	}
-}
 
 bool culling::SolveMeshRoleStage::CheckIsOccluderFromBoundingSphere
 (
@@ -87,16 +70,6 @@ void culling::SolveMeshRoleStage::SolveMeshRole
 			const bool isOccluder = CheckIsOccluderFromAABB(currentEntityBlock, entityIndex) && currentEntityBlock->GetIsIsAABBScreenSpacePointValid(entityIndex);
 
 			currentEntityBlock->SetIsOccluder(entityIndex, isOccluder);
-
-			if(isOccluder == true)
-			{
-				const size_t currentOccluderCount = IncreamentOccluderCount();
-				if (currentOccluderCount == 0)
-				{
-					//early finish this stage
-					break;
-				}
-			}
 		}
 	}	
 }
@@ -105,12 +78,6 @@ void culling::SolveMeshRoleStage::CullBlockEntityJob(const size_t cameraIndex)
 {
 	while (true)
 	{
-		if(IsOccluderCapacityFull() == true)
-		{
-			//early finish this stage
-			break;
-		}
-
 		culling::EntityBlock* const nextEntityBlock = GetNextEntityBlock(cameraIndex);;
 
 		if (nextEntityBlock != nullptr)
@@ -132,6 +99,5 @@ const char* culling::SolveMeshRoleStage::GetCullingModuleName() const
 void culling::SolveMeshRoleStage::ResetCullingModule()
 {
 	MaskedSWOcclusionCullingStage::ResetCullingModule();
-
-	mOccluderCount = 0;
+	
 }

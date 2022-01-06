@@ -9,10 +9,7 @@ namespace culling
 	{
 	
 	private:
-
-		std::atomic<size_t> mOccluderCount;
-		bool IsOccluderCapacityFull() const;
-		size_t IncreamentOccluderCount();
+		
 
 		bool CheckIsOccluderFromBoundingSphere
 		(
