@@ -28,7 +28,25 @@ void culling::TriangleList::Reset()
 void culling::Tile::Reset()
 {
 	mHizDatas.Reset();
-	mBinnedTriangles.Reset();
+	for(size_t i = 0 ; i < MAX_OCCLUDER_COUNT ; i++)
+	{
+		mBinnedTriangleList[i].Reset();
+	}
+}
+
+bool culling::Tile::GetIsTriangleBinned() const
+{
+	bool isTriangleBinned = false;
+	for (size_t i = 0; i < MAX_OCCLUDER_COUNT; i++)
+	{
+		if(mBinnedTriangleList[i].mCurrentTriangleCount > 0)
+		{
+			isTriangleBinned = true;
+			break;
+		}
+	}
+
+	return isTriangleBinned;
 }
 
 
@@ -92,7 +110,6 @@ void culling::SWDepthBuffer::Reset()
 	{
 		mTiles[i].Reset();
 	}
-	bmIsOccluderExist = false;
 
 	std::atomic_thread_fence(std::memory_order_release);
 }

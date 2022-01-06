@@ -69,13 +69,12 @@ void culling::EveryCulling::ResetCullingModules()
 
 }
 
-void culling::EveryCulling::SetAllOneIsVisibleFlag()
+void culling::EveryCulling::ResetEntityBlocks()
 {
 	//Maybe Compiler use SIMD or do faster than SIMD instruction
 	for (auto entityBlock : mActiveEntityBlockList)
 	{
-		std::memset(entityBlock->mIsVisibleBitflag, 0xFF, sizeof(char) * ENTITY_COUNT_IN_ENTITY_BLOCK);
-		std::memset(entityBlock->mIsAABBMinNDCZDataUsedForQuery, 0xFF, sizeof(char) * ENTITY_COUNT_IN_ENTITY_BLOCK);
+		entityBlock->ResetEntityBlock();
 	}
 }
 
@@ -89,7 +88,7 @@ void culling::EveryCulling::AllocateEntityBlockPool()
 	mAllocatedEntityBlockChunkList.push_back(newEntityBlockChunk);
 }
 
-void culling::EveryCulling::ResetEntityBlock(culling::EntityBlock* entityBlock)
+void culling::EveryCulling::ClearEntityBlock(culling::EntityBlock* entityBlock)
 {
 	entityBlock->mCurrentEntityCount = 0;
 	//std::memset(entityBlock->mQueryObjects, 0x00, sizeof(decltype(*(entityBlock->mQueryObjects))) * culling::ENTITY_COUNT_IN_ENTITY_BLOCK);
@@ -167,7 +166,7 @@ void culling::EveryCulling::WaitToFinishCullJobOfAllCameras() const
 
 void culling::EveryCulling::ResetCullJobState()
 {
-	SetAllOneIsVisibleFlag();
+	ResetEntityBlocks();
 	ResetCullingModules();
 	mIsCullJobFinished.store(false, std::memory_order_relaxed);
 
@@ -223,7 +222,7 @@ void culling::EveryCulling::SetEnabledCullingModule(const CullingModuleType cull
 culling::EntityBlock* culling::EveryCulling::AllocateNewEntityBlockFromPool()
 {
 	EntityBlock* newEntityBlock = GetNewEntityBlockFromPool();
-	ResetEntityBlock(newEntityBlock);
+	ClearEntityBlock(newEntityBlock);
 
 	mActiveEntityBlockList.push_back(newEntityBlock);
 

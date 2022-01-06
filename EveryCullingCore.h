@@ -17,6 +17,8 @@
 #  define VLA_ARRAY_ON_STACK(type__, varname__, size__) type__ *varname__ = (type__*)_alloca(size__ * sizeof(type__))
 #endif
 
+#define CACHE_LINE_SIZE 64
+
 ///////////////////////////////////////////////////////////////////////////////////////
 //Math
 #ifndef MAX
@@ -137,12 +139,12 @@
 #define SUB_TILE_HEIGHT 4
 #endif
 
-#ifndef BIN_TRIANGLE_CAPACITY_PER_TILE
-#define BIN_TRIANGLE_CAPACITY_PER_TILE 80
+#ifndef BIN_TRIANGLE_CAPACITY_PER_TILE_PER_OBJECT
+#define BIN_TRIANGLE_CAPACITY_PER_TILE_PER_OBJECT 32
 #endif
 
-#ifndef OCCLUDEE_MAXIMUM_AREA
-#define OCCLUDEE_MAXIMUM_AREA
+#ifndef MAX_OCCLUDER_COUNT
+#define MAX_OCCLUDER_COUNT 10
 #endif
 
 // Screen Space Bounding Sphere Culling

@@ -152,40 +152,42 @@ namespace culling
 	/// 
 	/// TwoDTriangle should be reserved after initialized!!!!
 	/// </summary>
-	struct TriangleList
+	struct alignas(CACHE_LINE_SIZE) TriangleList
 	{
-		alignas(32) float VertexX[3][BIN_TRIANGLE_CAPACITY_PER_TILE]; // VertexX[0] : Point1 of Triangle, VertexX[1] : Point2 of Triangle, VertexX[2] : 3 of Triangle
-		alignas(32) float VertexY[3][BIN_TRIANGLE_CAPACITY_PER_TILE];
-		alignas(32) float VertexZ[3][BIN_TRIANGLE_CAPACITY_PER_TILE];
+		alignas(32) float VertexX[3][BIN_TRIANGLE_CAPACITY_PER_TILE_PER_OBJECT]; // VertexX[0] : Point1 of Triangle, VertexX[1] : Point2 of Triangle, VertexX[2] : 3 of Triangle
+		alignas(32) float VertexY[3][BIN_TRIANGLE_CAPACITY_PER_TILE_PER_OBJECT];
+		alignas(32) float VertexZ[3][BIN_TRIANGLE_CAPACITY_PER_TILE_PER_OBJECT];
 
 		size_t mCurrentTriangleCount = 0;
 
 		void Reset();
 		FORCE_INLINE bool GetIsBinFull() const
 		{
-			return mCurrentTriangleCount >= BIN_TRIANGLE_CAPACITY_PER_TILE;
+			return mCurrentTriangleCount >= BIN_TRIANGLE_CAPACITY_PER_TILE_PER_OBJECT;
 		}
 	};
 
-	static_assert(BIN_TRIANGLE_CAPACITY_PER_TILE % 8 == 0);
+	static_assert(BIN_TRIANGLE_CAPACITY_PER_TILE_PER_OBJECT % 8 == 0);
 
 	/// <summary>
 	/// 32 X 8 Tile
 	/// 
 	/// alignas(64) is for preventing false sharing
 	/// </summary>
-	class alignas(64) Tile
+	class alignas(CACHE_LINE_SIZE) Tile
 	{
 		friend class SWDepthBuffer;
 	private:
 		
 		std::uint32_t mLeftBottomTileOrginX = 0xFFFFFFFF;
 		std::uint32_t mLeftBottomTileOrginY = 0xFFFFFFFF;
-		
+
+
+		TriangleList mBinnedTriangleList[MAX_OCCLUDER_COUNT];
+
 	public:
 
 		HizData mHizDatas;
-		TriangleList mBinnedTriangles;
 
 		void Reset();
 		FORCE_INLINE std::uint32_t GetLeftBottomTileOrginX() const
@@ -197,6 +199,14 @@ namespace culling
 		{
 			return mLeftBottomTileOrginY;
 		}
+
+		FORCE_INLINE TriangleList* GetBinnedTriangleListOfOccluder(const size_t index)
+		{
+			assert(index < MAX_OCCLUDER_COUNT);
+			return mBinnedTriangleList + index;
+		}
+
+		bool GetIsTriangleBinned() const;
 	};
 
 	struct Resolution
@@ -294,7 +304,6 @@ namespace culling
 
 	public:
 
-		bool bmIsOccluderExist;
 		const Resolution mResolution;
 
 		/// <summary>

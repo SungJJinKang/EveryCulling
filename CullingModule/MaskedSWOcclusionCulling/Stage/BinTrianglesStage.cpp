@@ -81,6 +81,7 @@ FORCE_INLINE void culling::BinTrianglesStage::BackfaceCulling
 
 FORCE_INLINE void culling::BinTrianglesStage::PassTrianglesToTileBin
 (
+	const size_t binnedTriangleIndex,
 	const culling::M256F& pointAScreenPixelPosX,
 	const culling::M256F& pointAScreenPixelPosY,
 	const culling::M256F& pointANdcSpaceVertexZ,
@@ -130,24 +131,23 @@ FORCE_INLINE void culling::BinTrianglesStage::PassTrianglesToTileBin
 				{
 					Tile* const targetTile = mMaskedOcclusionCulling->mDepthBuffer.GetTile(y, x);
 
-					//assert(targetTile->mBinnedTriangles.GetIsBinFull() == false);
-					if(targetTile->mBinnedTriangles.GetIsBinFull() == false)
+					//assert(targetTile->mBinnedTriangleList.GetIsBinFull() == false);
+					if(targetTile->GetBinnedTriangleListOfOccluder(binnedTriangleIndex)->GetIsBinFull() == false)
 					{
-						const size_t triListIndex = targetTile->mBinnedTriangles.mCurrentTriangleCount++;
+						const size_t triListIndex = targetTile->GetBinnedTriangleListOfOccluder(binnedTriangleIndex)->mCurrentTriangleCount++;
 						
-						targetTile->mBinnedTriangles.VertexX[0][triListIndex] = (reinterpret_cast<const float*>(&pointAScreenPixelPosX))[triangleIndex];
-						targetTile->mBinnedTriangles.VertexY[0][triListIndex] = (reinterpret_cast<const float*>(&pointAScreenPixelPosY))[triangleIndex];
-						targetTile->mBinnedTriangles.VertexZ[0][triListIndex] = (reinterpret_cast<const float*>(&pointANdcSpaceVertexZ))[triangleIndex];
+						targetTile->GetBinnedTriangleListOfOccluder(binnedTriangleIndex)->VertexX[0][triListIndex] = (reinterpret_cast<const float*>(&pointAScreenPixelPosX))[triangleIndex];
+						targetTile->GetBinnedTriangleListOfOccluder(binnedTriangleIndex)->VertexY[0][triListIndex] = (reinterpret_cast<const float*>(&pointAScreenPixelPosY))[triangleIndex];
+						targetTile->GetBinnedTriangleListOfOccluder(binnedTriangleIndex)->VertexZ[0][triListIndex] = (reinterpret_cast<const float*>(&pointANdcSpaceVertexZ))[triangleIndex];
 
-						targetTile->mBinnedTriangles.VertexX[1][triListIndex] = (reinterpret_cast<const float*>(&pointBScreenPixelPosX))[triangleIndex];
-						targetTile->mBinnedTriangles.VertexY[1][triListIndex] = (reinterpret_cast<const float*>(&pointBScreenPixelPosY))[triangleIndex];
-						targetTile->mBinnedTriangles.VertexZ[1][triListIndex] = (reinterpret_cast<const float*>(&pointBNdcSpaceVertexZ))[triangleIndex];
+						targetTile->GetBinnedTriangleListOfOccluder(binnedTriangleIndex)->VertexX[1][triListIndex] = (reinterpret_cast<const float*>(&pointBScreenPixelPosX))[triangleIndex];
+						targetTile->GetBinnedTriangleListOfOccluder(binnedTriangleIndex)->VertexY[1][triListIndex] = (reinterpret_cast<const float*>(&pointBScreenPixelPosY))[triangleIndex];
+						targetTile->GetBinnedTriangleListOfOccluder(binnedTriangleIndex)->VertexZ[1][triListIndex] = (reinterpret_cast<const float*>(&pointBNdcSpaceVertexZ))[triangleIndex];
 
-						targetTile->mBinnedTriangles.VertexX[2][triListIndex] = (reinterpret_cast<const float*>(&pointCScreenPixelPosX))[triangleIndex];
-						targetTile->mBinnedTriangles.VertexY[2][triListIndex] = (reinterpret_cast<const float*>(&pointCScreenPixelPosY))[triangleIndex];
-						targetTile->mBinnedTriangles.VertexZ[2][triListIndex] = (reinterpret_cast<const float*>(&pointCNdcSpaceVertexZ))[triangleIndex];
-
-						mMaskedOcclusionCulling->mDepthBuffer.bmIsOccluderExist = true;
+						targetTile->GetBinnedTriangleListOfOccluder(binnedTriangleIndex)->VertexX[2][triListIndex] = (reinterpret_cast<const float*>(&pointCScreenPixelPosX))[triangleIndex];
+						targetTile->GetBinnedTriangleListOfOccluder(binnedTriangleIndex)->VertexY[2][triListIndex] = (reinterpret_cast<const float*>(&pointCScreenPixelPosY))[triangleIndex];
+						targetTile->GetBinnedTriangleListOfOccluder(binnedTriangleIndex)->VertexZ[2][triListIndex] = (reinterpret_cast<const float*>(&pointCNdcSpaceVertexZ))[triangleIndex];
+						
 					}
 				}
 			}
@@ -254,31 +254,40 @@ void culling::BinTrianglesStage::BinTriangleThreadJob(const size_t cameraIndex)
 		{
 			for (size_t entityIndex = 0; entityIndex < nextEntityBlock->mCurrentEntityCount; entityIndex++)
 			{
-				if
+				const size_t binnedTriangleListIndex = mMaskedOcclusionCulling->IncreamentBinnedOccluderCountIfPossible();
+				if (binnedTriangleListIndex != 0)
+				{
+					if
 					(
 						(nextEntityBlock->GetIsCulled(entityIndex, cameraIndex) == false) &&
 						(nextEntityBlock->GetIsOccluder(entityIndex) == true)
-						)
-				{
-					const culling::Mat4x4 modelToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex) * nextEntityBlock->GetModelMatrix(entityIndex);
-					const VertexData& vertexData = nextEntityBlock->mVertexDatas[entityIndex];
+					)
+					{
+						const culling::Mat4x4 modelToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex) * nextEntityBlock->GetModelMatrix(entityIndex);
+						const VertexData& vertexData = nextEntityBlock->mVertexDatas[entityIndex];
 
-					BinTriangles
-					(
-						reinterpret_cast<const float*>(vertexData.mVertices),
-						vertexData.mVerticeCount,
-						vertexData.mIndices,
-						vertexData.mIndiceCount,
-						vertexData.mVertexStride,
-						modelToClipSpaceMatrix.data()
-					);
+						BinTriangles
+						(
+							binnedTriangleListIndex,
+							reinterpret_cast<const float*>(vertexData.mVertices),
+							vertexData.mVerticeCount,
+							vertexData.mIndices,
+							vertexData.mIndiceCount,
+							vertexData.mVertexStride,
+							modelToClipSpaceMatrix.data()
+						);
+					}
+				}
+				else
+				{
+					return;
 				}
 			}
 
 		}
 		else
 		{
-			break;
+			return;
 		}
 	}
 }
@@ -293,15 +302,25 @@ void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t 
 
 		culling::EntityBlock* const entityBlock = entityInfo.mEntityBlock;
 		const size_t entityIndexInEntityBlock = entityInfo.mIndexInEntityBlock;
+		
 
-		if (entityBlock->GetIsCulled(entityIndexInEntityBlock, cameraIndex) == false && entityBlock->GetIsOccluder(entityIndexInEntityBlock) == true)
+		if
+		(
+			entityBlock->GetIsCulled(entityIndexInEntityBlock, cameraIndex) == false && 
+			entityBlock->GetIsOccluder(entityIndexInEntityBlock) == true &&
+			entityBlock->TrySettingIsBinnedVariable(entityIndexInEntityBlock) == true
+		)
 		{
+
+			const size_t binnedTriangleListIndex = mMaskedOcclusionCulling->IncreamentBinnedOccluderCountIfPossible();
 
 			const culling::Mat4x4 modelToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex) * entityBlock->GetModelMatrix(entityIndexInEntityBlock);
 			const VertexData& vertexData = entityBlock->mVertexDatas[entityIndexInEntityBlock];
 
+
 			BinTriangles
 			(
+				binnedTriangleListIndex,
 				reinterpret_cast<const float*>(vertexData.mVertices),
 				vertexData.mVerticeCount,
 				vertexData.mIndices,
@@ -310,6 +329,7 @@ void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t 
 				modelToClipSpaceMatrix.data()
 			);
 		}
+		
 	}
 }
 
@@ -321,24 +341,15 @@ culling::BinTrianglesStage::BinTrianglesStage(MaskedSWOcclusionCulling* mMOcclus
 void culling::BinTrianglesStage::ResetCullingModule()
 {
 	MaskedSWOcclusionCullingStage::ResetCullingModule();
-
-	IsWorkingByAThread.store(false, std::memory_order_seq_cst);
 }
 
 void culling::BinTrianglesStage::CullBlockEntityJob(const size_t cameraIndex)
 {
-	const bool canWorkable = !(IsWorkingByAThread.exchange(true, std::memory_order_seq_cst));
-
-	// Only one thread can work on this stage
-	if(canWorkable == true)
-	{
 #ifdef FETCH_OBJECT_SORT_FROM_DOOMS_ENGINE_IN_BIN_TRIANGLE_STAGE
-		BinTriangleThreadJobByObjectOrder(cameraIndex);
+	BinTriangleThreadJobByObjectOrder(cameraIndex);
 #else
-		BinTriangleThreadJob(cameraIndex);
+	BinTriangleThreadJob(cameraIndex);
 #endif
-			
-	}
 }
 
 const char* culling::BinTrianglesStage::GetCullingModuleName() const
@@ -348,6 +359,7 @@ const char* culling::BinTrianglesStage::GetCullingModuleName() const
 
 FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 (
+	const size_t binnedTriangleIndex,
 	const float* const vertices, 
 	const size_t verticeCount,
 	const std::uint32_t* const vertexIndices, 
@@ -576,6 +588,7 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 			// Pass triangle in counter clock wise
 			PassTrianglesToTileBin
 			(
+				binnedTriangleIndex,
 				screenPixelPosX[0],
 				screenPixelPosY[0],
 				ndcSpaceVertexZ[0],
@@ -635,6 +648,7 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 			// Pass triangle in counter clock wise
 			PassTrianglesToTileBin
 			(
+				binnedTriangleIndex,
 				screenPixelPosX[2],
 				screenPixelPosY[2],
 				ndcSpaceVertexZ[2],

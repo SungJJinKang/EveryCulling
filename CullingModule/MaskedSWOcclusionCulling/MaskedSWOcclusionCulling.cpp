@@ -36,6 +36,7 @@ culling::MaskedSWOcclusionCulling::MaskedSWOcclusionCulling
 void culling::MaskedSWOcclusionCulling::ResetState()
 {
 	ResetDepthBuffer();
+	mBinnedOccluderCount.store(0, std::memory_order_relaxed);
 }
 
 void culling::MaskedSWOcclusionCulling::CullBlockEntityJob(const size_t cameraIndex)

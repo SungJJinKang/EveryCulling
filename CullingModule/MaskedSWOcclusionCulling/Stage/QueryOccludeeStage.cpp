@@ -218,7 +218,7 @@ culling::QueryOccludeeStage::QueryOccludeeStage
 
 void culling::QueryOccludeeStage::CullBlockEntityJob(const size_t cameraIndex)
 {
-	if(mMaskedOcclusionCulling->mDepthBuffer.bmIsOccluderExist == true)
+	if(mMaskedOcclusionCulling->IsOccluderExist() == true)
 	{
 		while (true)
 		{

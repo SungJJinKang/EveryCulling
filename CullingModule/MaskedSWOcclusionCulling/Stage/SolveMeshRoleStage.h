@@ -10,6 +10,10 @@ namespace culling
 	
 	private:
 
+		std::atomic<size_t> mOccluderCount;
+		bool IsOccluderCapacityFull() const;
+		size_t IncreamentOccluderCount();
+
 		bool CheckIsOccluderFromBoundingSphere
 		(
 			const size_t cameraIndex,
@@ -39,6 +43,7 @@ namespace culling
 		
 		void CullBlockEntityJob(const size_t cameraIndex) override;
 		const char* GetCullingModuleName() const override;
+		void ResetCullingModule() override;
 	};
 }
 

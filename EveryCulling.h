@@ -89,7 +89,7 @@ namespace culling
 		std::atomic<bool> mIsCullJobFinished;
 
 		void AllocateEntityBlockPool();
-		void ResetEntityBlock(culling::EntityBlock* entityBlock);
+		void ClearEntityBlock(culling::EntityBlock* entityBlock);
 		culling::EntityBlock* AllocateNewEntityBlockFromPool();
 		void RemoveEntityFromBlock(EntityBlock* ownerEntityBlock, std::uint32_t entityIndexInBlock);
 		/// <summary>
@@ -102,7 +102,7 @@ namespace culling
 		/// <summary>
 		/// Reset VisibleFlag
 		/// </summary>
-		void SetAllOneIsVisibleFlag();
+		void ResetEntityBlocks();
 
 	public:
 

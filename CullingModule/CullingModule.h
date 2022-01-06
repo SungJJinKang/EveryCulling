@@ -59,7 +59,7 @@ namespace culling
 		virtual void ResetCullingModule();
 		FORCE_INLINE std::uint32_t GetFinishedThreadCount(const size_t cameraIndex) const
 		{
-			return mCullJobState.mFinishedThreadCount[cameraIndex].load(std::memory_order_acquire);
+			return mCullJobState.mFinishedThreadCount[cameraIndex];
 		}
 
 

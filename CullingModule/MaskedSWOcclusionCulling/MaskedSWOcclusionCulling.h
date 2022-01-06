@@ -45,16 +45,10 @@ namespace culling
 
 
 
-		void GetOccluderCandidates()
-		{
-
-		}
+		std::atomic<size_t> mBinnedOccluderCount;
 
 	public:
-
 		
-
-	
 		culling::EveryCulling* const mEveryCulling;
 
 		SolveMeshRoleStage mSolveMeshRoleStage;
@@ -74,6 +68,41 @@ namespace culling
 		void ResetState();
 		void CullBlockEntityJob(const size_t cameraIndex) override;
 		const char* GetCullingModuleName() const override;
+
+		/// <summary>
+		/// If fail, return 0
+		/// </summary>
+		/// <returns></returns>
+		FORCE_INLINE size_t IncreamentBinnedOccluderCountIfPossible()
+		{
+			const size_t increamentedBinnedOccluderCount = mBinnedOccluderCount.fetch_add(1, std::memory_order_seq_cst);
+
+			if(increamentedBinnedOccluderCount < MAX_OCCLUDER_COUNT)
+			{
+				return increamentedBinnedOccluderCount;
+			}
+			else
+			{
+				mBinnedOccluderCount.fetch_add(-1, std::memory_order_seq_cst);
+				return 0;
+			}
+			
+		}
+
+		FORCE_INLINE bool GetIsBinnedOccluderListFull() const
+		{
+			return mBinnedOccluderCount >= MAX_OCCLUDER_COUNT;
+		}
+
+		FORCE_INLINE bool IsOccluderExist() const
+		{
+			return mBinnedOccluderCount > 0;
+		}
+
+		FORCE_INLINE size_t GetOccluderCount() const
+		{
+			return mBinnedOccluderCount;
+		}
 	};
 }
 
