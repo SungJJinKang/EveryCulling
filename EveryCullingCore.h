@@ -47,7 +47,7 @@
 #endif
 
 #if defined(_DEBUG) || true
-//#define PROFILING_CULLING
+#define PROFILING_CULLING
 #endif
 
 
