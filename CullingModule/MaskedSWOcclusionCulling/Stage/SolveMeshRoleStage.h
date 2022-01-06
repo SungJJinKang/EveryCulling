@@ -28,7 +28,8 @@ namespace culling
 		void SolveMeshRole
 		(
 			const size_t cameraIndex,
-			EntityBlock* const currentEntityBlock
+			EntityBlock* const currentEntityBlock,
+			bool& isOccluderExist
 		);
 
 	public:

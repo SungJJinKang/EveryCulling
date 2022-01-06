@@ -44,11 +44,10 @@ namespace culling
 
 		void ResetDepthBuffer();
 
-
-
-		std::atomic<std::int32_t> mBinnedOccluderCount;
+		std::atomic<bool> mIsOccluderExist;
 
 	public:
+
 		
 		culling::EveryCulling* const mEveryCulling;
 
@@ -70,40 +69,8 @@ namespace culling
 		void CullBlockEntityJob(const size_t cameraIndex) override;
 		const char* GetCullingModuleName() const override;
 
-		/// <summary>
-		/// If fail, return 0
-		/// </summary>
-		/// <returns></returns>
-		FORCE_INLINE std::int32_t IncreamentBinnedOccluderCountIfPossible()
-		{
-			const std::int32_t increamentedBinnedOccluderCount = mBinnedOccluderCount.fetch_add(1, std::memory_order_seq_cst);
-
-			if(increamentedBinnedOccluderCount < MAX_OCCLUDER_COUNT)
-			{
-				return increamentedBinnedOccluderCount;
-			}
-			else
-			{
-				mBinnedOccluderCount.fetch_add(-1, std::memory_order_seq_cst);
-				return INVALID_BINNED_OCCLUDER_COUNT;
-			}
-			
-		}
-
-		FORCE_INLINE bool GetIsBinnedOccluderListFull() const
-		{
-			return mBinnedOccluderCount >= MAX_OCCLUDER_COUNT;
-		}
-
-		FORCE_INLINE bool IsOccluderExist() const
-		{
-			return mBinnedOccluderCount > 0;
-		}
-
-		FORCE_INLINE std::int32_t GetOccluderCount() const
-		{
-			return mBinnedOccluderCount;
-		}
+		void SetIsOccluderExistTrue();
+		bool GetIsOccluderExist() const;
 	};
 }
 

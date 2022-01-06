@@ -60,7 +60,8 @@ culling::SolveMeshRoleStage::SolveMeshRoleStage(MaskedSWOcclusionCulling* occlus
 void culling::SolveMeshRoleStage::SolveMeshRole
 (
 	const size_t cameraIndex,
-	EntityBlock* const currentEntityBlock
+	EntityBlock* const currentEntityBlock,
+	bool& isOccluderExist
 )
 {
 	for(size_t entityIndex = 0 ; entityIndex < currentEntityBlock->mCurrentEntityCount ; entityIndex++)
@@ -70,24 +71,32 @@ void culling::SolveMeshRoleStage::SolveMeshRole
 			const bool isOccluder = CheckIsOccluderFromAABB(currentEntityBlock, entityIndex) && currentEntityBlock->GetIsIsAABBScreenSpacePointValid(entityIndex);
 
 			currentEntityBlock->SetIsOccluder(entityIndex, isOccluder);
+
+			isOccluderExist |= isOccluder;
 		}
 	}	
 }
 
 void culling::SolveMeshRoleStage::CullBlockEntityJob(const size_t cameraIndex)
 {
+	bool isOccluderExist = false;
 	while (true)
 	{
 		culling::EntityBlock* const nextEntityBlock = GetNextEntityBlock(cameraIndex);;
 
 		if (nextEntityBlock != nullptr)
 		{
-			SolveMeshRole(cameraIndex, nextEntityBlock);
+			SolveMeshRole(cameraIndex, nextEntityBlock, isOccluderExist);
 		}
 		else
 		{
 			break;
 		}
+	}
+
+	if(isOccluderExist == true)
+	{
+		mMaskedOcclusionCulling->SetIsOccluderExistTrue();
 	}
 }
 

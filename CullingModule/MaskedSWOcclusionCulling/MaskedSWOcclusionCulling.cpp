@@ -36,7 +36,7 @@ culling::MaskedSWOcclusionCulling::MaskedSWOcclusionCulling
 void culling::MaskedSWOcclusionCulling::ResetState()
 {
 	ResetDepthBuffer();
-	mBinnedOccluderCount.store(0, std::memory_order_relaxed);
+	mIsOccluderExist.store(false, std::memory_order_relaxed);
 }
 
 void culling::MaskedSWOcclusionCulling::CullBlockEntityJob(const size_t cameraIndex)
@@ -46,6 +46,16 @@ void culling::MaskedSWOcclusionCulling::CullBlockEntityJob(const size_t cameraIn
 const char* culling::MaskedSWOcclusionCulling::GetCullingModuleName() const
 {
 	return "MaskedSWOcclusionCulling";
+}
+
+void culling::MaskedSWOcclusionCulling::SetIsOccluderExistTrue()
+{
+	mIsOccluderExist = true;
+}
+
+bool culling::MaskedSWOcclusionCulling::GetIsOccluderExist() const
+{
+	return mIsOccluderExist;
 }
 
 

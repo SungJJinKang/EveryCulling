@@ -22,31 +22,13 @@ void culling::HizData::FillCoverageMask()
 
 void culling::TriangleList::Reset()
 {
-	mCurrentTriangleCount = 0;
+	mCurrentTriangleCount.store(0, std::memory_order_relaxed);
 }
 
 void culling::Tile::Reset()
 {
 	mHizDatas.Reset();
-	for(size_t i = 0 ; i < MAX_OCCLUDER_COUNT ; i++)
-	{
-		mBinnedTriangleList[i].Reset();
-	}
-}
-
-bool culling::Tile::GetIsTriangleBinned() const
-{
-	bool isTriangleBinned = false;
-	for (size_t i = 0; i < MAX_OCCLUDER_COUNT; i++)
-	{
-		if(mBinnedTriangleList[i].mCurrentTriangleCount > 0)
-		{
-			isTriangleBinned = true;
-			break;
-		}
-	}
-
-	return isTriangleBinned;
+	mBinnedTriangleList.Reset();
 }
 
 

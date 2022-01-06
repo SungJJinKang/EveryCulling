@@ -10,11 +10,8 @@
 
 #include "../Utility/RasterizerHelper.h"
 
-#define DEFAULT_BINNED_TRIANGLE_COUNT_PER_LOOP 8
 #define BIN_VERTEX_INDICE_COUNT_PER_THREAD 960
-
-static_assert(BIN_VERTEX_INDICE_COUNT_PER_THREAD % 3 == 0);
-static_assert((BIN_VERTEX_INDICE_COUNT_PER_THREAD / 3) % 8 == 0);
+#define DEFAULT_BINNED_TRIANGLE_COUNT_PER_LOOP 8
 
 #define CONVERT_TO_M256I(_M256F) *reinterpret_cast<const culling::M256I*>(&_M256F)
 
@@ -86,7 +83,6 @@ FORCE_INLINE void culling::BinTrianglesStage::BackfaceCulling
 
 FORCE_INLINE void culling::BinTrianglesStage::PassTrianglesToTileBin
 (
-	const size_t binnedTriangleIndex,
 	const culling::M256F& pointAScreenPixelPosX,
 	const culling::M256F& pointAScreenPixelPosY,
 	const culling::M256F& pointANdcSpaceVertexZ,
@@ -137,22 +133,26 @@ FORCE_INLINE void culling::BinTrianglesStage::PassTrianglesToTileBin
 					Tile* const targetTile = mMaskedOcclusionCulling->mDepthBuffer.GetTile(y, x);
 
 					//assert(targetTile->mBinnedTriangleList.GetIsBinFull() == false);
-					if(targetTile->GetBinnedTriangleListOfOccluder(binnedTriangleIndex)->GetIsBinFull() == false)
+
+					const size_t triListIndex = targetTile->mBinnedTriangleList.mCurrentTriangleCount++;
+
+					if(triListIndex < BIN_TRIANGLE_CAPACITY_PER_TILE)
 					{
-						const size_t triListIndex = targetTile->GetBinnedTriangleListOfOccluder(binnedTriangleIndex)->mCurrentTriangleCount++;
-						
-						targetTile->GetBinnedTriangleListOfOccluder(binnedTriangleIndex)->VertexX[0][triListIndex] = (reinterpret_cast<const float*>(&pointAScreenPixelPosX))[triangleIndex];
-						targetTile->GetBinnedTriangleListOfOccluder(binnedTriangleIndex)->VertexY[0][triListIndex] = (reinterpret_cast<const float*>(&pointAScreenPixelPosY))[triangleIndex];
-						targetTile->GetBinnedTriangleListOfOccluder(binnedTriangleIndex)->VertexZ[0][triListIndex] = (reinterpret_cast<const float*>(&pointANdcSpaceVertexZ))[triangleIndex];
+						targetTile->mBinnedTriangleList.VertexX[0][triListIndex] = (reinterpret_cast<const float*>(&pointAScreenPixelPosX))[triangleIndex];
+						targetTile->mBinnedTriangleList.VertexY[0][triListIndex] = (reinterpret_cast<const float*>(&pointAScreenPixelPosY))[triangleIndex];
+						targetTile->mBinnedTriangleList.VertexZ[0][triListIndex] = (reinterpret_cast<const float*>(&pointANdcSpaceVertexZ))[triangleIndex];
 
-						targetTile->GetBinnedTriangleListOfOccluder(binnedTriangleIndex)->VertexX[1][triListIndex] = (reinterpret_cast<const float*>(&pointBScreenPixelPosX))[triangleIndex];
-						targetTile->GetBinnedTriangleListOfOccluder(binnedTriangleIndex)->VertexY[1][triListIndex] = (reinterpret_cast<const float*>(&pointBScreenPixelPosY))[triangleIndex];
-						targetTile->GetBinnedTriangleListOfOccluder(binnedTriangleIndex)->VertexZ[1][triListIndex] = (reinterpret_cast<const float*>(&pointBNdcSpaceVertexZ))[triangleIndex];
+						targetTile->mBinnedTriangleList.VertexX[1][triListIndex] = (reinterpret_cast<const float*>(&pointBScreenPixelPosX))[triangleIndex];
+						targetTile->mBinnedTriangleList.VertexY[1][triListIndex] = (reinterpret_cast<const float*>(&pointBScreenPixelPosY))[triangleIndex];
+						targetTile->mBinnedTriangleList.VertexZ[1][triListIndex] = (reinterpret_cast<const float*>(&pointBNdcSpaceVertexZ))[triangleIndex];
 
-						targetTile->GetBinnedTriangleListOfOccluder(binnedTriangleIndex)->VertexX[2][triListIndex] = (reinterpret_cast<const float*>(&pointCScreenPixelPosX))[triangleIndex];
-						targetTile->GetBinnedTriangleListOfOccluder(binnedTriangleIndex)->VertexY[2][triListIndex] = (reinterpret_cast<const float*>(&pointCScreenPixelPosY))[triangleIndex];
-						targetTile->GetBinnedTriangleListOfOccluder(binnedTriangleIndex)->VertexZ[2][triListIndex] = (reinterpret_cast<const float*>(&pointCNdcSpaceVertexZ))[triangleIndex];
-						
+						targetTile->mBinnedTriangleList.VertexX[2][triListIndex] = (reinterpret_cast<const float*>(&pointCScreenPixelPosX))[triangleIndex];
+						targetTile->mBinnedTriangleList.VertexY[2][triListIndex] = (reinterpret_cast<const float*>(&pointCScreenPixelPosY))[triangleIndex];
+						targetTile->mBinnedTriangleList.VertexZ[2][triListIndex] = (reinterpret_cast<const float*>(&pointCNdcSpaceVertexZ))[triangleIndex];
+					}
+					else
+					{
+						targetTile->mBinnedTriangleList.mCurrentTriangleCount--;
 					}
 				}
 			}
@@ -318,15 +318,12 @@ void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t 
 			entityBlock->GetIsOccluder(entityIndexInEntityBlock) == true
 		)
 		{
-			static_assert(BIN_VERTEX_INDICE_COUNT_PER_THREAD % 3 == 0);
-			const std::uint32_t currentBinnedIndiceCount = vertexData.mBinnedIndiceCount.fetch_add(BIN_VERTEX_INDICE_COUNT_PER_THREAD, std::memory_order_seq_cst);
-
-			if(currentBinnedIndiceCount < vertexData.mIndiceCount)
+			while(true)
 			{
-				// Back object can have less value than front object.
-				const std::int32_t binnedTriangleListIndex = mMaskedOcclusionCulling->IncreamentBinnedOccluderCountIfPossible();
+				static_assert(BIN_VERTEX_INDICE_COUNT_PER_THREAD % 3 == 0);
+				const std::uint32_t currentBinnedIndiceCount = vertexData.mBinnedIndiceCount.fetch_add(BIN_VERTEX_INDICE_COUNT_PER_THREAD, std::memory_order_seq_cst);
 
-				if (binnedTriangleListIndex != INVALID_BINNED_OCCLUDER_COUNT)
+				if (currentBinnedIndiceCount < vertexData.mIndiceCount)
 				{
 					const culling::Mat4x4 modelToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex) * entityBlock->GetModelMatrix(entityIndexInEntityBlock);
 
@@ -335,7 +332,6 @@ void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t 
 
 					BinTriangles
 					(
-						binnedTriangleListIndex,
 						reinterpret_cast<const float*>(vertexData.mVertices),
 						vertexData.mVerticeCount,
 						startIndicePtr,
@@ -346,7 +342,6 @@ void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t 
 				}
 				else
 				{
-					// Binned Occluder Triangle List is full. Stop binning triangle.
 					break;
 				}
 			}
@@ -382,7 +377,6 @@ const char* culling::BinTrianglesStage::GetCullingModuleName() const
 
 FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 (
-	const size_t binnedTriangleIndex,
 	const float* const vertices, 
 	const size_t verticeCount,
 	const std::uint32_t* const vertexIndices, 
@@ -594,7 +588,7 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 			);
 
 #ifdef DEBUG_CULLING
-			for (size_t triangleIndex = 0; triangleIndex < triangleCountPerLoop; triangleIndex++)
+			for (size_t triangleIndex = 0; triangleIndex < fetchTriangleCount; triangleIndex++)
 			{
 				if ((triangleCullMask & (1 << triangleIndex)) != 0x00000000)
 				{
@@ -607,7 +601,6 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 			// Pass triangle in counter clock wise
 			PassTrianglesToTileBin
 			(
-				binnedTriangleIndex,
 				screenPixelPosX[0],
 				screenPixelPosY[0],
 				ndcSpaceVertexZ[0],
@@ -654,7 +647,7 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 			);
 
 #ifdef DEBUG_CULLING
-			for (size_t triangleIndex = 0; triangleIndex < triangleCountPerLoop; triangleIndex++)
+			for (size_t triangleIndex = 0; triangleIndex < fetchTriangleCount; triangleIndex++)
 			{
 				if ((triangleCullMask & (1 << triangleIndex)) != 0x00000000)
 				{
@@ -667,7 +660,6 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 			// Pass triangle in counter clock wise
 			PassTrianglesToTileBin
 			(
-				binnedTriangleIndex,
 				screenPixelPosX[2],
 				screenPixelPosY[2],
 				ndcSpaceVertexZ[2],

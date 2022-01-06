@@ -55,7 +55,6 @@ namespace culling
 
 		FORCE_INLINE void PassTrianglesToTileBin
 		(
-			const size_t binnedTriangleIndex,
 			const culling::M256F& pointAScreenPixelPosX,
 			const culling::M256F& pointAScreenPixelPosY,
 			const culling::M256F& pointANdcSpaceVertexZ,
@@ -131,7 +130,6 @@ namespace culling
 		/// <param name="modelToClipspaceMatrix"></param>
 		FORCE_INLINE void BinTriangles
 		(
-			const size_t binnedTriangleIndex,
 			const float* const vertices,
 			const size_t verticeCount,
 			const std::uint32_t* const vertexIndices,

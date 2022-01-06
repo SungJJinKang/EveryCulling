@@ -6,6 +6,9 @@
 
 #include "../../DataType/Math/Triangle.h"
 
+
+#define BIN_TRIANGLE_CAPACITY_PER_TILE 32
+
 namespace culling
 {
 	class SWDepthBuffer;
@@ -154,16 +157,18 @@ namespace culling
 	/// </summary>
 	struct alignas(CACHE_LINE_SIZE) TriangleList
 	{
-		alignas(32) float VertexX[3][BIN_TRIANGLE_CAPACITY_PER_TILE_PER_OBJECT]; // VertexX[0] : Point1 of Triangle, VertexX[1] : Point2 of Triangle, VertexX[2] : 3 of Triangle
-		alignas(32) float VertexY[3][BIN_TRIANGLE_CAPACITY_PER_TILE_PER_OBJECT];
-		alignas(32) float VertexZ[3][BIN_TRIANGLE_CAPACITY_PER_TILE_PER_OBJECT];
+		alignas(32) float VertexX[3][BIN_TRIANGLE_CAPACITY_PER_TILE]; // VertexX[0] : Point1 of Triangle, VertexX[1] : Point2 of Triangle, VertexX[2] : 3 of Triangle
+		alignas(32) float VertexY[3][BIN_TRIANGLE_CAPACITY_PER_TILE];
+		alignas(32) float VertexZ[3][BIN_TRIANGLE_CAPACITY_PER_TILE];
 
-		size_t mCurrentTriangleCount = 0;
+		char padding[1024];
+		std::atomic<size_t> mCurrentTriangleCount = 0;
+		char padding2[1024];
 
 		void Reset();
 		FORCE_INLINE bool GetIsBinFull() const
 		{
-			return mCurrentTriangleCount >= BIN_TRIANGLE_CAPACITY_PER_TILE_PER_OBJECT;
+			return mCurrentTriangleCount >= BIN_TRIANGLE_CAPACITY_PER_TILE;
 		}
 	};
 
@@ -183,11 +188,11 @@ namespace culling
 		std::uint32_t mLeftBottomTileOrginY = 0xFFFFFFFF;
 
 
-		TriangleList mBinnedTriangleList[MAX_OCCLUDER_COUNT];
 
 	public:
 
 		HizData mHizDatas;
+		TriangleList mBinnedTriangleList;
 
 		void Reset();
 		FORCE_INLINE std::uint32_t GetLeftBottomTileOrginX() const
@@ -199,14 +204,7 @@ namespace culling
 		{
 			return mLeftBottomTileOrginY;
 		}
-
-		FORCE_INLINE TriangleList* GetBinnedTriangleListOfOccluder(const size_t index)
-		{
-			assert(index < MAX_OCCLUDER_COUNT);
-			return mBinnedTriangleList + index;
-		}
-
-		bool GetIsTriangleBinned() const;
+		
 	};
 
 	struct Resolution
