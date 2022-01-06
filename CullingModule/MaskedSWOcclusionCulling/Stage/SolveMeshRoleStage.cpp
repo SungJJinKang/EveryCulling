@@ -44,6 +44,7 @@ FORCE_INLINE bool culling::SolveMeshRoleStage::CheckIsOccluderFromAABB
 		= (clampedAABBMaxScreenSpacePointX - clampedAABBMinScreenSpacePointX) *
 		  (clampedAABBMaxScreenSpacePointY - clampedAABBMinScreenSpacePointY);
 
+	assert(screenSpaceAABBArea >= 0.0f);
 	//assert(screenSpaceAABBArea > std::numeric_limits<float>::epsilon());
 
 	return screenSpaceAABBArea > mOccluderAABBScreenSpaceMinArea;
