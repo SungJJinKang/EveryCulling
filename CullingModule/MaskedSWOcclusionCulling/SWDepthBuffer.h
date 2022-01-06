@@ -7,7 +7,7 @@
 #include "../../DataType/Math/Triangle.h"
 
 
-#define BIN_TRIANGLE_CAPACITY_PER_TILE 32
+#define BIN_TRIANGLE_CAPACITY_PER_TILE 16
 
 namespace culling
 {

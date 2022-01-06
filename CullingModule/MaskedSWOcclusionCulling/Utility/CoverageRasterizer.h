@@ -74,7 +74,7 @@ namespace culling
 			const culling::M256I& rightFaceEvent,
 
 			const float bottomEdgeY,
-			const float& topEdgeY
+			const float topEdgeY
 		)
 		{
 #ifdef DEBUG_CULLING
