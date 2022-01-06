@@ -20,15 +20,11 @@ void culling::HizData::FillCoverageMask()
 	L1CoverageMask = _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF);
 }
 
-void culling::TriangleList::Reset()
-{
-	mCurrentTriangleCount.store(0, std::memory_order_relaxed);
-}
 
 void culling::Tile::Reset()
 {
 	mHizDatas.Reset();
-	mBinnedTriangleList.Reset();
+	mmBinnedTriangleCount = 0;
 }
 
 

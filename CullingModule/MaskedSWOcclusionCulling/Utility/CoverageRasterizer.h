@@ -67,15 +67,14 @@ namespace culling
 		
 		FORCE_INLINE extern void FillFlatTriangleBatch
 		(
-			const size_t triangleCount,
-			culling::M256I* const outCoverageMask, // 8 coverage mask. array size should be 8
+			culling::M256I& outCoverageMask, // 8 coverage mask. array size should be 8
 			const Vec2& TileLeftBottomOriginPoint,
 
-			const culling::M256I* const leftFaceEvent,
-			const culling::M256I* const rightFaceEvent,
+			const culling::M256I& leftFaceEvent,
+			const culling::M256I& rightFaceEvent,
 
-			const culling::M256F& bottomEdgeY,
-			const culling::M256F& topEdgeY
+			const float bottomEdgeY,
+			const float& topEdgeY
 		)
 		{
 #ifdef DEBUG_CULLING
@@ -84,28 +83,25 @@ namespace culling
 				assert(reinterpret_cast<const float*>(&bottomEdgeY)[i] <= reinterpret_cast<const float*>(&topEdgeY)[i]);
 			}
 #endif
-			culling::M256I Mask1[8];
-			culling::M256I Mask2[8];
+			culling::M256I Mask1;
+			culling::M256I Mask2;
 
-			culling::M256I Result[8];
+			culling::M256I Result;
 
-			culling::M256F aboveFlatBottomTriangleFace[8];
-			culling::M256F belowFlatTopTriangleFace[8];
+			culling::M256F aboveFlatBottomTriangleFace;
+			culling::M256F belowFlatTopTriangleFace;
 
-			for (size_t triIndex = 0; triIndex < triangleCount; triIndex++)
-			{
-				Mask1[triIndex] = _mm256_sllv_epi32(_mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF), leftFaceEvent[triIndex]);
-				Mask2[triIndex] = _mm256_sllv_epi32(_mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF), rightFaceEvent[triIndex]);
+			Mask1 = _mm256_sllv_epi32(_mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF), leftFaceEvent);
+			Mask2 = _mm256_sllv_epi32(_mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF), rightFaceEvent);
 
-				const culling::M256F blend = _mm256_andnot_ps(*reinterpret_cast<const culling::M256F*>(Mask2 + triIndex), *reinterpret_cast<const culling::M256F*>(Mask1 + triIndex));
-				Result[triIndex] = *reinterpret_cast<const culling::M256I*>(&blend);
+			const culling::M256F blend = _mm256_andnot_ps(*reinterpret_cast<const culling::M256F*>(&Mask2), *reinterpret_cast<const culling::M256F*>(&Mask1));
+			Result = *reinterpret_cast<const culling::M256I*>(&blend);
 
-				aboveFlatBottomTriangleFace[triIndex] = _mm256_cmp_ps(_mm256_setr_ps(TileLeftBottomOriginPoint.y + 0.5f, TileLeftBottomOriginPoint.y + 1.5f, TileLeftBottomOriginPoint.y + 2.5f, TileLeftBottomOriginPoint.y + 3.5f, TileLeftBottomOriginPoint.y + 4.5f, TileLeftBottomOriginPoint.y + 5.5f, TileLeftBottomOriginPoint.y + 6.5f, TileLeftBottomOriginPoint.y + 7.5f), _mm256_set1_ps(reinterpret_cast<const float*>(&bottomEdgeY)[triIndex]), _CMP_GE_OQ);
-				belowFlatTopTriangleFace[triIndex] = _mm256_cmp_ps(_mm256_setr_ps(TileLeftBottomOriginPoint.y + 0.5f, TileLeftBottomOriginPoint.y + 1.5f, TileLeftBottomOriginPoint.y + 2.5f, TileLeftBottomOriginPoint.y + 3.5f, TileLeftBottomOriginPoint.y + 4.5f, TileLeftBottomOriginPoint.y + 5.5f, TileLeftBottomOriginPoint.y + 6.5f, TileLeftBottomOriginPoint.y + 7.5f), _mm256_set1_ps(reinterpret_cast<const float*>(&topEdgeY)[triIndex]), _CMP_LE_OQ);
+			aboveFlatBottomTriangleFace = _mm256_cmp_ps(_mm256_setr_ps(TileLeftBottomOriginPoint.y + 0.5f, TileLeftBottomOriginPoint.y + 1.5f, TileLeftBottomOriginPoint.y + 2.5f, TileLeftBottomOriginPoint.y + 3.5f, TileLeftBottomOriginPoint.y + 4.5f, TileLeftBottomOriginPoint.y + 5.5f, TileLeftBottomOriginPoint.y + 6.5f, TileLeftBottomOriginPoint.y + 7.5f), _mm256_set1_ps(bottomEdgeY), _CMP_GE_OQ);
+			belowFlatTopTriangleFace = _mm256_cmp_ps(_mm256_setr_ps(TileLeftBottomOriginPoint.y + 0.5f, TileLeftBottomOriginPoint.y + 1.5f, TileLeftBottomOriginPoint.y + 2.5f, TileLeftBottomOriginPoint.y + 3.5f, TileLeftBottomOriginPoint.y + 4.5f, TileLeftBottomOriginPoint.y + 5.5f, TileLeftBottomOriginPoint.y + 6.5f, TileLeftBottomOriginPoint.y + 7.5f), _mm256_set1_ps(topEdgeY), _CMP_LE_OQ);
 
-				Result[triIndex] = _mm256_and_si256(Result[triIndex], *reinterpret_cast<const culling::M256I*>(aboveFlatBottomTriangleFace + triIndex));
-				outCoverageMask[triIndex] = _mm256_and_si256(Result[triIndex], *reinterpret_cast<const culling::M256I*>(belowFlatTopTriangleFace + triIndex));
-			}
+			Result = _mm256_and_si256(Result, *reinterpret_cast<const culling::M256I*>(&aboveFlatBottomTriangleFace));
+			outCoverageMask = _mm256_and_si256(Result, *reinterpret_cast<const culling::M256I*>(&belowFlatTopTriangleFace));
 		}
 		/*
 		extern void FillTriangleBatch

@@ -151,25 +151,23 @@ namespace culling
 	};
 	
 	/// <summary>
-	/// TriangleList, Bin
+	/// TriangleData, Bin
 	/// 
 	/// TwoDTriangle should be reserved after initialized!!!!
 	/// </summary>
-	struct alignas(CACHE_LINE_SIZE) TriangleList
+	struct alignas(CACHE_LINE_SIZE) TriangleData
 	{
-		alignas(32) float VertexX[3][BIN_TRIANGLE_CAPACITY_PER_TILE]; // VertexX[0] : Point1 of Triangle, VertexX[1] : Point2 of Triangle, VertexX[2] : 3 of Triangle
-		alignas(32) float VertexY[3][BIN_TRIANGLE_CAPACITY_PER_TILE];
-		alignas(32) float VertexZ[3][BIN_TRIANGLE_CAPACITY_PER_TILE];
+		float PointAVertexX;
+		float PointAVertexY;
+		float PointAVertexZ;
 
-		char padding[1024];
-		std::atomic<size_t> mCurrentTriangleCount = 0;
-		char padding2[1024];
+		float PointBVertexX;
+		float PointBVertexY;
+		float PointBVertexZ;
 
-		void Reset();
-		FORCE_INLINE bool GetIsBinFull() const
-		{
-			return mCurrentTriangleCount >= BIN_TRIANGLE_CAPACITY_PER_TILE;
-		}
+		float PointCVertexX;
+		float PointCVertexY;
+		float PointCVertexZ;
 	};
 
 	static_assert(BIN_TRIANGLE_CAPACITY_PER_TILE_PER_OBJECT % 8 == 0);
@@ -192,7 +190,8 @@ namespace culling
 	public:
 
 		HizData mHizDatas;
-		TriangleList mBinnedTriangleList;
+		TriangleData mBinnedTriangleList[BIN_TRIANGLE_CAPACITY_PER_TILE];
+		std::atomic<size_t> mmBinnedTriangleCount;
 
 		void Reset();
 		FORCE_INLINE std::uint32_t GetLeftBottomTileOrginX() const
