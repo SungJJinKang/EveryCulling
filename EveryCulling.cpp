@@ -8,6 +8,7 @@
 
 #include "CullingModule/ViewFrustumCulling/ViewFrustumCulling.h"
 #include "CullingModule/PreCulling/PreCulling.h"
+#include "CullingModule/DistanceCulling/DistanceCulling.h"
 
 #ifdef ENABLE_SCREEN_SAPCE_BOUDING_SPHERE_CULLING
 #include "CullingModule/ScreenSpaceBoundingSphereCulling/ScreenSpaceBoundingSphereCulling.h"
@@ -88,12 +89,6 @@ void culling::EveryCulling::AllocateEntityBlockPool()
 	mAllocatedEntityBlockChunkList.push_back(newEntityBlockChunk);
 }
 
-void culling::EveryCulling::ClearEntityBlock(culling::EntityBlock* entityBlock)
-{
-	entityBlock->mCurrentEntityCount = 0;
-	//std::memset(entityBlock->mQueryObjects, 0x00, sizeof(decltype(*(entityBlock->mQueryObjects))) * culling::ENTITY_COUNT_IN_ENTITY_BLOCK);
-	
-}
 
 void culling::EveryCulling::RemoveEntityFromBlock(EntityBlock* ownerEntityBlock, std::uint32_t entityIndexInBlock)
 {
@@ -210,6 +205,12 @@ void culling::EveryCulling::SetEnabledCullingModule(const CullingModuleType cull
 
 		break;
 
+	case CullingModuleType::_DistanceCulling:
+
+		mDistanceCulling->IsEnabled = isEnabled;
+
+		break;
+
 #ifdef ENABLE_QUERY_OCCLUSION
 	case CullingModuleType::_HwQueryOcclusionCulling:
 
@@ -222,8 +223,8 @@ void culling::EveryCulling::SetEnabledCullingModule(const CullingModuleType cull
 
 culling::EntityBlock* culling::EveryCulling::AllocateNewEntityBlockFromPool()
 {
-	EntityBlock* newEntityBlock = GetNewEntityBlockFromPool();
-	ClearEntityBlock(newEntityBlock);
+	EntityBlock* const newEntityBlock = GetNewEntityBlockFromPool();
+	newEntityBlock->ClearEntityBlock();
 
 	mActiveEntityBlockList.push_back(newEntityBlock);
 
@@ -275,7 +276,8 @@ void culling::EveryCulling::RemoveEntityFromBlock(EntityBlockViewer& entityBlock
 
 culling::EveryCulling::EveryCulling(const std::uint32_t resolutionWidth, const std::uint32_t resolutionHeight)
 	:
-	mEarlyOutDisabledObject{ std::make_unique<PreCulling>(this) },
+	mPreCulling{ std::make_unique<PreCulling>(this) },
+	mDistanceCulling{ std::make_unique<DistanceCulling>(this) },
 	mViewFrustumCulling{ std::make_unique<ViewFrustumCulling>(this) }
 #ifdef ENABLE_SCREEN_SAPCE_AABB_CULLING
 	, mScreenSpaceBoudingSphereCulling{ std::make_unique<ScreenSpaceBoundingSphereCulling>(this) }
@@ -286,7 +288,8 @@ culling::EveryCulling::EveryCulling(const std::uint32_t resolutionWidth, const s
 #endif
 	, mUpdatedCullingModules
 		{
-			mEarlyOutDisabledObject.get(),
+			mPreCulling.get(),
+			mDistanceCulling.get(),
 			mViewFrustumCulling.get(),
 	#ifdef ENABLE_SCREEN_SAPCE_BOUDING_SPHERE_CULLING
 			& (mScreenSpaceBoudingSphereCulling),

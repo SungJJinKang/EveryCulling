@@ -27,6 +27,7 @@ void culling::EntityBlockViewer::SetMeshVertexData
 	const size_t verticeStride
 )
 {
+	assert(GetIsActive() == true);
 	if (GetIsActive() == true)
 	{
 		mTargetEntityBlock->mVertexDatas[mEntityIndexInBlock].mVertices = vertices;

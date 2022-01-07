@@ -31,7 +31,7 @@ namespace culling
 {
 
 	//This code doesn't consider Memory alignment optimzation.
-	inline constexpr size_t ENTITY_COUNT_IN_ENTITY_BLOCK = 20;
+	inline constexpr size_t ENTITY_COUNT_IN_ENTITY_BLOCK = 16;
 
 	/// <summary>
 	/// EntityBlock size should be less 4KB(Page size) for Block data being allocated in a page
@@ -53,7 +53,7 @@ namespace culling
 		/// If Size of mIsVisibleBitflag isn't multiples of 256bit,
 		/// Setting mIsVisibleBitflag make mPositionAndBoundingSpheres value dirty
 		/// </summary>
-		culling::Position_BoundingSphereRadius mPositionAndBoundingSpheres[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		alignas(32) culling::Position_BoundingSphereRadius mPositionAndBoundingSpheres[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 #ifdef ENABLE_QUERY_OCCLUSION
 		culling::QueryObject* mQueryObjects[ENTITY_COUNT_IN_ENTITY_BLOCK];
@@ -90,6 +90,8 @@ namespace culling
 		culling::Mat4x4 mModelMatrixes[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 		bool mIsOccluder[ENTITY_COUNT_IN_ENTITY_BLOCK];
+
+		float mDesiredMaxDrawDistance[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		
 		/// <summary>
 		/// this variable is only used to decide whether to free this EntityBlock
@@ -243,15 +245,33 @@ namespace culling
 			std::memset(mIsVisibleBitflag, 0xFF, sizeof(char) * ENTITY_COUNT_IN_ENTITY_BLOCK);
 			std::memset(mIsAABBMinNDCZDataUsedForQuery, 0xFF, sizeof(char) * ENTITY_COUNT_IN_ENTITY_BLOCK);
 		}
+
+		FORCE_INLINE void SetDesiredMaxDrawDistance(const size_t entityIndex, const float desiredMaxDrawDistance)
+		{
+			assert(entityIndex < mCurrentEntityCount);
+			assert(desiredMaxDrawDistance >= 0.0f);
+
+			mDesiredMaxDrawDistance[entityIndex] = desiredMaxDrawDistance;
+		}
+
+		FORCE_INLINE float GetDesiredMaxDrawDistance(const size_t entityIndex)
+		{
+			assert(entityIndex < mCurrentEntityCount);
+			assert(mDesiredMaxDrawDistance[entityIndex] >= 0.0f);
+
+			return mDesiredMaxDrawDistance[entityIndex];
+		}
+
+		void ClearEntityBlock();
 	};
 
-	
+
 
 	/// <summary>
 	/// Size of Entity block should be less than 4kb(page size)
 	/// </summary>
 	static_assert(sizeof(EntityBlock) < PAGE_SIZE);
-
+	static_assert(sizeof(culling::Position_BoundingSphereRadius) == 16);
 	/// <summary>
 	/// ENTITY_COUNT_IN_ENTITY_BLOCK should be even number
 	/// </summary>

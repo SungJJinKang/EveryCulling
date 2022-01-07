@@ -154,8 +154,8 @@
 
 
 // Distance Culling
-#ifndef ENABLE_DISTANCE_CULLING
-//#define ENABLE_DISTANCE_CULLING
+#ifndef DEFAULT_DESIRED_MAX_DRAW_DISTANCE
+#define DEFAULT_DESIRED_MAX_DRAW_DISTANCE 3000.0f
 #endif
 
 // Query Occlusion

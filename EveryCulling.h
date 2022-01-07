@@ -23,6 +23,7 @@ namespace culling
 	class MaskedSWOcclusionCulling;
 	class QueryOcclusionCulling;
 	class PreCulling;
+	class DistanceCulling;
 	struct EntityBlock;
 
 	struct EntityInfoInEntityBlock
@@ -87,7 +88,6 @@ namespace culling
 		std::vector<EntityBlock*> mAllocatedEntityBlockChunkList{};
 		
 		void AllocateEntityBlockPool();
-		void ClearEntityBlock(culling::EntityBlock* entityBlock);
 		culling::EntityBlock* AllocateNewEntityBlockFromPool();
 		void RemoveEntityFromBlock(EntityBlock* ownerEntityBlock, std::uint32_t entityIndexInBlock);
 		/// <summary>
@@ -104,7 +104,8 @@ namespace culling
 
 	public:
 
-		std::unique_ptr<PreCulling> mEarlyOutDisabledObject;
+		std::unique_ptr<PreCulling> mPreCulling;
+		std::unique_ptr<DistanceCulling> mDistanceCulling;
 		std::unique_ptr<ViewFrustumCulling> mViewFrustumCulling;
 #ifdef ENABLE_SCREEN_SAPCE_BOUDING_SPHERE_CULLING
 		std::unique_ptr<ScreenSpaceBoundingSphereCulling> mScreenSpaceBoudingSphereCulling;
@@ -144,7 +145,8 @@ namespace culling
 		{
 			_ViewFrustumCulling,
 			_MaskedSWOcclusionCulling,
-			_HwQueryOcclusionCulling
+			_HwQueryOcclusionCulling,
+			_DistanceCulling
 		};
 
 		EveryCulling() = delete;

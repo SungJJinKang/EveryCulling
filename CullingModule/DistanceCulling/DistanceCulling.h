@@ -26,30 +26,23 @@ namespace culling
 	/// will be culled from view 
 	/// when they are CullDistanceVolume.mCullDistance or more from the Camera.
 	/// </summary>
-	class DistanceCulling : CullingModule
+	class DistanceCulling : public CullingModule
 	{
 
 	private:
 
-		std::vector<culling::CullDistanceVolume> mCullDistanceVolumes;
+		void DoDistanceCulling
+		(
+			const size_t cameraIndex,
+			culling::EntityBlock* const entityBlock
+		);
 
 	public:
 
-		// TODO : EntityBlock�� mPositionAndBoundingSpheres �̰� �׳� ����ϸ�ȴ�.
-		// �Ÿ� ���� �� sqrt�������� �׳� mCullDistance * mCullDistance�� ������
-		virtual void CullBlockEntityJob(EntityBlock* currentEntityBlock, size_t entityCountInBlock, size_t cameraIndex) final
-		{
-			if (mCullDistanceVolumes.size() == 0)
-			{
-				return;
-			}
+		DistanceCulling(EveryCulling* const everyCulling);
 
-
-		}
-
-		void AddCullDistanceVolume(culling::CullDistanceVolume cullDistanceVolume);
-		void DeleteCullDistanceVolume(size_t index);
 		const char* GetCullingModuleName() const override;
+		void CullBlockEntityJob(const size_t cameraIndex) override;
 	};
 }
 
