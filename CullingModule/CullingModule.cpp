@@ -17,6 +17,17 @@ culling::EntityBlock* culling::CullingModule::GetNextEntityBlock(const size_t ca
 	return currentEntityBlock;
 }
 
+culling::CullingModule::CullingModule
+(
+	EveryCulling* cullingSystem
+)
+:mCullingSystem{ cullingSystem }, IsEnabled(true)
+{
+
+}
+
+culling::CullingModule::~CullingModule() = default;
+
 void culling::CullingModule::ResetCullingModule()
 {
 	for (std::atomic<std::uint32_t>& atomicVal : mCullJobState.mCurrentCulledEntityBlockIndex)

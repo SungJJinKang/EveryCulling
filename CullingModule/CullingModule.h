@@ -44,15 +44,14 @@ namespace culling
 		/// <returns></returns>
 		culling::EntityBlock* GetNextEntityBlock(const size_t cameraIndex, const bool forceOrdering = true);
 
-		CullingModule(EveryCulling* frotbiteCullingSystem)
-			:mCullingSystem{ frotbiteCullingSystem }, IsEnabled(true)
-		{
-
-		}
+		
 
 		
 
 	public:
+
+		CullingModule(EveryCulling* cullingSystem);
+		virtual ~CullingModule();
 
 		bool IsEnabled;
 
