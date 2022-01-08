@@ -107,7 +107,10 @@ FORCE_INLINE void culling::PreCulling::ComputeScreenSpaceMinMaxAABBAndMinZ
 
 	const int isHomogeneousWNegativeMask = _mm256_movemask_ps(isHomogeneousWNegative);
 	entityBlock->SetIsAllAABBClipPointWPositive(entityIndex, (isHomogeneousWNegativeMask == 0x00000000));
-	entityBlock->SetIsAnyAABBClipPointWNegative(entityIndex, (isHomogeneousWNegativeMask != 0x000000FF));
+	entityBlock->SetIsAllAABBClipPointWNegative(entityIndex, (isHomogeneousWNegativeMask == 0x000000FF));
+
+	// If All vertex's w of clip space aabb is negative, it should be culled!
+	entityBlock->UpdateIsCulled(entityIndex, cameraIndex, isHomogeneousWNegativeMask == 0x000000FF);
 }
 
 void culling::PreCulling::DoPreCull

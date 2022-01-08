@@ -78,7 +78,7 @@ namespace culling
 		///	So AABBScreenSpacePoint is invalid
 		/// </summary>
 		bool mIsAllAABBClipPointWPositive[ENTITY_COUNT_IN_ENTITY_BLOCK];
-		bool mIsAnyAABBClipPointWNegative[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		bool mIsAllAABBClipPointWNegative[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 		// ---------------------------------------------------------------------------------------------------------------------------
 
@@ -103,19 +103,26 @@ namespace culling
 
 		// ----------------------------------------------------------------------------------------------------------------------
 
-		FORCE_INLINE bool GetIsAnyAABBClipPointWNegative(const size_t entityIndex) const
+		FORCE_INLINE bool GetIsAllAABBClipPointWNegative(const size_t entityIndex) const
 		{
 			assert(entityIndex < mCurrentEntityCount);
 
-			return mIsAnyAABBClipPointWNegative[entityIndex];
+			return mIsAllAABBClipPointWNegative[entityIndex];
 		}
-		
-		FORCE_INLINE void SetIsAnyAABBClipPointWNegative(const size_t entityIndex, const bool isAnyAABBClipPointWNegative)
+
+		FORCE_INLINE void SetIsAllAABBClipPointWNegative(const size_t entityIndex, const bool isAllAABBClipPointWNegative)
 		{
 			// Setting value to invalid index is acceptable
 			assert(entityIndex < ENTITY_COUNT_IN_ENTITY_BLOCK);
 
-			mIsAnyAABBClipPointWNegative[entityIndex] = isAnyAABBClipPointWNegative;
+			mIsAllAABBClipPointWNegative[entityIndex] = isAllAABBClipPointWNegative;
+		}
+
+		FORCE_INLINE bool GetIsAnyAABBClipPointWNegative(const size_t entityIndex) const
+		{
+			assert(entityIndex < mCurrentEntityCount);
+
+			return (mIsAllAABBClipPointWPositive[entityIndex] == false);
 		}
 
 		FORCE_INLINE bool GetIsAllAABBClipPointWPositive(const size_t entityIndex) const
@@ -165,7 +172,7 @@ namespace culling
 			// Setting value to invalid index is acceptable
 			assert(entityIndex < ENTITY_COUNT_IN_ENTITY_BLOCK);
 
-			const char cullMask = ~(((char)isCullded) << cameraIndex);
+			const char cullMask = ~((char)isCullded << cameraIndex);
 
 			mIsVisibleBitflag[entityIndex] &= cullMask;
 		}

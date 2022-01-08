@@ -67,7 +67,7 @@ void culling::SolveMeshRoleStage::SolveMeshRole
 	for(size_t entityIndex = 0 ; entityIndex < currentEntityBlock->mCurrentEntityCount ; entityIndex++)
 	{
 		if(currentEntityBlock->GetIsCulled(entityIndex, cameraIndex) == false)
-		{
+		{ // All vertices's w of clip space aabb is negative, it can't be occluder. it's already culled in PreCulling Stage
 			const bool isOccluder = CheckIsOccluderFromAABB(currentEntityBlock, entityIndex);
 
 			currentEntityBlock->SetIsOccluder(entityIndex, isOccluder);
