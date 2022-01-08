@@ -70,15 +70,15 @@ namespace culling
 		float mAABBMaxScreenSpacePointX[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		float mAABBMaxScreenSpacePointY[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		/// <summary>
-		/// This values is set only when mIsAABBMinNDCZDataUsedForQuery[entityIndex] is true
+		/// This values is set only when mIsAllAABBClipPointWPositive[entityIndex] is true
 		/// </summary>
 		float mAABBMinNDCZ[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		/// <summary>
 		/// If All vertex's homogeneous w of object aabb is negative.
 		///	So AABBScreenSpacePoint is invalid
 		/// </summary>
-		bool mIsAABBMinNDCZDataUsedForQuery[ENTITY_COUNT_IN_ENTITY_BLOCK];
-		bool mIsAABBScreenSpacePointValid[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		bool mIsAllAABBClipPointWPositive[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		bool mIsAnyAABBClipPointWNegative[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 		// ---------------------------------------------------------------------------------------------------------------------------
 
@@ -103,26 +103,26 @@ namespace culling
 
 		// ----------------------------------------------------------------------------------------------------------------------
 
-		FORCE_INLINE bool GetIsIsAABBScreenSpacePointValid(const size_t entityIndex) const
+		FORCE_INLINE bool GetIsAnyAABBClipPointWNegative(const size_t entityIndex) const
 		{
 			assert(entityIndex < mCurrentEntityCount);
 
-			return mIsAABBScreenSpacePointValid[entityIndex];
+			return mIsAnyAABBClipPointWNegative[entityIndex];
 		}
 		
-		FORCE_INLINE void SetIsAABBScreenSpacePointValid(const size_t entityIndex, const bool isAABBScreenSpacePointValid)
+		FORCE_INLINE void SetIsAnyAABBClipPointWNegative(const size_t entityIndex, const bool isAnyAABBClipPointWNegative)
 		{
 			// Setting value to invalid index is acceptable
 			assert(entityIndex < ENTITY_COUNT_IN_ENTITY_BLOCK);
 
-			mIsAABBScreenSpacePointValid[entityIndex] = isAABBScreenSpacePointValid;
+			mIsAnyAABBClipPointWNegative[entityIndex] = isAnyAABBClipPointWNegative;
 		}
 
-		FORCE_INLINE bool GetIsMinNDCZDataUsedForQuery(const size_t entityIndex) const
+		FORCE_INLINE bool GetIsAllAABBClipPointWPositive(const size_t entityIndex) const
 		{
 			assert(entityIndex < mCurrentEntityCount);
 
-			return mIsAABBMinNDCZDataUsedForQuery[entityIndex];
+			return mIsAllAABBClipPointWPositive[entityIndex];
 		}
 
 		/// <summary>
@@ -133,14 +133,14 @@ namespace culling
 		/// </summary>
 		/// <param name="entityIndex"></param>
 		/// <param name="cameraIndex"></param>
-		/// <param name="isAABBMinNDCZDataUsedForQuery"></param>
+		/// <param name="isAllAABBClipPointWPositive"></param>
 		/// <returns></returns>
-		FORCE_INLINE void SetIsMinNDCZDataUsedForQuery(const size_t entityIndex, const bool isAABBMinNDCZDataUsedForQuery)
+		FORCE_INLINE void SetIsAllAABBClipPointWPositive(const size_t entityIndex, const bool isAllAABBClipPointWPositive)
 		{
 			// Setting value to invalid index is acceptable
 			assert(entityIndex < ENTITY_COUNT_IN_ENTITY_BLOCK);
 			
-			mIsAABBMinNDCZDataUsedForQuery[entityIndex] = isAABBMinNDCZDataUsedForQuery;
+			mIsAllAABBClipPointWPositive[entityIndex] = isAllAABBClipPointWPositive;
 		}
 
 		FORCE_INLINE bool GetIsCulled(const size_t entityIndex, const size_t cameraIndex) const
@@ -248,7 +248,7 @@ namespace culling
 				mVertexDatas[entityIndex].Reset();
 			}
 			std::memset(mIsVisibleBitflag, 0xFF, sizeof(char) * ENTITY_COUNT_IN_ENTITY_BLOCK);
-			std::memset(mIsAABBMinNDCZDataUsedForQuery, 0xFF, sizeof(char) * ENTITY_COUNT_IN_ENTITY_BLOCK);
+			std::memset(mIsAllAABBClipPointWPositive, 0xFF, sizeof(char) * ENTITY_COUNT_IN_ENTITY_BLOCK);
 		}
 
 		FORCE_INLINE void SetDesiredMaxDrawDistance(const size_t entityIndex, const float desiredMaxDrawDistance)

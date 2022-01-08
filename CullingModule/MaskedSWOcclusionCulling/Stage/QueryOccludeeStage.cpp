@@ -109,7 +109,7 @@ void culling::QueryOccludeeStage::QueryOccludee
 		if
 		(
 			entityBlock->GetIsCulled(entityIndex, cameraIndex) == false && 
-			entityBlock->GetIsMinNDCZDataUsedForQuery(entityIndex) == true // if IsMinNDCZDataUsedForQuery is true, mIsAABBScreenSpacePointValid is also true
+			entityBlock->GetIsAllAABBClipPointWPositive(entityIndex) == true // if IsMinNDCZDataUsedForQuery is true, mIsAnyAABBClipPointWNegative is also true
 		)
 		{
 			ComputeBinBoundingBoxFromVertex

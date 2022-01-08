@@ -106,8 +106,8 @@ FORCE_INLINE void culling::PreCulling::ComputeScreenSpaceMinMaxAABBAndMinZ
 	entityBlock->mAABBMinNDCZ[entityIndex] = aabbMinDepthValue;
 
 	const int isHomogeneousWNegativeMask = _mm256_movemask_ps(isHomogeneousWNegative);
-	entityBlock->SetIsMinNDCZDataUsedForQuery(entityIndex, (isHomogeneousWNegativeMask == 0x00000000));
-	entityBlock->SetIsAABBScreenSpacePointValid(entityIndex, (isHomogeneousWNegativeMask != 0x000000FF));
+	entityBlock->SetIsAllAABBClipPointWPositive(entityIndex, (isHomogeneousWNegativeMask == 0x00000000));
+	entityBlock->SetIsAnyAABBClipPointWNegative(entityIndex, (isHomogeneousWNegativeMask != 0x000000FF));
 }
 
 void culling::PreCulling::DoPreCull
