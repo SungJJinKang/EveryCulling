@@ -51,35 +51,28 @@ namespace culling
 		/// This will be used for linearlly Frustum intersection check
 		///
 		/// If Size of mIsVisibleBitflag isn't multiples of 256bit,
-		/// Setting mIsVisibleBitflag make mPositionAndBoundingSpheres value dirty
+		/// Setting mIsVisibleBitflag make mWorldPositionAndWorldBoundingSphereRadius value dirty
 		/// </summary>
-		alignas(32) culling::Position_BoundingSphereRadius mPositionAndBoundingSpheres[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		alignas(64) culling::Position_BoundingSphereRadius mWorldPositionAndWorldBoundingSphereRadius[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 #ifdef ENABLE_QUERY_OCCLUSION
 		culling::QueryObject* mQueryObjects[ENTITY_COUNT_IN_ENTITY_BLOCK];
 #endif
 	
-		/// <summary>
-		/// Whether renderer component is enabled.
-		/// </summary>
-		bool mIsObjectEnabled[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		
-		VertexData mVertexDatas[ENTITY_COUNT_IN_ENTITY_BLOCK];
-		
-		culling::Vec4 mAABBMinWorldPoint[ENTITY_COUNT_IN_ENTITY_BLOCK];
-		culling::Vec4 mAABBMaxWorldPoint[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		alignas(64) VertexData mVertexDatas[ENTITY_COUNT_IN_ENTITY_BLOCK];
+
+		// Set in PreCulling Stage ---------------------------------------------------------------------------------------------------
 
 		// This variable is for a camera
 		float mAABBMinScreenSpacePointX[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		float mAABBMinScreenSpacePointY[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		float mAABBMaxScreenSpacePointX[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		float mAABBMaxScreenSpacePointY[ENTITY_COUNT_IN_ENTITY_BLOCK];
-
 		/// <summary>
 		/// This values is set only when mIsAABBMinNDCZDataUsedForQuery[entityIndex] is true
 		/// </summary>
 		float mAABBMinNDCZ[ENTITY_COUNT_IN_ENTITY_BLOCK];
-
 		/// <summary>
 		/// If All vertex's homogeneous w of object aabb is negative.
 		///	So AABBScreenSpacePoint is invalid
@@ -87,16 +80,28 @@ namespace culling
 		bool mIsAABBMinNDCZDataUsedForQuery[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		bool mIsAABBScreenSpacePointValid[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
+		// ---------------------------------------------------------------------------------------------------------------------------
+
+		alignas(64) bool mIsOccluder[ENTITY_COUNT_IN_ENTITY_BLOCK];
+
+		
+		// Below datas is set before start culling. -----------------------------------------------------------------------------
+
+		alignas(64) culling::Vec4 mAABBMinWorldPoint[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		culling::Vec4 mAABBMaxWorldPoint[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		culling::Mat4x4 mModelMatrixes[ENTITY_COUNT_IN_ENTITY_BLOCK];
-
-		bool mIsOccluder[ENTITY_COUNT_IN_ENTITY_BLOCK];
-
+		/// <summary>
+		/// Whether renderer component is enabled.
+		/// </summary>
+		bool mIsObjectEnabled[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		float mDesiredMaxDrawDistance[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		
 		/// <summary>
 		/// this variable is only used to decide whether to free this EntityBlock
 		/// </summary>
 		std::uint32_t mCurrentEntityCount;
+
+		// ----------------------------------------------------------------------------------------------------------------------
 
 		FORCE_INLINE bool GetIsIsAABBScreenSpacePointValid(const size_t entityIndex) const
 		{
@@ -225,7 +230,7 @@ namespace culling
 
 			culling::Vec4 vec = mAABBMaxWorldPoint[entityIndex] - mAABBMinWorldPoint[entityIndex];
 			vec[3] = 1.0f;
-			mPositionAndBoundingSpheres[entityIndex].SetBoundingSphereRadius(vec.magnitude() * 0.5f);
+			mWorldPositionAndWorldBoundingSphereRadius[entityIndex].SetBoundingSphereRadius(vec.magnitude() * 0.5f);
 		}
 
 		FORCE_INLINE void SetAABBWorldPosition(const size_t entityIndex, const float* const minWorldPos, const float* const maxWorldPos)

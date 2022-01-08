@@ -13,7 +13,7 @@ void culling::DistanceCulling::DoDistanceCulling
 	for(size_t entityIndex = 0 ; entityIndex < entityCount ; entityIndex += 2)
 	{
 		const culling::M256F vectorizedCameraWorldPos = _mm256_setr_ps(cameraWorldPos.x, cameraWorldPos.y, cameraWorldPos.z, 0.0f, cameraWorldPos.x, cameraWorldPos.y, cameraWorldPos.z, 0.0f);
-		const culling::M256F& vectorizedEntityWolrdPos = *reinterpret_cast<const culling::M256F*>(entityBlock->mPositionAndBoundingSpheres + entityIndex); // Bounding Sphere's Radius is located at index 4, 7
+		const culling::M256F& vectorizedEntityWolrdPos = *reinterpret_cast<const culling::M256F*>(entityBlock->mWorldPositionAndWorldBoundingSphereRadius + entityIndex); // Bounding Sphere's Radius is located at index 4, 7
 
 		const culling::M256F subOfCameraWorldPosAndEntityPos = _mm256_sub_ps(vectorizedCameraWorldPos, vectorizedEntityWolrdPos);
 		const culling::M256F sqrOfSubOfCameraWorldPosAndEntityPos = _mm256_mul_ps(subOfCameraWorldPosAndEntityPos, subOfCameraWorldPosAndEntityPos);

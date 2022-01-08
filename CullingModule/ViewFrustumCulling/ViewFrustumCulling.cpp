@@ -35,15 +35,15 @@ void culling::ViewFrustumCulling::DoViewFrustumCulling
 #ifdef DEBUG_CULLING
 			if(entityBlock->GetIsCulled(entityIndex, cameraIndex) == false)
 			{
-				assert(entityBlock->mPositionAndBoundingSpheres[entityIndex].GetBoundingSphereRadius() >= 0.0f);
+				assert(entityBlock->mWorldPositionAndWorldBoundingSphereRadius[entityIndex].GetBoundingSphereRadius() >= 0.0f);
 			}
 			if ((entityIndex + 1 < entityBlock->mCurrentEntityCount) && entityBlock->GetIsCulled(entityIndex + 1, cameraIndex) == false)
 			{
-				assert(entityBlock->mPositionAndBoundingSpheres[entityIndex + 1].GetBoundingSphereRadius() >= 0.0f);
+				assert(entityBlock->mWorldPositionAndWorldBoundingSphereRadius[entityIndex + 1].GetBoundingSphereRadius() >= 0.0f);
 			}
 #endif
 
-			const char result = CheckInFrustumSIMDWithTwoPoint(frustumPlane, entityBlock->mPositionAndBoundingSpheres + entityIndex);
+			const char result = CheckInFrustumSIMDWithTwoPoint(frustumPlane, entityBlock->mWorldPositionAndWorldBoundingSphereRadius + entityIndex);
 			// if first low bit has 1 value, Pos A is In Frustum
 			// if second low bit has 1 value, Pos A is In Frustum
 

@@ -111,7 +111,7 @@ namespace culling
 			assert(GetIsActive() == true);
 			if (GetIsActive() == true)
 			{
-				mTargetEntityBlock->mPositionAndBoundingSpheres[mEntityIndexInBlock].SetPosition(worldPos);
+				mTargetEntityBlock->mWorldPositionAndWorldBoundingSphereRadius[mEntityIndexInBlock].SetPosition(worldPos);
 			}
 		}
 
