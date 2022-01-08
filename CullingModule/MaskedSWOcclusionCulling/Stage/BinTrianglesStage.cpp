@@ -310,7 +310,13 @@ void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t 
 		culling::EntityBlock* const entityBlock = entityInfo.mEntityBlock;
 		const size_t entityIndexInEntityBlock = entityInfo.mIndexInEntityBlock;
 		
-		VertexData& vertexData = entityBlock->mVertexDatas[entityIndexInEntityBlock];
+		std::atomic<std::uint32_t>& binnedIndiceCount = entityBlock->mVertexDatas[entityIndexInEntityBlock].mBinnedIndiceCount;
+
+		const culling::Vec3* const vertices = entityBlock->mVertexDatas[entityIndexInEntityBlock].mVertices; 
+		const std::uint64_t verticeCount = entityBlock->mVertexDatas[entityIndexInEntityBlock].mVerticeCount; 
+		const std::uint32_t* const indices = entityBlock->mVertexDatas[entityIndexInEntityBlock].mIndices;
+		const std::uint64_t indiceCount = entityBlock->mVertexDatas[entityIndexInEntityBlock].mIndiceCount;
+		const std::uint64_t vertexStride = entityBlock->mVertexDatas[entityIndexInEntityBlock].mVertexStride;
 
 		if
 		(
@@ -321,22 +327,22 @@ void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t 
 			while(true)
 			{
 				static_assert(BIN_VERTEX_INDICE_COUNT_PER_THREAD % 3 == 0);
-				const std::uint32_t currentBinnedIndiceCount = vertexData.mBinnedIndiceCount.fetch_add(BIN_VERTEX_INDICE_COUNT_PER_THREAD, std::memory_order_seq_cst);
+				const std::uint32_t currentBinnedIndiceCount = binnedIndiceCount.fetch_add(BIN_VERTEX_INDICE_COUNT_PER_THREAD, std::memory_order_seq_cst);
 
-				if (currentBinnedIndiceCount < vertexData.mIndiceCount)
+				if (currentBinnedIndiceCount < indiceCount)
 				{
 					const culling::Mat4x4 modelToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex) * entityBlock->GetModelMatrix(entityIndexInEntityBlock);
 
-					const std::uint32_t* const startIndicePtr = vertexData.mIndices + currentBinnedIndiceCount;
-					const std::uint32_t indiceCount = MIN(BIN_VERTEX_INDICE_COUNT_PER_THREAD, vertexData.mIndiceCount - currentBinnedIndiceCount);
+					const std::uint32_t* const startIndicePtr = indices + currentBinnedIndiceCount;
+					const std::uint32_t indiceCount = MIN(BIN_VERTEX_INDICE_COUNT_PER_THREAD, indiceCount - currentBinnedIndiceCount);
 
 					BinTriangles
 					(
-						reinterpret_cast<const float*>(vertexData.mVertices),
-						vertexData.mVerticeCount,
+						reinterpret_cast<const float*>(vertices),
+						verticeCount,
 						startIndicePtr,
 						indiceCount,
-						vertexData.mVertexStride,
+						vertexStride,
 						modelToClipSpaceMatrix.data()
 					);
 				}

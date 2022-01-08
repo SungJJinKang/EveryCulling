@@ -6,7 +6,7 @@ namespace culling
 {
 	struct VertexData
 	{
-		std::atomic<std::uint64_t> mBinnedIndiceCount; // 8byte + ??
+		std::atomic<std::uint32_t> mBinnedIndiceCount; //  4byte + ??
 
 		const culling::Vec3* mVertices; // 8byte or 4byte
 		std::uint64_t mVerticeCount; // 8byte
