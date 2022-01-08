@@ -310,13 +310,6 @@ void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t 
 		culling::EntityBlock* const entityBlock = entityInfo.mEntityBlock;
 		const size_t entityIndexInEntityBlock = entityInfo.mIndexInEntityBlock;
 		
-		std::atomic<std::uint32_t>& binnedIndiceCount = entityBlock->mVertexDatas[entityIndexInEntityBlock].mBinnedIndiceCount;
-
-		const culling::Vec3* const vertices = entityBlock->mVertexDatas[entityIndexInEntityBlock].mVertices; 
-		const std::uint64_t verticeCount = entityBlock->mVertexDatas[entityIndexInEntityBlock].mVerticeCount; 
-		const std::uint32_t* const indices = entityBlock->mVertexDatas[entityIndexInEntityBlock].mIndices;
-		const std::uint64_t indiceCount = entityBlock->mVertexDatas[entityIndexInEntityBlock].mIndiceCount;
-		const std::uint64_t vertexStride = entityBlock->mVertexDatas[entityIndexInEntityBlock].mVertexStride;
 
 		if
 		(
@@ -324,6 +317,16 @@ void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t 
 			entityBlock->GetIsOccluder(entityIndexInEntityBlock) == true
 		)
 		{
+
+			std::atomic<std::uint32_t>& binnedIndiceCount = entityBlock->mVertexDatas[entityIndexInEntityBlock].mBinnedIndiceCount;
+
+			const culling::Vec3* const vertices = entityBlock->mVertexDatas[entityIndexInEntityBlock].mVertices; 
+			const std::uint64_t verticeCount = entityBlock->mVertexDatas[entityIndexInEntityBlock].mVerticeCount; 
+			const std::uint32_t* const indices = entityBlock->mVertexDatas[entityIndexInEntityBlock].mIndices;
+			const std::uint64_t indiceCount = entityBlock->mVertexDatas[entityIndexInEntityBlock].mIndiceCount;
+			const std::uint64_t vertexStride = entityBlock->mVertexDatas[entityIndexInEntityBlock].mVertexStride;
+
+
 			while(true)
 			{
 				static_assert(BIN_VERTEX_INDICE_COUNT_PER_THREAD % 3 == 0);
