@@ -118,7 +118,6 @@ namespace culling
 		FORCE_INLINE void SetDesiredMaxDrawDistance(const float desiredMaxDrawDistance)
 		{
 			assert(GetIsActive() == true);
-			assert(entityIndex < mCurrentEntityCount);
 
 			if (GetIsActive() == true)
 			{

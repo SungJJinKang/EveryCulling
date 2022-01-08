@@ -77,12 +77,6 @@ namespace culling
 			const float topEdgeY
 		)
 		{
-#ifdef DEBUG_CULLING
-			for (size_t i = 0; i < triangleCount; i++)
-			{
-				assert(reinterpret_cast<const float*>(&bottomEdgeY)[i] <= reinterpret_cast<const float*>(&topEdgeY)[i]);
-			}
-#endif
 			culling::M256I Mask1;
 			culling::M256I Mask2;
 

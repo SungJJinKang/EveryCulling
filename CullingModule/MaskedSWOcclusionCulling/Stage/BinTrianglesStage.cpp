@@ -465,14 +465,12 @@ FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 		
 		
 		
-		/* Clipping isn't required. Just clip only vertex with negative homogeneous w
-		 * Computing Bounding Box may solve this.
 		Clipping(ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, oneDividedByW, triangleCullMask);
 		if (triangleCullMask == 0x00000000)
 		{
 			continue;
 		}
-		*/
+		
 		
 
 		for (int i = 0; i < 3; i++)

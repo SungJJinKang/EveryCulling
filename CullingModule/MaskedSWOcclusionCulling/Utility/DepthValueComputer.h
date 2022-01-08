@@ -43,13 +43,7 @@ namespace culling
 			const float maxYOfTriangle
 		)
 		{
-
-#ifdef DEBUG_CULLING
-			for(int i = 0 ; i < triangleCount ; i++)
-			{
-				assert(reinterpret_cast<const float*>(&maxYOfTriangle)[i] >= reinterpret_cast<const float*>(&minYOfTriangle)[i]);
-			}
-#endif
+			
 			//const culling::M256I minYIntOfTriangles = _mm256_cvtps_epi32(_mm256_floor_ps(_mm256_add_ps(minYOfTriangle, _mm256_set1_ps(0.5f))));
 			//const culling::M256I maxYIntOfTriangles = _mm256_cvtps_epi32(_mm256_floor_ps(_mm256_add_ps(maxYOfTriangle, _mm256_set1_ps(0.5f))));
 
