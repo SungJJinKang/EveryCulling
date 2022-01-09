@@ -323,7 +323,7 @@ void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t 
 			const culling::Vec3* const vertices = entityBlock->mVertexDatas[entityIndexInEntityBlock].mVertices; 
 			const std::uint64_t verticeCount = entityBlock->mVertexDatas[entityIndexInEntityBlock].mVerticeCount; 
 			const std::uint32_t* const indices = entityBlock->mVertexDatas[entityIndexInEntityBlock].mIndices;
-			const std::uint64_t indiceCount = entityBlock->mVertexDatas[entityIndexInEntityBlock].mIndiceCount;
+			const std::uint64_t totalIndiceCount = entityBlock->mVertexDatas[entityIndexInEntityBlock].mIndiceCount;
 			const std::uint64_t vertexStride = entityBlock->mVertexDatas[entityIndexInEntityBlock].mVertexStride;
 
 
@@ -332,12 +332,12 @@ void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t 
 				static_assert(BIN_VERTEX_INDICE_COUNT_PER_THREAD % 3 == 0);
 				const std::uint32_t currentBinnedIndiceCount = binnedIndiceCount.fetch_add(BIN_VERTEX_INDICE_COUNT_PER_THREAD, std::memory_order_seq_cst);
 
-				if (currentBinnedIndiceCount < indiceCount)
+				if (currentBinnedIndiceCount < totalIndiceCount)
 				{
 					const culling::Mat4x4 modelToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex) * entityBlock->GetModelMatrix(entityIndexInEntityBlock);
 
 					const std::uint32_t* const startIndicePtr = indices + currentBinnedIndiceCount;
-					const std::uint32_t indiceCount = MIN(BIN_VERTEX_INDICE_COUNT_PER_THREAD, indiceCount - currentBinnedIndiceCount);
+					const std::uint32_t indiceCount = MIN(BIN_VERTEX_INDICE_COUNT_PER_THREAD, totalIndiceCount - currentBinnedIndiceCount);
 
 					BinTriangles
 					(
