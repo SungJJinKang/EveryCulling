@@ -64,8 +64,6 @@
 
 #ifndef CULLING_DIRECTX
 //#define CULLING_DIRECTX
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 //#include "" Put Your DIRECTX Header!!
 #endif
 
