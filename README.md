@@ -134,7 +134,13 @@ Reference paper : https://software.intel.com/content/dam/develop/external/us/en/
 개발 일지 : https://sungjjinkang.github.io/computerscience/computergraphics/2021/12/31/masked_sw_occlusion_culling.html            
 Video : [https://youtu.be/tMgokVljvAY](https://youtu.be/tMgokVljvAY), [https://youtu.be/1IKTXsSLJ5g](https://youtu.be/1IKTXsSLJ5g)                       
 동작 원리 한국어 설명 : ["Masked Software Occlusion Culling"는 어떻게 작동하는가?](https://github.com/SungJJinKang/EveryCulling/blob/main/CullingModule/MaskedSWOcclusionCulling/MaskedSWOcclusionCulling_HowWorks.md)                 
-references : https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf, https://www.slideshare.net/IntelSoftware/masked-software-occlusion-culling, https://www.slideshare.net/IntelSoftware/masked-occlusion-culling         
+references : https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf, https://www.slideshare.net/IntelSoftware/masked-software-occlusion-culling, https://www.slideshare.net/IntelSoftware/masked-occlusion-culling          
+                
+
+Please read this :        
+SW Occlusion Culling doesn't make always good performance. It can makes rendering slower than not using it. It depends on scene.           
+If there is many occludees, it's good to use it. If not, It's better not to use it because Cost of rasterizing occluder can be more expensive than cost of rendering occludees. As you know, CPU isn't good at this computation. So it should be used carefully          
+I'm trying make rasterizing occluder faster.        
 
 ## Distance Culling From Unreal Engine ( 100% )
          
