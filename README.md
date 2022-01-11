@@ -14,13 +14,13 @@ This library is targeting Maximizing **SIMD, Cache hit, Multi Threading.**
 3. Multi Threading : Data of entities is separately stored in entity block, Then Threads works on a entity block. These structure prevent data race and cache coherency ( false sharing, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/main/DataType/EntityBlock.h), [VertexData.h](https://github.com/SungJJinKang/EveryCulling/blob/main/DataType/VertexData.h) ), Locking is not required.               
               
 ## Fully implemented features
-- View Frustum Culling from Frostbite Engine of EA Dice ( video : [https://youtu.be/G-IFukD2bNg](https://youtu.be/G-IFukD2bNg) )    
-- Masked SW ( CPU ) Occlusion Culling from Intel ( video : [https://youtu.be/tMgokVljvAY](https://youtu.be/tMgokVljvAY), [https://youtu.be/1IKTXsSLJ5g](https://youtu.be/1IKTXsSLJ5g), reference paper : https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf )                                       
-- Distance Culling from Unreal Engine ( https://docs.unrealengine.com/en-US/RenderingAndGraphics/VisibilityCulling/CullDistanceVolume/index.html )              
+- View Frustum Culling from Frostbite Engine of EA Dice ( [video](https://youtu.be/G-IFukD2bNg) )    
+- Masked SW ( CPU ) Occlusion Culling from Intel ( [video 1](https://youtu.be/tMgokVljvAY), [video 2](https://youtu.be/1IKTXsSLJ5g), [reference paper](https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf) )                                       
+- Distance Culling from Unreal Engine ( [reference](https://docs.unrealengine.com/en-US/RenderingAndGraphics/VisibilityCulling/CullDistanceVolume/index.html) )              
                             
 ## View Frustum Culling from Frostbite Engine of EA Dice ( 100% )
          
-Code directory : [https://github.com/SungJJinKang/EveryCulling/tree/main/CullingModule/ViewFrustumCulling](https://github.com/SungJJinKang/EveryCulling/tree/main/CullingModule/ViewFrustumCulling)          
+[Source code](https://github.com/SungJJinKang/EveryCulling/tree/main/CullingModule/ViewFrustumCulling)          
             
 [Video](https://youtu.be/G-IFukD2bNg)         
 [Slide Resource](https://www.ea.com/frostbite/news/culling-the-battlefield-data-oriented-design-in-practice)        
@@ -123,18 +123,18 @@ In My experiment, Waiting time is near to zero.
 
 ## Masked SW ( CPU ) Occlusion Culling From Intel ( 100% )             
              
-Code directory : [https://github.com/SungJJinKang/EveryCulling/tree/main/CullingModule/MaskedSWOcclusionCulling](https://github.com/SungJJinKang/EveryCulling/tree/main/CullingModule/MaskedSWOcclusionCulling)         
+[Source Code](https://github.com/SungJJinKang/EveryCulling/tree/main/CullingModule/MaskedSWOcclusionCulling)         
 
 Stage 1 : Solve Mesh Role Stage ( Decide occluder based on object's screen space bouding sphere's size )             
 Stage 2 : Bin Occluder Triangle Stage ( Dispatch(Bin) triangles to screen tiles based on triangle's screen space vertex data for following rasterizer stage )             
 Stage 3 : Multithread Rasterize Occluder Triangles ( Threads do job rasterizing each tile's binned triangles, calculate max depth value of tile )             
 Stage 4 : Multithread Query depth buffer ( Compare aabb of occludee's min depth value with tile depth buffer. check 52p https://www.ea.com/frostbite/news/culling-the-battlefield-data-oriented-design-in-practice )              
 
-Reference paper : https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf           
-개발 일지 : https://sungjjinkang.github.io/computerscience/computergraphics/2021/12/31/masked_sw_occlusion_culling.html            
-Video : [https://youtu.be/tMgokVljvAY](https://youtu.be/tMgokVljvAY), [https://youtu.be/1IKTXsSLJ5g](https://youtu.be/1IKTXsSLJ5g)                       
+[Reference paper](https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf)             
+[개발 일지](https://sungjjinkang.github.io/computerscience/computergraphics/2021/12/31/masked_sw_occlusion_culling.html)                
+[Video1](https://youtu.be/tMgokVljvAY), [Video2](https://youtu.be/1IKTXsSLJ5g)                       
 동작 원리 한국어 설명 : ["Masked Software Occlusion Culling"는 어떻게 작동하는가?](https://github.com/SungJJinKang/EveryCulling/blob/main/CullingModule/MaskedSWOcclusionCulling/MaskedSWOcclusionCulling_HowWorks.md)                 
-references : https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf, https://www.slideshare.net/IntelSoftware/masked-software-occlusion-culling, https://www.slideshare.net/IntelSoftware/masked-occlusion-culling          
+References : [references 1](https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf), [references 2](https://www.slideshare.net/IntelSoftware/masked-software-occlusion-culling), [references 3](https://www.slideshare.net/IntelSoftware/masked-occlusion-culling)                
                 
 
 Please read this :        
