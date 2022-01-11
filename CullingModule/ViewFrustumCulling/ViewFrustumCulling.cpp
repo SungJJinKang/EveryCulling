@@ -12,7 +12,7 @@ culling::ViewFrustumCulling::ViewFrustumCulling(EveryCulling* frotbiteCullingSys
 
 }
 
-
+// TODO : Implement AV2 ( _m256f ) version.
 void culling::ViewFrustumCulling::DoViewFrustumCulling
 (
 	const size_t cameraIndex,
