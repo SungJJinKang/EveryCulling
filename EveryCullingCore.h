@@ -156,11 +156,6 @@
 #define DEFAULT_DESIRED_MAX_DRAW_DISTANCE 6000.0f
 #endif
 
-// Query Occlusion
-#if !defined(ENABLE_QUERY_OCCLUSION) && defined(CULLING_OPENGL)
-//#define ENABLE_QUERY_OCCLUSION
-#endif
-
 #ifndef IS_ALIGNED_ASSERT
 #define IS_ALIGNED_ASSERT(ADDRESS, ALIGNMENT) (assert(ADDRESS % ALIGNMENT == 0))
 #endif
