@@ -139,8 +139,12 @@ References : [references 1](https://software.intel.com/content/dam/develop/exter
 
 Please read this :        
 SW Occlusion Culling doesn't make always good performance. It can makes rendering slower than not using it. It depends on scene.           
-If there is many occludees, it's good to use it. If not, It's better not to use it because Cost of rasterizing occluder can be more expensive than cost of rendering occludees. As you know, CPU isn't good at this computation. So it should be used carefully          
+If there is many occludees, it's good to use it. If not, It's better not to use it because Cost of rasterizing occluder can be more expensive than cost of rendering occludees. It decrease maximum fps but increase minimum fps. I think it's good trade-off.       
+
+As you know, CPU isn't good at this computation. So it should be used carefully          
 I'm trying make rasterizing occluder faster.        
+
+This algorithm is used in MS Flight Simulator 2020.                      
 
 ## Distance Culling From Unreal Engine ( 100% )
          
