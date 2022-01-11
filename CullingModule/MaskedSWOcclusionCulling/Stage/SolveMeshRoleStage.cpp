@@ -6,6 +6,7 @@
 #include "../Utility/vertexTransformationHelper.h"
 
 
+/*
 bool culling::SolveMeshRoleStage::CheckIsOccluderFromBoundingSphere
 (
 	const size_t cameraIndex,
@@ -29,6 +30,7 @@ bool culling::SolveMeshRoleStage::CheckIsOccluderFromBoundingSphere
 	
 	return (radiusOfViewSpaceSphere > mOccluderViewSpaceBoundingSphereRadius);
 }
+*/
 
 FORCE_INLINE bool culling::SolveMeshRoleStage::CheckIsOccluderFromAABB
 (

@@ -68,6 +68,14 @@ namespace culling
 			}
 		}
 
+		/**
+		 * \brief Set entity's mesh vertex data.
+		 * \param vertices 
+		 * \param verticeCount 
+		 * \param indices 
+		 * \param indiceCount 
+		 * \param verticeStride 
+		 */
 		void SetMeshVertexData
 		(
 			const culling::Vec3* const vertices,
@@ -123,6 +131,29 @@ namespace culling
 			{
 				mTargetEntityBlock->SetDesiredMaxDrawDistance(mEntityIndexInBlock, desiredMaxDrawDistance);
 			}
+		}
+
+		/// <summary>
+		/// Update EntityData
+		///	Should be updated every frame before cull job
+		/// </summary>
+		/// <param name="entityWorldPositionVec3"></param>
+		/// <param name="aabbMinWorldPositionVec3"></param>
+		/// <param name="aabbMaxWorldPositionVec3"></param>
+		/// <param name="entityModelMatrix4x4"></param>
+		/// <returns></returns>
+		FORCE_INLINE void UpdateEntityData
+		(
+			const float* const entityWorldPositionVec3, 
+			const float* const aabbMinWorldPositionVec3,
+			const float* const aabbMaxWorldPositionVec3,
+			const float* const entityModelMatrix4x4
+		)
+		{
+			SetObjectWorldPosition(entityWorldPositionVec3);
+			SetAABBWorldPosition(aabbMinWorldPositionVec3, aabbMaxWorldPositionVec3);
+
+			SetModelMatrix(entityModelMatrix4x4);
 		}
 	};
 }

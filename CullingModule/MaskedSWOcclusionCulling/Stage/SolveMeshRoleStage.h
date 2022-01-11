@@ -11,12 +11,14 @@ namespace culling
 	private:
 		
 
+		/*
 		bool CheckIsOccluderFromBoundingSphere
 		(
 			const size_t cameraIndex,
 			const culling::Vec3& spherePointInWorldSpace,
 			const float sphereRadiusInWorldSpace
 		) const;
+		*/
 
 
 		FORCE_INLINE bool CheckIsOccluderFromAABB
@@ -33,8 +35,7 @@ namespace culling
 		);
 
 	public:
-
-		float mOccluderViewSpaceBoundingSphereRadius = 0.9f;
+		
 		float mOccluderAABBScreenSpaceMinArea = 500.0f;
 
 		SolveMeshRoleStage(MaskedSWOcclusionCulling* occlusionCulling);

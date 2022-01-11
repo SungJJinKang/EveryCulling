@@ -17,7 +17,7 @@ namespace culling
 		char padding1[64];
 		//static inline constexpr std::uint32_t M256_COUNT_OF_VISIBLE_ARRAY = 1 + ( (ENTITY_COUNT_IN_ENTITY_BLOCK * sizeof(decltype(*EntityBlock::mIsVisibleBitflag)) - 1) / 32 );
 		/// <summary>
-		/// will be used at CullBlockEntityJob
+		/// will be used at ThreadCullJob
 		/// </summary>
 		//std::atomic<std::uint32_t> mAtomicCurrentBlockIndex;
 		std::array<std::atomic<std::uint32_t>, MAX_CAMERA_COUNT> mCurrentCulledEntityBlockIndex;

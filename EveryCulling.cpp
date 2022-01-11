@@ -16,9 +16,6 @@
 
 #include "CullingModule/MaskedSWOcclusionCulling/MaskedSWOcclusionCulling.h"
 
-#ifdef ENABLE_QUERY_OCCLUSION
-#include "CullingModule/QueryOcclusionCulling/QueryOcclusionCulling.h"
-#endif
 
 void culling::EveryCulling::FreeEntityBlock(EntityBlock* freedEntityBlock)
 {
@@ -109,7 +106,7 @@ void culling::EveryCulling::RemoveEntityFromBlock(EntityBlock* ownerEntityBlock,
 	
 }
 
-void culling::EveryCulling::CullBlockEntityJob(const size_t cameraIndex)
+void culling::EveryCulling::ThreadCullJob(const size_t cameraIndex)
 {
 	const std::uint32_t entityBlockCount = static_cast<std::uint32_t>(GetActiveEntityBlockCount());
 	if (entityBlockCount > 0)
@@ -161,7 +158,7 @@ void culling::EveryCulling::WaitToFinishCullJobOfAllCameras() const
 	}
 }
 
-void culling::EveryCulling::ResetCullJobState()
+void culling::EveryCulling::ResetCullJob()
 {
 	ResetEntityBlocks();
 	ResetCullingModules();
@@ -210,14 +207,7 @@ void culling::EveryCulling::SetEnabledCullingModule(const CullingModuleType cull
 		mDistanceCulling->IsEnabled = isEnabled;
 
 		break;
-
-#ifdef ENABLE_QUERY_OCCLUSION
-	case CullingModuleType::_HwQueryOcclusionCulling:
-
-		mQueryOcclusionCulling->IsEnabled = isEnabled;
-
-		break;
-#endif
+		
 	}
 }
 
@@ -283,9 +273,6 @@ culling::EveryCulling::EveryCulling(const std::uint32_t resolutionWidth, const s
 	, mScreenSpaceBoudingSphereCulling{ std::make_unique<ScreenSpaceBoundingSphereCulling>(this) }
 #endif
 	, mMaskedSWOcclusionCulling{ std::make_unique<MaskedSWOcclusionCulling>(this, resolutionWidth, resolutionHeight) }
-#ifdef ENABLE_QUERY_OCCLUSION
-	, mQueryOcclusionCulling{ std::make_unique<QueryOcclusionCulling>(this) }
-#endif
 	, mUpdatedCullingModules
 		{
 			mPreCulling.get(),
@@ -446,7 +433,7 @@ void culling::EveryCulling::SetCameraRotation(const size_t cameraIndex, const cu
 	}
 }
 
-void culling::EveryCulling::Configure(const size_t cameraIndex, const SettingParameters& settingParameters)
+void culling::EveryCulling::UpdateGlobalDataForCullJob(const size_t cameraIndex, const GlobalDataForCullJob& settingParameters)
 {
 	SetViewProjectionMatrix(cameraIndex, settingParameters.mViewProjectionMatrix);
 	SetFieldOfViewInDegree(cameraIndex, settingParameters.mFieldOfViewInDegree);

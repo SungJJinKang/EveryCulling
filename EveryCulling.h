@@ -111,9 +111,6 @@ namespace culling
 		std::unique_ptr<ScreenSpaceBoundingSphereCulling> mScreenSpaceBoudingSphereCulling;
 #endif
 		std::unique_ptr<MaskedSWOcclusionCulling> mMaskedSWOcclusionCulling;
-#ifdef ENABLE_QUERY_OCCLUSION
-		std::unique_ptr<QueryOcclusionCulling> mQueryOcclusionCulling;
-#endif
 
 #ifdef PROFILING_CULLING
 		EveryCullingProfiler mEveryCullingProfiler;
@@ -160,8 +157,8 @@ namespace culling
 
 		void SetCameraCount(const size_t cameraCount);
 		void SetThreadCount(const size_t threadCount);
-
-		struct SettingParameters
+		
+		struct GlobalDataForCullJob
 		{
 			culling::Mat4x4 mViewProjectionMatrix;
 			float mFieldOfViewInDegree;
@@ -171,7 +168,12 @@ namespace culling
 			culling::Vec4 mCameraRotation;
 		};
 
-		void Configure(const size_t cameraIndex, const SettingParameters& settingParameters);
+		/**
+		 * \brief Update global data for cull job. Should be called every frame.
+		 * \param cameraIndex 
+		 * \param settingParameters 
+		 */
+		void UpdateGlobalDataForCullJob(const size_t cameraIndex, const GlobalDataForCullJob& settingParameters);
 
 		FORCE_INLINE size_t GetCameraCount() const
 		{
@@ -235,8 +237,8 @@ namespace culling
 		/// </summary>
 		void RemoveEntityFromBlock(EntityBlockViewer& entityBlockViewer);
 		
-		void CullBlockEntityJob(const size_t cameraIndex);
-		//void CullBlockEntityJob(const std::uint32_t threadIndex, const std::uint32_t threadCount);
+		void ThreadCullJob(const size_t cameraIndex);
+		//void ThreadCullJob(const std::uint32_t threadIndex, const std::uint32_t threadCount);
 
 		/// <summary>
 		/// Caller thread will stall until cull job of all entity block is finished
@@ -244,16 +246,17 @@ namespace culling
 		void WaitToFinishCullJob(const std::uint32_t cameraIndex) const;
 		void WaitToFinishCullJobOfAllCameras() const;
 
-		/// <summary>
-		/// Reset cull job state before pushing cull jobs to job pool
-		/// </summary>
-		void ResetCullJobState();
+
+		/**
+		 * \brief Reset cull job. Should be called every frame after finish cull job
+		 */
+		void ResetCullJob();
 		
-		constexpr auto GetCullJobInLambda(const size_t cameraIndex)
+		constexpr auto GetThreadCullJobInLambda(const size_t cameraIndex)
 		{
 			return [this, cameraIndex]()
 			{
-				this->CullBlockEntityJob(cameraIndex);
+				this->ThreadCullJob(cameraIndex);
 			};
 		}
 
