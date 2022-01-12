@@ -105,8 +105,6 @@ namespace culling
 
 		FORCE_INLINE bool GetIsAllAABBClipPointWNegative(const size_t entityIndex) const
 		{
-			assert(entityIndex < mCurrentEntityCount);
-
 			return mIsAllAABBClipPointWNegative[entityIndex];
 		}
 
@@ -120,15 +118,11 @@ namespace culling
 
 		FORCE_INLINE bool GetIsAnyAABBClipPointWNegative(const size_t entityIndex) const
 		{
-			assert(entityIndex < mCurrentEntityCount);
-
 			return (mIsAllAABBClipPointWPositive[entityIndex] == false);
 		}
 
 		FORCE_INLINE bool GetIsAllAABBClipPointWPositive(const size_t entityIndex) const
 		{
-			assert(entityIndex < mCurrentEntityCount);
-
 			return mIsAllAABBClipPointWPositive[entityIndex];
 		}
 
@@ -152,8 +146,6 @@ namespace culling
 
 		FORCE_INLINE bool GetIsCulled(const size_t entityIndex, const size_t cameraIndex) const
 		{
-			assert(entityIndex < mCurrentEntityCount);
-
 			return ( mIsVisibleBitflag[entityIndex] & (1 << cameraIndex) ) == 0;
 		}
 
@@ -179,62 +171,44 @@ namespace culling
 
 		FORCE_INLINE void SetCulled(const size_t entityIndex, const size_t cameraIndex)
 		{
-			assert(entityIndex < mCurrentEntityCount);
-
 			mIsVisibleBitflag[entityIndex] &= ~(1 << cameraIndex);
 		}
 
 		FORCE_INLINE void SetNotCulled(const size_t entityIndex, const size_t cameraIndex)
 		{
-			assert(entityIndex < mCurrentEntityCount);
-
 			mIsVisibleBitflag[entityIndex] |= (1 << cameraIndex);
 		}
 
 		FORCE_INLINE void SetIsObjectEnabled(const size_t entityIndex, const bool isEnabled)
 		{
-			assert(entityIndex < mCurrentEntityCount);
-
 			mIsObjectEnabled[entityIndex] = isEnabled;
 		}
 		FORCE_INLINE bool GetIsObjectEnabled(const size_t entityIndex) const
 		{
-			assert(entityIndex < mCurrentEntityCount);
-
 			return mIsObjectEnabled[entityIndex];
 		}
 		
 		FORCE_INLINE bool GetIsOccluder(const size_t entityIndex) const
 		{
-			assert(entityIndex < mCurrentEntityCount);
-
 			return mIsOccluder[entityIndex];
 		}
 
 		FORCE_INLINE void SetIsOccluder(const size_t entityIndex, const bool isOccluder)
 		{
-			assert(entityIndex < mCurrentEntityCount);
-
 			mIsOccluder[entityIndex] = isOccluder;
 		}
 
 		FORCE_INLINE void SetModelMatrix(const size_t entityIndex, const float* const modelToClipspaceMatrix)
 		{
-			assert(entityIndex < mCurrentEntityCount);
-
 			std::memcpy(mModelMatrixes + entityIndex, modelToClipspaceMatrix, sizeof(culling::Mat4x4));
 		}
 		FORCE_INLINE const culling::Mat4x4& GetModelMatrix(const size_t entityIndex) const
 		{
-			assert(entityIndex < mCurrentEntityCount);
-
 			return mModelMatrixes[entityIndex];
 		}
 
 		FORCE_INLINE void UpdateBoundingSphereRadius(const size_t entityIndex)
 		{
-			assert(entityIndex < mCurrentEntityCount);
-
 			culling::Vec4 vec = mAABBMaxWorldPoint[entityIndex] - mAABBMinWorldPoint[entityIndex];
 			vec[3] = 1.0f;
 			mWorldPositionAndWorldBoundingSphereRadius[entityIndex].SetBoundingSphereRadius(vec.magnitude() * 0.5f);
@@ -242,8 +216,6 @@ namespace culling
 
 		FORCE_INLINE void SetAABBWorldPosition(const size_t entityIndex, const float* const minWorldPos, const float* const maxWorldPos)
 		{
-			assert(entityIndex < mCurrentEntityCount);
-
 			std::memcpy(mAABBMinWorldPoint + entityIndex, minWorldPos, sizeof(culling::Vec4));
 			std::memcpy(mAABBMaxWorldPoint + entityIndex, maxWorldPos, sizeof(culling::Vec4));
 		}
@@ -260,7 +232,6 @@ namespace culling
 
 		FORCE_INLINE void SetDesiredMaxDrawDistance(const size_t entityIndex, const float desiredMaxDrawDistance)
 		{
-			assert(entityIndex < mCurrentEntityCount);
 			assert(desiredMaxDrawDistance >= 0.0f);
 
 			mDesiredMaxDrawDistance[entityIndex] = desiredMaxDrawDistance;
@@ -268,7 +239,6 @@ namespace culling
 
 		FORCE_INLINE float GetDesiredMaxDrawDistance(const size_t entityIndex)
 		{
-			assert(entityIndex < mCurrentEntityCount);
 			assert(mDesiredMaxDrawDistance[entityIndex] >= 0.0f);
 
 			return mDesiredMaxDrawDistance[entityIndex];
