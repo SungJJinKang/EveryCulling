@@ -26,7 +26,7 @@ This library is targeting Maximizing **SIMD, Cache hit, Multi Threading.**
 - Masked SW ( CPU ) Occlusion Culling from Intel ( [video 1](https://youtu.be/tMgokVljvAY), [video 2](https://youtu.be/1IKTXsSLJ5g), [reference paper](https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf) )                                       
 - Distance Culling from Unreal Engine ( [reference](https://docs.unrealengine.com/en-US/RenderingAndGraphics/VisibilityCulling/CullDistanceVolume/index.html) )       
 
-Procedure : **Distance Culling -> View Frustum Culing -> Masked SW Occlusion Culling**              
+Culling Order : **Distance Culling ( Cheap ) -> View Frustum Culing -> Masked SW Occlusion Culling ( Expensive )**              
                             
 ## View Frustum Culling from Frostbite Engine of EA Dice ( 100% )
          
