@@ -12,70 +12,7 @@ This library is targeting Maximizing **SIMD, Cache hit, Multi Threading.**
 1. SIMD : Data is stored for using SIMD Intrinsics ( Object's Datas has SoA layout, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/main/DataType/EntityBlock.h) ) ( Require AVX2 ( _mm256 ) )                       
 2. Cache Hit : SoA!! ( Structure of Arrays, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/main/DataType/EntityBlock.h) )           
 3. Multi Threading : Data of entities is separately stored in entity block, Then Threads works on a entity block. These structure prevent data race and cache coherency ( false sharing, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/main/DataType/EntityBlock.h), [VertexData.h](https://github.com/SungJJinKang/EveryCulling/blob/main/DataType/VertexData.h) ), Locking is not required.               
-               
-## Code Example
-                
-1. Initialize entity data for culling                  
-```
-culling::EntityBlockViewer entityBlockViewer = EveryCulling::AllocateNewEntity();
-entityBlockViewer.SetMeshVertexData
-(
-    Vertex Data,
-    Vertice Count,
-    MeshIndices Data,
-    MeshIndices Count ,
-    Vertex Stride
-);
-entityBlockViewer.SetDesiredMaxDrawDistance(mDesiredMaxDrawDistance);
-```            
-             
-                
-2. Update datas for cull job ( Should be updated every frame )            
-```
-Update Camera Data
-
-culling::EveryCulling::GlobalDataForCullJob cullingSettingParameters;
-std::memcpy(cullingSettingParameters.mViewProjectionMatrix.data(), Camera ViewProjection Matrix ( Mat4x4, Column major ), sizeof(culling::Mat4x4));
-cullingSettingParameters.mFieldOfViewInDegree = Camera FOV;
-cullingSettingParameters.mCameraFarPlaneDistance = Camera ClippingPlaneFar;
-cullingSettingParameters.mCameraNearPlaneDistance = Camera ClippingPlaneNear;
-std::memcpy(cullingSettingParameters.mCameraWorldPosition.data(), Camera World Position Data, sizeof(culling::Vec3));
-std::memcpy(cullingSettingParameters.mCameraRotation.data(), Camera Rotation Data ( Quaternion ), sizeof(culling::Vec4));
-
-mCullingSystem->UpdateGlobalDataForCullJob(camera->CameraIndexInCullingSystem, cullingSettingParameters);
-
-------------------
-Update Entity Data
-
-for(entity : EntityList)
-{
-    entity.EntityBlockViewer.UpdateEntityData
-    (
-        Entity World Position Data,
-        Entity AABB LowerBound World Position Data,
-        Entity AABB UpperBound World Position Data,
-        Entity Model Matrix Data ( Mat4x4 )
-    );
-}
-```                
-                
-                   
-3. Update Entity Front to Back Sorting Data ( Optional. Important for Peforamance of Masked SW Occlusion Culling )  ( Should be updated every frame )              
-```
-int entityOrder = 0;
-for(entity : Front to Back Sorted Entity List)
-{
-    EveryCulling.SetSortedEntityInfo
-    (
-        CameraIndex,
-        entityOrder,
-        entity.EntityBlockViewer
-    );
-
-    entityOrder++;
-}
-```
-                  
+                                 
                
 ## Fully implemented features
 - View Frustum Culling from Frostbite Engine of EA Dice ( [video](https://youtu.be/G-IFukD2bNg) )    
@@ -205,10 +142,9 @@ Please read this :
 SW Occlusion Culling doesn't make always good performance. It can makes rendering slower than not using it. It depends on scene.           
 If there is many occludees, it's good to use it. If not, It's better not to use it because Cost of rasterizing occluder can be more expensive than cost of rendering occludees. It decrease maximum fps but increase minimum fps. I think it's good trade-off.       
 
-As you know, CPU isn't good at this computation. So it should be used carefully          
-I'm trying make rasterizing occluder faster.        
+As you know, CPU isn't good at this computation. So this algorithm should be used carefully              
 
-This algorithm is used in MS Flight Simulator 2020.                      
+This algorithm is used in [MS Flight Simulator 2020](https://medium.com/intel-tech/above-and-beyond-intels-leading-performance-in-microsoft-flight-simulator-2020-6977516d27f8).                       
 
 ## Distance Culling From Unreal Engine ( 100% )
          
@@ -221,7 +157,79 @@ With this feature, You can make tiny object not to be rendered when it is far fr
 If Object's DesiredMaxDrawDistance is larger than distance between object and camera, The object is culled.             
 
 
+## Code Example
 
+1. Initialize CullingSystem
+```
+EveryCulling::SetThreadCount( Thread Count to do cull job );
+EveryCulling::mMaskedSWOcclusionCulling->mSolveMeshRoleStage.mOccluderAABBScreenSpaceMinArea = Screen Space AABB Minimum Area in Masked SW Occlusion Culling ( Used for deciding occluders of entities )
+```
+                
+2. Initialize entity data for culling                 
+```
+culling::EntityBlockViewer entityBlockViewer = EveryCulling::AllocateNewEntity();
+entityBlockViewer.SetMeshVertexData // Used in Masked SW Occlusion Culling
+(
+    Vertex Data,
+    Vertice Count,
+    MeshIndices Data,
+    MeshIndices Count ,
+    Vertex Stride
+);
+entityBlockViewer.SetDesiredMaxDrawDistance(mDesiredMaxDrawDistance); // Used in Distance Culling
+```            
+             
+                
+3. Update datas for cull job ( Should be updated every frame )            
+```
+Update Camera Data
+
+culling::EveryCulling::GlobalDataForCullJob cullingSettingParameters;
+std::memcpy(cullingSettingParameters.mViewProjectionMatrix.data(), Camera ViewProjection Matrix ( Mat4x4, Column major ), sizeof(culling::Mat4x4));
+cullingSettingParameters.mFieldOfViewInDegree = Camera FOV;
+cullingSettingParameters.mCameraFarPlaneDistance = Camera ClippingPlaneFar;
+cullingSettingParameters.mCameraNearPlaneDistance = Camera ClippingPlaneNear;
+std::memcpy(cullingSettingParameters.mCameraWorldPosition.data(), Camera World Position Data, sizeof(culling::Vec3));
+std::memcpy(cullingSettingParameters.mCameraRotation.data(), Camera Rotation Data ( Quaternion ), sizeof(culling::Vec4));
+
+mCullingSystem->UpdateGlobalDataForCullJob(camera->CameraIndexInCullingSystem, cullingSettingParameters);
+
+------------------
+Update Entity Data
+
+for(entity : EntityList)
+{
+    entity.EntityBlockViewer.UpdateEntityData
+    (
+        Entity World Position Data,
+        Entity AABB LowerBound World Position Data,
+        Entity AABB UpperBound World Position Data,
+        Entity Model Matrix Data ( Mat4x4 )
+    );
+}
+```                
+                
+                   
+3. Update Entity Front to Back Sorting Data ( Optional. Important for Peforamance of Masked SW Occlusion Culling )  ( Should be updated every frame )              
+```
+int entityOrder = 0;
+for(entity : Front to Back Sorted Entity List)
+{
+    EveryCulling.SetSortedEntityInfo
+    (
+        CameraIndex,
+        entityOrder,
+        entity.EntityBlockViewer
+    );
+
+    entityOrder++;
+}
+```
+
+4. Pass Culling Job to SubThreads
+```
+Your Job System.PassJobToThread(EveryCulling::GetThreadCullJobInLambda(CameraIndex));        
+```
 
 ## References
 
