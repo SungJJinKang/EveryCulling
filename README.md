@@ -2,7 +2,7 @@
 
 This library integrate multiple culling system into One library.      
 
-This System contain **Multithread ViewFrustumCulling**, **Masked SW Occlusion Culling**, **Distance Culling**            
+This System contain **ViewFrustumCulling**, **Masked SW Occlusion Culling**, **Distance Culling**            
 Most of Systems in this library is actually used in the commercial game engines.       
 
 This project tries to integrate them into one system and make them easy to use.  
@@ -24,7 +24,9 @@ This library is targeting Maximizing **SIMD, Cache hit, Multi Threading.**
 ## Fully implemented features
 - View Frustum Culling from Frostbite Engine of EA Dice ( [video](https://youtu.be/G-IFukD2bNg) )    
 - Masked SW ( CPU ) Occlusion Culling from Intel ( [video 1](https://youtu.be/tMgokVljvAY), [video 2](https://youtu.be/1IKTXsSLJ5g), [reference paper](https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf) )                                       
-- Distance Culling from Unreal Engine ( [reference](https://docs.unrealengine.com/en-US/RenderingAndGraphics/VisibilityCulling/CullDistanceVolume/index.html) )              
+- Distance Culling from Unreal Engine ( [reference](https://docs.unrealengine.com/en-US/RenderingAndGraphics/VisibilityCulling/CullDistanceVolume/index.html) )       
+
+Procedure : **Distance Culling -> View Frustum Culing -> Masked SW Occlusion Culling**              
                             
 ## View Frustum Culling from Frostbite Engine of EA Dice ( 100% )
          
