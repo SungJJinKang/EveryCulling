@@ -26,7 +26,7 @@ This library is targeting Maximizing **SIMD, Cache hit, Multi Threading.**
 - Masked SW ( CPU ) Occlusion Culling from Intel ( [video 1](https://youtu.be/tMgokVljvAY), [video 2](https://youtu.be/1IKTXsSLJ5g), [reference paper](https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf) )                                       
 - Distance Culling from Unreal Engine ( [reference](https://docs.unrealengine.com/en-US/RenderingAndGraphics/VisibilityCulling/CullDistanceVolume/index.html) )       
 
-Procedure : **Distance Culling -> View Frustum Culing -> Masked SW Occlusion Culling**              
+Culling Order : **Distance Culling ( Cheap ) -> View Frustum Culing -> Masked SW Occlusion Culling ( Expensive )**              
                             
 ## View Frustum Culling from Frostbite Engine of EA Dice ( 100% )
          
@@ -142,7 +142,8 @@ Stage 4 : Multithread Query depth buffer ( Compare aabb of occludee's min depth 
 
 [Reference paper](https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf)             
 [개발 일지](https://sungjjinkang.github.io/computerscience/computergraphics/2021/12/31/masked_sw_occlusion_culling.html)                
-[Video1](https://youtu.be/tMgokVljvAY), [Video2](https://youtu.be/1IKTXsSLJ5g)                       
+[Video1](https://youtu.be/tMgokVljvAY), [Video2](https://youtu.be/1IKTXsSLJ5g).
+[Performance comparision between ON/OFF](https://youtu.be/4xJu6_Jtbu4)             
 동작 원리 한국어 설명 : ["Masked Software Occlusion Culling"는 어떻게 작동하는가?](https://github.com/SungJJinKang/EveryCulling/blob/main/CullingModule/MaskedSWOcclusionCulling/MaskedSWOcclusionCulling_HowWorks.md)                 
 References : [references 1](https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf), [references 2](https://www.slideshare.net/IntelSoftware/masked-software-occlusion-culling), [references 3](https://www.slideshare.net/IntelSoftware/masked-occlusion-culling)                
                 
