@@ -14,8 +14,6 @@ namespace culling
 	class EntityBlockViewer
 	{
 		friend class EveryCulling;
-		friend class QueryOcclusionCulling;
-
 	private:
 
 		bool bmIsActive;
@@ -24,6 +22,8 @@ namespace culling
 		/// Entity Index in Entity Block
 		/// </summary>
 		size_t mEntityIndexInBlock;
+
+		void ResetEntityData();
 
 	public:
 
@@ -36,6 +36,12 @@ namespace culling
 		}
 
 		FORCE_INLINE EntityBlock* GetTargetEntityBlock()
+		{
+			assert(GetIsActive() == true);
+			return mTargetEntityBlock;
+		}
+
+		FORCE_INLINE const EntityBlock* GetTargetEntityBlock() const
 		{
 			assert(GetIsActive() == true);
 			return mTargetEntityBlock;

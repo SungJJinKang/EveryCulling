@@ -12,7 +12,71 @@ This library is targeting Maximizing **SIMD, Cache hit, Multi Threading.**
 1. SIMD : Data is stored for using SIMD Intrinsics ( Object's Datas has SoA layout, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/main/DataType/EntityBlock.h) ) ( Require AVX2 ( _mm256 ) )                       
 2. Cache Hit : SoA!! ( Structure of Arrays, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/main/DataType/EntityBlock.h) )           
 3. Multi Threading : Data of entities is separately stored in entity block, Then Threads works on a entity block. These structure prevent data race and cache coherency ( false sharing, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/main/DataType/EntityBlock.h), [VertexData.h](https://github.com/SungJJinKang/EveryCulling/blob/main/DataType/VertexData.h) ), Locking is not required.               
-              
+               
+## Code Example
+                
+1. Initialize entity data for culling                  
+```
+culling::EntityBlockViewer entityBlockViewer = EveryCulling::AllocateNewEntity();
+entityBlockViewer.SetMeshVertexData
+(
+    Vertex Data,
+    Vertice Count,
+    MeshIndices Data,
+    MeshIndices Count ,
+    Vertex Stride
+);
+entityBlockViewer.SetDesiredMaxDrawDistance(mDesiredMaxDrawDistance);
+```            
+             
+                
+2. Update datas for cull job ( Should be updated every frame )            
+```
+Update Camera Data
+
+culling::EveryCulling::GlobalDataForCullJob cullingSettingParameters;
+std::memcpy(cullingSettingParameters.mViewProjectionMatrix.data(), Camera ViewProjection Matrix ( Mat4x4, Column major ), sizeof(culling::Mat4x4));
+cullingSettingParameters.mFieldOfViewInDegree = Camera FOV;
+cullingSettingParameters.mCameraFarPlaneDistance = Camera ClippingPlaneFar;
+cullingSettingParameters.mCameraNearPlaneDistance = Camera ClippingPlaneNear;
+std::memcpy(cullingSettingParameters.mCameraWorldPosition.data(), Camera World Position Data, sizeof(culling::Vec3));
+std::memcpy(cullingSettingParameters.mCameraRotation.data(), Camera Rotation Data ( Quaternion ), sizeof(culling::Vec4));
+
+mCullingSystem->UpdateGlobalDataForCullJob(camera->CameraIndexInCullingSystem, cullingSettingParameters);
+
+------------------
+Update Entity Data
+
+for(entity : EntityList)
+{
+    entity.EntityBlockViewer.UpdateEntityData
+    (
+        Entity World Position Data,
+        Entity AABB LowerBound World Position Data,
+        Entity AABB UpperBound World Position Data,
+        Entity Model Matrix Data ( Mat4x4 )
+    );
+}
+```                
+                
+                   
+3. Update Entity Front to Back Sorting Data ( Optional. Important for Peforamance of Masked SW Occlusion Culling )  ( Should be updated every frame )              
+```
+int entityOrder = 0;
+for(entity : Front to Back Sorted Entity List)
+{
+    EveryCulling.SetSortedEntityInfo
+    (
+        CameraIndex,
+        entityOrder,
+        entity.EntityBlockViewer
+    );
+
+    entityOrder++;
+}
+```
+                  
+               
 ## Fully implemented features
 - View Frustum Culling from Frostbite Engine of EA Dice ( [video](https://youtu.be/G-IFukD2bNg) )    
 - Masked SW ( CPU ) Occlusion Culling from Intel ( [video 1](https://youtu.be/tMgokVljvAY), [video 2](https://youtu.be/1IKTXsSLJ5g), [reference paper](https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf) )                                       

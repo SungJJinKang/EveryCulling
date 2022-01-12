@@ -284,6 +284,17 @@ namespace culling
 
 			mSortedEntityCount = MAX(mSortedEntityCount, objectOrder + 1);
 		}
+
+		FORCE_INLINE void SetSortedEntityInfo
+		(
+			const size_t cameraIndex,
+			const size_t objectOrder,
+			EntityBlockViewer& entityBlockViewer
+		)
+		{
+			SetSortedEntityInfo(cameraIndex, objectOrder, entityBlockViewer.GetTargetEntityBlock(), entityBlockViewer.GetEntityIndexInBlock());
+		}
+
 		FORCE_INLINE size_t GetSortedEntityCount() const
 		{
 			return mSortedEntityCount;

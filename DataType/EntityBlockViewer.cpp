@@ -4,6 +4,11 @@
 #include <cstring>
 
 
+void culling::EntityBlockViewer::ResetEntityData()
+{
+	SetIsObjectEnabled(true);
+}
+
 culling::EntityBlockViewer::EntityBlockViewer()
 	: bmIsActive(false), mTargetEntityBlock(nullptr), mEntityIndexInBlock(0)
 {
@@ -15,7 +20,9 @@ culling::EntityBlockViewer::EntityBlockViewer
 	const size_t entityIndexInBlock
 )
 	: mTargetEntityBlock{ entityBlock }, mEntityIndexInBlock{ entityIndexInBlock }, bmIsActive{ true }
-{}
+{
+	ResetEntityData();
+}
 
 
 void culling::EntityBlockViewer::SetMeshVertexData
