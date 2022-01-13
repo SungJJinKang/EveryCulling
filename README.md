@@ -192,7 +192,10 @@ entityBlockViewer.SetDesiredMaxDrawDistance(mDesiredMaxDrawDistance); // Used in
                 
 3. Update datas for cull job ( Should be updated every frame )            
 ```
-Update Camera Data
+Update GlobalData for cull job
+
+mCullingSystem.SetCameraCount(Camera Count)
+mCullingSystem.ResetCullJob();
 
 culling::EveryCulling::GlobalDataForCullJob cullingSettingParameters;
 std::memcpy(cullingSettingParameters.mViewProjectionMatrix.data(), Camera ViewProjection Matrix ( Mat4x4, Column major ), sizeof(culling::Mat4x4));
@@ -202,7 +205,7 @@ cullingSettingParameters.mCameraNearPlaneDistance = Camera ClippingPlaneNear;
 std::memcpy(cullingSettingParameters.mCameraWorldPosition.data(), Camera World Position Data, sizeof(culling::Vec3));
 std::memcpy(cullingSettingParameters.mCameraRotation.data(), Camera Rotation Data ( Quaternion ), sizeof(culling::Vec4));
 
-mCullingSystem->UpdateGlobalDataForCullJob(camera->CameraIndexInCullingSystem, cullingSettingParameters);
+mCullingSystem.UpdateGlobalDataForCullJob(CameraIndex ( 0 ~ 4 ), cullingSettingParameters);
 
 ------------------
 Update Entity Data
@@ -222,6 +225,7 @@ for(entity : EntityList)
                    
 3. Update Front to Back Sorting Data of entities ( Important for Peforamance of Masked SW Occlusion Culling )  ( Should be updated every frame )              
 ```
+EveryCulling.ResetSortedEntityCount();
 int entityOrder = 0;
 for(entity : Front to Back Sorted Entity List)
 {
