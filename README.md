@@ -220,7 +220,7 @@ for(entity : EntityList)
 ```                
                 
                    
-3. Update Front to Back Sorting Data of entities ( Optional. Important for Peforamance of Masked SW Occlusion Culling )  ( Should be updated every frame )              
+3. Update Front to Back Sorting Data of entities ( Important for Peforamance of Masked SW Occlusion Culling )  ( Should be updated every frame )              
 ```
 int entityOrder = 0;
 for(entity : Front to Back Sorted Entity List)
@@ -240,6 +240,17 @@ for(entity : Front to Back Sorted Entity List)
 ```
 Your Job System.PassJobToThread(EveryCulling::GetThreadCullJobInLambda(CameraIndex));        
 ```
+
+5. Draw Entity
+```
+for(entity : EntityList)
+{
+  if(entity.EntityBlockViewer.GetIsCulled(CameraIndex) == false)
+  {
+    entity.Draw();
+  }
+}
+```                         
 
 ## References
 
