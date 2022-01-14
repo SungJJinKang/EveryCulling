@@ -6,7 +6,7 @@ namespace culling
 {
 	namespace rasterizerHelper
 	{
-		FORCE_INLINE extern void GetMiddlePointOfTriangle
+		EVERYCULLING_FORCE_INLINE extern void GetMiddlePointOfTriangle
 		(
 			const culling::M256F& TriPointA_X,
 			const culling::M256F& TriPointA_Y,

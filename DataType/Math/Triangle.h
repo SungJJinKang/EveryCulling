@@ -29,7 +29,7 @@ namespace culling
 	/// Point1 is TopMost Vec2
 	/// </summary>
 	/// <param name="triangle"></param>
-	FORCE_INLINE extern void SortTriangle(TwoDTriangle& triangle)
+	EVERYCULLING_FORCE_INLINE extern void SortTriangle(TwoDTriangle& triangle)
 	{
 		if (triangle.Points[0].y < triangle.Points[1].y)
 		{
@@ -45,7 +45,7 @@ namespace culling
 		}
 	}
 
-	FORCE_INLINE extern void SortTriangle(ThreeDTriangle& triangle)
+	EVERYCULLING_FORCE_INLINE extern void SortTriangle(ThreeDTriangle& triangle)
 	{
 		if (triangle.Points[0].y < triangle.Points[1].y)
 		{
@@ -61,7 +61,7 @@ namespace culling
 		}
 	}
 
-	FORCE_INLINE extern bool IsFrontFaceOfProjectSpaceTriangle(const TwoDTriangle& triangle)
+	EVERYCULLING_FORCE_INLINE extern bool IsFrontFaceOfProjectSpaceTriangle(const TwoDTriangle& triangle)
 	{
 		return PerpDot(triangle.Points[1] - triangle.Points[0], triangle.Points[2] - triangle.Points[0]) > 0;
 		/*
@@ -94,7 +94,7 @@ namespace culling
 	/// <param name="vertexX"></param>
 	/// <param name="vertexY"></param>
 	/// <returns></returns>
-	FORCE_INLINE extern std::uint32_t TestTrianglesIsFrontFaceUsingSIMD
+	EVERYCULLING_FORCE_INLINE extern std::uint32_t TestTrianglesIsFrontFaceUsingSIMD
 	(
 		const culling::M256F* const verticesX,
 		const culling::M256F* const verticesY
@@ -131,7 +131,7 @@ namespace culling
 	/// </summary>
 	/// <param name="TriPointX"></param>
 	/// <param name="TriPointY"></param>
-	FORCE_INLINE extern void Sort_8_2DTriangles(culling::M256F* TriPointX, culling::M256F* TriPointY)
+	EVERYCULLING_FORCE_INLINE extern void Sort_8_2DTriangles(culling::M256F* TriPointX, culling::M256F* TriPointY)
 	{
 		culling::M256F MASK;
 
@@ -163,7 +163,7 @@ namespace culling
 	/// <param name="TriPointX">3 size array culling::M256F</param>
 	/// <param name="TriPointY">3 size array culling::M256F</param>
 	/// <param name="TriPointZ">3 size array culling::M256F</param>
-	FORCE_INLINE extern void Sort_8_3DTriangles(culling::M256F* TriPointX, culling::M256F* TriPointY, culling::M256F* TriPointZ)
+	EVERYCULLING_FORCE_INLINE extern void Sort_8_3DTriangles(culling::M256F* TriPointX, culling::M256F* TriPointY, culling::M256F* TriPointZ)
 	{
 		culling::M256F MASK;
 
@@ -183,7 +183,7 @@ namespace culling
 		culling::M256F_SWAP(TriPointZ[1], TriPointZ[2], MASK);
 	}
 
-	FORCE_INLINE extern void Sort_8_2DTriangles
+	EVERYCULLING_FORCE_INLINE extern void Sort_8_2DTriangles
 	(
 		culling::M256F& TriPointA_X,
 		culling::M256F& TriPointA_Y,
@@ -210,7 +210,7 @@ namespace culling
 		culling::M256F_SWAP(TriPointB_Y, TriPointC_Y, MASK);
 	}
 
-	FORCE_INLINE extern void Sort_8_3DTriangles
+	EVERYCULLING_FORCE_INLINE extern void Sort_8_3DTriangles
 	(
 		culling::M256F& TriPointA_X,
 		culling::M256F& TriPointA_Y,
@@ -243,7 +243,7 @@ namespace culling
 		culling::M256F_SWAP(TriPointB_Z, TriPointC_Z, MASK);
 	}
 
-	FORCE_INLINE extern void Sort_8_3DTriangles
+	EVERYCULLING_FORCE_INLINE extern void Sort_8_3DTriangles
 	(
 		culling::M256F& TriPointA_X,
 		culling::M256F& TriPointA_Y,

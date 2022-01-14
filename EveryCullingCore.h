@@ -1,20 +1,13 @@
 #pragma once
-#include <assert.h>
-
+#include <cassert>
 #include <stddef.h>
 
 #include "DataType/Math/SIMD_Core.h"
 
 #if defined(__GNUC__)  || defined( __clang__)
-#  define FORCE_INLINE inline __attribute__ ((always_inline))
-#  define NEVER_INLINE __attribute__ ((noinline))
-#  define RESTRICT __restrict
-#  define VLA_ARRAY_ON_STACK(type__, varname__, size__) type__ varname__[size__];
+#  define EVERYCULLING_FORCE_INLINE inline __attribute__ ((always_inline))
 #elif defined(_MSC_VER)
-#  define FORCE_INLINE __forceinline
-#  define NEVER_INLINE __declspec(noinline)
-#  define RESTRICT __restrict
-#  define VLA_ARRAY_ON_STACK(type__, varname__, size__) type__ *varname__ = (type__*)_alloca(size__ * sizeof(type__))
+#  define EVERYCULLING_FORCE_INLINE __forceinline
 #endif
 
 #define CACHE_LINE_SIZE 64

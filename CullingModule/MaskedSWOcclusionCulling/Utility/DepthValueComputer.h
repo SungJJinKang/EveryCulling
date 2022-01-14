@@ -18,7 +18,7 @@ namespace culling
 		*/
 		
 
-		FORCE_INLINE extern void ComputeFlatTriangleMaxDepthValue
+		EVERYCULLING_FORCE_INLINE extern void ComputeFlatTriangleMaxDepthValue
 		(
 			culling::M256F& subTileMaxValues,
 			const std::uint32_t tileOriginX, // 32x8 tile

@@ -6,7 +6,7 @@ namespace culling
 {
 	namespace depthUtility
 	{
-		FORCE_INLINE extern void ComputeDepthPlane
+		EVERYCULLING_FORCE_INLINE extern void ComputeDepthPlane
 		(
 			const float vertexPoint1X,
 			const float vertexPoint1Y,

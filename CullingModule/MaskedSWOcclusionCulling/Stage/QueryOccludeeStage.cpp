@@ -8,7 +8,7 @@
 
 #include <Rendering/Renderer/Renderer.h>
 
-FORCE_INLINE float culling::QueryOccludeeStage::MinFloatFromM256F(const culling::M256F& data)
+EVERYCULLING_FORCE_INLINE float culling::QueryOccludeeStage::MinFloatFromM256F(const culling::M256F& data)
 {
 	float min = FLT_MAX;
 	for (size_t i = 0; i < 8; i++)
@@ -18,7 +18,7 @@ FORCE_INLINE float culling::QueryOccludeeStage::MinFloatFromM256F(const culling:
 	return min;
 }
 
-FORCE_INLINE float culling::QueryOccludeeStage::MaxFloatFromM256F(const culling::M256F& data)
+EVERYCULLING_FORCE_INLINE float culling::QueryOccludeeStage::MaxFloatFromM256F(const culling::M256F& data)
 {
 	float max = -FLT_MAX;
 	for (size_t i = 0; i < 8; i++)
@@ -28,7 +28,7 @@ FORCE_INLINE float culling::QueryOccludeeStage::MaxFloatFromM256F(const culling:
 	return max;
 }
 
-FORCE_INLINE void culling::QueryOccludeeStage::ComputeBinBoundingBoxFromVertex
+EVERYCULLING_FORCE_INLINE void culling::QueryOccludeeStage::ComputeBinBoundingBoxFromVertex
 (
 	const culling::M256F& screenPixelX,
 	const culling::M256F& screenPixelY,
@@ -60,7 +60,7 @@ FORCE_INLINE void culling::QueryOccludeeStage::ComputeBinBoundingBoxFromVertex
 	);
 }
 
-FORCE_INLINE void culling::QueryOccludeeStage::ComputeBinBoundingBoxFromVertex
+EVERYCULLING_FORCE_INLINE void culling::QueryOccludeeStage::ComputeBinBoundingBoxFromVertex
 (
 	const float minScreenPixelX,
 	const float minScreenPixelY,

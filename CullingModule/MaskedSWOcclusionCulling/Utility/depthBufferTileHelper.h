@@ -9,7 +9,7 @@ namespace culling
 {
 	namespace depthBufferTileHelper
 	{
-		FORCE_INLINE extern void ComputeBinBoundingBoxFromThreeVertices
+		EVERYCULLING_FORCE_INLINE extern void ComputeBinBoundingBoxFromThreeVertices
 		(
 			const culling::M256F& pointAScreenPixelX,
 			const culling::M256F& pointAScreenPixelY,

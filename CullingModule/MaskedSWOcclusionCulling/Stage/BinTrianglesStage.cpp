@@ -15,7 +15,7 @@
 
 #define CONVERT_TO_M256I(_M256F) *reinterpret_cast<const culling::M256I*>(&_M256F)
 
-FORCE_INLINE void culling::BinTrianglesStage::Clipping
+EVERYCULLING_FORCE_INLINE void culling::BinTrianglesStage::Clipping
 (
 	const culling::M256F* const clipspaceVertexX,
 	const culling::M256F* const clipspaceVertexY,
@@ -48,7 +48,7 @@ FORCE_INLINE void culling::BinTrianglesStage::Clipping
 	triangleCullMask &= _mm256_movemask_ps(*reinterpret_cast<const culling::M256F*>(&verticesInFrustum));
 }
 
-FORCE_INLINE culling::M256F culling::BinTrianglesStage::ComputePositiveWMask
+EVERYCULLING_FORCE_INLINE culling::M256F culling::BinTrianglesStage::ComputePositiveWMask
 (
 	const culling::M256F* const clipspaceVertexW
 )
@@ -63,7 +63,7 @@ FORCE_INLINE culling::M256F culling::BinTrianglesStage::ComputePositiveWMask
 
 
 
-FORCE_INLINE void culling::BinTrianglesStage::BackfaceCulling
+EVERYCULLING_FORCE_INLINE void culling::BinTrianglesStage::BackfaceCulling
 (
 	culling::M256F* const screenPixelX,
 	culling::M256F* const screenPixelY,
@@ -81,7 +81,7 @@ FORCE_INLINE void culling::BinTrianglesStage::BackfaceCulling
 
 
 
-FORCE_INLINE void culling::BinTrianglesStage::PassTrianglesToTileBin
+EVERYCULLING_FORCE_INLINE void culling::BinTrianglesStage::PassTrianglesToTileBin
 (
 	const culling::M256F& pointAScreenPixelPosX,
 	const culling::M256F& pointAScreenPixelPosY,
@@ -163,7 +163,7 @@ FORCE_INLINE void culling::BinTrianglesStage::PassTrianglesToTileBin
 
 
 
-FORCE_INLINE void culling::BinTrianglesStage::GatherVertices
+EVERYCULLING_FORCE_INLINE void culling::BinTrianglesStage::GatherVertices
 (
 	const float* const vertices,
 	const size_t verticeCount,
@@ -384,7 +384,7 @@ const char* culling::BinTrianglesStage::GetCullingModuleName() const
 	return "BinTrianglesStage";
 }
 
-FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
+EVERYCULLING_FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 (
 	const float* const vertices, 
 	const size_t verticeCount,

@@ -86,19 +86,19 @@ namespace culling
 		void Reset();
 
 		void ClearCoverageMaskAllSubTile();
-		FORCE_INLINE void ClearCoverageMask(const size_t subTileIndex)
+		EVERYCULLING_FORCE_INLINE void ClearCoverageMask(const size_t subTileIndex)
 		{
 			assert(subTileIndex < 8);
 			(reinterpret_cast<std::uint32_t*>(&L1CoverageMask))[subTileIndex] = 0x00000000;
 		}
 		void FillCoverageMask();
 
-		FORCE_INLINE void ClearL1MaxDepthValueAllSubTile()
+		EVERYCULLING_FORCE_INLINE void ClearL1MaxDepthValueAllSubTile()
 		{
 			L1SubTileMaxDepthValue = _mm256_set1_ps(0.0f);
 		}
 
-		FORCE_INLINE void ClearL1MaxDepthValue(const size_t subTileIndex)
+		EVERYCULLING_FORCE_INLINE void ClearL1MaxDepthValue(const size_t subTileIndex)
 		{
 			assert(subTileIndex < 8);
 			(reinterpret_cast<std::uint32_t*>(&L1SubTileMaxDepthValue))[subTileIndex] = 0x00000000;
@@ -135,14 +135,14 @@ namespace culling
 		/// </summary>
 		/// <param name="subTileIndex"></param>
 		/// <returns></returns>
-		FORCE_INLINE bool IsCoverageMaskFullByOne(const size_t subTileIndex) const
+		EVERYCULLING_FORCE_INLINE bool IsCoverageMaskFullByOne(const size_t subTileIndex) const
 		{
 			assert(subTileIndex < 8);
 			return reinterpret_cast<const std::uint32_t*>(&L1CoverageMask)[subTileIndex] == 0xFFFFFFFF;
 		}
 		
 		/*
-		FORCE_INLINE void OverriteCoverageMask(const size_t subTileIndex, const std::uint32_t tileCoverage)
+		EVERYCULLING_FORCE_INLINE void OverriteCoverageMask(const size_t subTileIndex, const std::uint32_t tileCoverage)
 		{
 			reinterpret_cast<std::uint32_t*>(&L1CoverageMask)[subTileIndex] = tileCoverage;
 		}
@@ -196,12 +196,12 @@ namespace culling
 		std::atomic<size_t> mmBinnedTriangleCount;
 
 		void Reset();
-		FORCE_INLINE std::uint32_t GetLeftBottomTileOrginX() const
+		EVERYCULLING_FORCE_INLINE std::uint32_t GetLeftBottomTileOrginX() const
 		{
 			return mLeftBottomTileOrginX;
 		}
 
-		FORCE_INLINE std::uint32_t GetLeftBottomTileOrginY() const
+		EVERYCULLING_FORCE_INLINE std::uint32_t GetLeftBottomTileOrginY() const
 		{
 			return mLeftBottomTileOrginY;
 		}
@@ -314,7 +314,7 @@ namespace culling
 
 		~SWDepthBuffer();
 
-		FORCE_INLINE size_t GetTileCount() const
+		EVERYCULLING_FORCE_INLINE size_t GetTileCount() const
 		{
 			return mTileCount;
 		}
@@ -323,7 +323,7 @@ namespace culling
 		
 		const Tile* GetTiles() const;
 
-		FORCE_INLINE const Tile* GetTile(const std::uint32_t rowIndex, const std::uint32_t colIndex) const
+		EVERYCULLING_FORCE_INLINE const Tile* GetTile(const std::uint32_t rowIndex, const std::uint32_t colIndex) const
 		{
 			assert(rowIndex < mResolution.mRowTileCount);
 			assert(colIndex < mResolution.mColumnTileCount);
@@ -332,7 +332,7 @@ namespace culling
 			assert(tileIndex < mTileCount);
 			return mTiles + tileIndex;
 		}
-		FORCE_INLINE Tile* GetTile(const std::uint32_t rowIndex, const std::uint32_t colIndex)
+		EVERYCULLING_FORCE_INLINE Tile* GetTile(const std::uint32_t rowIndex, const std::uint32_t colIndex)
 		{
 			assert(rowIndex < mResolution.mRowTileCount);
 			assert(colIndex < mResolution.mColumnTileCount);
@@ -341,12 +341,12 @@ namespace culling
 			assert(tileIndex < mTileCount);
 			return mTiles + tileIndex;
 		}
-		FORCE_INLINE const Tile* GetTile(const size_t tileIndex) const
+		EVERYCULLING_FORCE_INLINE const Tile* GetTile(const size_t tileIndex) const
 		{
 			assert(tileIndex < mTileCount);
 			return mTiles + tileIndex;
 		}
-		FORCE_INLINE Tile* GetTile(const size_t tileIndex)
+		EVERYCULLING_FORCE_INLINE Tile* GetTile(const size_t tileIndex)
 		{
 			assert(tileIndex < mTileCount);
 			return mTiles + tileIndex;

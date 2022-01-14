@@ -103,14 +103,14 @@ namespace culling
 
 		// ----------------------------------------------------------------------------------------------------------------------
 
-		FORCE_INLINE bool GetIsAllAABBClipPointWNegative(const size_t entityIndex) const
+		EVERYCULLING_FORCE_INLINE bool GetIsAllAABBClipPointWNegative(const size_t entityIndex) const
 		{
 			assert(entityIndex < mCurrentEntityCount);
 
 			return mIsAllAABBClipPointWNegative[entityIndex];
 		}
 
-		FORCE_INLINE void SetIsAllAABBClipPointWNegative(const size_t entityIndex, const bool isAllAABBClipPointWNegative)
+		EVERYCULLING_FORCE_INLINE void SetIsAllAABBClipPointWNegative(const size_t entityIndex, const bool isAllAABBClipPointWNegative)
 		{
 			// Setting value to invalid index is acceptable
 			assert(entityIndex < ENTITY_COUNT_IN_ENTITY_BLOCK);
@@ -118,14 +118,14 @@ namespace culling
 			mIsAllAABBClipPointWNegative[entityIndex] = isAllAABBClipPointWNegative;
 		}
 
-		FORCE_INLINE bool GetIsAnyAABBClipPointWNegative(const size_t entityIndex) const
+		EVERYCULLING_FORCE_INLINE bool GetIsAnyAABBClipPointWNegative(const size_t entityIndex) const
 		{
 			assert(entityIndex < mCurrentEntityCount);
 
 			return (mIsAllAABBClipPointWPositive[entityIndex] == false);
 		}
 
-		FORCE_INLINE bool GetIsAllAABBClipPointWPositive(const size_t entityIndex) const
+		EVERYCULLING_FORCE_INLINE bool GetIsAllAABBClipPointWPositive(const size_t entityIndex) const
 		{
 			assert(entityIndex < mCurrentEntityCount);
 
@@ -142,7 +142,7 @@ namespace culling
 		/// <param name="cameraIndex"></param>
 		/// <param name="isAllAABBClipPointWPositive"></param>
 		/// <returns></returns>
-		FORCE_INLINE void SetIsAllAABBClipPointWPositive(const size_t entityIndex, const bool isAllAABBClipPointWPositive)
+		EVERYCULLING_FORCE_INLINE void SetIsAllAABBClipPointWPositive(const size_t entityIndex, const bool isAllAABBClipPointWPositive)
 		{
 			// Setting value to invalid index is acceptable
 			assert(entityIndex < ENTITY_COUNT_IN_ENTITY_BLOCK);
@@ -150,7 +150,7 @@ namespace culling
 			mIsAllAABBClipPointWPositive[entityIndex] = isAllAABBClipPointWPositive;
 		}
 
-		FORCE_INLINE bool GetIsCulled(const size_t entityIndex, const size_t cameraIndex) const
+		EVERYCULLING_FORCE_INLINE bool GetIsCulled(const size_t entityIndex, const size_t cameraIndex) const
 		{
 			assert(entityIndex < mCurrentEntityCount);
 
@@ -167,7 +167,7 @@ namespace culling
 		/// <param name="cameraIndex"></param>
 		/// <param name="isCullded"></param>
 		/// <returns></returns>
-		FORCE_INLINE void UpdateIsCulled(const size_t entityIndex, const size_t cameraIndex, const bool isCullded)
+		EVERYCULLING_FORCE_INLINE void UpdateIsCulled(const size_t entityIndex, const size_t cameraIndex, const bool isCullded)
 		{
 			// Setting value to invalid index is acceptable
 			assert(entityIndex < ENTITY_COUNT_IN_ENTITY_BLOCK);
@@ -177,61 +177,61 @@ namespace culling
 			mIsVisibleBitflag[entityIndex] &= cullMask;
 		}
 
-		FORCE_INLINE void SetCulled(const size_t entityIndex, const size_t cameraIndex)
+		EVERYCULLING_FORCE_INLINE void SetCulled(const size_t entityIndex, const size_t cameraIndex)
 		{
 			assert(entityIndex < mCurrentEntityCount);
 
 			mIsVisibleBitflag[entityIndex] &= ~(1 << cameraIndex);
 		}
 
-		FORCE_INLINE void SetNotCulled(const size_t entityIndex, const size_t cameraIndex)
+		EVERYCULLING_FORCE_INLINE void SetNotCulled(const size_t entityIndex, const size_t cameraIndex)
 		{
 			assert(entityIndex < mCurrentEntityCount);
 
 			mIsVisibleBitflag[entityIndex] |= (1 << cameraIndex);
 		}
 
-		FORCE_INLINE void SetIsObjectEnabled(const size_t entityIndex, const bool isEnabled)
+		EVERYCULLING_FORCE_INLINE void SetIsObjectEnabled(const size_t entityIndex, const bool isEnabled)
 		{
 			assert(entityIndex < mCurrentEntityCount);
 
 			mIsObjectEnabled[entityIndex] = isEnabled;
 		}
-		FORCE_INLINE bool GetIsObjectEnabled(const size_t entityIndex) const
+		EVERYCULLING_FORCE_INLINE bool GetIsObjectEnabled(const size_t entityIndex) const
 		{
 			assert(entityIndex < mCurrentEntityCount);
 
 			return mIsObjectEnabled[entityIndex];
 		}
 		
-		FORCE_INLINE bool GetIsOccluder(const size_t entityIndex) const
+		EVERYCULLING_FORCE_INLINE bool GetIsOccluder(const size_t entityIndex) const
 		{
 			assert(entityIndex < mCurrentEntityCount);
 
 			return mIsOccluder[entityIndex];
 		}
 
-		FORCE_INLINE void SetIsOccluder(const size_t entityIndex, const bool isOccluder)
+		EVERYCULLING_FORCE_INLINE void SetIsOccluder(const size_t entityIndex, const bool isOccluder)
 		{
 			assert(entityIndex < mCurrentEntityCount);
 
 			mIsOccluder[entityIndex] = isOccluder;
 		}
 
-		FORCE_INLINE void SetModelMatrix(const size_t entityIndex, const float* const modelToClipspaceMatrix)
+		EVERYCULLING_FORCE_INLINE void SetModelMatrix(const size_t entityIndex, const float* const modelToClipspaceMatrix)
 		{
 			assert(entityIndex < mCurrentEntityCount);
 
 			std::memcpy(mModelMatrixes + entityIndex, modelToClipspaceMatrix, sizeof(culling::Mat4x4));
 		}
-		FORCE_INLINE const culling::Mat4x4& GetModelMatrix(const size_t entityIndex) const
+		EVERYCULLING_FORCE_INLINE const culling::Mat4x4& GetModelMatrix(const size_t entityIndex) const
 		{
 			assert(entityIndex < mCurrentEntityCount);
 
 			return mModelMatrixes[entityIndex];
 		}
 
-		FORCE_INLINE void UpdateBoundingSphereRadius(const size_t entityIndex)
+		EVERYCULLING_FORCE_INLINE void UpdateBoundingSphereRadius(const size_t entityIndex)
 		{
 			assert(entityIndex < mCurrentEntityCount);
 
@@ -240,7 +240,7 @@ namespace culling
 			mWorldPositionAndWorldBoundingSphereRadius[entityIndex].SetBoundingSphereRadius(vec.magnitude() * 0.5f);
 		}
 
-		FORCE_INLINE void SetAABBWorldPosition(const size_t entityIndex, const float* const minWorldPos, const float* const maxWorldPos)
+		EVERYCULLING_FORCE_INLINE void SetAABBWorldPosition(const size_t entityIndex, const float* const minWorldPos, const float* const maxWorldPos)
 		{
 			assert(entityIndex < mCurrentEntityCount);
 
@@ -248,17 +248,17 @@ namespace culling
 			std::memcpy(mAABBMaxWorldPoint + entityIndex, maxWorldPos, sizeof(culling::Vec4));
 		}
 		
-		FORCE_INLINE void ResetEntityBlock()
+		EVERYCULLING_FORCE_INLINE void ResetEntityBlock(const unsigned long long currentTickCount)
 		{
 			for(size_t entityIndex = 0 ; entityIndex < ENTITY_COUNT_IN_ENTITY_BLOCK ; entityIndex++)
 			{
-				mVertexDatas[entityIndex].Reset();
+				mVertexDatas[entityIndex].Reset(currentTickCount);
 			}
 			std::memset(mIsVisibleBitflag, 0xFF, sizeof(char) * ENTITY_COUNT_IN_ENTITY_BLOCK);
 			std::memset(mIsAllAABBClipPointWPositive, 0xFF, sizeof(char) * ENTITY_COUNT_IN_ENTITY_BLOCK);
 		}
 
-		FORCE_INLINE void SetDesiredMaxDrawDistance(const size_t entityIndex, const float desiredMaxDrawDistance)
+		EVERYCULLING_FORCE_INLINE void SetDesiredMaxDrawDistance(const size_t entityIndex, const float desiredMaxDrawDistance)
 		{
 			assert(entityIndex < mCurrentEntityCount);
 			assert(desiredMaxDrawDistance >= 0.0f);
@@ -266,7 +266,7 @@ namespace culling
 			mDesiredMaxDrawDistance[entityIndex] = desiredMaxDrawDistance;
 		}
 
-		FORCE_INLINE float GetDesiredMaxDrawDistance(const size_t entityIndex)
+		EVERYCULLING_FORCE_INLINE float GetDesiredMaxDrawDistance(const size_t entityIndex)
 		{
 			assert(entityIndex < mCurrentEntityCount);
 			assert(mDesiredMaxDrawDistance[entityIndex] >= 0.0f);

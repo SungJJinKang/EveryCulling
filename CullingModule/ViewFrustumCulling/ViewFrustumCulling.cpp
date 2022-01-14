@@ -83,7 +83,7 @@ const char* culling::ViewFrustumCulling::GetCullingModuleName() const
 	return "ViewFrustumCulling";
 }
 
-FORCE_INLINE char culling::ViewFrustumCulling::CheckInFrustumSIMDWithTwoPoint
+EVERYCULLING_FORCE_INLINE char culling::ViewFrustumCulling::CheckInFrustumSIMDWithTwoPoint
 (
 	const Vec4* eightPlanes,
 	const Position_BoundingSphereRadius* twoPoint

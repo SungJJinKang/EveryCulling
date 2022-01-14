@@ -32,7 +32,7 @@ bool culling::SolveMeshRoleStage::CheckIsOccluderFromBoundingSphere
 }
 */
 
-FORCE_INLINE bool culling::SolveMeshRoleStage::CheckIsOccluderFromAABB
+EVERYCULLING_FORCE_INLINE bool culling::SolveMeshRoleStage::CheckIsOccluderFromAABB
 (
 	EntityBlock* const currentEntityBlock,
 	const size_t entityIndex

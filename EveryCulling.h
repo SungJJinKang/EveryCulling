@@ -125,9 +125,9 @@ namespace culling
 		std::vector<culling::CullingModule*> mUpdatedCullingModules;
 
 		// this function is called by multiple threads
-		FORCE_INLINE void OnStartCullingModule(const culling::CullingModule* const cullingModule);
+		EVERYCULLING_FORCE_INLINE void OnStartCullingModule(const culling::CullingModule* const cullingModule);
 		// this function is called by multiple threads
-		FORCE_INLINE void OnEndCullingModule(const culling::CullingModule* const cullingModule);
+		EVERYCULLING_FORCE_INLINE void OnEndCullingModule(const culling::CullingModule* const cullingModule);
 		
 		void SetViewProjectionMatrix(const size_t cameraIndex, const culling::Mat4x4& viewProjectionMatrix);
 		void SetFieldOfViewInDegree(const size_t cameraIndex, const float fov);
@@ -175,36 +175,36 @@ namespace culling
 		 */
 		void UpdateGlobalDataForCullJob(const size_t cameraIndex, const GlobalDataForCullJob& settingParameters);
 
-		FORCE_INLINE size_t GetCameraCount() const
+		EVERYCULLING_FORCE_INLINE size_t GetCameraCount() const
 		{
 			return mCameraCount;
 		}
-		FORCE_INLINE const culling::Vec3& GetCameraWorldPosition(const size_t cameraIndex) const
+		EVERYCULLING_FORCE_INLINE const culling::Vec3& GetCameraWorldPosition(const size_t cameraIndex) const
 		{
 			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
 			return mCameraWorldPositions[cameraIndex];
 		}
-		FORCE_INLINE const culling::Mat4x4& GetCameraModelMatrix(const size_t cameraIndex) const
+		EVERYCULLING_FORCE_INLINE const culling::Mat4x4& GetCameraModelMatrix(const size_t cameraIndex) const
 		{
 			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
 			return mCameraModelMatrixes[cameraIndex];
 		}
-		FORCE_INLINE const culling::Mat4x4& GetCameraViewProjectionMatrix(const size_t cameraIndex) const
+		EVERYCULLING_FORCE_INLINE const culling::Mat4x4& GetCameraViewProjectionMatrix(const size_t cameraIndex) const
 		{
 			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
 			return mCameraViewProjectionMatrixes[cameraIndex];
 		}
-		FORCE_INLINE float GetCameraFieldOfView(const size_t cameraIndex) const
+		EVERYCULLING_FORCE_INLINE float GetCameraFieldOfView(const size_t cameraIndex) const
 		{
 			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
 			return mCameraFieldOfView[cameraIndex];
 		}
-		FORCE_INLINE float GetCameraFarClipPlaneDistance(const size_t cameraIndex) const
+		EVERYCULLING_FORCE_INLINE float GetCameraFarClipPlaneDistance(const size_t cameraIndex) const
 		{
 			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
 			return mFarClipPlaneDistance[cameraIndex];
 		}
-		FORCE_INLINE float GetCameraNearClipPlaneDistance(const size_t cameraIndex) const
+		EVERYCULLING_FORCE_INLINE float GetCameraNearClipPlaneDistance(const size_t cameraIndex) const
 		{
 			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
 			return mNearClipPlaneDistance[cameraIndex];
@@ -266,7 +266,7 @@ namespace culling
 
 		void ResetSortedEntityCount();
 
-		FORCE_INLINE void SetSortedEntityInfo
+		EVERYCULLING_FORCE_INLINE void SetSortedEntityInfo
 		(
 			const size_t cameraIndex,
 			const size_t objectOrder,
@@ -285,7 +285,7 @@ namespace culling
 			mSortedEntityCount = MAX(mSortedEntityCount, objectOrder + 1);
 		}
 
-		FORCE_INLINE void SetSortedEntityInfo
+		EVERYCULLING_FORCE_INLINE void SetSortedEntityInfo
 		(
 			const size_t cameraIndex,
 			const size_t objectOrder,
@@ -295,7 +295,7 @@ namespace culling
 			SetSortedEntityInfo(cameraIndex, objectOrder, entityBlockViewer.GetTargetEntityBlock(), entityBlockViewer.GetEntityIndexInBlock());
 		}
 
-		FORCE_INLINE size_t GetSortedEntityCount() const
+		EVERYCULLING_FORCE_INLINE size_t GetSortedEntityCount() const
 		{
 			return mSortedEntityCount;
 		}
