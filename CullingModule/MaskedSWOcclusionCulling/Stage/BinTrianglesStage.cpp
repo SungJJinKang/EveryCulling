@@ -134,7 +134,7 @@ EVERYCULLING_FORCE_INLINE void culling::BinTrianglesStage::PassTrianglesToTileBi
 
 					//assert(targetTile->mBinnedTriangleList.GetIsBinFull() == false);
 
-					const size_t triListIndex = targetTile->mmBinnedTriangleCount++;
+					const size_t triListIndex = targetTile->mBinnedTriangleCount++;
 
 					if(triListIndex < BIN_TRIANGLE_CAPACITY_PER_TILE)
 					{
@@ -152,7 +152,7 @@ EVERYCULLING_FORCE_INLINE void culling::BinTrianglesStage::PassTrianglesToTileBi
 					}
 					else
 					{
-						targetTile->mmBinnedTriangleCount--;
+						targetTile->mBinnedTriangleCount--;
 					}
 				}
 			}
@@ -370,13 +370,16 @@ void culling::BinTrianglesStage::ResetCullingModule(const unsigned long long cur
 	MaskedSWOcclusionCullingStage::ResetCullingModule(currentTickCount);
 }
 
-void culling::BinTrianglesStage::CullBlockEntityJob(const size_t cameraIndex)
+void culling::BinTrianglesStage::CullBlockEntityJob(const size_t cameraIndex, const unsigned long long currentTickCount)
 {
+	if(WHEN_TO_BIN_TRIANGLE(currentTickCount))
+	{
 #ifdef FETCH_OBJECT_SORT_FROM_DOOMS_ENGINE_IN_BIN_TRIANGLE_STAGE
-	BinTriangleThreadJobByObjectOrder(cameraIndex);
+		BinTriangleThreadJobByObjectOrder(cameraIndex);
 #else
-	BinTriangleThreadJob(cameraIndex);
+		BinTriangleThreadJob(cameraIndex);
 #endif
+	}
 }
 
 const char* culling::BinTrianglesStage::GetCullingModuleName() const

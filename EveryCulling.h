@@ -122,7 +122,7 @@ namespace culling
 
 	private:
 
-		unsigned long long mCurrentTickCount = 0;
+		unsigned long long mCurrentTickCount = 1;
 
 		size_t mSortedEntityCount;
 		std::array<std::vector<EntityInfoInEntityBlock>, MAX_CAMERA_COUNT> mSortedEntityInfo;

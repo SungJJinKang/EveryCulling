@@ -30,7 +30,7 @@ void culling::Tile::Reset(const unsigned long long currentTickCount)
 
 	if (WHEN_TO_BIN_TRIANGLE(currentTickCount))
 	{
-		mmBinnedTriangleCount = 0;
+		mBinnedTriangleCount = 0;
 	}
 }
 

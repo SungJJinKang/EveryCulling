@@ -66,7 +66,7 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 
 	const culling::Vec2 tileOriginPoint{ static_cast<float>(tile->GetLeftBottomTileOrginX()), static_cast<float>(tile->GetLeftBottomTileOrginY()) };
 
-	const size_t binnedTriangleCount = tile->mmBinnedTriangleCount;
+	const size_t binnedTriangleCount = tile->mBinnedTriangleCount;
 
 	for (size_t triangleIndex = 0; triangleIndex < binnedTriangleCount; triangleIndex++)
 	{
@@ -301,27 +301,29 @@ void culling::RasterizeOccludersStage::ResetCullingModule(const unsigned long lo
 	}
 }
 
-void culling::RasterizeOccludersStage::CullBlockEntityJob(const size_t cameraIndex)
+void culling::RasterizeOccludersStage::CullBlockEntityJob(const size_t cameraIndex, const unsigned long long currentTickCount)
 {
-	if (mMaskedOcclusionCulling->GetIsOccluderExist() == true)
+	if (WHEN_TO_RASTERIZE_DEPTHBUFFER(currentTickCount))
 	{
-		const culling::Tile* const endTile = mMaskedOcclusionCulling->mDepthBuffer.GetTiles() + mMaskedOcclusionCulling->mDepthBuffer.GetTileCount();
-
-		while (true)
+		if (mMaskedOcclusionCulling->GetIsOccluderExist() == true)
 		{
-			culling::Tile* const nextTile = GetNextDepthBufferTile(cameraIndex);
+			const culling::Tile* const endTile = mMaskedOcclusionCulling->mDepthBuffer.GetTiles() + mMaskedOcclusionCulling->mDepthBuffer.GetTileCount();
 
-			if (nextTile != nullptr)
-			{
-				RasterizeBinnedTriangles(cameraIndex, nextTile);
-			}
-			else
-			{
-				break;
-			}
+				while (true)
+				{
+					culling::Tile* const nextTile = GetNextDepthBufferTile(cameraIndex);
+
+						if (nextTile != nullptr)
+						{
+							RasterizeBinnedTriangles(cameraIndex, nextTile);
+						}
+						else
+						{
+							break;
+						}
+				}
 		}
 	}
-
 }
 
 const char* culling::RasterizeOccludersStage::GetCullingModuleName() const

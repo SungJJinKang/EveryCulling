@@ -36,10 +36,13 @@ culling::MaskedSWOcclusionCulling::MaskedSWOcclusionCulling
 void culling::MaskedSWOcclusionCulling::ResetState(const unsigned long long currentTickCount)
 {
 	ResetDepthBuffer(currentTickCount);
-	mIsOccluderExist.store(false, std::memory_order_relaxed);
+	if (WHEN_TO_BIN_TRIANGLE(currentTickCount))
+	{
+		mIsOccluderExist.store(false, std::memory_order_relaxed);
+	}
 }
 
-void culling::MaskedSWOcclusionCulling::CullBlockEntityJob(const size_t cameraIndex)
+void culling::MaskedSWOcclusionCulling::CullBlockEntityJob(const size_t cameraIndex, const unsigned long long currentTickCount)
 {
 }
 

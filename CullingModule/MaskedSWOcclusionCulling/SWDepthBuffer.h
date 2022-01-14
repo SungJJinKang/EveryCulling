@@ -193,7 +193,7 @@ namespace culling
 
 		HizData mHizDatas;
 		TriangleData mBinnedTriangleList[BIN_TRIANGLE_CAPACITY_PER_TILE];
-		std::atomic<size_t> mmBinnedTriangleCount;
+		std::atomic<size_t> mBinnedTriangleCount;
 
 		void Reset(const unsigned long long currentTickCount);
 		EVERYCULLING_FORCE_INLINE std::uint32_t GetLeftBottomTileOrginX() const

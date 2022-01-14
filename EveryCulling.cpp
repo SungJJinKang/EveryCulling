@@ -109,6 +109,8 @@ void culling::EveryCulling::RemoveEntityFromBlock(EntityBlock* ownerEntityBlock,
 void culling::EveryCulling::ThreadCullJob(const size_t cameraIndex)
 {
 	const std::uint32_t entityBlockCount = static_cast<std::uint32_t>(GetActiveEntityBlockCount());
+	const unsigned long long currentTickCount = mCurrentTickCount;
+
 	if (entityBlockCount > 0)
 	{
 		for (size_t moduleIndex = 0; moduleIndex < mUpdatedCullingModules.size(); moduleIndex++)
@@ -120,7 +122,7 @@ void culling::EveryCulling::ThreadCullJob(const size_t cameraIndex)
 
 			if(cullingModule->IsEnabled == true)
 			{
-				cullingModule->ThreadCullJob(cameraIndex);
+				cullingModule->ThreadCullJob(cameraIndex, currentTickCount);
 
 				std::atomic_thread_fence(std::memory_order_seq_cst);
 

@@ -79,26 +79,29 @@ void culling::SolveMeshRoleStage::SolveMeshRole
 	}	
 }
 
-void culling::SolveMeshRoleStage::CullBlockEntityJob(const size_t cameraIndex)
+void culling::SolveMeshRoleStage::CullBlockEntityJob(const size_t cameraIndex, const unsigned long long currentTickCount)
 {
-	bool isOccluderExist = false;
-	while (true)
+	if (WHEN_TO_BIN_TRIANGLE(currentTickCount))
 	{
-		culling::EntityBlock* const nextEntityBlock = GetNextEntityBlock(cameraIndex);;
-
-		if (nextEntityBlock != nullptr)
+		bool isOccluderExist = false;
+		while (true)
 		{
-			SolveMeshRole(cameraIndex, nextEntityBlock, isOccluderExist);
-		}
-		else
-		{
-			break;
-		}
-	}
+			culling::EntityBlock* const nextEntityBlock = GetNextEntityBlock(cameraIndex);;
 
-	if(isOccluderExist == true)
-	{
-		mMaskedOcclusionCulling->SetIsOccluderExistTrue();
+			if (nextEntityBlock != nullptr)
+			{
+				SolveMeshRole(cameraIndex, nextEntityBlock, isOccluderExist);
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		if (isOccluderExist == true)
+		{
+			mMaskedOcclusionCulling->SetIsOccluderExistTrue();
+		}
 	}
 }
 
