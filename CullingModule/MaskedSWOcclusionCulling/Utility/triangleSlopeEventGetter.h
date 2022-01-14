@@ -7,7 +7,7 @@ namespace culling
 {
 	namespace triangleSlopeHelper
 	{
-		FORCE_INLINE extern void GatherBottomFlatTriangleSlopeEvent
+		EVERYCULLING_FORCE_INLINE extern void GatherBottomFlatTriangleSlopeEvent
 		(
 			const culling::Vec2& TileLeftBottomOriginPoint,
 			culling::M256I& leftFaceEvent,
@@ -39,7 +39,7 @@ namespace culling
 
 		}
 
-		FORCE_INLINE extern void GatherTopFlatTriangleSlopeEvent
+		EVERYCULLING_FORCE_INLINE extern void GatherTopFlatTriangleSlopeEvent
 		(
 			const size_t triangleCount,
 			const culling::Vec2& TileLeftBottomOriginPoint,

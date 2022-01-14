@@ -7,7 +7,7 @@ namespace culling
 {
 	namespace vertexTransformationHelper
 	{
-		FORCE_INLINE extern void TransformThreeVerticesToClipSpace
+		EVERYCULLING_FORCE_INLINE extern void TransformThreeVerticesToClipSpace
 		(
 			culling::M256F* outClipVertexX,
 			culling::M256F* outClipVertexY,
@@ -32,7 +32,7 @@ namespace culling
 			}
 		}
 
-		FORCE_INLINE extern void TransformThreeVerticesToClipSpace
+		EVERYCULLING_FORCE_INLINE extern void TransformThreeVerticesToClipSpace
 		(
 			culling::M256F* outClipVertexX,
 			culling::M256F* outClipVertexY,
@@ -54,7 +54,7 @@ namespace culling
 			}
 		}
 
-		FORCE_INLINE extern void TransformVertexToClipSpace
+		EVERYCULLING_FORCE_INLINE extern void TransformVertexToClipSpace
 		(
 			culling::M256F& outClipVertexX,
 			culling::M256F& outClipVertexY,
@@ -75,7 +75,7 @@ namespace culling
 			outClipVertexW = tmpW;
 		}
 
-		FORCE_INLINE extern void TransformVertexToClipSpace
+		EVERYCULLING_FORCE_INLINE extern void TransformVertexToClipSpace
 		(
 			culling::M256F& outClipVertexX,
 			culling::M256F& outClipVertexY,
@@ -94,7 +94,7 @@ namespace culling
 			outClipVertexZ = tmpZ;
 		}
 
-		FORCE_INLINE extern void ConvertClipSpaceThreeVerticesToNDCSpace
+		EVERYCULLING_FORCE_INLINE extern void ConvertClipSpaceThreeVerticesToNDCSpace
 		(
 			culling::M256F* outClipVertexX,
 			culling::M256F* outClipVertexY,
@@ -116,7 +116,7 @@ namespace culling
 			}
 		}
 
-		FORCE_INLINE extern void ConvertClipSpaceVertexToNDCSpace
+		EVERYCULLING_FORCE_INLINE extern void ConvertClipSpaceVertexToNDCSpace
 		(
 			culling::M256F& outClipVertexX,
 			culling::M256F& outClipVertexY,
@@ -130,7 +130,7 @@ namespace culling
 		}
 
 
-		FORCE_INLINE extern void ConvertNDCSpaceThreeVerticesToScreenPixelSpace
+		EVERYCULLING_FORCE_INLINE extern void ConvertNDCSpaceThreeVerticesToScreenPixelSpace
 		(
 			const culling::M256F* ndcSpaceVertexX,
 			const culling::M256F* ndcSpaceVertexY,
@@ -164,7 +164,7 @@ namespace culling
 			}
 		}
 
-		FORCE_INLINE extern void ConvertClipSpaceThreeVerticesToScreenPixelSpace
+		EVERYCULLING_FORCE_INLINE extern void ConvertClipSpaceThreeVerticesToScreenPixelSpace
 		(
 			const culling::M256F* clipSpaceVertexX,
 			const culling::M256F* clipSpaceVertexY,
@@ -202,7 +202,7 @@ namespace culling
 			}
 		}
 
-		FORCE_INLINE extern void ConvertNDCSpaceVertexToScreenPixelSpace
+		EVERYCULLING_FORCE_INLINE extern void ConvertNDCSpaceVertexToScreenPixelSpace
 		(
 			const culling::M256F& ndcSpaceVertexX,
 			const culling::M256F& ndcSpaceVertexY,

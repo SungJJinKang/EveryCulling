@@ -6,7 +6,7 @@
 #define SCREEN_SPACE_MIN_VALUE (float)-50000.0f
 #define SCREEN_SPACE_MAX_VALUE (float)50000.0f
 
-FORCE_INLINE void culling::PreCulling::ComputeScreenSpaceMinMaxAABBAndMinZ
+EVERYCULLING_FORCE_INLINE void culling::PreCulling::ComputeScreenSpaceMinMaxAABBAndMinZ
 (
 	const size_t cameraIndex,
 	culling::EntityBlock* const entityBlock, 

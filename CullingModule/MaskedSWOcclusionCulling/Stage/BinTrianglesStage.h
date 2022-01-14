@@ -21,7 +21,7 @@ namespace culling
 		/// <param name="clipspaceVertexX"></param>
 		/// <param name="clipspaceVertexY"></param>
 		/// <param name="triangleCullMask"></param>
-		FORCE_INLINE void Clipping
+		EVERYCULLING_FORCE_INLINE void Clipping
 		(
 			const culling::M256F* const clipspaceVertexX,
 			const culling::M256F* const clipspaceVertexY,
@@ -30,7 +30,7 @@ namespace culling
 			std::uint32_t& triangleCullMask
 		);
 
-		FORCE_INLINE culling::M256F ComputePositiveWMask
+		EVERYCULLING_FORCE_INLINE culling::M256F ComputePositiveWMask
 		(
 			const culling::M256F* const clipspaceVertexW
 		);
@@ -44,7 +44,7 @@ namespace culling
 		/// <param name="screenPixelY"></param>
 		/// <param name="ndcSpaceVertexZ"></param>
 		/// <param name="triangleCullMask"></param>
-		FORCE_INLINE void BackfaceCulling
+		EVERYCULLING_FORCE_INLINE void BackfaceCulling
 		(
 			culling::M256F* const screenPixelX, 
 			culling::M256F* const screenPixelY, 
@@ -53,7 +53,7 @@ namespace culling
 
 		
 
-		FORCE_INLINE void PassTrianglesToTileBin
+		EVERYCULLING_FORCE_INLINE void PassTrianglesToTileBin
 		(
 			const culling::M256F& pointAScreenPixelPosX,
 			const culling::M256F& pointAScreenPixelPosY,
@@ -101,7 +101,7 @@ namespace culling
 		/// <param name="outVerticesX"></param>
 		/// <param name="outVerticesY"></param>
 		/// <param name="triangleCullMask"></param>
-		FORCE_INLINE void GatherVertices
+		EVERYCULLING_FORCE_INLINE void GatherVertices
 		(
 			const float* const vertices,
 			const size_t verticeCount,
@@ -128,7 +128,7 @@ namespace culling
 		/// --> vertexStride is 6 * 4(float)
 		/// </param>
 		/// <param name="modelToClipspaceMatrix"></param>
-		FORCE_INLINE void BinTriangles
+		EVERYCULLING_FORCE_INLINE void BinTriangles
 		(
 			const float* const vertices,
 			const size_t verticeCount,

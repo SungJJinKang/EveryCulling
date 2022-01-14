@@ -30,24 +30,24 @@ namespace culling
 		EntityBlockViewer();
 		EntityBlockViewer(EntityBlock* const entityBlock, const size_t entityIndexInBlock);
 
-		FORCE_INLINE bool GetIsActive() const
+		EVERYCULLING_FORCE_INLINE bool GetIsActive() const
 		{
 			return bmIsActive;
 		}
 
-		FORCE_INLINE EntityBlock* GetTargetEntityBlock()
+		EVERYCULLING_FORCE_INLINE EntityBlock* GetTargetEntityBlock()
 		{
 			assert(GetIsActive() == true);
 			return mTargetEntityBlock;
 		}
 
-		FORCE_INLINE const EntityBlock* GetTargetEntityBlock() const
+		EVERYCULLING_FORCE_INLINE const EntityBlock* GetTargetEntityBlock() const
 		{
 			assert(GetIsActive() == true);
 			return mTargetEntityBlock;
 		}
 
-		FORCE_INLINE size_t GetEntityIndexInBlock() const
+		EVERYCULLING_FORCE_INLINE size_t GetEntityIndexInBlock() const
 		{
 			assert(GetIsActive() == true);
 			return mEntityIndexInBlock;
@@ -58,14 +58,14 @@ namespace culling
 		/// </summary>
 		/// <param name="cameraIndex">0 <= cameraIndex < EveryCulling::mCameraCount</param>
 		/// <returns></returns>
-		FORCE_INLINE bool GetIsCulled(const std::uint32_t cameraIndex) const
+		EVERYCULLING_FORCE_INLINE bool GetIsCulled(const std::uint32_t cameraIndex) const
 		{
 			assert(GetIsActive() == true);
 			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
 			return mTargetEntityBlock->GetIsCulled(mEntityIndexInBlock, cameraIndex);
 		}
 
-		FORCE_INLINE void SetModelMatrix(const float* const modelMatrix)
+		EVERYCULLING_FORCE_INLINE void SetModelMatrix(const float* const modelMatrix)
 		{
 			assert(GetIsActive() == true);
 			if (GetIsActive() == true)
@@ -91,18 +91,18 @@ namespace culling
 			const size_t verticeStride
 		);
 		
-		FORCE_INLINE const culling::VertexData& GetVertexData() const
+		EVERYCULLING_FORCE_INLINE const culling::VertexData& GetVertexData() const
 		{
 			assert(GetIsActive() == true);
 			return mTargetEntityBlock->mVertexDatas[mEntityIndexInBlock];
 		}
-		FORCE_INLINE bool GetIsOccluder() const
+		EVERYCULLING_FORCE_INLINE bool GetIsOccluder() const
 		{
 			assert(GetIsActive() == true);
 			return mTargetEntityBlock->GetIsOccluder(mEntityIndexInBlock);
 		}
 
-		FORCE_INLINE void SetIsObjectEnabled(const bool isEnabled)
+		EVERYCULLING_FORCE_INLINE void SetIsObjectEnabled(const bool isEnabled)
 		{
 			assert(GetIsActive() == true);
 			if (GetIsActive() == true)
@@ -111,7 +111,7 @@ namespace culling
 			}
 		}
 
-		FORCE_INLINE void SetAABBWorldPosition(const float* const minWorldPos, const float* const maxWorldPos)
+		EVERYCULLING_FORCE_INLINE void SetAABBWorldPosition(const float* const minWorldPos, const float* const maxWorldPos)
 		{
 			assert(GetIsActive() == true);
 			if (GetIsActive() == true)
@@ -120,7 +120,7 @@ namespace culling
 			}
 		}
 
-		FORCE_INLINE void SetObjectWorldPosition(const float* const worldPos)
+		EVERYCULLING_FORCE_INLINE void SetObjectWorldPosition(const float* const worldPos)
 		{
 			assert(GetIsActive() == true);
 			if (GetIsActive() == true)
@@ -129,7 +129,7 @@ namespace culling
 			}
 		}
 
-		FORCE_INLINE void SetDesiredMaxDrawDistance(const float desiredMaxDrawDistance)
+		EVERYCULLING_FORCE_INLINE void SetDesiredMaxDrawDistance(const float desiredMaxDrawDistance)
 		{
 			assert(GetIsActive() == true);
 
@@ -148,7 +148,7 @@ namespace culling
 		/// <param name="aabbMaxWorldPositionVec3"></param>
 		/// <param name="entityModelMatrix4x4"></param>
 		/// <returns></returns>
-		FORCE_INLINE void UpdateEntityData
+		EVERYCULLING_FORCE_INLINE void UpdateEntityData
 		(
 			const float* const entityWorldPositionVec3, 
 			const float* const aabbMinWorldPositionVec3,

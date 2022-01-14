@@ -22,9 +22,14 @@ namespace culling
 		std::uint64_t mVertexStride; // 8byte
 		char padding[32]; // to prevent false sharing
 		
-		FORCE_INLINE void Reset()
+		EVERYCULLING_FORCE_INLINE void Reset(const unsigned long long currentTickCount)
 		{
-			mBinnedIndiceCount = 0;
+			if(currentTickCount % 2 == 0)
+			{
+				// Clear binned triangle 
+				mBinnedIndiceCount = 0;
+			}
+			
 		}
 	};
 

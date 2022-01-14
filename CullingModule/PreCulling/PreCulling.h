@@ -10,7 +10,7 @@ namespace culling
 	{
 	private:
 
-		FORCE_INLINE void ComputeScreenSpaceMinMaxAABBAndMinZ
+		EVERYCULLING_FORCE_INLINE void ComputeScreenSpaceMinMaxAABBAndMinZ
 		(
 			const size_t cameraIndex,
 			culling::EntityBlock* const entityBlock,

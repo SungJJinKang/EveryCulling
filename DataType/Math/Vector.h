@@ -8,19 +8,19 @@ namespace culling
 	{
 		float x, y;
 
-		FORCE_INLINE Vec2() {}
-		FORCE_INLINE Vec2(const float _x, const float _y)
+		EVERYCULLING_FORCE_INLINE Vec2() {}
+		EVERYCULLING_FORCE_INLINE Vec2(const float _x, const float _y)
 			:x(_x), y(_y)
 		{
 
 		}
 
-		FORCE_INLINE float* data()
+		EVERYCULLING_FORCE_INLINE float* data()
 		{
 			return &x;
 		}
 
-		FORCE_INLINE const float* data() const
+		EVERYCULLING_FORCE_INLINE const float* data() const
 		{
 			return &x;
 		}
@@ -30,19 +30,19 @@ namespace culling
 	{
 		float x, y, z;
 
-		FORCE_INLINE Vec3() {}
-		FORCE_INLINE Vec3(const float _x, const float _y, const float _z)
+		EVERYCULLING_FORCE_INLINE Vec3() {}
+		EVERYCULLING_FORCE_INLINE Vec3(const float _x, const float _y, const float _z)
 			:x(_x), y(_y), z(_z)
 		{
 
 		}
 
-		FORCE_INLINE float* data()
+		EVERYCULLING_FORCE_INLINE float* data()
 		{
 			return &x;
 		}
 
-		FORCE_INLINE const float* data() const
+		EVERYCULLING_FORCE_INLINE const float* data() const
 		{
 			return &x;
 		}
@@ -58,27 +58,27 @@ namespace culling
 	{
 		float values[4];
 
-		FORCE_INLINE float& operator[](size_t index)
+		EVERYCULLING_FORCE_INLINE float& operator[](size_t index)
 		{
 			return values[index];
 		}
 
-		FORCE_INLINE float operator[](size_t index) const
+		EVERYCULLING_FORCE_INLINE float operator[](size_t index) const
 		{
 			return values[index];
 		}
 
-		FORCE_INLINE float* data()
+		EVERYCULLING_FORCE_INLINE float* data()
 		{
 			return values;
 		}
 
-		FORCE_INLINE const float* data() const
+		EVERYCULLING_FORCE_INLINE const float* data() const
 		{
 			return values;
 		}
 
-		FORCE_INLINE float sqrMagnitude() const
+		EVERYCULLING_FORCE_INLINE float sqrMagnitude() const
 		{
 			const culling::M128F mul0 = _mm_mul_ps(*reinterpret_cast<const culling::M128F*>(data()), *reinterpret_cast<const culling::M128F*>(data()));
 			const culling::M128F had0 = _mm_hadd_ps(mul0, mul0);
@@ -86,7 +86,7 @@ namespace culling
 			return _mm_cvtss_f32(had1);
 		}
 
-		FORCE_INLINE float magnitude() const
+		EVERYCULLING_FORCE_INLINE float magnitude() const
 		{
 			return std::sqrt(sqrMagnitude());
 		}
@@ -96,27 +96,27 @@ namespace culling
 	{
 		float values[4];
 
-		FORCE_INLINE float& operator[](size_t index)
+		EVERYCULLING_FORCE_INLINE float& operator[](size_t index)
 		{
 			return values[index];
 		}
 
-		FORCE_INLINE float operator[](size_t index) const
+		EVERYCULLING_FORCE_INLINE float operator[](size_t index) const
 		{
 			return values[index];
 		}
 
-		FORCE_INLINE float* data()
+		EVERYCULLING_FORCE_INLINE float* data()
 		{
 			return values;
 		}
 
-		FORCE_INLINE const float* data() const
+		EVERYCULLING_FORCE_INLINE const float* data() const
 		{
 			return values;
 		}
 
-		FORCE_INLINE float sqrMagnitude() const
+		EVERYCULLING_FORCE_INLINE float sqrMagnitude() const
 		{
 			const culling::M128F mul0 = _mm_mul_ps(*reinterpret_cast<const culling::M128F*>(data()), *reinterpret_cast<const culling::M128F*>(data()));
 			const culling::M128F had0 = _mm_hadd_ps(mul0, mul0);
@@ -124,35 +124,35 @@ namespace culling
 			return _mm_cvtss_f32(had1);
 		}
 
-		FORCE_INLINE float magnitude() const
+		EVERYCULLING_FORCE_INLINE float magnitude() const
 		{
 			return std::sqrt(sqrMagnitude());
 		}
 	};
 
-	FORCE_INLINE culling::Vec2 operator+(const culling::Vec2& a, const culling::Vec2& b)
+	EVERYCULLING_FORCE_INLINE culling::Vec2 operator+(const culling::Vec2& a, const culling::Vec2& b)
 	{
 		return culling::Vec2(a.x + b.x, a.y + b.y);
 	}
 
-	FORCE_INLINE culling::Vec2 operator-(const culling::Vec2& a, const culling::Vec2& b)
+	EVERYCULLING_FORCE_INLINE culling::Vec2 operator-(const culling::Vec2& a, const culling::Vec2& b)
 	{
 		return culling::Vec2(a.x - b.x, a.y - b.y);
 
 	}
 
-	FORCE_INLINE culling::Vec3 operator+(const culling::Vec3& a, const culling::Vec3& b)
+	EVERYCULLING_FORCE_INLINE culling::Vec3 operator+(const culling::Vec3& a, const culling::Vec3& b)
 	{
 		return culling::Vec3(a.x + b.x, a.y + b.y, a.z + b.z);
 	}
 
-	FORCE_INLINE culling::Vec3 operator-(const culling::Vec3& a, const culling::Vec3& b)
+	EVERYCULLING_FORCE_INLINE culling::Vec3 operator-(const culling::Vec3& a, const culling::Vec3& b)
 	{
 		return culling::Vec3(a.x - b.x, a.y - b.y, a.z - b.z);
 	}
 
 
-	FORCE_INLINE culling::Vec4 operator+(const culling::Vec4& a, const culling::Vec4& b)
+	EVERYCULLING_FORCE_INLINE culling::Vec4 operator+(const culling::Vec4& a, const culling::Vec4& b)
 	{
 		culling::Vec4 result;
 
@@ -161,7 +161,7 @@ namespace culling
 		return result;
 	}
 
-	FORCE_INLINE culling::Vec4 operator-(const culling::Vec4& a, const culling::Vec4& b)
+	EVERYCULLING_FORCE_INLINE culling::Vec4 operator-(const culling::Vec4& a, const culling::Vec4& b)
 	{
 		culling::Vec4 result;
 
@@ -170,22 +170,22 @@ namespace culling
 		return result;
 	}
 
-	FORCE_INLINE float Dot(const culling::Vec2& a, const culling::Vec2& b)
+	EVERYCULLING_FORCE_INLINE float Dot(const culling::Vec2& a, const culling::Vec2& b)
 	{
 		return a.x * b.x + a.y * b.y;
 	}
 
-	FORCE_INLINE float Dot(const culling::Vec3& a, const culling::Vec3& b)
+	EVERYCULLING_FORCE_INLINE float Dot(const culling::Vec3& a, const culling::Vec3& b)
 	{
 		return a.x * b.x + a.y * b.y + a.z * b.z;
 	}
 
-	FORCE_INLINE float PerpDot(const culling::Vec2& lhs, const culling::Vec2& rhs)
+	EVERYCULLING_FORCE_INLINE float PerpDot(const culling::Vec2& lhs, const culling::Vec2& rhs)
 	{
 		return lhs.x * rhs.y - lhs.y * rhs.x;
 	}
 
-	FORCE_INLINE culling::Vec3 Cross(const culling::Vec3& lhs, const culling::Vec3& rhs)
+	EVERYCULLING_FORCE_INLINE culling::Vec3 Cross(const culling::Vec3& lhs, const culling::Vec3& rhs)
 	{
 		return culling::Vec3(
 			lhs.y * rhs.z - rhs.y * lhs.z,

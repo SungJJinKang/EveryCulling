@@ -65,7 +65,7 @@ namespace culling
 		);
 
 		
-		FORCE_INLINE extern void FillFlatTriangleBatch
+		EVERYCULLING_FORCE_INLINE extern void FillFlatTriangleBatch
 		(
 			culling::M256I& outCoverageMask, // 8 coverage mask. array size should be 8
 			const Vec2& TileLeftBottomOriginPoint,

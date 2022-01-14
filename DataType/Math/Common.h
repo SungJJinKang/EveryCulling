@@ -27,7 +27,7 @@ namespace culling
 
 	NO_DISCARD void ExtractSIMDPlanesFromViewProjectionMatrix(const Mat4x4& viewProjectionMatrix, Vec4* eightPlanes, bool normalize) noexcept;
 
-	NO_DISCARD FORCE_INLINE Vec4 operator*(const culling::Mat4x4& mat4, const culling::Vec3& vec3) noexcept
+	NO_DISCARD EVERYCULLING_FORCE_INLINE Vec4 operator*(const culling::Mat4x4& mat4, const culling::Vec3& vec3) noexcept
 	{
 		return Vec4
 		{
@@ -38,7 +38,7 @@ namespace culling
 		};
 	}
 
-	NO_DISCARD FORCE_INLINE Vec4 operator*(const culling::Mat4x4& mat4, const culling::Vec4& vec4) noexcept
+	NO_DISCARD EVERYCULLING_FORCE_INLINE Vec4 operator*(const culling::Mat4x4& mat4, const culling::Vec4& vec4) noexcept
 	{
 		culling::M128F tempVec4;
 
@@ -55,7 +55,7 @@ namespace culling
 		return Vec4{ *(Vec4*)(&tempVec4) };
 	}
 
-	NO_DISCARD FORCE_INLINE culling::Mat4x4 operator*(const culling::Mat4x4& mat4_A, const culling::Mat4x4& mat4_B) noexcept
+	NO_DISCARD EVERYCULLING_FORCE_INLINE culling::Mat4x4 operator*(const culling::Mat4x4& mat4_A, const culling::Mat4x4& mat4_B) noexcept
 	{
 		culling::M256F _REULST_MAT4[2];
 		culling::M128F TEMP_M128F;
@@ -93,7 +93,7 @@ namespace culling
 	}
 
 	template <typename T>
-	FORCE_INLINE void SWAP(T& a, T& b) noexcept
+	EVERYCULLING_FORCE_INLINE void SWAP(T& a, T& b) noexcept
 	{
 		const T original = a;
 		a = b;
@@ -101,7 +101,7 @@ namespace culling
 	}
 
 	template <typename T>
-	FORCE_INLINE T CLAMP(const T& value, const T& min, const T& max) noexcept
+	EVERYCULLING_FORCE_INLINE T CLAMP(const T& value, const T& min, const T& max) noexcept
 	{
 		assert(min <= max);
 		return MIN(MAX(value, min), max);

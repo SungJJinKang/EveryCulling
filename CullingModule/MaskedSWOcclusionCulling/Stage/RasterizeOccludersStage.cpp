@@ -36,7 +36,7 @@
 /// </summary>
 /// <param name="coverageMask"></param>
 /// <returns></returns>
-FORCE_INLINE culling::M256I culling::RasterizeOccludersStage::ShuffleCoverageMask(const culling::M256I& coverageMask) const
+EVERYCULLING_FORCE_INLINE culling::M256I culling::RasterizeOccludersStage::ShuffleCoverageMask(const culling::M256I& coverageMask) const
 {
 	static const culling::M256I shuffleMask
 	=

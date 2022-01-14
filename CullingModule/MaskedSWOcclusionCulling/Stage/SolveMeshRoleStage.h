@@ -21,7 +21,7 @@ namespace culling
 		*/
 
 
-		FORCE_INLINE bool CheckIsOccluderFromAABB
+		EVERYCULLING_FORCE_INLINE bool CheckIsOccluderFromAABB
 		(
 			EntityBlock* const currentEntityBlock,
 			const size_t entityIndex

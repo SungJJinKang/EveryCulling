@@ -56,7 +56,7 @@ namespace culling
 		bool IsEnabled;
 
 		virtual void ResetCullingModule();
-		FORCE_INLINE std::uint32_t GetFinishedThreadCount(const size_t cameraIndex) const
+		EVERYCULLING_FORCE_INLINE std::uint32_t GetFinishedThreadCount(const size_t cameraIndex) const
 		{
 			return mCullJobState.mFinishedThreadCount[cameraIndex];
 		}

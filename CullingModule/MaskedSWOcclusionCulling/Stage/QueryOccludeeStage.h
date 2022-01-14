@@ -11,9 +11,9 @@ namespace culling
 	
 	private:
 
-		FORCE_INLINE float MinFloatFromM256F(const culling::M256F& data);
-		FORCE_INLINE float MaxFloatFromM256F(const culling::M256F& data);
-		FORCE_INLINE void ComputeBinBoundingBoxFromVertex
+		EVERYCULLING_FORCE_INLINE float MinFloatFromM256F(const culling::M256F& data);
+		EVERYCULLING_FORCE_INLINE float MaxFloatFromM256F(const culling::M256F& data);
+		EVERYCULLING_FORCE_INLINE void ComputeBinBoundingBoxFromVertex
 		(
 			const culling::M256F& screenPixelX,
 			const culling::M256F& screenPixelY,
@@ -23,7 +23,7 @@ namespace culling
 			std::uint32_t& outBinBoundingBoxMaxY,
 			SWDepthBuffer& depthBuffer
 		);
-		FORCE_INLINE void ComputeBinBoundingBoxFromVertex
+		EVERYCULLING_FORCE_INLINE void ComputeBinBoundingBoxFromVertex
 		(
 			const float minScreenPixelX,
 			const float minScreenPixelY,
@@ -35,7 +35,7 @@ namespace culling
 			std::uint32_t& outBinBoundingBoxMaxY,
 			SWDepthBuffer& depthBuffer
 		);
-		FORCE_INLINE void Clipping
+		EVERYCULLING_FORCE_INLINE void Clipping
 		(
 			const culling::M256F& clipspaceVertexX,
 			const culling::M256F& clipspaceVertexY,
