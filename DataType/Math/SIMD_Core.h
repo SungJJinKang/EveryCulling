@@ -1,14 +1,7 @@
 #pragma once
-// references :
-// https://stackoverflow.com/questions/66743623/what-is-difference-between-m128a-and-m128a?noredirect=1#comment117984269_66743623
-// https://stackoverflow.com/questions/52112605/is-reinterpret-casting-between-hardware-simd-vector-pointer-and-the-correspond
-// https://stackoverflow.com/questions/6996764/fastest-way-to-do-horizontal-sse-vector-sum-or-other-reduction
-// Unreal Engine Source Code  
-//
+#include "../../EveryCullingCore.h"
 
-#include "SIMD.h"
-
-#ifdef SIMD_ENABLED
+#if defined(__AVX__) || defined(__AVX2__)
 
 
 

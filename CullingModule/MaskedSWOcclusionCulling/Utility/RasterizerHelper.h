@@ -2,6 +2,8 @@
 
 #include "../../../EveryCullingCore.h"
 
+#include "../../../DataType/Math/SIMD_Core.h"
+
 namespace culling
 {
 	namespace rasterizerHelper

@@ -206,11 +206,11 @@ EVERYCULLING_FORCE_INLINE void culling::BinTrianglesStage::GatherVertices
 	//m256i_indices[1] : 1 ( second vertex index ), 4, 7, 10, 13, 16, 19, 22
 	//m256i_indices[2] : 2, 5, 8, 11, 14, 17, 20, 23
 	//Point1 indices of Triangles
-	m256i_indices[0] = _mm256_i32gather_epi32(reinterpret_cast<const INT32*>(currentVertexIndices + 0), safeIndiceIndexs, 4); // why 4? -> vertexIndices is std::uint32_t( 4byte )
+	m256i_indices[0] = _mm256_i32gather_epi32(reinterpret_cast<const int*>(currentVertexIndices + 0), safeIndiceIndexs, 4); // why 4? -> vertexIndices is std::uint32_t( 4byte )
 	//Point2 indices of Triangles
-	m256i_indices[1] = _mm256_i32gather_epi32(reinterpret_cast<const INT32*>(currentVertexIndices + 1), safeIndiceIndexs, 4);
+	m256i_indices[1] = _mm256_i32gather_epi32(reinterpret_cast<const int*>(currentVertexIndices + 1), safeIndiceIndexs, 4);
 	//Point3 indices of Triangles
-	m256i_indices[2] = _mm256_i32gather_epi32(reinterpret_cast<const INT32*>(currentVertexIndices + 2), safeIndiceIndexs, 4);
+	m256i_indices[2] = _mm256_i32gather_epi32(reinterpret_cast<const int*>(currentVertexIndices + 2), safeIndiceIndexs, 4);
 
 	if(vertexStrideByte > 0)
 	{
@@ -219,7 +219,7 @@ EVERYCULLING_FORCE_INLINE void culling::BinTrianglesStage::GatherVertices
 		//m256i_indices[0] : 0 * 28, 3 * 28, 6 * 28,  9 * 28, 12 * 28, 15 * 28, 18 * 28, 21 * 28
 		//m256i_indices[1] : 1 * 28, 4 * 28, 7 * 28, 10 * 28, 13 * 28, 16 * 28, 19 * 28, 22 * 28
 		//m256i_indices[2] : 2 * 28, 5 * 28, 8 * 28, 11 * 28, 14 * 28, 17 * 28, 20 * 28, 23 * 28
-		const culling::M256I m256i_stride = _mm256_set1_epi32(static_cast<INT32>(vertexStrideByte));
+		const culling::M256I m256i_stride = _mm256_set1_epi32(static_cast<int>(vertexStrideByte));
 		m256i_indices[0] = _mm256_mullo_epi32(m256i_indices[0], m256i_stride);
 		m256i_indices[1] = _mm256_mullo_epi32(m256i_indices[1], m256i_stride);
 		m256i_indices[2] = _mm256_mullo_epi32(m256i_indices[2], m256i_stride);

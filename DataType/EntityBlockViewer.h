@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cassert>
+
 #include "EntityBlock.h"
 
 namespace culling

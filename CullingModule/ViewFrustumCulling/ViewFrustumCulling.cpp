@@ -19,8 +19,6 @@ void culling::ViewFrustumCulling::DoViewFrustumCulling
 	culling::EntityBlock* const entityBlock
 )
 {
-	const math::Vector3* const cameraPos = reinterpret_cast<const math::Vector3*>(&(mCullingSystem->GetCameraWorldPosition(cameraIndex)));
-
 	assert(entityBlock->mCurrentEntityCount != 0);
 	
 
@@ -141,8 +139,8 @@ EVERYCULLING_FORCE_INLINE char culling::ViewFrustumCulling::CheckInFrustumSIMDWi
 	culling::M128F RMaskA = _mm_and_ps(dotPosA, dotPosA45); //when everty bits is 1, PointA is in frustum
 	culling::M128F RMaskB = _mm_and_ps(dotPosB, dotPosB45);//when everty bits is 1, PointB is in frustum
 
-	INT32 IsPointAInFrustum = _mm_test_all_ones(*reinterpret_cast<M128I*>(&RMaskA)); // value is 1, Point in in frustum
-	INT32 IsPointBInFrustum = _mm_test_all_ones(*reinterpret_cast<M128I*>(&RMaskB));
+	int IsPointAInFrustum = _mm_test_all_ones(*reinterpret_cast<M128I*>(&RMaskA)); // value is 1, Point in in frustum
+	int IsPointBInFrustum = _mm_test_all_ones(*reinterpret_cast<M128I*>(&RMaskB));
 
 	char IsPointABInFrustum = IsPointAInFrustum | (IsPointBInFrustum << 1);
 	return IsPointABInFrustum;

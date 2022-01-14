@@ -1,8 +1,6 @@
 #pragma once
 #include <cassert>
-#include <stddef.h>
-
-#include "DataType/Math/SIMD_Core.h"
+#include <cstdint>
 
 #if defined(__GNUC__)  || defined( __clang__)
 #  define EVERYCULLING_FORCE_INLINE inline __attribute__ ((always_inline))

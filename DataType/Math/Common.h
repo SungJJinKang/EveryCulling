@@ -23,11 +23,11 @@ namespace culling
 		/// https://www.gamedevs.org/uploads/fast-extraction-viewing-frustum-planes-from-world-view-projection-matrix.pdf
 		/// https://macton.smugmug.com/Other/2008-07-15-by-Eye-Fi/n-xmKDH/i-bJq8JqZ/A
 		/// </summary>
-	NO_DISCARD void ExtractPlanesFromVIewProjectionMatrix(const Mat4x4& viewProjectionMatrix, Vec4* sixPlanes, bool normalize) noexcept;
+	void ExtractPlanesFromVIewProjectionMatrix(const Mat4x4& viewProjectionMatrix, Vec4* sixPlanes, bool normalize) noexcept;
 
-	NO_DISCARD void ExtractSIMDPlanesFromViewProjectionMatrix(const Mat4x4& viewProjectionMatrix, Vec4* eightPlanes, bool normalize) noexcept;
+	void ExtractSIMDPlanesFromViewProjectionMatrix(const Mat4x4& viewProjectionMatrix, Vec4* eightPlanes, bool normalize) noexcept;
 
-	NO_DISCARD EVERYCULLING_FORCE_INLINE Vec4 operator*(const culling::Mat4x4& mat4, const culling::Vec3& vec3) noexcept
+	EVERYCULLING_FORCE_INLINE Vec4 operator*(const culling::Mat4x4& mat4, const culling::Vec3& vec3) noexcept
 	{
 		return Vec4
 		{
@@ -38,7 +38,7 @@ namespace culling
 		};
 	}
 
-	NO_DISCARD EVERYCULLING_FORCE_INLINE Vec4 operator*(const culling::Mat4x4& mat4, const culling::Vec4& vec4) noexcept
+	EVERYCULLING_FORCE_INLINE Vec4 operator*(const culling::Mat4x4& mat4, const culling::Vec4& vec4) noexcept
 	{
 		culling::M128F tempVec4;
 
@@ -55,7 +55,7 @@ namespace culling
 		return Vec4{ *(Vec4*)(&tempVec4) };
 	}
 
-	NO_DISCARD EVERYCULLING_FORCE_INLINE culling::Mat4x4 operator*(const culling::Mat4x4& mat4_A, const culling::Mat4x4& mat4_B) noexcept
+	EVERYCULLING_FORCE_INLINE culling::Mat4x4 operator*(const culling::Mat4x4& mat4_A, const culling::Mat4x4& mat4_B) noexcept
 	{
 		culling::M256F _REULST_MAT4[2];
 		culling::M128F TEMP_M128F;

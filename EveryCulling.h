@@ -1,8 +1,12 @@
 #pragma once
 
 #include "EveryCullingCore.h"
+
 #include "DataType/EntityGridCell.h"
 #include "DataType/EntityBlockViewer.h"
+#include "DataType/Math/Vector.h"
+#include "DataType/Math/Matrix.h"
+
 
 #ifdef PROFILING_CULLING
 #include "EveryCullingProfiler.h"

@@ -2,6 +2,9 @@
 
 #include "../../EveryCullingCore.h"
 
+#include <cmath>
+#include "SIMD_Core.h"
+
 namespace culling
 {
 	struct Vec2

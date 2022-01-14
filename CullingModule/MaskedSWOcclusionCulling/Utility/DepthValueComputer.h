@@ -2,6 +2,7 @@
 
 #include "../../../EveryCullingCore.h"
 
+#include "../../../DataType/Math/SIMD_Core.h"
 #include "depthUtility.h"
 
 namespace culling
