@@ -21,10 +21,17 @@ void culling::HizData::FillCoverageMask()
 }
 
 
-void culling::Tile::Reset()
+void culling::Tile::Reset(const unsigned long long currentTickCount)
 {
-	mHizDatas.Reset();
-	mmBinnedTriangleCount = 0;
+	if(WHEN_TO_RASTERIZE_DEPTHBUFFER(currentTickCount))
+	{
+		mHizDatas.Reset();
+	}
+
+	if (WHEN_TO_BIN_TRIANGLE(currentTickCount))
+	{
+		mmBinnedTriangleCount = 0;
+	}
 }
 
 
@@ -82,11 +89,11 @@ culling::SWDepthBuffer::~SWDepthBuffer()
 	
 }
 
-void culling::SWDepthBuffer::Reset()
+void culling::SWDepthBuffer::Reset(const unsigned long long currentTickCount)
 {
 	for (size_t i = 0; i < mTileCount; i++)
 	{
-		mTiles[i].Reset();
+		mTiles[i].Reset(currentTickCount);
 	}
 
 	std::atomic_thread_fence(std::memory_order_release);

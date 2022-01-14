@@ -107,8 +107,8 @@ const char* culling::SolveMeshRoleStage::GetCullingModuleName() const
 	return "SolveMeshRoleStage";
 }
 
-void culling::SolveMeshRoleStage::ResetCullingModule()
+void culling::SolveMeshRoleStage::ResetCullingModule(const unsigned long long currentTickCount)
 {
-	MaskedSWOcclusionCullingStage::ResetCullingModule();
+	MaskedSWOcclusionCullingStage::ResetCullingModule(currentTickCount);
 	
 }

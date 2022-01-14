@@ -49,8 +49,8 @@ namespace culling
 
 		RasterizeOccludersStage(MaskedSWOcclusionCulling* mOcclusionCulling);
 
-		void ResetCullingModule() override;
-		void CullBlockEntityJob(const size_t cameraIndex) override;
+		void ResetCullingModule(const unsigned long long currentTickCount) override;
+		void CullBlockEntityJob(const size_t cameraIndex, const unsigned long long currentTickCount) override;
 		const char* GetCullingModuleName() const override;
 
 		// TODO : Use linear depth!! ( float linearDepth = (2.0 * near * far) / (far + near - z * (far - near)) )

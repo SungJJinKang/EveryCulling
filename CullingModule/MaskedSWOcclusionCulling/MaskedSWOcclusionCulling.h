@@ -42,7 +42,7 @@ namespace culling
 
 		const std::uint32_t binCountInRow, binCountInColumn;
 
-		void ResetDepthBuffer();
+		void ResetDepthBuffer(const unsigned long long currentTickCount);
 
 		std::atomic<bool> mIsOccluderExist;
 
@@ -65,8 +65,8 @@ namespace culling
 			const std::uint32_t depthBufferheight
 		);
 	
-		void ResetState();
-		void CullBlockEntityJob(const size_t cameraIndex) override;
+		void ResetState(const unsigned long long currentTickCount);
+		void CullBlockEntityJob(const size_t cameraIndex, const unsigned long long currentTickCount) override;
 		const char* GetCullingModuleName() const override;
 
 		void SetIsOccluderExistTrue();

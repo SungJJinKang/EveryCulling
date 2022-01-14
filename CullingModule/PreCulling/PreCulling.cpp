@@ -149,7 +149,7 @@ culling::PreCulling::PreCulling(EveryCulling* frotbiteCullingSystem)
 {
 }
 
-void culling::PreCulling::CullBlockEntityJob(const size_t cameraIndex)
+void culling::PreCulling::CullBlockEntityJob(const size_t cameraIndex, const unsigned long long currentTickCount)
 {
 	while (true)
 	{

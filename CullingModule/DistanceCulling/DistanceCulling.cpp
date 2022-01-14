@@ -39,7 +39,7 @@ const char* culling::DistanceCulling::GetCullingModuleName() const
 	return "DistanceCulling";
 }
 
-void culling::DistanceCulling::CullBlockEntityJob(const size_t cameraIndex)
+void culling::DistanceCulling::CullBlockEntityJob(const size_t cameraIndex, const unsigned long long currentTickCount)
 {
 	while (true)
 	{

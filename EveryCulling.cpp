@@ -60,10 +60,10 @@ void culling::EveryCulling::ResetCullingModules()
 {
 	for (auto cullingModule : mUpdatedCullingModules)
 	{
-		cullingModule->ResetCullingModule();
+		cullingModule->ResetCullingModule(mCurrentTickCount);
 	}
 	
-	mMaskedSWOcclusionCulling->ResetState();
+	mMaskedSWOcclusionCulling->ResetState(mCurrentTickCount);
 
 }
 
@@ -72,7 +72,7 @@ void culling::EveryCulling::ResetEntityBlocks()
 	//Maybe Compiler use SIMD or do faster than SIMD instruction
 	for (auto entityBlock : mActiveEntityBlockList)
 	{
-		entityBlock->ResetEntityBlock(TickCount);
+		entityBlock->ResetEntityBlock(mCurrentTickCount);
 	}
 }
 
@@ -160,7 +160,7 @@ void culling::EveryCulling::WaitToFinishCullJobOfAllCameras() const
 
 void culling::EveryCulling::PreCullJob()
 {
-	TickCount++;
+	mCurrentTickCount++;
 
 	ResetEntityBlocks();
 	ResetCullingModules();
@@ -334,7 +334,7 @@ void culling::EveryCulling::SetThreadCount(const size_t threadCount)
 
 unsigned long long culling::EveryCulling::GetTickCount() const
 {
-	return TickCount;
+	return mCurrentTickCount;
 }
 
 EVERYCULLING_FORCE_INLINE void culling::EveryCulling::OnStartCullingModule(const culling::CullingModule* const cullingModule)

@@ -3,9 +3,9 @@
 #include "Stage/BinTrianglesStage.h"
 #include "Stage/RasterizeOccludersStage.h"
 
-void culling::MaskedSWOcclusionCulling::ResetDepthBuffer()
+void culling::MaskedSWOcclusionCulling::ResetDepthBuffer(const unsigned long long currentTickCount)
 {
-	mDepthBuffer.Reset();
+	mDepthBuffer.Reset(currentTickCount);
 	
 }
 
@@ -33,9 +33,9 @@ culling::MaskedSWOcclusionCulling::MaskedSWOcclusionCulling
 	assert(depthBufferheight% TILE_HEIGHT == 0);
 }
 
-void culling::MaskedSWOcclusionCulling::ResetState()
+void culling::MaskedSWOcclusionCulling::ResetState(const unsigned long long currentTickCount)
 {
-	ResetDepthBuffer();
+	ResetDepthBuffer(currentTickCount);
 	mIsOccluderExist.store(false, std::memory_order_relaxed);
 }
 

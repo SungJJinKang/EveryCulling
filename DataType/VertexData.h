@@ -24,7 +24,7 @@ namespace culling
 		
 		EVERYCULLING_FORCE_INLINE void Reset(const unsigned long long currentTickCount)
 		{
-			if(currentTickCount % 2 == 0)
+			if(WHEN_TO_BIN_TRIANGLE(currentTickCount) == true)
 			{
 				// Clear binned triangle 
 				mBinnedIndiceCount = 0;

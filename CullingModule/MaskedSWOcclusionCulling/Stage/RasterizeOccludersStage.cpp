@@ -291,9 +291,9 @@ culling::RasterizeOccludersStage::RasterizeOccludersStage(MaskedSWOcclusionCulli
 {
 }
 
-void culling::RasterizeOccludersStage::ResetCullingModule()
+void culling::RasterizeOccludersStage::ResetCullingModule(const unsigned long long currentTickCount)
 {
-	MaskedSWOcclusionCullingStage::ResetCullingModule();
+	MaskedSWOcclusionCullingStage::ResetCullingModule(currentTickCount);
 
 	for (std::atomic<size_t>& atomicVal : mFinishedTileCount)
 	{

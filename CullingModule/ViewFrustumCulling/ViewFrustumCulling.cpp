@@ -56,7 +56,7 @@ void culling::ViewFrustumCulling::DoViewFrustumCulling
 
 void culling::ViewFrustumCulling::CullBlockEntityJob
 (
-	const size_t cameraIndex
+	const size_t cameraIndex, const unsigned long long currentTickCount
 )
 {
 	while(true)

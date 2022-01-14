@@ -36,7 +36,7 @@ culling::CullingModule::CullingModule
 
 culling::CullingModule::~CullingModule() = default;
 
-void culling::CullingModule::ResetCullingModule()
+void culling::CullingModule::ResetCullingModule(const unsigned long long currentTickCount)
 {
 	for (std::atomic<std::uint32_t>& atomicVal : mCullJobState.mCurrentCulledEntityBlockIndex)
 	{
@@ -49,10 +49,10 @@ void culling::CullingModule::ResetCullingModule()
 	}
 }
 
-void culling::CullingModule::ThreadCullJob(const size_t cameraIndex)
+void culling::CullingModule::ThreadCullJob(const size_t cameraIndex, const unsigned long long currentTickCount)
 {
 	std::atomic_thread_fence(std::memory_order_acquire);
-	CullBlockEntityJob(cameraIndex);
+	CullBlockEntityJob(cameraIndex, currentTickCount);
 
 
 	mCullJobState.mFinishedThreadCount[cameraIndex].fetch_add(1, std::memory_order_seq_cst);

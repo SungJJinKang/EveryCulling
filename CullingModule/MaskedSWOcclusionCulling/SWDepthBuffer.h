@@ -195,7 +195,7 @@ namespace culling
 		TriangleData mBinnedTriangleList[BIN_TRIANGLE_CAPACITY_PER_TILE];
 		std::atomic<size_t> mmBinnedTriangleCount;
 
-		void Reset();
+		void Reset(const unsigned long long currentTickCount);
 		EVERYCULLING_FORCE_INLINE std::uint32_t GetLeftBottomTileOrginX() const
 		{
 			return mLeftBottomTileOrginX;
@@ -319,7 +319,7 @@ namespace culling
 			return mTileCount;
 		}
 
-		void Reset();
+		void Reset(const unsigned long long currentTickCount);
 		
 		const Tile* GetTiles() const;
 

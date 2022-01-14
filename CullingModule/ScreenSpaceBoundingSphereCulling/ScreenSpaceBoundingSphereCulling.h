@@ -34,7 +34,7 @@ namespace culling
 		
 		
 
-		virtual void CullBlockEntityJob(const size_t cameraIndex);
+		virtual void CullBlockEntityJob(const size_t cameraIndex, const unsigned long long currentTickCount);
 		const char* GetCullingModuleName() const override;
 	};
 

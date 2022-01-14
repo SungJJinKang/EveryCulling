@@ -49,7 +49,7 @@ namespace culling
 
 	union __M128I {
 		__m128i raw;    // SSE 4 x float vector
-		INT32 m128_i32[4];  // scalar array of 4 floats
+		int m128_i32[4];  // scalar array of 4 floats
 
 		EVERYCULLING_FORCE_INLINE operator __m128i() { return raw; }
 		EVERYCULLING_FORCE_INLINE operator __m128i() const { return raw; }
@@ -100,7 +100,7 @@ namespace culling
 
 	union __M256I {
 		__m256i raw;    // SSE 4 x float vector
-		INT32 m128_i32[8];  // scalar array of 4 floats
+		int m128_i32[8];  // scalar array of 4 floats
 
 		EVERYCULLING_FORCE_INLINE operator __m256i() { return raw; }
 		EVERYCULLING_FORCE_INLINE operator __m256i() const { return raw; }

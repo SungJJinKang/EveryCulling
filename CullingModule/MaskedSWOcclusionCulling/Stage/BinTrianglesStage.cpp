@@ -365,9 +365,9 @@ culling::BinTrianglesStage::BinTrianglesStage(MaskedSWOcclusionCulling* mMOcclus
 {
 }
 
-void culling::BinTrianglesStage::ResetCullingModule()
+void culling::BinTrianglesStage::ResetCullingModule(const unsigned long long currentTickCount)
 {
-	MaskedSWOcclusionCullingStage::ResetCullingModule();
+	MaskedSWOcclusionCullingStage::ResetCullingModule(currentTickCount);
 }
 
 void culling::BinTrianglesStage::CullBlockEntityJob(const size_t cameraIndex)
