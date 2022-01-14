@@ -118,6 +118,7 @@ namespace culling
 
 	private:
 
+		unsigned long long TickCount = 0;
 
 		size_t mSortedEntityCount;
 		std::array<std::vector<EntityInfoInEntityBlock>, MAX_CAMERA_COUNT> mSortedEntityInfo;
@@ -157,6 +158,7 @@ namespace culling
 
 		void SetCameraCount(const size_t cameraCount);
 		void SetThreadCount(const size_t threadCount);
+		unsigned long long GetTickCount() const;
 		
 		struct GlobalDataForCullJob
 		{
@@ -250,7 +252,7 @@ namespace culling
 		/**
 		 * \brief Reset cull job. Should be called every frame after finish cull job
 		 */
-		void ResetCullJob();
+		void PreCullJob();
 		
 		constexpr auto GetThreadCullJobInLambda(const size_t cameraIndex)
 		{

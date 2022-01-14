@@ -72,7 +72,7 @@ void culling::EveryCulling::ResetEntityBlocks()
 	//Maybe Compiler use SIMD or do faster than SIMD instruction
 	for (auto entityBlock : mActiveEntityBlockList)
 	{
-		entityBlock->ResetEntityBlock();
+		entityBlock->ResetEntityBlock(TickCount);
 	}
 }
 
@@ -158,8 +158,10 @@ void culling::EveryCulling::WaitToFinishCullJobOfAllCameras() const
 	}
 }
 
-void culling::EveryCulling::ResetCullJob()
+void culling::EveryCulling::PreCullJob()
 {
+	TickCount++;
+
 	ResetEntityBlocks();
 	ResetCullingModules();
 
@@ -330,14 +332,19 @@ void culling::EveryCulling::SetThreadCount(const size_t threadCount)
 	mThreadCount = threadCount;
 }
 
-FORCE_INLINE void culling::EveryCulling::OnStartCullingModule(const culling::CullingModule* const cullingModule)
+unsigned long long culling::EveryCulling::GetTickCount() const
+{
+	return TickCount;
+}
+
+EVERYCULLING_FORCE_INLINE void culling::EveryCulling::OnStartCullingModule(const culling::CullingModule* const cullingModule)
 {
 #ifdef PROFILING_CULLING
 	mEveryCullingProfiler.SetStartTime(cullingModule->GetCullingModuleName());
 #endif
 }
 
-FORCE_INLINE void culling::EveryCulling::OnEndCullingModule(const culling::CullingModule* const cullingModule)
+EVERYCULLING_FORCE_INLINE void culling::EveryCulling::OnEndCullingModule(const culling::CullingModule* const cullingModule)
 {
 #ifdef PROFILING_CULLING
 	mEveryCullingProfiler.SetEndTime(cullingModule->GetCullingModuleName());
