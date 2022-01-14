@@ -138,7 +138,9 @@ In My experiment, Waiting time is near to zero.
 Stage 1 : Solve Mesh Role Stage ( Choose occluder based on object's screen space aabb area )             
 Stage 2 : Bin Occluder Triangle Stage ( Dispatch(Bin) triangles to screen tiles based on triangle's screen space vertex data for following rasterizer stage. This is for not using lock when multiple threads rasterize triangles on depth buffer )               
 Stage 3 : Multithread Rasterize Occluder Triangles ( Threads do job rasterizing each tile's binned triangles, calculate max depth value of tile )             
-Stage 4 : Multithread Query depth buffer ( Compare aabb of occludee's min depth value with tile depth buffer. check 52p https://www.ea.com/frostbite/news/culling-the-battlefield-data-oriented-design-in-practice )              
+Stage 4 : Multithread Query depth buffer ( Occludee Test ) ( Compare aabb of occludee's min depth value with tile depth buffer. check 52p https://www.ea.com/frostbite/news/culling-the-battlefield-data-oriented-design-in-practice )          
+
+Stage 2, 3 is pretty slow. So they are performed alternately. Rasterization ( Stage 3 ) is performed with previous frame's binned triangle. It makes slight error when query depth buffer. But It's acceptable and it makes occlusion culling run faster. It's good trade-off.            
 
 [Reference paper](https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf)             
 [개발 일지](https://sungjjinkang.github.io/computerscience/computergraphics/2021/12/31/masked_sw_occlusion_culling.html)                
