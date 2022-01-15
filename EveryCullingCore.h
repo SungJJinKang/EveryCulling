@@ -136,6 +136,14 @@
 #define MAX_OCCLUDER_COUNT 10
 #endif
 
+// If Object's indice count is greater than this value, the object is excluded from occluder candidate.
+// This is for performance.
+// If occluder's vertices is too many, It may takes long times to rasterize them.
+// It causes performance drop by masked occlusion culling
+#ifndef OCCLUDER_CANDIDATE_INDICE_COUNT_LIMIT
+#define OCCLUDER_CANDIDATE_INDICE_COUNT_LIMIT 15000 
+#endif
+
 // Screen Space Bounding Sphere Culling
 #ifndef ENABLE_SCREEN_SAPCE_BOUDING_SPHERE_CULLING
 //#define ENABLE_SCREEN_SAPCE_BOUDING_SPHERE_CULLING

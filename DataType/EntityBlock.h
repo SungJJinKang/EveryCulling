@@ -254,6 +254,11 @@ namespace culling
 			return mFrontToBackSortingOrder[entityIndex];
 		}
 
+		EVERYCULLING_FORCE_INLINE const culling::VertexData& GetVertexData(const size_t entityIndex) const
+		{
+			return mVertexDatas[entityIndex];
+		}
+
 		void ClearEntityBlock();
 	};
 
