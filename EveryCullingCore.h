@@ -139,7 +139,7 @@
 // If Object's indice count is greater than this value, the object is excluded from occluder candidate.
 // This is for performance.
 // If occluder's vertices is too many, It may takes long times to rasterize them.
-// It causes performance drop by masked occlusion culling
+// It causes performance drop by masked occlusion culling, Then It's better not to use masked sw oc.
 #ifndef OCCLUDER_CANDIDATE_INDICE_COUNT_LIMIT
 #define OCCLUDER_CANDIDATE_INDICE_COUNT_LIMIT 15000 
 #endif

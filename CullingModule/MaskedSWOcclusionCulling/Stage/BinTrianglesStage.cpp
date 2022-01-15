@@ -303,7 +303,9 @@ void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t 
 {
 	std::vector<culling::EntityInfoInEntityBlock>& sortedEntityInfos = mCullingSystem->GetSortedEntityInfo(cameraIndex);
 
-	for(size_t entityInfoIndex = 0 ; entityInfoIndex < mCullingSystem->GetSortedEntityCount() ; entityInfoIndex++)
+	unsigned int binnedEntityCount = 0;
+
+	for(size_t entityInfoIndex = 0 ; entityInfoIndex < mCullingSystem->GetSortedEntityCount() && binnedEntityCount < MAX_OCCLUDER_COUNT ; entityInfoIndex++)
 	{
 		culling::EntityInfoInEntityBlock& entityInfo = sortedEntityInfos[entityInfoIndex];
 
@@ -317,6 +319,7 @@ void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t 
 			entityBlock->GetIsOccluder(entityIndexInEntityBlock) == true
 		)
 		{
+			binnedEntityCount++;
 
 			std::atomic<std::uint32_t>& binnedIndiceCount = entityBlock->mVertexDatas[entityIndexInEntityBlock].mBinnedIndiceCount;
 
