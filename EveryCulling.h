@@ -275,9 +275,9 @@ namespace culling
 		EVERYCULLING_FORCE_INLINE void SetSortedEntityInfo
 		(
 			const size_t cameraIndex,
-			const size_t objectOrder,
+			const unsigned int objectOrder,
 			EntityBlock* const entityBlock,
-			const size_t IndexInEntityBlock
+			const size_t indexInEntityBlock
 		)
 		{
 			if (mSortedEntityInfo[cameraIndex].size() <= objectOrder)
@@ -286,9 +286,11 @@ namespace culling
 			}
 
 			mSortedEntityInfo[cameraIndex][objectOrder].mEntityBlock = entityBlock;
-			mSortedEntityInfo[cameraIndex][objectOrder].mIndexInEntityBlock = IndexInEntityBlock;
+			mSortedEntityInfo[cameraIndex][objectOrder].mIndexInEntityBlock = indexInEntityBlock;
 
 			mSortedEntityCount = MAX(mSortedEntityCount, objectOrder + 1);
+
+			entityBlock->SetFrontToBackSortingOrder(indexInEntityBlock, objectOrder);
 		}
 
 		EVERYCULLING_FORCE_INLINE void SetSortedEntityInfo

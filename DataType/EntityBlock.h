@@ -83,7 +83,7 @@ namespace culling
 		// ---------------------------------------------------------------------------------------------------------------------------
 
 		alignas(64) bool mIsOccluder[ENTITY_COUNT_IN_ENTITY_BLOCK];
-
+		alignas(64) unsigned int mFrontToBackSortingOrder[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		
 		// Below datas is set before start culling. -----------------------------------------------------------------------------
 
@@ -242,6 +242,16 @@ namespace culling
 			assert(mDesiredMaxDrawDistance[entityIndex] >= 0.0f);
 
 			return mDesiredMaxDrawDistance[entityIndex];
+		}
+
+		EVERYCULLING_FORCE_INLINE void SetFrontToBackSortingOrder(const size_t entityIndex, const unsigned int frontToBackSortOrder)
+		{
+			mFrontToBackSortingOrder[entityIndex] = frontToBackSortOrder;
+		}
+
+		EVERYCULLING_FORCE_INLINE unsigned int GetFrontToBackSortingOrder(const size_t entityIndex) const
+		{
+			return mFrontToBackSortingOrder[entityIndex];
 		}
 
 		void ClearEntityBlock();
