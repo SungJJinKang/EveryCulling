@@ -305,61 +305,55 @@ void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t 
 
 	unsigned int binnedEntityCount = 0;
 
-	for(size_t entityInfoIndex = 0 ; entityInfoIndex < sortedOccluderList.size() && binnedEntityCount < MAX_OCCLUDER_COUNT ; entityInfoIndex++)
+	// TODO : change MAX_OCCLUDER_COUNT to BINNED_INDICE_COUNT_LIMIT
+	for (size_t entityInfoIndex = 0; entityInfoIndex < sortedOccluderList.size() && binnedEntityCount < MAX_OCCLUDER_COUNT; entityInfoIndex++)
 	{
 		culling::OccluderData& occluderInfo = sortedOccluderList[entityInfoIndex];
 
 		culling::EntityBlock* const entityBlock = occluderInfo.mEntityBlock;
 		const size_t entityIndexInEntityBlock = occluderInfo.mEntityIndexInEntityBlock;
-		
 
-		if
-		(
-			entityBlock->GetIsCulled(entityIndexInEntityBlock, cameraIndex) == false && 
-			entityBlock->GetIsOccluder(entityIndexInEntityBlock) == true
-		)
+		assert(entityBlock->GetIsOccluder(entityIndexInEntityBlock) == true);
+		assert(entityBlock->GetIsCulled(entityIndexInEntityBlock) == false);
+
+		binnedEntityCount++;
+
+		std::atomic<std::uint32_t>& binnedIndiceCount = entityBlock->mVertexDatas[entityIndexInEntityBlock].mBinnedIndiceCount;
+
+		const culling::Vec3* const vertices = entityBlock->mVertexDatas[entityIndexInEntityBlock].mVertices;
+		const std::uint64_t verticeCount = entityBlock->mVertexDatas[entityIndexInEntityBlock].mVerticeCount;
+		const std::uint32_t* const indices = entityBlock->mVertexDatas[entityIndexInEntityBlock].mIndices;
+		const std::uint64_t totalIndiceCount = entityBlock->mVertexDatas[entityIndexInEntityBlock].mIndiceCount;
+		const std::uint64_t vertexStride = entityBlock->mVertexDatas[entityIndexInEntityBlock].mVertexStride;
+
+
+		while (true)
 		{
-			binnedEntityCount++;
+			static_assert(BIN_VERTEX_INDICE_COUNT_PER_THREAD % 3 == 0);
+			const std::uint32_t currentBinnedIndiceCount = binnedIndiceCount.fetch_add(BIN_VERTEX_INDICE_COUNT_PER_THREAD, std::memory_order_seq_cst);
 
-			std::atomic<std::uint32_t>& binnedIndiceCount = entityBlock->mVertexDatas[entityIndexInEntityBlock].mBinnedIndiceCount;
-
-			const culling::Vec3* const vertices = entityBlock->mVertexDatas[entityIndexInEntityBlock].mVertices; 
-			const std::uint64_t verticeCount = entityBlock->mVertexDatas[entityIndexInEntityBlock].mVerticeCount; 
-			const std::uint32_t* const indices = entityBlock->mVertexDatas[entityIndexInEntityBlock].mIndices;
-			const std::uint64_t totalIndiceCount = entityBlock->mVertexDatas[entityIndexInEntityBlock].mIndiceCount;
-			const std::uint64_t vertexStride = entityBlock->mVertexDatas[entityIndexInEntityBlock].mVertexStride;
-
-
-			while(true)
+			if (currentBinnedIndiceCount < totalIndiceCount)
 			{
-				static_assert(BIN_VERTEX_INDICE_COUNT_PER_THREAD % 3 == 0);
-				const std::uint32_t currentBinnedIndiceCount = binnedIndiceCount.fetch_add(BIN_VERTEX_INDICE_COUNT_PER_THREAD, std::memory_order_seq_cst);
+				const culling::Mat4x4 modelToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex) * entityBlock->GetModelMatrix(entityIndexInEntityBlock);
 
-				if (currentBinnedIndiceCount < totalIndiceCount)
-				{
-					const culling::Mat4x4 modelToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex) * entityBlock->GetModelMatrix(entityIndexInEntityBlock);
+				const std::uint32_t* const startIndicePtr = indices + currentBinnedIndiceCount;
+				const std::uint32_t indiceCount = MIN(BIN_VERTEX_INDICE_COUNT_PER_THREAD, totalIndiceCount - currentBinnedIndiceCount);
 
-					const std::uint32_t* const startIndicePtr = indices + currentBinnedIndiceCount;
-					const std::uint32_t indiceCount = MIN(BIN_VERTEX_INDICE_COUNT_PER_THREAD, totalIndiceCount - currentBinnedIndiceCount);
-
-					BinTriangles
-					(
-						reinterpret_cast<const float*>(vertices),
-						verticeCount,
-						startIndicePtr,
-						indiceCount,
-						vertexStride,
-						modelToClipSpaceMatrix.data()
-					);
-				}
-				else
-				{
-					break;
-				}
+				BinTriangles
+				(
+					reinterpret_cast<const float*>(vertices),
+					verticeCount,
+					startIndicePtr,
+					indiceCount,
+					vertexStride,
+					modelToClipSpaceMatrix.data()
+				);
 			}
-			
+			else
+			{
+				break;
+			}
 		}
-		
 	}
 }
 
