@@ -27,7 +27,8 @@ culling::MaskedSWOcclusionCulling::MaskedSWOcclusionCulling
 	mBinTrianglesStage{this},
 	mRasterizeTrianglesStage{this},
 	mSolveMeshRoleStage{ this },
-	mQueryOccludeeStage{this}
+	mQueryOccludeeStage{this},
+	mOccluderListManager{}
 {
 	assert(depthBufferWidth% TILE_WIDTH == 0);
 	assert(depthBufferheight% TILE_HEIGHT == 0);
@@ -40,6 +41,8 @@ void culling::MaskedSWOcclusionCulling::ResetState(const unsigned long long curr
 	{
 		mIsOccluderExist.store(false, std::memory_order_relaxed);
 	}
+
+	mOccluderListManager.ResetOccluderList();
 }
 
 void culling::MaskedSWOcclusionCulling::CullBlockEntityJob(const size_t cameraIndex, const unsigned long long currentTickCount)

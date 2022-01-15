@@ -14,6 +14,8 @@
 #include "Stage/SolveMeshRoleStage.h"
 #include "Stage/QueryOccludeeStage.h"
 
+#include "OccluderListManager.h"
+
 #define INVALID_BINNED_OCCLUDER_COUNT (std::int32_t)(-1)
 
 namespace culling
@@ -46,8 +48,13 @@ namespace culling
 
 		std::atomic<bool> mIsOccluderExist;
 
+		
+
+		
+
 	public:
 
+		OccluderListManager mOccluderListManager;
 		
 		culling::EveryCulling* const mEveryCulling;
 

@@ -77,8 +77,12 @@ void culling::SolveMeshRoleStage::SolveMeshRole
 			const bool isOccluder = CheckIsOccluderFromAABB(currentEntityBlock, entityIndex);
 
 			currentEntityBlock->SetIsOccluder(entityIndex, isOccluder);
-
 			isOccluderExist |= isOccluder;
+
+			if(isOccluder == true)
+			{
+				mMaskedOcclusionCulling->mOccluderListManager.AddOccluder(currentEntityBlock, entityIndex);
+			}
 		}
 	}	
 }

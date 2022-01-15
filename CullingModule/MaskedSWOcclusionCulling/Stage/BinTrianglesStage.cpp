@@ -301,16 +301,16 @@ void culling::BinTrianglesStage::BinTriangleThreadJob(const size_t cameraIndex)
 
 void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t cameraIndex)
 {
-	std::vector<culling::EntityInfoInEntityBlock>& sortedEntityInfos = mCullingSystem->GetSortedEntityInfo(cameraIndex);
+	std::vector<OccluderData> sortedOccluderList = mMaskedOcclusionCulling->mOccluderListManager.GetSortedOccluderList();
 
 	unsigned int binnedEntityCount = 0;
 
-	for(size_t entityInfoIndex = 0 ; entityInfoIndex < mCullingSystem->GetSortedEntityCount() && binnedEntityCount < MAX_OCCLUDER_COUNT ; entityInfoIndex++)
+	for(size_t entityInfoIndex = 0 ; entityInfoIndex < sortedOccluderList.size() && binnedEntityCount < MAX_OCCLUDER_COUNT ; entityInfoIndex++)
 	{
-		culling::EntityInfoInEntityBlock& entityInfo = sortedEntityInfos[entityInfoIndex];
+		culling::OccluderData& occluderInfo = sortedOccluderList[entityInfoIndex];
 
-		culling::EntityBlock* const entityBlock = entityInfo.mEntityBlock;
-		const size_t entityIndexInEntityBlock = entityInfo.mIndexInEntityBlock;
+		culling::EntityBlock* const entityBlock = occluderInfo.mEntityBlock;
+		const size_t entityIndexInEntityBlock = occluderInfo.mEntityIndexInEntityBlock;
 		
 
 		if
