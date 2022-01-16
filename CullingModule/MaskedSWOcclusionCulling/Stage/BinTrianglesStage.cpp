@@ -303,10 +303,9 @@ void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t 
 {
 	std::vector<OccluderData> sortedOccluderList = mMaskedOcclusionCulling->mOccluderListManager.GetSortedOccluderList();
 
-	unsigned int binnedEntityCount = 0;
-
-	// TODO : change MAX_OCCLUDER_COUNT to BINNED_INDICE_COUNT_LIMIT
-	for (size_t entityInfoIndex = 0; entityInfoIndex < sortedOccluderList.size() && binnedEntityCount < MAX_OCCLUDER_COUNT; entityInfoIndex++)
+	std::uint64_t totalBinnedIndiceCount = 0;
+	
+	for (size_t entityInfoIndex = 0; entityInfoIndex < sortedOccluderList.size() && totalBinnedIndiceCount < MAX_BINNED_INDICE_COUNT ; entityInfoIndex++)
 	{
 		culling::OccluderData& occluderInfo = sortedOccluderList[entityInfoIndex];
 
@@ -315,10 +314,8 @@ void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t 
 
 		assert(entityBlock->GetIsOccluder(entityIndexInEntityBlock) == true);
 		assert(entityBlock->GetIsCulled(entityIndexInEntityBlock) == false);
-
-		binnedEntityCount++;
-
-		std::atomic<std::uint32_t>& binnedIndiceCount = entityBlock->mVertexDatas[entityIndexInEntityBlock].mBinnedIndiceCount;
+		
+		std::atomic<std::uint64_t>& atomic_binnedIndiceCountOfCurrentEntity = entityBlock->mVertexDatas[entityIndexInEntityBlock].mBinnedIndiceCount;
 
 		const culling::Vec3* const vertices = entityBlock->mVertexDatas[entityIndexInEntityBlock].mVertices;
 		const std::uint64_t verticeCount = entityBlock->mVertexDatas[entityIndexInEntityBlock].mVerticeCount;
@@ -326,18 +323,19 @@ void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t 
 		const std::uint64_t totalIndiceCount = entityBlock->mVertexDatas[entityIndexInEntityBlock].mIndiceCount;
 		const std::uint64_t vertexStride = entityBlock->mVertexDatas[entityIndexInEntityBlock].mVertexStride;
 
+		std::uint64_t currentBinnedIndiceCountOfCurrentEntity = 0;
 
-		while (true)
+		while (totalBinnedIndiceCount + currentBinnedIndiceCountOfCurrentEntity < MAX_BINNED_INDICE_COUNT)
 		{
 			static_assert(BIN_VERTEX_INDICE_COUNT_PER_THREAD % 3 == 0);
-			const std::uint32_t currentBinnedIndiceCount = binnedIndiceCount.fetch_add(BIN_VERTEX_INDICE_COUNT_PER_THREAD, std::memory_order_seq_cst);
-
-			if (currentBinnedIndiceCount < totalIndiceCount)
+			currentBinnedIndiceCountOfCurrentEntity = atomic_binnedIndiceCountOfCurrentEntity.fetch_add(BIN_VERTEX_INDICE_COUNT_PER_THREAD, std::memory_order_seq_cst);
+			
+			if (currentBinnedIndiceCountOfCurrentEntity < totalIndiceCount)
 			{
 				const culling::Mat4x4 modelToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex) * entityBlock->GetModelMatrix(entityIndexInEntityBlock);
 
-				const std::uint32_t* const startIndicePtr = indices + currentBinnedIndiceCount;
-				const std::uint32_t indiceCount = MIN(BIN_VERTEX_INDICE_COUNT_PER_THREAD, totalIndiceCount - currentBinnedIndiceCount);
+				const std::uint32_t* const startIndicePtr = indices + currentBinnedIndiceCountOfCurrentEntity;
+				const std::uint32_t indiceCount = MIN(BIN_VERTEX_INDICE_COUNT_PER_THREAD, totalIndiceCount - currentBinnedIndiceCountOfCurrentEntity);
 
 				BinTriangles
 				(
@@ -354,6 +352,8 @@ void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t 
 				break;
 			}
 		}
+
+		totalBinnedIndiceCount += MIN(totalIndiceCount, currentBinnedIndiceCountOfCurrentEntity);
 	}
 }
 

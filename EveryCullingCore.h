@@ -132,16 +132,8 @@
 #define BIN_TRIANGLE_CAPACITY_PER_TILE_PER_OBJECT 32
 #endif
 
-#ifndef MAX_OCCLUDER_COUNT
-#define MAX_OCCLUDER_COUNT 10
-#endif
-
-// If Object's indice count is greater than this value, the object is excluded from occluder candidate.
-// This is for performance.
-// If occluder's vertices is too many, It may takes long times to rasterize them.
-// It causes performance drop by masked occlusion culling, Then It's better not to use masked sw oc.
-#ifndef OCCLUDER_CANDIDATE_INDICE_COUNT_LIMIT
-#define OCCLUDER_CANDIDATE_INDICE_COUNT_LIMIT 15000 
+#ifndef MAX_BINNED_INDICE_COUNT
+#define MAX_BINNED_INDICE_COUNT (std::uint64_t)50000
 #endif
 
 // Screen Space Bounding Sphere Culling
