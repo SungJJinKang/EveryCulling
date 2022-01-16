@@ -25,7 +25,7 @@ std::vector<culling::OccluderData> culling::OccluderListManager::GetSortedOcclud
 	const size_t occluderCount = mOccluderCount;
 
 	std::vector<culling::OccluderData> occluderList;
-	occluderList.reserve(occluderCount);
+	occluderList.reserve(MIN(occluderCount, OCCLUDER_LIST_POOL_SIZE));
 
 	for (size_t occluderIndex = 0; occluderIndex < MIN(occluderCount, OCCLUDER_LIST_POOL_SIZE) ; occluderIndex++)
 	{
