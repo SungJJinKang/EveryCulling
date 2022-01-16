@@ -32,16 +32,16 @@ namespace culling
 		/// x, y, z : components is position of entity
 		/// w : component is radius of entity's sphere bound
 		/// 
-		/// This will be used for linearlly Frustum intersection check
-		///
-		/// If Size of mIsVisibleBitflag isn't multiples of 256bit,
-		/// Setting mIsVisibleBitflag make mWorldPositionAndWorldBoundingSphereRadius value dirty
+		/// Writeen in Pre Culling, Read in ViewFrustum Culling, Distance Culling
 		/// </summary>
-		alignas(64) culling::Position_BoundingSphereRadius mWorldPositionAndWorldBoundingSphereRadius[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		alignas(CACHE_LINE_SIZE) culling::Position_BoundingSphereRadius mWorldPositionAndWorldBoundingSphereRadius[ENTITY_COUNT_IN_ENTITY_BLOCK]; // 4 * 16 byte
+		
+		/**
+		 * \brief Written in BinTriangleStage, Read in BinTriangleStage.
+		 */
+		VertexData mVertexDatas[ENTITY_COUNT_IN_ENTITY_BLOCK]; // 4 * 16 byte
 
-		alignas(64) VertexData mVertexDatas[ENTITY_COUNT_IN_ENTITY_BLOCK];
-
-		// Set in PreCulling Stage ---------------------------------------------------------------------------------------------------
+		// Written in PreCulling Stage ---------------------------------------------------------------------------------------------------
 
 		// This variable is for a camera
 		float mAABBMinScreenSpacePointX[ENTITY_COUNT_IN_ENTITY_BLOCK];
@@ -58,15 +58,12 @@ namespace culling
 		/// </summary>
 		bool mIsAllAABBClipPointWPositive[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		bool mIsAllAABBClipPointWNegative[ENTITY_COUNT_IN_ENTITY_BLOCK];
-
-		// ---------------------------------------------------------------------------------------------------------------------------
-
-		alignas(64) bool mIsOccluder[ENTITY_COUNT_IN_ENTITY_BLOCK];
-		alignas(64) unsigned int mFrontToBackSortingOrder[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		
-		// Below datas is set before start culling. -----------------------------------------------------------------------------
+		
+		
+		// Below variables is written(set) before start culling. -----------------------------------------------------------------------------
 
-		alignas(64) culling::Vec4 mAABBMinWorldPoint[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		alignas(CACHE_LINE_SIZE) culling::Vec4 mAABBMinWorldPoint[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		culling::Vec4 mAABBMaxWorldPoint[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		culling::Mat4x4 mModelMatrixes[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		/// <summary>
@@ -74,7 +71,8 @@ namespace culling
 		/// </summary>
 		bool mIsObjectEnabled[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		float mDesiredMaxDrawDistance[ENTITY_COUNT_IN_ENTITY_BLOCK];
-		
+		unsigned int mFrontToBackSortingOrder[ENTITY_COUNT_IN_ENTITY_BLOCK];
+
 		/// <summary>
 		/// this variable is only used to decide whether to free this EntityBlock
 		/// </summary>
@@ -167,16 +165,6 @@ namespace culling
 			return mIsObjectEnabled[entityIndex];
 		}
 		
-		EVERYCULLING_FORCE_INLINE bool GetIsOccluder(const size_t entityIndex) const
-		{
-			return mIsOccluder[entityIndex];
-		}
-
-		EVERYCULLING_FORCE_INLINE void SetIsOccluder(const size_t entityIndex, const bool isOccluder)
-		{
-			mIsOccluder[entityIndex] = isOccluder;
-		}
-
 		EVERYCULLING_FORCE_INLINE void SetModelMatrix(const size_t entityIndex, const float* const modelToClipspaceMatrix)
 		{
 			std::memcpy(mModelMatrixes + entityIndex, modelToClipspaceMatrix, sizeof(culling::Mat4x4));

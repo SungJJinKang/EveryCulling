@@ -307,8 +307,7 @@ void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t 
 
 		culling::EntityBlock* const entityBlock = occluderInfo.mEntityBlock;
 		const size_t entityIndexInEntityBlock = occluderInfo.mEntityIndexInEntityBlock;
-
-		assert(entityBlock->GetIsOccluder(entityIndexInEntityBlock) == true);
+		
 		assert(entityBlock->GetIsCulled(entityIndexInEntityBlock) == false);
 		
 		std::atomic<std::uint64_t>& atomic_binnedIndiceCountOfCurrentEntity = entityBlock->mVertexDatas[entityIndexInEntityBlock].mBinnedIndiceCount;

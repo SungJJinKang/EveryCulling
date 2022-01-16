@@ -97,11 +97,6 @@ namespace culling
 			assert(GetIsActive() == true);
 			return mTargetEntityBlock->mVertexDatas[mEntityIndexInBlock];
 		}
-		EVERYCULLING_FORCE_INLINE bool GetIsOccluder() const
-		{
-			assert(GetIsActive() == true);
-			return mTargetEntityBlock->GetIsOccluder(mEntityIndexInBlock);
-		}
 
 		EVERYCULLING_FORCE_INLINE void SetIsObjectEnabled(const bool isEnabled)
 		{
