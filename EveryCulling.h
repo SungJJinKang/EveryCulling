@@ -124,7 +124,7 @@ namespace culling
 
 		unsigned long long mCurrentTickCount = 1;
 
-		size_t mSortedEntityCount;
+		unsigned long mSortedEntityCount;
 		std::array<std::vector<EntityInfoInEntityBlock>, MAX_CAMERA_COUNT> mSortedEntityInfo;
 
 		std::vector<culling::CullingModule*> mUpdatedCullingModules;
@@ -276,7 +276,7 @@ namespace culling
 		EVERYCULLING_FORCE_INLINE void SetSortedEntityInfo
 		(
 			const size_t cameraIndex,
-			const unsigned int objectOrder,
+			const unsigned long objectOrder,
 			EntityBlock* const entityBlock,
 			const size_t indexInEntityBlock
 		)
@@ -297,7 +297,7 @@ namespace culling
 		EVERYCULLING_FORCE_INLINE void SetSortedEntityInfo
 		(
 			const size_t cameraIndex,
-			const size_t objectOrder,
+			const unsigned long objectOrder,
 			EntityBlockViewer& entityBlockViewer
 		)
 		{

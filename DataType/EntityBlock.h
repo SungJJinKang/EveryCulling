@@ -71,7 +71,7 @@ namespace culling
 		/// </summary>
 		bool mIsObjectEnabled[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		float mDesiredMaxDrawDistance[ENTITY_COUNT_IN_ENTITY_BLOCK];
-		unsigned int mFrontToBackSortingOrder[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		unsigned long mFrontToBackSortingOrder[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 		/// <summary>
 		/// this variable is only used to decide whether to free this EntityBlock
@@ -211,7 +211,7 @@ namespace culling
 			return mDesiredMaxDrawDistance[entityIndex];
 		}
 
-		EVERYCULLING_FORCE_INLINE void SetFrontToBackSortingOrder(const size_t entityIndex, const unsigned int frontToBackSortOrder)
+		EVERYCULLING_FORCE_INLINE void SetFrontToBackSortingOrder(const size_t entityIndex, const unsigned long frontToBackSortOrder)
 		{
 			mFrontToBackSortingOrder[entityIndex] = frontToBackSortOrder;
 		}
