@@ -190,12 +190,13 @@ void culling::EveryCulling::SetEnabledCullingModule(const CullingModuleType cull
 	switch (cullingModuleType)
 	{
 
-	case CullingModuleType::_ViewFrustumCulling:
-
-		mViewFrustumCulling->IsEnabled = isEnabled;
-
+	case CullingModuleType::_PreCulling:
+		mPreCulling->IsEnabled = isEnabled;
 		break;
 
+	case CullingModuleType::_ViewFrustumCulling:
+		mViewFrustumCulling->IsEnabled = isEnabled;
+		break;
 
 	case CullingModuleType::_MaskedSWOcclusionCulling:
 
@@ -203,13 +204,11 @@ void culling::EveryCulling::SetEnabledCullingModule(const CullingModuleType cull
 		mMaskedSWOcclusionCulling->mBinTrianglesStage.IsEnabled = isEnabled;
 		mMaskedSWOcclusionCulling->mRasterizeTrianglesStage.IsEnabled = isEnabled;
 		mMaskedSWOcclusionCulling->mQueryOccludeeStage.IsEnabled = isEnabled;
-
 		break;
 
 	case CullingModuleType::_DistanceCulling:
 
 		mDistanceCulling->IsEnabled = isEnabled;
-
 		break;
 		
 	}

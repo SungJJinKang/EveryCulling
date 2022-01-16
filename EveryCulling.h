@@ -145,6 +145,7 @@ namespace culling
 
 		enum class CullingModuleType
 		{
+			_PreCulling,
 			_ViewFrustumCulling,
 			_MaskedSWOcclusionCulling,
 			_HwQueryOcclusionCulling,
