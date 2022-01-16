@@ -77,7 +77,7 @@
 #endif
 
 #ifndef MAX_CAMERA_COUNT
-#define MAX_CAMERA_COUNT 3
+#define MAX_CAMERA_COUNT 5
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -133,7 +133,7 @@
 #endif
 
 #ifndef MAX_BINNED_INDICE_COUNT
-#define MAX_BINNED_INDICE_COUNT (std::uint64_t)50000
+#define MAX_BINNED_INDICE_COUNT (std::uint64_t)30000
 #endif
 
 // Screen Space Bounding Sphere Culling

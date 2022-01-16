@@ -270,46 +270,6 @@ namespace culling
 		const culling::CullingModule* GetLastEnabledCullingModule() const;
 		void SetEnabledCullingModule(const CullingModuleType cullingModuleType, const bool isEnabled);
 
-
-		void ResetSortedEntityCount();
-
-		EVERYCULLING_FORCE_INLINE void SetSortedEntityInfo
-		(
-			const std::uint32_t cameraIndex,
-			const unsigned long objectOrder,
-			EntityBlock* const entityBlock,
-			const size_t indexInEntityBlock
-		)
-		{
-			if (mSortedEntityInfo[cameraIndex].size() <= objectOrder)
-			{
-				mSortedEntityInfo[cameraIndex].resize(MAX(objectOrder + 1, (mSortedEntityInfo[cameraIndex].size() * 2) - 1));
-			}
-
-			mSortedEntityInfo[cameraIndex][objectOrder].mEntityBlock = entityBlock;
-			mSortedEntityInfo[cameraIndex][objectOrder].mIndexInEntityBlock = indexInEntityBlock;
-
-			mSortedEntityCount = MAX(mSortedEntityCount, objectOrder + 1);
-
-			entityBlock->SetFrontToBackSortingOrder(indexInEntityBlock, objectOrder);
-		}
-
-		EVERYCULLING_FORCE_INLINE void SetSortedEntityInfo
-		(
-			const std::uint32_t cameraIndex,
-			const unsigned long objectOrder,
-			EntityBlockViewer& entityBlockViewer
-		)
-		{
-			SetSortedEntityInfo(cameraIndex, objectOrder, entityBlockViewer.GetTargetEntityBlock(), entityBlockViewer.GetEntityIndexInBlock());
-		}
-
-		EVERYCULLING_FORCE_INLINE size_t GetSortedEntityCount() const
-		{
-			return mSortedEntityCount;
-		}
-		std::vector<EntityInfoInEntityBlock>& GetSortedEntityInfo(const size_t cameraIndex);
-
 	};
 }
 

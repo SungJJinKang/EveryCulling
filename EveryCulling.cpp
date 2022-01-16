@@ -459,16 +459,3 @@ size_t culling::EveryCulling::GetActiveEntityBlockCount() const
 {
 	return GetActiveEntityBlockList().size();
 }
-
-void culling::EveryCulling::ResetSortedEntityCount()
-{
-	mSortedEntityCount = 0;
-}
-
-std::vector<culling::EntityInfoInEntityBlock>& culling::EveryCulling::GetSortedEntityInfo
-(
-	const size_t cameraIndex
-)
-{
-	return mSortedEntityInfo[cameraIndex];
-}

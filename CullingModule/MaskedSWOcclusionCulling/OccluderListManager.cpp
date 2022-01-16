@@ -20,7 +20,7 @@ void culling::OccluderListManager::AddOccluder(EntityBlock* const entityBlock, c
 	}
 }
 
-std::vector<culling::OccluderData> culling::OccluderListManager::GetSortedOccluderList() const
+std::vector<culling::OccluderData> culling::OccluderListManager::GetSortedOccluderList(const size_t cameraIndex) const
 {
 	const size_t occluderCount = mOccluderCount;
 
@@ -36,9 +36,9 @@ std::vector<culling::OccluderData> culling::OccluderListManager::GetSortedOcclud
 	(
 		occluderList.begin(),
 		occluderList.end(),
-		[](const culling::OccluderData& left, const culling::OccluderData& right)
+		[cameraIndex](const culling::OccluderData& left, const culling::OccluderData& right)
 		{
-			return left.mEntityBlock->GetFrontToBackSortingOrder(left.mEntityIndexInEntityBlock) < right.mEntityBlock->GetFrontToBackSortingOrder(right.mEntityIndexInEntityBlock);
+			return left.mEntityBlock->GetFrontToBackSortingOrder(cameraIndex, left.mEntityIndexInEntityBlock) < right.mEntityBlock->GetFrontToBackSortingOrder(cameraIndex, right.mEntityIndexInEntityBlock);
 		}
 	);
 

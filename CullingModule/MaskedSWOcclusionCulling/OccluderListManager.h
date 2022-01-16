@@ -31,7 +31,7 @@ namespace culling
 		OccluderListManager();
 		void AddOccluder(EntityBlock* const entityBlock, const size_t entityIndexInEntityBlock);
 
-		std::vector<OccluderData> GetSortedOccluderList() const;
+		std::vector<OccluderData> GetSortedOccluderList(const size_t cameraIndex) const;
 
 		void ResetOccluderList();
 	};

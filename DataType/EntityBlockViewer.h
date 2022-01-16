@@ -157,5 +157,11 @@ namespace culling
 
 			SetModelMatrix(entityModelMatrix4x4);
 		}
+
+		EVERYCULLING_FORCE_INLINE void SetFrontToBackSortingOrder(const unsigned long* frontToBackSortOrder)
+		{
+			mTargetEntityBlock->SetFrontToBackSortingOrder(mEntityIndexInBlock, frontToBackSortOrder);
+		}
+
 	};
 }
