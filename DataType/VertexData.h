@@ -2,11 +2,13 @@
 
 #include "../EveryCullingCore.h"
 
+#include <atomic>
+
 namespace culling
 {
 	struct VertexData
 	{
-		std::atomic<std::uint64_t> mBinnedIndiceCount; //  4byte + ??
+		std::atomic<std::uint64_t> mBinnedIndiceCount; //  8byte + ??
 
 		const culling::Vec3* mVertices; // 8byte or 4byte
 		std::uint64_t mVerticeCount; // 8byte
@@ -20,7 +22,6 @@ namespace culling
 		///		-> Stride is 8byte!
 		/// </summary>
 		std::uint64_t mVertexStride; // 8byte
-		char padding[32]; // to prevent false sharing
 		
 		EVERYCULLING_FORCE_INLINE void Reset(const unsigned long long currentTickCount)
 		{

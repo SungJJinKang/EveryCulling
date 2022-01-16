@@ -9,23 +9,7 @@
 #include "VertexData.h"
 #include "Math/Matrix.h"
 
-#ifdef ENABLE_QUERY_OCCLUSION
-#include "QueryObject.h"
-
-#define QUERY_OBJECT_PTR_SIZE sizeof(culling::QueryObject*)
-
-#else
-
-#define QUERY_OBJECT_PTR_SIZE 0
-
-#endif
-
-
-
-
 #define PAGE_SIZE 4096
-
-#define MAKE_EVEN_NUMBER(X) (X - (X%2))
 
 namespace culling
 {
@@ -55,11 +39,6 @@ namespace culling
 		/// </summary>
 		alignas(64) culling::Position_BoundingSphereRadius mWorldPositionAndWorldBoundingSphereRadius[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
-#ifdef ENABLE_QUERY_OCCLUSION
-		culling::QueryObject* mQueryObjects[ENTITY_COUNT_IN_ENTITY_BLOCK];
-#endif
-	
-		
 		alignas(64) VertexData mVertexDatas[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 		// Set in PreCulling Stage ---------------------------------------------------------------------------------------------------
