@@ -275,7 +275,7 @@ namespace culling
 
 		EVERYCULLING_FORCE_INLINE void SetSortedEntityInfo
 		(
-			const size_t cameraIndex,
+			const std::uint32_t cameraIndex,
 			const unsigned long objectOrder,
 			EntityBlock* const entityBlock,
 			const size_t indexInEntityBlock
@@ -296,7 +296,7 @@ namespace culling
 
 		EVERYCULLING_FORCE_INLINE void SetSortedEntityInfo
 		(
-			const size_t cameraIndex,
+			const std::uint32_t cameraIndex,
 			const unsigned long objectOrder,
 			EntityBlockViewer& entityBlockViewer
 		)

@@ -126,11 +126,11 @@ EVERYCULLING_FORCE_INLINE void culling::BinTrianglesStage::PassTrianglesToTileBi
 			assert(endBoxIndexX >= 0 && endBoxIndexX <= (int)(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mColumnTileCount));
 			assert(endBoxIndexY >= 0 && endBoxIndexY <= (int)(mMaskedOcclusionCulling->mDepthBuffer.mResolution.mRowTileCount));
 
-			for (size_t y = startBoxIndexY; y <= endBoxIndexY; y++)
+			for (int y = startBoxIndexY; y <= endBoxIndexY; y++)
 			{
-				for (size_t x = startBoxIndexX; x <= endBoxIndexX; x++)
+				for (int x = startBoxIndexX; x <= endBoxIndexX; x++)
 				{
-					Tile* const targetTile = mMaskedOcclusionCulling->mDepthBuffer.GetTile(y, x);
+					Tile* const targetTile = mMaskedOcclusionCulling->mDepthBuffer.GetTile(static_cast<std::uint32_t>(y), static_cast<std::uint32_t>(x));
 
 					//assert(targetTile->mBinnedTriangleList.GetIsBinFull() == false);
 
@@ -308,7 +308,7 @@ void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t 
 		culling::EntityBlock* const entityBlock = occluderInfo.mEntityBlock;
 		const size_t entityIndexInEntityBlock = occluderInfo.mEntityIndexInEntityBlock;
 		
-		assert(entityBlock->GetIsCulled(entityIndexInEntityBlock) == false);
+		assert(entityBlock->GetIsCulled(entityIndexInEntityBlock, cameraIndex) == false);
 		
 		std::atomic<std::uint64_t>& atomic_binnedIndiceCountOfCurrentEntity = entityBlock->mVertexDatas[entityIndexInEntityBlock].mBinnedIndiceCount;
 
@@ -330,7 +330,7 @@ void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t 
 				const culling::Mat4x4 modelToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex) * entityBlock->GetModelMatrix(entityIndexInEntityBlock);
 
 				const std::uint32_t* const startIndicePtr = indices + currentBinnedIndiceCountOfCurrentEntity;
-				const std::uint32_t indiceCount = MIN(BIN_VERTEX_INDICE_COUNT_PER_THREAD, totalIndiceCount - currentBinnedIndiceCountOfCurrentEntity);
+				const std::uint64_t indiceCount = MIN(BIN_VERTEX_INDICE_COUNT_PER_THREAD, totalIndiceCount - currentBinnedIndiceCountOfCurrentEntity);
 
 				BinTriangles
 				(
@@ -382,10 +382,10 @@ const char* culling::BinTrianglesStage::GetCullingModuleName() const
 EVERYCULLING_FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 (
 	const float* const vertices, 
-	const size_t verticeCount,
+	const uint64_t verticeCount,
 	const std::uint32_t* const vertexIndices, 
-	const size_t indiceCount, 
-	const size_t vertexStrideByte, 
+	const uint64_t indiceCount,
+	const uint64_t vertexStrideByte,
 	const float* const modelToClipspaceMatrix
 )
 {

@@ -174,7 +174,7 @@ void culling::EveryCulling::PreCullJob()
 const culling::CullingModule* culling::EveryCulling::GetLastEnabledCullingModule() const
 {
 	culling::CullingModule* lastEnabledCullingModule = nullptr;
-	for(int cullingModuleIndex = mUpdatedCullingModules.size() - 1 ; cullingModuleIndex >= 0 ; cullingModuleIndex--)
+	for(int cullingModuleIndex = static_cast<int>(mUpdatedCullingModules.size()) - 1 ; cullingModuleIndex >= 0 ; cullingModuleIndex--)
 	{
 		if(mUpdatedCullingModules[cullingModuleIndex]->IsEnabled == true)
 		{

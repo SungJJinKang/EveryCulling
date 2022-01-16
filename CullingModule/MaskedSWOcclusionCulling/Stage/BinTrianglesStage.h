@@ -131,10 +131,10 @@ namespace culling
 		EVERYCULLING_FORCE_INLINE void BinTriangles
 		(
 			const float* const vertices,
-			const size_t verticeCount,
+			const uint64_t verticeCount,
 			const std::uint32_t* const vertexIndices,
-			const size_t indiceCount, 
-			const size_t vertexStrideByte, 
+			const uint64_t indiceCount,
+			const uint64_t vertexStrideByte,
 			const float* const modelToClipspaceMatrix
 		);
 
