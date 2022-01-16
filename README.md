@@ -151,8 +151,8 @@ References : [references 1](https://software.intel.com/content/dam/develop/exter
                 
 
 Please read this :        
-SW Occlusion Culling doesn't make always good performance. It can makes rendering slower than not using it. It depends on scene.           
-If there is many occludees, it's good to use it. If not, It's better not to use it because Cost of rasterizing occluder can be more expensive than cost of rendering occludees. It decrease maximum fps but increase minimum fps. I think it's good trade-off.       
+SW Occlusion Culling doesn't make always good performance. It can makes rendering slower than not using it because Rasterizing occluder is expensive computation.                         
+But if your application is gpu bound, SW Occlusion Culling will make your application run faster.          
 
 As you know, CPU isn't good at this computation. So this algorithm should be used carefully              
 
