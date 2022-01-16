@@ -66,7 +66,8 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 
 	const culling::Vec2 tileOriginPoint{ static_cast<float>(tile->GetLeftBottomTileOrginX()), static_cast<float>(tile->GetLeftBottomTileOrginY()) };
 
-	const size_t binnedTriangleCount = tile->mBinnedTriangleCount;
+	size_t binnedTriangleCount = tile->mBinnedTriangleCount;
+	binnedTriangleCount = MIN(binnedTriangleCount, BIN_TRIANGLE_CAPACITY_PER_TILE);
 
 	for (size_t triangleIndex = 0; triangleIndex < binnedTriangleCount; triangleIndex++)
 	{

@@ -150,10 +150,6 @@ EVERYCULLING_FORCE_INLINE void culling::BinTrianglesStage::PassTrianglesToTileBi
 						targetTile->mBinnedTriangleList[triListIndex].PointCVertexY = (reinterpret_cast<const float*>(&pointCScreenPixelPosY))[triangleIndex];
 						targetTile->mBinnedTriangleList[triListIndex].PointCVertexZ = (reinterpret_cast<const float*>(&pointCNdcSpaceVertexZ))[triangleIndex];
 					}
-					else
-					{
-						targetTile->mBinnedTriangleCount--;
-					}
 				}
 			}
 		}
