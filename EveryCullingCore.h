@@ -133,7 +133,7 @@
 #endif
 
 #ifndef MAX_BINNED_INDICE_COUNT
-#define MAX_BINNED_INDICE_COUNT (std::uint64_t)30000
+#define MAX_BINNED_INDICE_COUNT (std::uint64_t)50000
 #endif
 
 // Screen Space Bounding Sphere Culling
