@@ -20,7 +20,7 @@ namespace culling
 		/// will be used at ThreadCullJob
 		/// </summary>
 		//std::atomic<std::uint32_t> mAtomicCurrentBlockIndex;
-		std::array<std::atomic<std::uint32_t>, MAX_CAMERA_COUNT> mCurrentCulledEntityBlockIndex;
+		std::array<std::array<std::atomic<std::uint32_t>, MAX_CAMERA_COUNT>, MAX_THREAD_COUNT> mCurrentCulledEntityBlockIndexOfThread;
 		char padding2[64];
 		std::array<std::atomic<std::uint32_t>, MAX_CAMERA_COUNT> mFinishedThreadCount;
 		char padding4[64];
@@ -38,6 +38,8 @@ namespace culling
 		/// <param name="cameraIndex"></param>
 		/// <returns></returns>
 		culling::EntityBlock* GetNextEntityBlock(const size_t cameraIndex, const bool forceOrdering = true);
+
+		size_t ComputeEndEntityBlockIndexOfThread(const std::int32_t threadIndex);
 
 	protected:
 
@@ -88,6 +90,7 @@ namespace culling
 		virtual void OnSetCameraFieldOfView(const size_t cameraIndex, const float fieldOfView)
 		{
 		}
+		virtual void OnSetThreadCount(const size_t threadCount);
 
 		virtual void ClearEntityData
 		(

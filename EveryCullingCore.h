@@ -80,6 +80,10 @@
 #define MAX_CAMERA_COUNT 5
 #endif
 
+#ifndef MAX_THREAD_COUNT
+#define MAX_THREAD_COUNT 10
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////////////
 //ViewFrustum Culling
 #ifndef BOUNDING_SPHRE_RADIUS_MARGIN

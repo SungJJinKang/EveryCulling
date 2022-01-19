@@ -329,6 +329,10 @@ void culling::EveryCulling::SetCameraCount(const size_t cameraCount)
 void culling::EveryCulling::SetThreadCount(const std::uint32_t threadCount)
 {
 	mThreadCount = threadCount;
+	for (auto updatedCullingModule : mUpdatedCullingModules)
+	{
+		updatedCullingModule->OnSetThreadCount(threadCount);
+	}
 }
 
 unsigned long long culling::EveryCulling::GetTickCount() const
