@@ -25,6 +25,23 @@ culling::EntityBlock* culling::CullingModule::GetNextEntityBlock(const size_t ca
 	return currentEntityBlock;
 }
 
+culling::EntityBlock* culling::CullingModule::GetNextEntityBlockForMultipleThreads(const size_t cameraIndex, const std::int32_t localThreadIndex)
+{
+	if(localThreadIndex != EVERYCULLING_INVALID_LOCAL_THREAD_INDEX)
+	{
+		//const std::int32_t localThreadIndex = mCullingSystem->GetLocalThreadIndex();
+		const std::uint32_t threadCount = mCullingSystem->GetThreadCount();
+
+		// Steal other thread's entity block 
+		
+	}
+	else
+	{
+		return GetNextEntityBlock(cameraIndex, true);
+	}
+}
+
+
 culling::CullingModule::CullingModule
 (
 	EveryCulling* cullingSystem
@@ -49,10 +66,10 @@ void culling::CullingModule::ResetCullingModule(const unsigned long long current
 	}
 }
 
-void culling::CullingModule::ThreadCullJob(const size_t cameraIndex, const unsigned long long currentTickCount)
+void culling::CullingModule::ThreadCullJob(const size_t cameraIndex, const std::int32_t localThreadIndex, const unsigned long long currentTickCount)
 {
 	std::atomic_thread_fence(std::memory_order_acquire);
-	CullBlockEntityJob(cameraIndex, currentTickCount);
+	CullBlockEntityJob(cameraIndex, localThreadIndex, currentTickCount);
 
 
 	mCullJobState.mFinishedThreadCount[cameraIndex].fetch_add(1, std::memory_order_seq_cst);

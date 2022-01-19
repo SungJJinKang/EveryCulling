@@ -17,7 +17,9 @@
 #include <atomic>
 #include <thread>
 
-
+#ifndef EVERYCULLING_INVALID_LOCAL_THREAD_INDEX
+#define EVERYCULLING_INVALID_LOCAL_THREAD_INDEX (-1)
+#endif
 
 namespace culling
 {
@@ -29,13 +31,7 @@ namespace culling
 	class PreCulling;
 	class DistanceCulling;
 	struct EntityBlock;
-
-	struct EntityInfoInEntityBlock
-	{
-		EntityBlock* mEntityBlock;
-		size_t mIndexInEntityBlock;
-	};
-
+	
 	/// <summary>
 	/// 
 	/// This is implementation of Data Oriented ViewFrustumCulling of Frostbite in 2011
@@ -65,7 +61,8 @@ namespace culling
 	{
 	private:
 
-		size_t mThreadCount;
+		std::uint32_t mThreadCount;
+		
 		size_t mCameraCount;
 		std::array<culling::Mat4x4, MAX_CAMERA_COUNT> mCameraModelMatrixes;
 		std::array<culling::Mat4x4, MAX_CAMERA_COUNT> mCameraViewProjectionMatrixes;
@@ -124,9 +121,6 @@ namespace culling
 
 		unsigned long long mCurrentTickCount = 1;
 
-		unsigned long mSortedEntityCount;
-		std::array<std::vector<EntityInfoInEntityBlock>, MAX_CAMERA_COUNT> mSortedEntityInfo;
-
 		std::vector<culling::CullingModule*> mUpdatedCullingModules;
 
 		// this function is called by multiple threads
@@ -139,7 +133,6 @@ namespace culling
 		void SetCameraNearFarClipPlaneDistance(const size_t cameraIndex, const float nearPlaneDistance, const float farPlaneDistance);;
 		void SetCameraWorldPosition(const size_t cameraIndex, const culling::Vec3& cameraWorldPos);
 		void SetCameraRotation(const size_t cameraIndex, const culling::Vec4& cameraRotation);
-		
 
 	public:
 
@@ -162,7 +155,8 @@ namespace culling
 		~EveryCulling();
 
 		void SetCameraCount(const size_t cameraCount);
-		void SetThreadCount(const size_t threadCount);
+		void SetThreadCount(const std::uint32_t threadCount);
+
 		unsigned long long GetTickCount() const;
 		
 		struct GlobalDataForCullJob
@@ -244,7 +238,7 @@ namespace culling
 		/// </summary>
 		void RemoveEntityFromBlock(EntityBlockViewer& entityBlockViewer);
 		
-		void ThreadCullJob(const size_t cameraIndex);
+		void ThreadCullJob(const size_t cameraIndex, const std::int32_t localThreadIndex = -1);
 		//void ThreadCullJob(const std::uint32_t threadIndex, const std::uint32_t threadCount);
 
 		/// <summary>
@@ -259,16 +253,17 @@ namespace culling
 		 */
 		void PreCullJob();
 		
-		constexpr auto GetThreadCullJobInLambda(const size_t cameraIndex)
+		auto GetThreadCullJob(const size_t cameraIndex, const std::int32_t threadIndex = EVERYCULLING_INVALID_LOCAL_THREAD_INDEX)
 		{
-			return [this, cameraIndex]()
+			return [this, cameraIndex, threadIndex]()
 			{
-				this->ThreadCullJob(cameraIndex);
+				this->ThreadCullJob(cameraIndex, threadIndex);
 			};
 		}
 
 		const culling::CullingModule* GetLastEnabledCullingModule() const;
 		void SetEnabledCullingModule(const CullingModuleType cullingModuleType, const bool isEnabled);
+		std::uint32_t GetThreadCount() const;
 
 	};
 }

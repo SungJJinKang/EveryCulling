@@ -12,7 +12,7 @@ namespace culling
 	class EveryCulling;
 	struct EntityBlock;
 
-	struct EntityBlockState
+	struct CullJobState
 	{
 		char padding1[64];
 		//static inline constexpr std::uint32_t M256_COUNT_OF_VISIBLE_ARRAY = 1 + ( (ENTITY_COUNT_IN_ENTITY_BLOCK * sizeof(decltype(*EntityBlock::mIsVisibleBitflag)) - 1) / 32 );
@@ -28,13 +28,8 @@ namespace culling
 	class CullingModule
 	{
 	private:
-
-
-		EntityBlockState mCullJobState;
-
-	protected:
-
-		EveryCulling* const mCullingSystem;
+		
+		CullJobState mCullJobState;
 
 		/// <summary>
 		/// return next entity block
@@ -43,6 +38,12 @@ namespace culling
 		/// <param name="cameraIndex"></param>
 		/// <returns></returns>
 		culling::EntityBlock* GetNextEntityBlock(const size_t cameraIndex, const bool forceOrdering = true);
+
+	protected:
+
+		EveryCulling* const mCullingSystem;
+
+		culling::EntityBlock* GetNextEntityBlockForMultipleThreads(const size_t cameraIndex, const std::int32_t localThreadIndex = EVERYCULLING_INVALID_LOCAL_THREAD_INDEX);
 
 		
 
@@ -96,10 +97,10 @@ namespace culling
 
 		virtual void CullBlockEntityJob
 		(
-			const size_t cameraIndex, const unsigned long long currentTickCount
+			const size_t cameraIndex, const std::int32_t localThreadIndex, const unsigned long long currentTickCount
 		) = 0;
 		
-		void ThreadCullJob(const size_t cameraIndex, const unsigned long long currentTickCount);
+		void ThreadCullJob(const size_t cameraIndex, const std::int32_t localThreadIndex, const unsigned long long currentTickCount);
 
 		virtual const char* GetCullingModuleName() const = 0;
 	};

@@ -45,7 +45,7 @@ void culling::MaskedSWOcclusionCulling::ResetState(const unsigned long long curr
 	mOccluderListManager.ResetOccluderList();
 }
 
-void culling::MaskedSWOcclusionCulling::CullBlockEntityJob(const size_t cameraIndex, const unsigned long long currentTickCount)
+void culling::MaskedSWOcclusionCulling::CullBlockEntityJob(const size_t cameraIndex, const std::int32_t localThreadIndex, const unsigned long long currentTickCount)
 {
 }
 

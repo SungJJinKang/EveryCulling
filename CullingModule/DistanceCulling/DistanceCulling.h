@@ -40,7 +40,7 @@ namespace culling
 		DistanceCulling(EveryCulling* const everyCulling);
 
 		const char* GetCullingModuleName() const override;
-		void CullBlockEntityJob(const size_t cameraIndex, const unsigned long long currentTickCount) override;
+		void CullBlockEntityJob(const size_t cameraIndex, const std::int32_t localThreadIndex, const unsigned long long currentTickCount) override;
 	};
 }
 

@@ -81,14 +81,14 @@ void culling::SolveMeshRoleStage::SolveMeshRole
 	}	
 }
 
-void culling::SolveMeshRoleStage::CullBlockEntityJob(const size_t cameraIndex, const unsigned long long currentTickCount)
+void culling::SolveMeshRoleStage::CullBlockEntityJob(const size_t cameraIndex, const std::int32_t localThreadIndex, const unsigned long long currentTickCount)
 {
 	if (WHEN_TO_BIN_TRIANGLE(currentTickCount))
 	{
 		bool isOccluderExist = false;
 		while (true)
 		{
-			culling::EntityBlock* const nextEntityBlock = GetNextEntityBlock(cameraIndex);;
+			culling::EntityBlock* const nextEntityBlock = GetNextEntityBlockForMultipleThreads(cameraIndex, localThreadIndex);
 
 			if (nextEntityBlock != nullptr)
 			{
