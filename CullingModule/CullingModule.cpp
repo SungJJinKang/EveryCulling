@@ -33,7 +33,7 @@ culling::EntityBlock* culling::CullingModule::GetNextEntityBlockForMultipleThrea
 		const std::uint32_t threadCount = mCullingSystem->GetThreadCount();
 
 		// Steal other thread's entity block 
-		
+		return nullptr;
 	}
 	else
 	{
