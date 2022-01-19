@@ -17,8 +17,8 @@ This project tries to integrate them into one system and make them easy to use.
 ## Core Feature 
 This library is targeting Maximizing **SIMD, Cache hit, Multi Threading.**                 
 1. SIMD : Data is stored for using SIMD Intrinsics ( Object's Datas has SoA layout, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/main/DataType/EntityBlock.h) ) ( Require AVX2 ( _mm256 ) )                       
-2. Cache Hit : SoA!! ( Structure of Arrays, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/main/DataType/EntityBlock.h) )           
-3. Multi Threading : Data of entities is separately stored in entity block, Then Threads works on a entity block. These structure prevent data race and cache coherency ( false sharing, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/main/DataType/EntityBlock.h), [VertexData.h](https://github.com/SungJJinKang/EveryCulling/blob/main/DataType/VertexData.h) ), Locking is not required.               
+2. Cache Hit : SoA!!. Data of 16 entieis is stored in SoA. ( Structure of Arrays, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/main/DataType/EntityBlock.h) )           
+3. Multi Threading : All culling methods in this library utilize multiple threads. Data of 16 entities is stored in a entity block and Entity block is aligned to cache line size, Then Threads works on each entity block. These structure prevent data race and cache coherency problem ( false sharing, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/main/DataType/EntityBlock.h) ), Locking is not required.               
                                  
                
 ## Fully implemented features
@@ -28,7 +28,7 @@ This library is targeting Maximizing **SIMD, Cache hit, Multi Threading.**
 
 Culling Order : **Distance Culling ( Cheap ) -> View Frustum Culing -> Masked SW Occlusion Culling ( Expensive )**              
                             
-## View Frustum Culling from Frostbite Engine of EA Dice ( 100% )
+## View Frustum Culling from Frostbite Engine of EA Dice ( 100% )        
          
 [Source code](https://github.com/SungJJinKang/EveryCulling/tree/main/CullingModule/ViewFrustumCulling)          
             
