@@ -314,14 +314,14 @@ void culling::RasterizeOccludersStage::CullBlockEntityJob(const size_t cameraInd
 				{
 					culling::Tile* const nextTile = GetNextDepthBufferTile(cameraIndex);
 
-						if (nextTile != nullptr)
-						{
-							RasterizeBinnedTriangles(cameraIndex, nextTile);
-						}
-						else
-						{
-							break;
-						}
+					if (nextTile != nullptr)
+					{
+						RasterizeBinnedTriangles(cameraIndex, nextTile);
+					}
+					else
+					{
+						break;
+					}
 				}
 		}
 	}

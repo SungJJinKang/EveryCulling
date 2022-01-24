@@ -10,7 +10,6 @@
 
 #include "../Utility/RasterizerHelper.h"
 
-#define BIN_VERTEX_INDICE_COUNT_PER_THREAD 24
 #define DEFAULT_BINNED_TRIANGLE_COUNT_PER_LOOP 8
 
 #define CONVERT_TO_M256I(_M256F) *reinterpret_cast<const culling::M256I*>(&_M256F)
@@ -322,15 +321,15 @@ void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t 
 
 		while (totalBinnedIndiceCount + currentBinnedIndiceCountOfCurrentEntity < MAX_BINNED_INDICE_COUNT)
 		{
-			static_assert(BIN_VERTEX_INDICE_COUNT_PER_THREAD % 3 == 0);
-			currentBinnedIndiceCountOfCurrentEntity = atomic_binnedIndiceCountOfCurrentEntity.fetch_add(BIN_VERTEX_INDICE_COUNT_PER_THREAD, std::memory_order_seq_cst);
+			static_assert((DEFAULT_BINNED_TRIANGLE_COUNT_PER_LOOP * 3) % 3 == 0);
+			currentBinnedIndiceCountOfCurrentEntity = atomic_binnedIndiceCountOfCurrentEntity.fetch_add(DEFAULT_BINNED_TRIANGLE_COUNT_PER_LOOP * 3, std::memory_order_seq_cst);
 			
 			if (currentBinnedIndiceCountOfCurrentEntity < totalIndiceCount)
 			{
 				const culling::Mat4x4 modelToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex) * entityBlock->GetModelMatrix(entityIndexInEntityBlock);
 
 				const std::uint32_t* const startIndicePtr = indices + currentBinnedIndiceCountOfCurrentEntity;
-				const std::uint64_t indiceCount = MIN(BIN_VERTEX_INDICE_COUNT_PER_THREAD, totalIndiceCount - currentBinnedIndiceCountOfCurrentEntity);
+				const std::uint64_t indiceCount = MIN(DEFAULT_BINNED_TRIANGLE_COUNT_PER_LOOP * 3, totalIndiceCount - currentBinnedIndiceCountOfCurrentEntity);
 
 				BinTriangles
 				(
@@ -381,170 +380,221 @@ const char* culling::BinTrianglesStage::GetCullingModuleName() const
 
 EVERYCULLING_FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 (
-	const float* const vertices, 
+	const float* const vertices,
 	const uint64_t verticeCount,
-	const std::uint32_t* const vertexIndices, 
+	const std::uint32_t* const vertexIndices,
 	const uint64_t indiceCount,
 	const uint64_t vertexStrideByte,
 	const float* const modelToClipspaceMatrix
 )
 {
-	std::int32_t currentIndiceIndex = -(DEFAULT_BINNED_TRIANGLE_COUNT_PER_LOOP * 3);
+	assert(indiceCount > 0);
 
-	assert(indiceCount != 0); // check GatherVertices function
+	const uint64_t fetchTriangleCount = MIN(8, indiceCount / 3);
+	assert(fetchTriangleCount != 0);
 
-	while (currentIndiceIndex < (std::int32_t)indiceCount)
+	// First 4 bits show if traingle is valid
+	// Current Value : 00000000 00000000 00000000 11111111
+	std::uint32_t triangleCullMask = (1 << fetchTriangleCount) - 1;
+
+
+	//Why Size of array is 3?
+	//A culling::M256F can have 8 floating-point
+	//A TwoDTriangle have 3 point
+	//So If you have just one culling::M256F variable, a floating-point is unused.
+	//Not to make unused space, 12 floating point is required per axis
+	// culling::M256F * 3 -> 8 TwoDTriangle with no unused space
+
+	//We don't need z value in Binning stage!!!
+	// Triangle's First Vertex X is in ndcSpaceVertexX[0][0]
+	// Triangle's Second Vertex X is in ndcSpaceVertexX[0][1]
+	// Triangle's Third Vertex X is in ndcSpaceVertexX[0][2]
+	culling::M256F ndcSpaceVertexX[3], ndcSpaceVertexY[3], ndcSpaceVertexZ[3], oneDividedByW[3];
+
+	//Gather Vertex with indice
+	//WE ARRIVE AT MODEL SPACE COORDINATE!
+	GatherVertices(vertices, verticeCount, vertexIndices, indiceCount, 0, vertexStrideByte, fetchTriangleCount, ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ);
+
+
+	//////////////////////////////////////////////////
+
+
+	for (int i = 0; i < 3; i++)
 	{
-		currentIndiceIndex += (DEFAULT_BINNED_TRIANGLE_COUNT_PER_LOOP * 3);
+		oneDividedByW[i] = culling::M256F_MUL_AND_ADD(ndcSpaceVertexX[i], _mm256_set1_ps(modelToClipspaceMatrix[3]), culling::M256F_MUL_AND_ADD(ndcSpaceVertexY[i], _mm256_set1_ps(modelToClipspaceMatrix[7]), culling::M256F_MUL_AND_ADD(ndcSpaceVertexZ[i], _mm256_set1_ps(modelToClipspaceMatrix[11]), _mm256_set1_ps(modelToClipspaceMatrix[15]))));
+	}
 
-		if(currentIndiceIndex >= (std::int32_t)indiceCount)
-		{
-			break;
-		}
-		const size_t fetchTriangleCount = MIN(8, (indiceCount - currentIndiceIndex) / 3);
-		assert(fetchTriangleCount != 0);
+	const culling::M256F positiveWMask = ComputePositiveWMask(oneDividedByW);
 
-		// First 4 bits show if traingle is valid
-		// Current Value : 00000000 00000000 00000000 11111111
-		std::uint32_t triangleCullMask = (1 << fetchTriangleCount) - 1;
+	const culling::M256I allOne = _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF);
+	const culling::M256F negativeWMask = _mm256_xor_ps(positiveWMask, *reinterpret_cast<const __m256*>(&allOne));
+	triangleCullMask &= _mm256_movemask_ps(*reinterpret_cast<const culling::M256F*>(&positiveWMask));
+	if (triangleCullMask == 0x00000000)
+	{
+		return;
+	}
 
-
-		//Why Size of array is 3?
-		//A culling::M256F can have 8 floating-point
-		//A TwoDTriangle have 3 point
-		//So If you have just one culling::M256F variable, a floating-point is unused.
-		//Not to make unused space, 12 floating point is required per axis
-		// culling::M256F * 3 -> 8 TwoDTriangle with no unused space
-
-		//We don't need z value in Binning stage!!!
-		// Triangle's First Vertex X is in ndcSpaceVertexX[0][0]
-		// Triangle's Second Vertex X is in ndcSpaceVertexX[0][1]
-		// Triangle's Third Vertex X is in ndcSpaceVertexX[0][2]
-		culling::M256F ndcSpaceVertexX[3], ndcSpaceVertexY[3], ndcSpaceVertexZ[3], oneDividedByW[3];
-		
-		//Gather Vertex with indice
-		//WE ARRIVE AT MODEL SPACE COORDINATE!
-		GatherVertices(vertices, verticeCount, vertexIndices, indiceCount, currentIndiceIndex, vertexStrideByte, fetchTriangleCount, ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ);
+	/*
+	for (int i = 0; i < 3; i++)
+	{
+		const culling::M256F point_W_IsNegativeValue = _mm256_cmp_ps(oneDividedByW[i], _mm256_set1_ps(std::numeric_limits<float>::epsilon()), _CMP_LT_OQ);
+		oneDividedByW[i] = _mm256_blendv_ps(oneDividedByW[i], _mm256_set1_ps(1.0f), point_W_IsNegativeValue);
+	}
+	*/
 
 
-		//////////////////////////////////////////////////
+	//////////////////////////////////////////////////
 
 
-		for(int i = 0 ; i < 3 ; i++)
-		{
-			oneDividedByW[i] = culling::M256F_MUL_AND_ADD(ndcSpaceVertexX[i], _mm256_set1_ps(modelToClipspaceMatrix[3]), culling::M256F_MUL_AND_ADD(ndcSpaceVertexY[i], _mm256_set1_ps(modelToClipspaceMatrix[7]), culling::M256F_MUL_AND_ADD(ndcSpaceVertexZ[i], _mm256_set1_ps(modelToClipspaceMatrix[11]), _mm256_set1_ps(modelToClipspaceMatrix[15]))));
-		}
-
-		const culling::M256F positiveWMask = ComputePositiveWMask(oneDividedByW);
-
-		const culling::M256I allOne = _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF);
-		const culling::M256F negativeWMask = _mm256_xor_ps(positiveWMask, *reinterpret_cast<const __m256*>(&allOne));
-		triangleCullMask &= _mm256_movemask_ps(*reinterpret_cast<const culling::M256F*>(&positiveWMask));
-		if (triangleCullMask == 0x00000000)
-		{
-			continue;
-		}
-
-		/*
-		for (int i = 0; i < 3; i++)
-		{
-			const culling::M256F point_W_IsNegativeValue = _mm256_cmp_ps(oneDividedByW[i], _mm256_set1_ps(std::numeric_limits<float>::epsilon()), _CMP_LT_OQ);
-			oneDividedByW[i] = _mm256_blendv_ps(oneDividedByW[i], _mm256_set1_ps(1.0f), point_W_IsNegativeValue);
-		}
-		*/
+	//Convert Model space Vertex To Clip space Vertex
+	//WE ARRIVE AT CLIP SPACE COORDINATE. W IS NOT 1
+	culling::vertexTransformationHelper::TransformThreeVerticesToClipSpace
+	(
+		ndcSpaceVertexX,
+		ndcSpaceVertexY,
+		ndcSpaceVertexZ,
+		modelToClipspaceMatrix
+	);
 
 
-		//////////////////////////////////////////////////
+
+	Clipping(ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, oneDividedByW, triangleCullMask);
+	if (triangleCullMask == 0x00000000)
+	{
+		return;
+	}
 
 
-		//Convert Model space Vertex To Clip space Vertex
-		//WE ARRIVE AT CLIP SPACE COORDINATE. W IS NOT 1
-		culling::vertexTransformationHelper::TransformThreeVerticesToClipSpace
+
+	for (int i = 0; i < 3; i++)
+	{
+		oneDividedByW[i] = culling::M256F_DIV(_mm256_set1_ps(1.0f), oneDividedByW[i]);
+	}
+
+	//////////////////////////////////////////////////
+
+	// Now Z value is on NDC coordinate
+	for (int i = 0; i < 3; i++)
+	{
+		ndcSpaceVertexZ[i] = culling::M256F_MUL(ndcSpaceVertexZ[i], oneDividedByW[i]);
+	}
+
+	//////////////////////////////////////////////////
+
+	culling::M256F screenPixelPosX[3], screenPixelPosY[3];
+	culling::vertexTransformationHelper::ConvertClipSpaceThreeVerticesToScreenPixelSpace(ndcSpaceVertexX, ndcSpaceVertexY, oneDividedByW, screenPixelPosX, screenPixelPosY, mMaskedOcclusionCulling->mDepthBuffer);
+
+	BackfaceCulling(screenPixelPosX, screenPixelPosY, triangleCullMask);
+
+	if (triangleCullMask == 0x00000000)
+	{
+		return;
+	}
+
+
+	//////////////////////////////////////////////////
+
+
+	Sort_8_3DTriangles
+	(
+		screenPixelPosX[0],
+		screenPixelPosY[0],
+		ndcSpaceVertexZ[0],
+
+		screenPixelPosX[1],
+		screenPixelPosY[1],
+		ndcSpaceVertexZ[1],
+
+		screenPixelPosX[2],
+		screenPixelPosY[2],
+		ndcSpaceVertexZ[2]
+	);
+
+
+	culling::M256F LEFT_MIDDLE_POINT_X;
+	culling::M256F LEFT_MIDDLE_POINT_Y;
+	culling::M256F LEFT_MIDDLE_POINT_Z;
+
+	culling::M256F RIGHT_MIDDLE_POINT_X;
+	culling::M256F RIGHT_MIDDLE_POINT_Y;
+	culling::M256F RIGHT_MIDDLE_POINT_Z;
+
+
+	// split triangle
+	culling::rasterizerHelper::GetMiddlePointOfTriangle
+	(
+		screenPixelPosX[0],
+		screenPixelPosY[0],
+		ndcSpaceVertexZ[0],
+
+		screenPixelPosX[1],
+		screenPixelPosY[1],
+		ndcSpaceVertexZ[1],
+
+		screenPixelPosX[2],
+		screenPixelPosY[2],
+		ndcSpaceVertexZ[2],
+
+		LEFT_MIDDLE_POINT_X,
+		LEFT_MIDDLE_POINT_Y,
+		LEFT_MIDDLE_POINT_Z,
+
+		RIGHT_MIDDLE_POINT_X,
+		RIGHT_MIDDLE_POINT_Y,
+		RIGHT_MIDDLE_POINT_Z
+	);
+
+#ifdef DEBUG_CULLING
+
+
+
+#endif
+
+
+	{
+		//Bin Bottom Flat Triangle
+
+
+		culling::M256I outBinBoundingBoxMinX, outBinBoundingBoxMinY, outBinBoundingBoxMaxX, outBinBoundingBoxMaxY;
+		//Bin Triangles to tiles
+
+		//Compute Bin Bounding Box
+		//Get Intersecting Bin List
+		culling::depthBufferTileHelper::ComputeBinBoundingBoxFromThreeVertices
 		(
-			ndcSpaceVertexX, 
-			ndcSpaceVertexY, 
-			ndcSpaceVertexZ, 
-			modelToClipspaceMatrix
-		);
-		
-		
-		
-		Clipping(ndcSpaceVertexX, ndcSpaceVertexY, ndcSpaceVertexZ, oneDividedByW, triangleCullMask);
-		if (triangleCullMask == 0x00000000)
-		{
-			continue;
-		}
-		
-		
+			screenPixelPosX[0],
+			screenPixelPosY[0],
 
-		for (int i = 0; i < 3; i++)
-		{
-			oneDividedByW[i] = culling::M256F_DIV(_mm256_set1_ps(1.0f), oneDividedByW[i]);
-		}
+			LEFT_MIDDLE_POINT_X,
+			LEFT_MIDDLE_POINT_Y,
 
-		//////////////////////////////////////////////////
+			RIGHT_MIDDLE_POINT_X,
+			RIGHT_MIDDLE_POINT_Y,
 
-		// Now Z value is on NDC coordinate
-		for (int i = 0; i < 3; i++)
-		{
-			ndcSpaceVertexZ[i] = culling::M256F_MUL(ndcSpaceVertexZ[i], oneDividedByW[i]);
-		}
-
-		//////////////////////////////////////////////////
-
-		culling::M256F screenPixelPosX[3], screenPixelPosY[3];
-		culling::vertexTransformationHelper::ConvertClipSpaceThreeVerticesToScreenPixelSpace(ndcSpaceVertexX, ndcSpaceVertexY, oneDividedByW, screenPixelPosX, screenPixelPosY, mMaskedOcclusionCulling->mDepthBuffer);
-
-		BackfaceCulling(screenPixelPosX, screenPixelPosY, triangleCullMask);
-
-		if (triangleCullMask == 0x00000000)
-		{
-			continue;
-		}
-		
-
-		//////////////////////////////////////////////////
-
-
-		Sort_8_3DTriangles
-		(
-			screenPixelPosX[0], 
-			screenPixelPosY[0], 
-			ndcSpaceVertexZ[0],
-
-			screenPixelPosX[1],
-			screenPixelPosY[1],
-			ndcSpaceVertexZ[1],
-
-			screenPixelPosX[2],
-			screenPixelPosY[2],
-			ndcSpaceVertexZ[2]
+			outBinBoundingBoxMinX,
+			outBinBoundingBoxMinY,
+			outBinBoundingBoxMaxX,
+			outBinBoundingBoxMaxY,
+			mMaskedOcclusionCulling->mDepthBuffer
 		);
 
-		
-		culling::M256F LEFT_MIDDLE_POINT_X;
-		culling::M256F LEFT_MIDDLE_POINT_Y;
-		culling::M256F LEFT_MIDDLE_POINT_Z;
+#ifdef DEBUG_CULLING
+		for (size_t triangleIndex = 0; triangleIndex < fetchTriangleCount; triangleIndex++)
+		{
+			if ((triangleCullMask & (1 << triangleIndex)) != 0x00000000)
+			{
+				assert(reinterpret_cast<const int*>(&outBinBoundingBoxMinX)[triangleIndex] <= reinterpret_cast<const int*>(&outBinBoundingBoxMaxX)[triangleIndex]);
+				assert(reinterpret_cast<const int*>(&outBinBoundingBoxMinY)[triangleIndex] <= reinterpret_cast<const int*>(&outBinBoundingBoxMaxY)[triangleIndex]);
+			}
+		}
+#endif
 
-		culling::M256F RIGHT_MIDDLE_POINT_X;
-		culling::M256F RIGHT_MIDDLE_POINT_Y;
-		culling::M256F RIGHT_MIDDLE_POINT_Z;
-
-		
-		// split triangle
-		culling::rasterizerHelper::GetMiddlePointOfTriangle
+		// Pass triangle in counter clock wise
+		PassTrianglesToTileBin
 		(
 			screenPixelPosX[0],
 			screenPixelPosY[0],
 			ndcSpaceVertexZ[0],
-
-			screenPixelPosX[1],
-			screenPixelPosY[1],
-			ndcSpaceVertexZ[1],
-
-			screenPixelPosX[2],
-			screenPixelPosY[2],
-			ndcSpaceVertexZ[2],
 
 			LEFT_MIDDLE_POINT_X,
 			LEFT_MIDDLE_POINT_Y,
@@ -552,138 +602,74 @@ EVERYCULLING_FORCE_INLINE void culling::BinTrianglesStage::BinTriangles
 
 			RIGHT_MIDDLE_POINT_X,
 			RIGHT_MIDDLE_POINT_Y,
-			RIGHT_MIDDLE_POINT_Z
+			RIGHT_MIDDLE_POINT_Z,
+
+			triangleCullMask,
+			fetchTriangleCount,
+			outBinBoundingBoxMinX,
+			outBinBoundingBoxMinY,
+			outBinBoundingBoxMaxX,
+			outBinBoundingBoxMaxY
+		);
+	}
+
+
+	{
+		//Bin Top Flat Triangle
+
+		culling::M256I outBinBoundingBoxMinX, outBinBoundingBoxMinY, outBinBoundingBoxMaxX, outBinBoundingBoxMaxY;
+
+		culling::depthBufferTileHelper::ComputeBinBoundingBoxFromThreeVertices
+		(
+			screenPixelPosX[2],
+			screenPixelPosY[2],
+
+			RIGHT_MIDDLE_POINT_X,
+			RIGHT_MIDDLE_POINT_Y,
+
+			LEFT_MIDDLE_POINT_X,
+			LEFT_MIDDLE_POINT_Y,
+
+			outBinBoundingBoxMinX,
+			outBinBoundingBoxMinY,
+			outBinBoundingBoxMaxX,
+			outBinBoundingBoxMaxY,
+			mMaskedOcclusionCulling->mDepthBuffer
 		);
 
 #ifdef DEBUG_CULLING
-
-		
-
-#endif
-
-
+		for (size_t triangleIndex = 0; triangleIndex < fetchTriangleCount; triangleIndex++)
 		{
-			//Bin Bottom Flat Triangle
-
-
-			culling::M256I outBinBoundingBoxMinX, outBinBoundingBoxMinY, outBinBoundingBoxMaxX, outBinBoundingBoxMaxY;
-			//Bin Triangles to tiles
-
-			//Compute Bin Bounding Box
-			//Get Intersecting Bin List
-			culling::depthBufferTileHelper::ComputeBinBoundingBoxFromThreeVertices
-			(
-				screenPixelPosX[0],
-				screenPixelPosY[0],
-
-				LEFT_MIDDLE_POINT_X,
-				LEFT_MIDDLE_POINT_Y,
-
-				RIGHT_MIDDLE_POINT_X,
-				RIGHT_MIDDLE_POINT_Y,
-
-				outBinBoundingBoxMinX,
-				outBinBoundingBoxMinY,
-				outBinBoundingBoxMaxX,
-				outBinBoundingBoxMaxY,
-				mMaskedOcclusionCulling->mDepthBuffer
-			);
-
-#ifdef DEBUG_CULLING
-			for (size_t triangleIndex = 0; triangleIndex < fetchTriangleCount; triangleIndex++)
+			if ((triangleCullMask & (1 << triangleIndex)) != 0x00000000)
 			{
-				if ((triangleCullMask & (1 << triangleIndex)) != 0x00000000)
-				{
-					assert(reinterpret_cast<const int*>(&outBinBoundingBoxMinX)[triangleIndex] <= reinterpret_cast<const int*>(&outBinBoundingBoxMaxX)[triangleIndex]);
-					assert(reinterpret_cast<const int*>(&outBinBoundingBoxMinY)[triangleIndex] <= reinterpret_cast<const int*>(&outBinBoundingBoxMaxY)[triangleIndex]);
-				}
+				assert(reinterpret_cast<const int*>(&outBinBoundingBoxMinX)[triangleIndex] <= reinterpret_cast<const int*>(&outBinBoundingBoxMaxX)[triangleIndex]);
+				assert(reinterpret_cast<const int*>(&outBinBoundingBoxMinY)[triangleIndex] <= reinterpret_cast<const int*>(&outBinBoundingBoxMaxY)[triangleIndex]);
 			}
+		}
 #endif
 
-			// Pass triangle in counter clock wise
-			PassTrianglesToTileBin
-			(
-				screenPixelPosX[0],
-				screenPixelPosY[0],
-				ndcSpaceVertexZ[0],
+		// Pass triangle in counter clock wise
+		PassTrianglesToTileBin
+		(
+			screenPixelPosX[2],
+			screenPixelPosY[2],
+			ndcSpaceVertexZ[2],
 
-				LEFT_MIDDLE_POINT_X,
-				LEFT_MIDDLE_POINT_Y,
-				LEFT_MIDDLE_POINT_Z,
+			RIGHT_MIDDLE_POINT_X,
+			RIGHT_MIDDLE_POINT_Y,
+			RIGHT_MIDDLE_POINT_Z,
 
-				RIGHT_MIDDLE_POINT_X,
-				RIGHT_MIDDLE_POINT_Y,
-				RIGHT_MIDDLE_POINT_Z,
+			LEFT_MIDDLE_POINT_X,
+			LEFT_MIDDLE_POINT_Y,
+			LEFT_MIDDLE_POINT_Z,
 
-				triangleCullMask,
-				fetchTriangleCount,
-				outBinBoundingBoxMinX,
-				outBinBoundingBoxMinY,
-				outBinBoundingBoxMaxX,
-				outBinBoundingBoxMaxY
-			);
-		}
-
-
-		{
-			//Bin Top Flat Triangle
-
-			culling::M256I outBinBoundingBoxMinX, outBinBoundingBoxMinY, outBinBoundingBoxMaxX, outBinBoundingBoxMaxY;
-		
-			culling::depthBufferTileHelper::ComputeBinBoundingBoxFromThreeVertices
-			(
-				screenPixelPosX[2],
-				screenPixelPosY[2],
-
-				RIGHT_MIDDLE_POINT_X,
-				RIGHT_MIDDLE_POINT_Y,
-
-				LEFT_MIDDLE_POINT_X,
-				LEFT_MIDDLE_POINT_Y,
-				
-				outBinBoundingBoxMinX,
-				outBinBoundingBoxMinY,
-				outBinBoundingBoxMaxX,
-				outBinBoundingBoxMaxY,
-				mMaskedOcclusionCulling->mDepthBuffer
-			);
-
-#ifdef DEBUG_CULLING
-			for (size_t triangleIndex = 0; triangleIndex < fetchTriangleCount; triangleIndex++)
-			{
-				if ((triangleCullMask & (1 << triangleIndex)) != 0x00000000)
-				{
-					assert(reinterpret_cast<const int*>(&outBinBoundingBoxMinX)[triangleIndex] <= reinterpret_cast<const int*>(&outBinBoundingBoxMaxX)[triangleIndex]);
-					assert(reinterpret_cast<const int*>(&outBinBoundingBoxMinY)[triangleIndex] <= reinterpret_cast<const int*>(&outBinBoundingBoxMaxY)[triangleIndex]);
-				}
-			}
-#endif
-
-			// Pass triangle in counter clock wise
-			PassTrianglesToTileBin
-			(
-				screenPixelPosX[2],
-				screenPixelPosY[2],
-				ndcSpaceVertexZ[2],
-
-				RIGHT_MIDDLE_POINT_X,
-				RIGHT_MIDDLE_POINT_Y,
-				RIGHT_MIDDLE_POINT_Z,
-
-				LEFT_MIDDLE_POINT_X,
-				LEFT_MIDDLE_POINT_Y,
-				LEFT_MIDDLE_POINT_Z,
-				
-				triangleCullMask,
-				fetchTriangleCount,
-				outBinBoundingBoxMinX,
-				outBinBoundingBoxMinY,
-				outBinBoundingBoxMaxX,
-				outBinBoundingBoxMaxY
-			);
-		}
-		
-		
+			triangleCullMask,
+			fetchTriangleCount,
+			outBinBoundingBoxMinX,
+			outBinBoundingBoxMinY,
+			outBinBoundingBoxMaxX,
+			outBinBoundingBoxMaxY
+		);
 	}
 }
 
