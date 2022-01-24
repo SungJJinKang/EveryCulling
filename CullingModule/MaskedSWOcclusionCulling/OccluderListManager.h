@@ -6,6 +6,8 @@
 #include <vector>
 #include <atomic>
 
+#include "../../DataType/Math/Vector.h"
+
 #define OCCLUDER_LIST_POOL_SIZE 50
 
 namespace culling
@@ -31,7 +33,7 @@ namespace culling
 		OccluderListManager();
 		void AddOccluder(EntityBlock* const entityBlock, const size_t entityIndexInEntityBlock);
 
-		std::vector<OccluderData> GetSortedOccluderList(const size_t cameraIndex) const;
+		std::vector<OccluderData> GetSortedOccluderList(const culling::Vec3& cameraWorldPos) const;
 
 		void ResetOccluderList();
 	};

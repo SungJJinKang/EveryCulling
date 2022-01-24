@@ -297,7 +297,7 @@ void culling::BinTrianglesStage::BinTriangleThreadJob(const size_t cameraIndex)
 
 void culling::BinTrianglesStage::BinTriangleThreadJobByObjectOrder(const size_t cameraIndex)
 {
-	std::vector<OccluderData> sortedOccluderList = mMaskedOcclusionCulling->mOccluderListManager.GetSortedOccluderList(cameraIndex);
+	std::vector<OccluderData> sortedOccluderList = mMaskedOcclusionCulling->mOccluderListManager.GetSortedOccluderList(mCullingSystem->GetCameraWorldPosition(cameraIndex));
 
 	std::uint64_t totalBinnedIndiceCount = 0;
 	

@@ -71,7 +71,6 @@ namespace culling
 		/// </summary>
 		bool mIsObjectEnabled[ENTITY_COUNT_IN_ENTITY_BLOCK];
 		float mDesiredMaxDrawDistance[ENTITY_COUNT_IN_ENTITY_BLOCK];
-		const unsigned long* mFrontToBackSortingOrder[ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 		/// <summary>
 		/// this variable is only used to decide whether to free this EntityBlock
@@ -181,6 +180,11 @@ namespace culling
 			mWorldPositionAndWorldBoundingSphereRadius[entityIndex].SetBoundingSphereRadius(vec.magnitude() * 0.5f);
 		}
 
+		EVERYCULLING_FORCE_INLINE const culling::Position_BoundingSphereRadius& GetEntityWorldPositionAndBoudingSphereRadius(const size_t entityIndex) const
+		{
+			return mWorldPositionAndWorldBoundingSphereRadius[entityIndex];
+		}
+
 		EVERYCULLING_FORCE_INLINE void SetAABBWorldPosition(const size_t entityIndex, const float* const minWorldPos, const float* const maxWorldPos)
 		{
 			std::memcpy(mAABBMinWorldPoint + entityIndex, minWorldPos, sizeof(culling::Vec4));
@@ -210,18 +214,7 @@ namespace culling
 
 			return mDesiredMaxDrawDistance[entityIndex];
 		}
-
-		EVERYCULLING_FORCE_INLINE void SetFrontToBackSortingOrder(const size_t entityIndex, const unsigned long* frontToBackSortOrder)
-		{
-			mFrontToBackSortingOrder[entityIndex] = frontToBackSortOrder;
-		}
-
-		EVERYCULLING_FORCE_INLINE unsigned long GetFrontToBackSortingOrder(const size_t cameraIndex, const size_t entityIndex) const
-		{
-			assert(cameraIndex < MAX_CAMERA_COUNT);
-			return mFrontToBackSortingOrder[entityIndex][cameraIndex];
-		}
-
+		
 		EVERYCULLING_FORCE_INLINE const culling::VertexData& GetVertexData(const size_t entityIndex) const
 		{
 			return mVertexDatas[entityIndex];

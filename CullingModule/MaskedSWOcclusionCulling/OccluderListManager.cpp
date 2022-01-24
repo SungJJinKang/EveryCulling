@@ -20,7 +20,7 @@ void culling::OccluderListManager::AddOccluder(EntityBlock* const entityBlock, c
 	}
 }
 
-std::vector<culling::OccluderData> culling::OccluderListManager::GetSortedOccluderList(const size_t cameraIndex) const
+std::vector<culling::OccluderData> culling::OccluderListManager::GetSortedOccluderList(const culling::Vec3& cameraWorldPos) const
 {
 	const size_t occluderCount = mOccluderCount;
 
@@ -31,14 +31,20 @@ std::vector<culling::OccluderData> culling::OccluderListManager::GetSortedOcclud
 	{
 		occluderList.emplace_back(mOccluderList[occluderIndex]);
 	}
-
+	
 	std::sort
 	(
 		occluderList.begin(),
 		occluderList.end(),
-		[cameraIndex](const culling::OccluderData& left, const culling::OccluderData& right)
+		[cameraWorldPos](const culling::OccluderData& left, const culling::OccluderData& right)
 		{
-			return left.mEntityBlock->GetFrontToBackSortingOrder(cameraIndex, left.mEntityIndexInEntityBlock) < right.mEntityBlock->GetFrontToBackSortingOrder(cameraIndex, right.mEntityIndexInEntityBlock);
+			const culling::Position_BoundingSphereRadius& leftEntityWorldPosAndBoundingSphereRadius = left.mEntityBlock->GetEntityWorldPositionAndBoudingSphereRadius(left.mEntityIndexInEntityBlock);
+			const culling::Position_BoundingSphereRadius& rightEntityWorldPosAndBoundingSphereRadius = right.mEntityBlock->GetEntityWorldPositionAndBoudingSphereRadius(right.mEntityIndexInEntityBlock);
+
+			const float disFromCameraToLeftEntity = (leftEntityWorldPosAndBoundingSphereRadius.GetPosition() - cameraWorldPos).magnitude() - leftEntityWorldPosAndBoundingSphereRadius.GetBoundingSphereRadius();
+			const float disFromCameraToRightEntity = (rightEntityWorldPosAndBoundingSphereRadius.GetPosition() - cameraWorldPos).magnitude() - rightEntityWorldPosAndBoundingSphereRadius.GetBoundingSphereRadius();
+
+			return  disFromCameraToLeftEntity < disFromCameraToRightEntity;
 		}
 	);
 
