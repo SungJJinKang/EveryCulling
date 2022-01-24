@@ -49,6 +49,16 @@ namespace culling
 		{
 			return &x;
 		}
+
+		EVERYCULLING_FORCE_INLINE float sqrMagnitude() const
+		{
+			return x * x + y * y + z * z;
+		}
+
+		EVERYCULLING_FORCE_INLINE float magnitude() const
+		{
+			return std::sqrt(sqrMagnitude());
+		}
 	};
 
 	
