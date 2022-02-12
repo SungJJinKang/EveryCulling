@@ -31,32 +31,7 @@ namespace culling
 	class PreCulling;
 	class DistanceCulling;
 	struct EntityBlock;
-	
-	/// <summary>
-	/// 
-	/// This is implementation of Data Oriented ViewFrustumCulling of Frostbite in 2011
-	///
-	/// [Slide Resource](https://www.ea.com/frostbite/news/culling-the-battlefield-data-oriented-design-in-practice)        
-	/// [GDC Talk Video](https://www.gdcvault.com/play/1014491/Culling-the-Battlefield-Data-Oriented)          
-	/// [�ѱ��� ���α� ��] (https ://sungjjinkang.github.io/doom/2021/04/02/viewfrustumculling.html)  
-	///
-	/// 
-	/// This culling use SIMD DotProduct, So Check LightMath_Cpp/Mat4x4Float_Aligned.inl
-	///
-	/// Feature :
-	/// 1. Linear arrays scale great. All entity's position data is stored linearlly.
-	/// 2. Tree based sturucture or other Acceleration strucutures isn;t required 
-	/// 3. Frustum vs Sphere intersections check per loop
-	/// 3. Threads solve intersections(blocks) parrallily
-	/// 
-	/// this library require math library : https://github.com/SungJJinKang/LightMath_Cpp/blob/main/Mat4x4Float_Aligned.inl
-	/// 
-	/// references : 
-	/// https://www.gdcvault.com/play/1014491/Culling-the-Battlefield-Data-Oriented
-	/// https://www.slideshare.net/DICEStudio/culling-the-battlefield-data-oriented-design-in-practice
-	/// https://macton.smugmug.com/Other/2008-07-15-by-Eye-Fi/n-xmKDH/
-	/// 
-	/// </summary>
+
 	class EveryCulling
 	{
 	private:
@@ -108,9 +83,6 @@ namespace culling
 		std::unique_ptr<PreCulling> mPreCulling;
 		std::unique_ptr<DistanceCulling> mDistanceCulling;
 		std::unique_ptr<ViewFrustumCulling> mViewFrustumCulling;
-#ifdef ENABLE_SCREEN_SAPCE_BOUDING_SPHERE_CULLING
-		std::unique_ptr<ScreenSpaceBoundingSphereCulling> mScreenSpaceBoudingSphereCulling;
-#endif
 		std::unique_ptr<MaskedSWOcclusionCulling> mMaskedSWOcclusionCulling;
 
 #ifdef PROFILING_CULLING

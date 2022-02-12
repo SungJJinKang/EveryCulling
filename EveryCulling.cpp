@@ -9,11 +9,6 @@
 #include "CullingModule/ViewFrustumCulling/ViewFrustumCulling.h"
 #include "CullingModule/PreCulling/PreCulling.h"
 #include "CullingModule/DistanceCulling/DistanceCulling.h"
-
-#ifdef ENABLE_SCREEN_SAPCE_BOUDING_SPHERE_CULLING
-#include "CullingModule/ScreenSpaceBoundingSphereCulling/ScreenSpaceBoundingSphereCulling.h"
-#endif
-
 #include "CullingModule/MaskedSWOcclusionCulling/MaskedSWOcclusionCulling.h"
 
 
@@ -284,9 +279,6 @@ culling::EveryCulling::EveryCulling(const std::uint32_t resolutionWidth, const s
 			mPreCulling.get(),
 			mDistanceCulling.get(),
 			mViewFrustumCulling.get(),
-	#ifdef ENABLE_SCREEN_SAPCE_BOUDING_SPHERE_CULLING
-			& (mScreenSpaceBoudingSphereCulling),
-	#endif	
 			mMaskedSWOcclusionCulling.get(), // Choose Role Stage
 			&(mMaskedSWOcclusionCulling->mSolveMeshRoleStage), // Choose Role Stage
 			&(mMaskedSWOcclusionCulling->mBinTrianglesStage), // BinTriangles
