@@ -1,6 +1,6 @@
 #include "CullingModule.h"
 
-#include "Graphics/Acceleration/LinearData_ViewFrustumCulling/EveryCulling.h"
+#include "../EveryCulling.h"
 
 culling::EntityBlock* culling::CullingModule::GetNextEntityBlock(const size_t cameraIndex, const bool forceOrdering)
 {

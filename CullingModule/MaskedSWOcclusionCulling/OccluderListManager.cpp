@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-#include "Graphics/Acceleration/LinearData_ViewFrustumCulling/DataType/EntityBlock.h"
+#include "../../DataType/EntityBlock.h"
 
 culling::OccluderListManager::OccluderListManager()
 {
