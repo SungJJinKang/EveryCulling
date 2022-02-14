@@ -1,8 +1,13 @@
 #include "EntityBlockViewer.h"
 
 #include <cassert>
-#include <cstring>
 
+
+void culling::EntityBlockViewer::DeInitializeEntityBlockViewer()
+{
+	mTargetEntityBlock = nullptr;
+	mEntityIndexInBlock = (std::uint64_t)-1;
+}
 
 void culling::EntityBlockViewer::ResetEntityData()
 {
@@ -10,8 +15,8 @@ void culling::EntityBlockViewer::ResetEntityData()
 }
 
 culling::EntityBlockViewer::EntityBlockViewer()
-	: bmIsActive(false), mTargetEntityBlock(nullptr), mEntityIndexInBlock(0)
 {
+	DeInitializeEntityBlockViewer();
 }
 
 culling::EntityBlockViewer::EntityBlockViewer
@@ -19,11 +24,14 @@ culling::EntityBlockViewer::EntityBlockViewer
 	EntityBlock* const entityBlock, 
 	const size_t entityIndexInBlock
 )
-	: mTargetEntityBlock{ entityBlock }, mEntityIndexInBlock{ entityIndexInBlock }, bmIsActive{ true }
+	: mTargetEntityBlock{ entityBlock }, mEntityIndexInBlock{ entityIndexInBlock }
 {
+	assert(IsValid() == true);
 	ResetEntityData();
 }
 
+culling::EntityBlockViewer::EntityBlockViewer(EntityBlockViewer&&) noexcept = default;
+culling::EntityBlockViewer& culling::EntityBlockViewer::operator=(EntityBlockViewer&&) noexcept = default;
 
 void culling::EntityBlockViewer::SetMeshVertexData
 (
@@ -34,8 +42,8 @@ void culling::EntityBlockViewer::SetMeshVertexData
 	const size_t verticeStride
 )
 {
-	assert(GetIsActive() == true);
-	if (GetIsActive() == true)
+	assert(IsValid() == true);
+	if (IsValid() == true)
 	{
 		mTargetEntityBlock->mVertexDatas[mEntityIndexInBlock].mVertices = vertices;
 		mTargetEntityBlock->mVertexDatas[mEntityIndexInBlock].mVerticeCount = verticeCount;

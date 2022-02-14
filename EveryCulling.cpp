@@ -259,10 +259,12 @@ culling::EntityBlockViewer culling::EveryCulling::AllocateNewEntity()
 
 void culling::EveryCulling::RemoveEntityFromBlock(EntityBlockViewer& entityBlockViewer)
 {
-	//Do nothing......
+	if(entityBlockViewer.IsValid() == true)
+	{
+		RemoveEntityFromBlock(entityBlockViewer.mTargetEntityBlock, entityBlockViewer.mEntityIndexInBlock);
+		entityBlockViewer.DeInitializeEntityBlockViewer();
+	}
 
-	entityBlockViewer.bmIsActive = false;
-	RemoveEntityFromBlock(entityBlockViewer.mTargetEntityBlock, entityBlockViewer.mEntityIndexInBlock);
 	//Don't decrement mEntityGridCell.AllocatedEntityCountInBlocks
 	//Entities Indexs in EntityBlock should not be swapped because already allocated EntityBlockViewer can't see it
 }

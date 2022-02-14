@@ -7,7 +7,6 @@
 namespace culling
 {
 	struct EntityBlock;
-	class QueryOcclusionCulling;
 
 	/// <summary>
 	/// Used for storing specific EntityBlock pointer
@@ -15,42 +14,47 @@ namespace culling
 	class EntityBlockViewer
 	{
 		friend class EveryCulling;
-	private:
 
-		bool bmIsActive;
+	private:
+		
 		EntityBlock* mTargetEntityBlock;
 		/// <summary>
 		/// Entity Index in Entity Block
 		/// </summary>
-		size_t mEntityIndexInBlock;
+		std::uint64_t mEntityIndexInBlock;
 
+		void DeInitializeEntityBlockViewer();
 		void ResetEntityData();
 
 	public:
 
 		EntityBlockViewer();
 		EntityBlockViewer(EntityBlock* const entityBlock, const size_t entityIndexInBlock);
+		EntityBlockViewer(const EntityBlockViewer&) = delete;
+		EntityBlockViewer& operator=(const EntityBlockViewer&) = delete;
+		EntityBlockViewer(EntityBlockViewer&&) noexcept;
+		EntityBlockViewer& operator=(EntityBlockViewer&&)noexcept ;
 
-		EVERYCULLING_FORCE_INLINE bool GetIsActive() const
+		EVERYCULLING_FORCE_INLINE bool IsValid() const
 		{
-			return bmIsActive;
+			return (mTargetEntityBlock != nullptr) && (mEntityIndexInBlock != (std::uint64_t)-1);
 		}
 
 		EVERYCULLING_FORCE_INLINE EntityBlock* GetTargetEntityBlock()
 		{
-			assert(GetIsActive() == true);
+			assert(IsValid() == true);
 			return mTargetEntityBlock;
 		}
 
 		EVERYCULLING_FORCE_INLINE const EntityBlock* GetTargetEntityBlock() const
 		{
-			assert(GetIsActive() == true);
+			assert(IsValid() == true);
 			return mTargetEntityBlock;
 		}
 
 		EVERYCULLING_FORCE_INLINE size_t GetEntityIndexInBlock() const
 		{
-			assert(GetIsActive() == true);
+			assert(IsValid() == true);
 			return mEntityIndexInBlock;
 		}
 		
@@ -61,15 +65,15 @@ namespace culling
 		/// <returns></returns>
 		EVERYCULLING_FORCE_INLINE bool GetIsCulled(const std::uint32_t cameraIndex) const
 		{
-			assert(GetIsActive() == true);
+			assert(IsValid() == true);
 			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
 			return mTargetEntityBlock->GetIsCulled(mEntityIndexInBlock, cameraIndex);
 		}
 
 		EVERYCULLING_FORCE_INLINE void SetModelMatrix(const float* const modelMatrix)
 		{
-			assert(GetIsActive() == true);
-			if (GetIsActive() == true)
+			assert(IsValid() == true);
+			if (IsValid() == true)
 			{
 				mTargetEntityBlock->SetModelMatrix(mEntityIndexInBlock, modelMatrix);
 			}
@@ -94,14 +98,14 @@ namespace culling
 		
 		EVERYCULLING_FORCE_INLINE const culling::VertexData& GetVertexData() const
 		{
-			assert(GetIsActive() == true);
+			assert(IsValid() == true);
 			return mTargetEntityBlock->mVertexDatas[mEntityIndexInBlock];
 		}
 
 		EVERYCULLING_FORCE_INLINE void SetIsObjectEnabled(const bool isEnabled)
 		{
-			assert(GetIsActive() == true);
-			if (GetIsActive() == true)
+			assert(IsValid() == true);
+			if (IsValid() == true)
 			{
 				mTargetEntityBlock->SetIsObjectEnabled(mEntityIndexInBlock, isEnabled);
 			}
@@ -109,8 +113,8 @@ namespace culling
 
 		EVERYCULLING_FORCE_INLINE void SetAABBWorldPosition(const float* const minWorldPos, const float* const maxWorldPos)
 		{
-			assert(GetIsActive() == true);
-			if (GetIsActive() == true)
+			assert(IsValid() == true);
+			if (IsValid() == true)
 			{
 				mTargetEntityBlock->SetAABBWorldPosition(mEntityIndexInBlock, minWorldPos, maxWorldPos);
 			}
@@ -118,8 +122,8 @@ namespace culling
 
 		EVERYCULLING_FORCE_INLINE void SetObjectWorldPosition(const float* const worldPos)
 		{
-			assert(GetIsActive() == true);
-			if (GetIsActive() == true)
+			assert(IsValid() == true);
+			if (IsValid() == true)
 			{
 				mTargetEntityBlock->mWorldPositionAndWorldBoundingSphereRadius[mEntityIndexInBlock].SetPosition(worldPos);
 			}
@@ -127,9 +131,9 @@ namespace culling
 
 		EVERYCULLING_FORCE_INLINE void SetDesiredMaxDrawDistance(const float desiredMaxDrawDistance)
 		{
-			assert(GetIsActive() == true);
+			assert(IsValid() == true);
 
-			if (GetIsActive() == true)
+			if (IsValid() == true)
 			{
 				mTargetEntityBlock->SetDesiredMaxDrawDistance(mEntityIndexInBlock, desiredMaxDrawDistance);
 			}
@@ -152,10 +156,15 @@ namespace culling
 			const float* const entityModelMatrix4x4
 		)
 		{
-			SetObjectWorldPosition(entityWorldPositionVec3);
-			SetAABBWorldPosition(aabbMinWorldPositionVec3, aabbMaxWorldPositionVec3);
+			assert(IsValid() == true);
 
-			SetModelMatrix(entityModelMatrix4x4);
+			if (IsValid() == true)
+			{
+				SetObjectWorldPosition(entityWorldPositionVec3);
+				SetAABBWorldPosition(aabbMinWorldPositionVec3, aabbMaxWorldPositionVec3);
+
+				SetModelMatrix(entityModelMatrix4x4);
+			}
 		}
 
 	};
