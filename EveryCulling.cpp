@@ -1,11 +1,8 @@
 #include "EveryCulling.h"
 
-#include <cstring>
-#include <chrono>
+#include <thread>
 
 #include "DataType/EntityBlock.h"
-#include <vector_erase_move_lastelement/vector_swap_popback.h>
-
 #include "CullingModule/ViewFrustumCulling/ViewFrustumCulling.h"
 #include "CullingModule/PreCulling/PreCulling.h"
 #include "CullingModule/DistanceCulling/DistanceCulling.h"
@@ -34,7 +31,12 @@ void culling::EveryCulling::FreeEntityBlock(EntityBlock* freedEntityBlock)
 	assert(IsSuccessToFind == true);
 
 	mFreeEntityBlockList.push_back(freedEntityBlock);
-	swap_popback::vector_find_swap_popback(mActiveEntityBlockList, freedEntityBlock);
+
+	if(IsSuccessToFind == true)
+	{
+		mActiveEntityBlockList.erase(mActiveEntityBlockList.begin() + freedEntityBlockIndex);
+	}
+	
 }
 
 
