@@ -288,6 +288,8 @@ culling::EveryCulling::EveryCulling(const std::uint32_t resolutionWidth, const s
 #ifdef PROFILING_CULLING
 	, mEveryCullingProfiler{}
 #endif
+	, mCurrentTickCount()
+	, bmIsEntityBlockPoolInitialized(false)
 {
 	//to protect 
 	mFreeEntityBlockList.reserve(INITIAL_ENTITY_BLOCK_RESERVED_SIZE);
@@ -299,6 +301,8 @@ culling::EveryCulling::EveryCulling(const std::uint32_t resolutionWidth, const s
 	bmIsEntityBlockPoolInitialized = true;
 }
 
+culling::EveryCulling::EveryCulling(EveryCulling&&) noexcept = default;
+culling::EveryCulling& culling::EveryCulling::operator=(EveryCulling&&) noexcept = default;
 
 culling::EveryCulling::~EveryCulling()
 {

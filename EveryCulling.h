@@ -14,8 +14,7 @@
 
 #include <array>
 #include <vector>
-#include <atomic>
-#include <thread>
+#include <memory>
 
 #ifndef EVERYCULLING_INVALID_LOCAL_THREAD_INDEX
 #define EVERYCULLING_INVALID_LOCAL_THREAD_INDEX (-1)
@@ -47,21 +46,21 @@ namespace culling
 		std::array<float, MAX_CAMERA_COUNT> mFarClipPlaneDistance;
 		std::array<float, MAX_CAMERA_COUNT> mNearClipPlaneDistance;
 
-		bool bmIsEntityBlockPoolInitialized{ false };
+		bool bmIsEntityBlockPoolInitialized;
 
 		/// <summary>
 		/// List of EntityBlock with no entity ( maybe entity was destroyed)
 		/// </summary>
-		std::vector<EntityBlock*> mFreeEntityBlockList{};
+		std::vector<EntityBlock*> mFreeEntityBlockList;
 		/// <summary>
 		/// List of EntityBlock containing Entities
 		/// </summary>
-		std::vector<EntityBlock*> mActiveEntityBlockList{};
+		std::vector<EntityBlock*> mActiveEntityBlockList;
 		/// <summary>
 		/// Allocated EntityBlock Arrays
 		/// This objects will be released at destructor
 		/// </summary>
-		std::vector<EntityBlock*> mAllocatedEntityBlockChunkList{};
+		std::vector<EntityBlock*> mAllocatedEntityBlockChunkList;
 		
 		void AllocateEntityBlockPool();
 		culling::EntityBlock* AllocateNewEntityBlockFromPool();
@@ -91,7 +90,7 @@ namespace culling
 
 	private:
 
-		unsigned long long mCurrentTickCount = 1;
+		unsigned long long mCurrentTickCount;
 
 		std::vector<culling::CullingModule*> mUpdatedCullingModules;
 
@@ -113,16 +112,15 @@ namespace culling
 			_PreCulling,
 			_ViewFrustumCulling,
 			_MaskedSWOcclusionCulling,
-			_HwQueryOcclusionCulling,
 			_DistanceCulling
 		};
 
 		EveryCulling() = delete;
 		EveryCulling(const std::uint32_t resolutionWidth, const std::uint32_t resolutionHeight);
 		EveryCulling(const EveryCulling&) = delete;
-		EveryCulling(EveryCulling&&) noexcept = delete;
+		EveryCulling(EveryCulling&&) noexcept;
 		EveryCulling& operator=(const EveryCulling&) = delete;
-		EveryCulling& operator=(EveryCulling&&) noexcept = delete;
+		EveryCulling& operator=(EveryCulling&&) noexcept;
 
 		~EveryCulling();
 
