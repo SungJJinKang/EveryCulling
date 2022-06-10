@@ -16,10 +16,6 @@
 #include <vector>
 #include <memory>
 
-#ifndef EVERYCULLING_INVALID_LOCAL_THREAD_INDEX
-#define EVERYCULLING_INVALID_LOCAL_THREAD_INDEX (-1)
-#endif
-
 namespace culling
 {
 	class CullingModule;
@@ -35,7 +31,7 @@ namespace culling
 	{
 	private:
 
-		std::uint32_t mThreadCount;
+		std::atomic<std::uint32_t> mRunningThreadCount;
 		
 		size_t mCameraCount;
 		std::array<culling::Mat4x4, MAX_CAMERA_COUNT> mCameraModelMatrixes;
@@ -118,14 +114,11 @@ namespace culling
 		EveryCulling() = delete;
 		EveryCulling(const std::uint32_t resolutionWidth, const std::uint32_t resolutionHeight);
 		EveryCulling(const EveryCulling&) = delete;
-		EveryCulling(EveryCulling&&) noexcept;
 		EveryCulling& operator=(const EveryCulling&) = delete;
-		EveryCulling& operator=(EveryCulling&&) noexcept;
 
 		~EveryCulling();
 
 		void SetCameraCount(const size_t cameraCount);
-		void SetThreadCount(const std::uint32_t threadCount);
 
 		unsigned long long GetTickCount() const;
 		
@@ -208,7 +201,7 @@ namespace culling
 		/// </summary>
 		void RemoveEntityFromBlock(EntityBlockViewer& entityBlockViewer);
 		
-		void ThreadCullJob(const size_t cameraIndex, const std::int32_t localThreadIndex = -1);
+		void ThreadCullJob(const size_t cameraIndex, const unsigned long long tickCount);
 		//void ThreadCullJob(const std::uint32_t threadIndex, const std::uint32_t threadCount);
 
 		/// <summary>
@@ -223,17 +216,17 @@ namespace culling
 		 */
 		void PreCullJob();
 		
-		auto GetThreadCullJob(const size_t cameraIndex, const std::int32_t threadIndex = EVERYCULLING_INVALID_LOCAL_THREAD_INDEX)
+		auto GetThreadCullJob(const size_t cameraIndex, const unsigned long long tickCount)
 		{
-			return [this, cameraIndex, threadIndex]()
+			return [this, cameraIndex, tickCount]()
 			{
-				this->ThreadCullJob(cameraIndex, threadIndex);
+				this->ThreadCullJob(cameraIndex, tickCount);
 			};
 		}
 
 		const culling::CullingModule* GetLastEnabledCullingModule() const;
 		void SetEnabledCullingModule(const CullingModuleType cullingModuleType, const bool isEnabled);
-		std::uint32_t GetThreadCount() const;
+		std::uint32_t GetRunningThreadCount() const;
 
 	};
 }

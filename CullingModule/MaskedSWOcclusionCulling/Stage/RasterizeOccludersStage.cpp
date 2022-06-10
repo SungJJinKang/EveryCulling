@@ -302,7 +302,7 @@ void culling::RasterizeOccludersStage::ResetCullingModule(const unsigned long lo
 	}
 }
 
-void culling::RasterizeOccludersStage::CullBlockEntityJob(const size_t cameraIndex, const std::int32_t localThreadIndex, const unsigned long long currentTickCount)
+void culling::RasterizeOccludersStage::CullBlockEntityJob(const size_t cameraIndex, const unsigned long long currentTickCount)
 {
 	if (WHEN_TO_RASTERIZE_DEPTHBUFFER(currentTickCount))
 	{

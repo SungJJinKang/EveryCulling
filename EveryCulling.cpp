@@ -103,13 +103,16 @@ void culling::EveryCulling::RemoveEntityFromBlock(EntityBlock* ownerEntityBlock,
 	
 }
 
-void culling::EveryCulling::ThreadCullJob(const size_t cameraIndex, const std::int32_t localThreadIndex)
+void culling::EveryCulling::ThreadCullJob(const size_t cameraIndex, const unsigned long long tickCount)
 {
+
 	const std::uint32_t entityBlockCount = static_cast<std::uint32_t>(GetActiveEntityBlockCount());
 	const unsigned long long currentTickCount = mCurrentTickCount;
 
-	if (entityBlockCount > 0)
+	if (entityBlockCount > 0 && currentTickCount == tickCount)
 	{
+		mRunningThreadCount++;
+
 		for (size_t moduleIndex = 0; moduleIndex < mUpdatedCullingModules.size(); moduleIndex++)
 		{
 			culling::CullingModule* cullingModule = mUpdatedCullingModules[moduleIndex];
@@ -119,11 +122,11 @@ void culling::EveryCulling::ThreadCullJob(const size_t cameraIndex, const std::i
 
 			if(cullingModule->IsEnabled == true)
 			{
-				cullingModule->ThreadCullJob(cameraIndex, localThreadIndex, currentTickCount);
+				cullingModule->ThreadCullJob(cameraIndex, currentTickCount);
 
 				std::atomic_thread_fence(std::memory_order_seq_cst);
 
-				while (cullingModule->GetFinishedThreadCount(cameraIndex) < mThreadCount)
+				while (cullingModule->GetFinishedThreadCount(cameraIndex) < mRunningThreadCount)
 				{
 					std::this_thread::yield();
 				}
@@ -140,7 +143,7 @@ void culling::EveryCulling::WaitToFinishCullJob(const std::uint32_t cameraIndex)
 	const CullingModule* lastEnabledCullingModule = GetLastEnabledCullingModule();
 	if(lastEnabledCullingModule != nullptr)
 	{
-		while (lastEnabledCullingModule->GetFinishedThreadCount(cameraIndex) < mThreadCount)
+		while (lastEnabledCullingModule->GetFinishedThreadCount(cameraIndex) < mRunningThreadCount)
 		{
 			std::this_thread::yield();
 		}
@@ -158,6 +161,7 @@ void culling::EveryCulling::WaitToFinishCullJobOfAllCameras() const
 void culling::EveryCulling::PreCullJob()
 {
 	mCurrentTickCount++;
+	mRunningThreadCount = 0;
 
 	ResetEntityBlocks();
 	ResetCullingModules();
@@ -209,9 +213,9 @@ void culling::EveryCulling::SetEnabledCullingModule(const CullingModuleType cull
 	}
 }
 
-std::uint32_t culling::EveryCulling::GetThreadCount() const
+std::uint32_t culling::EveryCulling::GetRunningThreadCount() const
 {
-	return mThreadCount;
+	return mRunningThreadCount;
 }
 
 culling::EntityBlock* culling::EveryCulling::AllocateNewEntityBlockFromPool()
@@ -305,9 +309,6 @@ culling::EveryCulling::EveryCulling(const std::uint32_t resolutionWidth, const s
 	bmIsEntityBlockPoolInitialized = true;
 }
 
-culling::EveryCulling::EveryCulling(EveryCulling&&) noexcept = default;
-culling::EveryCulling& culling::EveryCulling::operator=(EveryCulling&&) noexcept = default;
-
 culling::EveryCulling::~EveryCulling()
 {
 	for (culling::EntityBlock* allocatedEntityBlockChunk : mAllocatedEntityBlockChunkList)
@@ -323,15 +324,6 @@ void culling::EveryCulling::SetCameraCount(const size_t cameraCount)
 	for (auto updatedCullingModule : mUpdatedCullingModules)
 	{
 		updatedCullingModule->OnSetCameraCount(cameraCount);
-	}
-}
-
-void culling::EveryCulling::SetThreadCount(const std::uint32_t threadCount)
-{
-	mThreadCount = threadCount;
-	for (auto updatedCullingModule : mUpdatedCullingModules)
-	{
-		updatedCullingModule->OnSetThreadCount(threadCount);
 	}
 }
 

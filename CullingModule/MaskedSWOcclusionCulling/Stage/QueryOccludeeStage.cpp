@@ -216,13 +216,13 @@ culling::QueryOccludeeStage::QueryOccludeeStage
 {
 }
 
-void culling::QueryOccludeeStage::CullBlockEntityJob(const size_t cameraIndex, const std::int32_t localThreadIndex, const unsigned long long currentTickCount)
+void culling::QueryOccludeeStage::CullBlockEntityJob(const size_t cameraIndex, const unsigned long long currentTickCount)
 {
 	if(mMaskedOcclusionCulling->GetIsOccluderExist() == true)
 	{
 		while (true)
 		{
-			culling::EntityBlock* const nextEntityBlock = GetNextEntityBlockForMultipleThreads(cameraIndex, localThreadIndex);
+			culling::EntityBlock* const nextEntityBlock = GetNextEntityBlock(cameraIndex);
 
 			if (nextEntityBlock != nullptr)
 			{

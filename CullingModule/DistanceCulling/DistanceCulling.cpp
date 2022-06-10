@@ -39,11 +39,11 @@ const char* culling::DistanceCulling::GetCullingModuleName() const
 	return "DistanceCulling";
 }
 
-void culling::DistanceCulling::CullBlockEntityJob(const size_t cameraIndex, const std::int32_t localThreadIndex, const unsigned long long currentTickCount)
+void culling::DistanceCulling::CullBlockEntityJob(const size_t cameraIndex, const unsigned long long currentTickCount)
 {
 	while (true)
 	{
-		culling::EntityBlock* const nextEntityBlock = GetNextEntityBlockForMultipleThreads(cameraIndex, localThreadIndex);
+		culling::EntityBlock* const nextEntityBlock = GetNextEntityBlock(cameraIndex);
 
 		if (nextEntityBlock != nullptr)
 		{

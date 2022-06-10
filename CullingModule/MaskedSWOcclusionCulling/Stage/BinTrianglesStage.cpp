@@ -361,7 +361,7 @@ void culling::BinTrianglesStage::ResetCullingModule(const unsigned long long cur
 	MaskedSWOcclusionCullingStage::ResetCullingModule(currentTickCount);
 }
 
-void culling::BinTrianglesStage::CullBlockEntityJob(const size_t cameraIndex, const std::int32_t localThreadIndex, const unsigned long long currentTickCount)
+void culling::BinTrianglesStage::CullBlockEntityJob(const size_t cameraIndex, const unsigned long long currentTickCount)
 {
 	if(WHEN_TO_BIN_TRIANGLE(currentTickCount))
 	{
