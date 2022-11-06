@@ -332,14 +332,14 @@ unsigned long long culling::EveryCulling::GetTickCount() const
 	return mCurrentTickCount;
 }
 
-EVERYCULLING_FORCE_INLINE void culling::EveryCulling::OnStartCullingModule(const culling::CullingModule* const cullingModule)
+void culling::EveryCulling::OnStartCullingModule(const culling::CullingModule* const cullingModule)
 {
 #ifdef PROFILING_CULLING
 	mEveryCullingProfiler.SetStartTime(cullingModule->GetCullingModuleName());
 #endif
 }
 
-EVERYCULLING_FORCE_INLINE void culling::EveryCulling::OnEndCullingModule(const culling::CullingModule* const cullingModule)
+void culling::EveryCulling::OnEndCullingModule(const culling::CullingModule* const cullingModule)
 {
 #ifdef PROFILING_CULLING
 	mEveryCullingProfiler.SetEndTime(cullingModule->GetCullingModuleName());

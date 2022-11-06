@@ -91,9 +91,9 @@ namespace culling
 		std::vector<culling::CullingModule*> mUpdatedCullingModules;
 
 		// this function is called by multiple threads
-		EVERYCULLING_FORCE_INLINE void OnStartCullingModule(const culling::CullingModule* const cullingModule);
+		void OnStartCullingModule(const culling::CullingModule* const cullingModule);
 		// this function is called by multiple threads
-		EVERYCULLING_FORCE_INLINE void OnEndCullingModule(const culling::CullingModule* const cullingModule);
+		void OnEndCullingModule(const culling::CullingModule* const cullingModule);
 		
 		void SetViewProjectionMatrix(const size_t cameraIndex, const culling::Mat4x4& viewProjectionMatrix);
 		void SetFieldOfViewInDegree(const size_t cameraIndex, const float fov);
