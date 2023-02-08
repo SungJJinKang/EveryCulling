@@ -35,7 +35,7 @@ Culling Order : **Distance Culling ( Cheap ) -> View Frustum Culing -> Masked SW
 [Video](https://youtu.be/G-IFukD2bNg)         
 [Slide Resource](https://www.ea.com/frostbite/news/culling-the-battlefield-data-oriented-design-in-practice)        
 [GDC Talk Video](https://www.gdcvault.com/play/1014491/Culling-the-Battlefield-Data-Oriented)   
-[한국어 블로그 글](https://sungjjinkang.github.io/doom/c++/computergraphics/game/2021/04/02/viewfrustumculling.html)    
+[한국어 블로그 글](https://sungjjinkang.github.io/viewfrustumculling)    
 
 MultiThreaded View Frustum Culling is 8ms faster than SingleThreaded View Frustum Culling ( in Stress Test )
 
@@ -143,7 +143,7 @@ Stage 4 : Multithread Query depth buffer ( Occludee Test ) ( Compare aabb of occ
 Stage 2, 3 is pretty slow. So they are performed alternately. Rasterization ( Stage 3 ) is performed with previous frame's binned triangle. It makes slight error when query depth buffer. But It's acceptable and it makes occlusion culling run faster. It's good trade-off.            
 
 [Reference paper](https://software.intel.com/content/dam/develop/external/us/en/documents/masked-software-occlusion-culling.pdf)             
-[개발 일지](https://sungjjinkang.github.io/computerscience/computergraphics/2021/12/31/masked_sw_occlusion_culling.html)                
+[개발 일지](https://sungjjinkang.github.io/masked_sw_occlusion_culling)                
 [Video1](https://youtu.be/tMgokVljvAY), [Video2](https://youtu.be/1IKTXsSLJ5g).
 [Performance comparision between ON/OFF](https://youtu.be/4xJu6_Jtbu4)             
 동작 원리 한국어 설명 : ["Masked Software Occlusion Culling"는 어떻게 작동하는가?](https://github.com/SungJJinKang/EveryCulling/blob/main/CullingModule/MaskedSWOcclusionCulling/MaskedSWOcclusionCulling_HowWorks.md)                 
