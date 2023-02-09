@@ -128,7 +128,7 @@ void culling::EveryCulling::ThreadCullJob(const size_t cameraIndex, const unsign
 
 				while (cullingModule->GetFinishedThreadCount(cameraIndex) < mRunningThreadCount)
 				{
-					std::this_thread::yield();
+					
 				}
 			}
 
@@ -145,7 +145,7 @@ void culling::EveryCulling::WaitToFinishCullJob(const std::uint32_t cameraIndex)
 	{
 		while (lastEnabledCullingModule->GetFinishedThreadCount(cameraIndex) < mRunningThreadCount)
 		{
-			std::this_thread::yield();
+
 		}
 	}
 }
