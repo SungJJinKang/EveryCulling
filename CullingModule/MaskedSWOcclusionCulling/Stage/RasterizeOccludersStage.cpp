@@ -308,21 +308,19 @@ void culling::RasterizeOccludersStage::CullBlockEntityJob(const size_t cameraInd
 	{
 		if (mMaskedOcclusionCulling->GetIsOccluderExist() == true)
 		{
-			const culling::Tile* const endTile = mMaskedOcclusionCulling->mDepthBuffer.GetTiles() + mMaskedOcclusionCulling->mDepthBuffer.GetTileCount();
+			while (true)
+			{
+				culling::Tile* const nextTile = GetNextDepthBufferTile(cameraIndex);
 
-				while (true)
+				if (nextTile != nullptr)
 				{
-					culling::Tile* const nextTile = GetNextDepthBufferTile(cameraIndex);
-
-					if (nextTile != nullptr)
-					{
-						RasterizeBinnedTriangles(cameraIndex, nextTile);
-					}
-					else
-					{
-						break;
-					}
+					RasterizeBinnedTriangles(cameraIndex, nextTile);
 				}
+				else
+				{
+					break;
+				}
+			}
 		}
 	}
 }
