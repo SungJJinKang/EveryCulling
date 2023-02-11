@@ -23,16 +23,16 @@ namespace culling
 		/// <param name="triangleCullMask"></param>
 		EVERYCULLING_FORCE_INLINE void Clipping
 		(
-			const culling::M256F* const clipspaceVertexX,
-			const culling::M256F* const clipspaceVertexY,
-			const culling::M256F* const clipspaceVertexZ,
-			const culling::M256F* const clipspaceVertexW,
+			const culling::EVERYCULLING_M256F* const clipspaceVertexX,
+			const culling::EVERYCULLING_M256F* const clipspaceVertexY,
+			const culling::EVERYCULLING_M256F* const clipspaceVertexZ,
+			const culling::EVERYCULLING_M256F* const clipspaceVertexW,
 			std::uint32_t& triangleCullMask
 		);
 
-		EVERYCULLING_FORCE_INLINE culling::M256F ComputePositiveWMask
+		EVERYCULLING_FORCE_INLINE culling::EVERYCULLING_M256F ComputePositiveWMask
 		(
-			const culling::M256F* const clipspaceVertexW
+			const culling::EVERYCULLING_M256F* const clipspaceVertexW
 		);
 		
 		
@@ -46,8 +46,8 @@ namespace culling
 		/// <param name="triangleCullMask"></param>
 		EVERYCULLING_FORCE_INLINE void BackfaceCulling
 		(
-			culling::M256F* const screenPixelX, 
-			culling::M256F* const screenPixelY, 
+			culling::EVERYCULLING_M256F* const screenPixelX, 
+			culling::EVERYCULLING_M256F* const screenPixelY, 
 			std::uint32_t& triangleCullMask
 		);
 
@@ -55,24 +55,24 @@ namespace culling
 
 		EVERYCULLING_FORCE_INLINE void PassTrianglesToTileBin
 		(
-			const culling::M256F& pointAScreenPixelPosX,
-			const culling::M256F& pointAScreenPixelPosY,
-			const culling::M256F& pointANdcSpaceVertexZ,
+			const culling::EVERYCULLING_M256F& pointAScreenPixelPosX,
+			const culling::EVERYCULLING_M256F& pointAScreenPixelPosY,
+			const culling::EVERYCULLING_M256F& pointANdcSpaceVertexZ,
 
-			const culling::M256F& pointBScreenPixelPosX,
-			const culling::M256F& pointBScreenPixelPosY,
-			const culling::M256F& pointBNdcSpaceVertexZ,
+			const culling::EVERYCULLING_M256F& pointBScreenPixelPosX,
+			const culling::EVERYCULLING_M256F& pointBScreenPixelPosY,
+			const culling::EVERYCULLING_M256F& pointBNdcSpaceVertexZ,
 
-			const culling::M256F& pointCScreenPixelPosX,
-			const culling::M256F& pointCScreenPixelPosY,
-			const culling::M256F& pointCNdcSpaceVertexZ,
+			const culling::EVERYCULLING_M256F& pointCScreenPixelPosX,
+			const culling::EVERYCULLING_M256F& pointCScreenPixelPosY,
+			const culling::EVERYCULLING_M256F& pointCNdcSpaceVertexZ,
 
 			const std::uint32_t& triangleCullMask,
 			const size_t triangleCountPerLoop,
-			const culling::M256I& outBinBoundingBoxMinX,
-			const culling::M256I& outBinBoundingBoxMinY,
-			const culling::M256I& outBinBoundingBoxMaxX,
-			const culling::M256I& outBinBoundingBoxMaxY
+			const culling::EVERYCULLING_M256I& outBinBoundingBoxMinX,
+			const culling::EVERYCULLING_M256I& outBinBoundingBoxMinY,
+			const culling::EVERYCULLING_M256I& outBinBoundingBoxMaxX,
+			const culling::EVERYCULLING_M256I& outBinBoundingBoxMaxY
 		);
 		
 
@@ -110,9 +110,9 @@ namespace culling
 			const size_t currentIndiceIndex, 
 			const size_t vertexStrideByte, 
 			const size_t fetchTriangleCount,
-			culling::M256F* outVerticesX, 
-			culling::M256F* outVerticesY, 
-			culling::M256F* outVerticesZ
+			culling::EVERYCULLING_M256F* outVerticesX, 
+			culling::EVERYCULLING_M256F* outVerticesY, 
+			culling::EVERYCULLING_M256F* outVerticesZ
 		);
 		
 		/// <summary>
@@ -138,7 +138,7 @@ namespace culling
 			const float* const modelToClipspaceMatrix
 		);
 
-		void ConvertToPlatformDepth(culling::M256F* const depth);
+		void ConvertToPlatformDepth(culling::EVERYCULLING_M256F* const depth);
 
 		//void BinTriangleThreadJob(const size_t cameraIndex);
 

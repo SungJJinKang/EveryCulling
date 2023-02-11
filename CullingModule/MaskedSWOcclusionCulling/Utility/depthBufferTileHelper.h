@@ -13,37 +13,37 @@ namespace culling
 	{
 		EVERYCULLING_FORCE_INLINE extern void ComputeBinBoundingBoxFromThreeVertices
 		(
-			const culling::M256F& pointAScreenPixelX,
-			const culling::M256F& pointAScreenPixelY,
+			const culling::EVERYCULLING_M256F& pointAScreenPixelX,
+			const culling::EVERYCULLING_M256F& pointAScreenPixelY,
 
-			const culling::M256F& pointBScreenPixelX,
-			const culling::M256F& pointBScreenPixelY,
+			const culling::EVERYCULLING_M256F& pointBScreenPixelX,
+			const culling::EVERYCULLING_M256F& pointBScreenPixelY,
 
-			const culling::M256F& pointCScreenPixelX,
-			const culling::M256F& pointCScreenPixelY,
+			const culling::EVERYCULLING_M256F& pointCScreenPixelX,
+			const culling::EVERYCULLING_M256F& pointCScreenPixelY,
 
-			culling::M256I& outBinBoundingBoxMinX,
-			culling::M256I& outBinBoundingBoxMinY,
-			culling::M256I& outBinBoundingBoxMaxX,
-			culling::M256I& outBinBoundingBoxMaxY,
+			culling::EVERYCULLING_M256I& outBinBoundingBoxMinX,
+			culling::EVERYCULLING_M256I& outBinBoundingBoxMinY,
+			culling::EVERYCULLING_M256I& outBinBoundingBoxMaxX,
+			culling::EVERYCULLING_M256I& outBinBoundingBoxMaxY,
 			SWDepthBuffer& depthBuffer
 		)
 		{
-			static const culling::M256I WIDTH_MASK = _mm256_set1_epi32(~(TILE_WIDTH - 1));
-			static const culling::M256I HEIGHT_MASK = _mm256_set1_epi32(~(TILE_HEIGHT - 1));
+			static const culling::EVERYCULLING_M256I WIDTH_MASK = _mm256_set1_epi32(~(EVERYCULLING_TILE_WIDTH - 1));
+			static const culling::EVERYCULLING_M256I HEIGHT_MASK = _mm256_set1_epi32(~(EVERYCULLING_TILE_HEIGHT - 1));
 
 			// to prevent overflow.
 			// when floating point is converted to integer
-			const culling::M256F minScreenPixelFloatX = _mm256_max_ps(_mm256_set1_ps(-FLOAT_OVERFLOW_CHECKER), _mm256_min_ps(_mm256_floor_ps(_mm256_min_ps(pointAScreenPixelX, _mm256_min_ps(pointBScreenPixelX, pointCScreenPixelX))), _mm256_set1_ps(FLOAT_OVERFLOW_CHECKER)));
-			const culling::M256F minScreenPixelFloatY = _mm256_max_ps(_mm256_set1_ps(-FLOAT_OVERFLOW_CHECKER), _mm256_min_ps(_mm256_floor_ps(_mm256_min_ps(pointAScreenPixelY, _mm256_min_ps(pointBScreenPixelY, pointCScreenPixelY))), _mm256_set1_ps(FLOAT_OVERFLOW_CHECKER)));
-			const culling::M256F maxScreenPixelFloatX = _mm256_max_ps(_mm256_set1_ps(-FLOAT_OVERFLOW_CHECKER), _mm256_min_ps(_mm256_ceil_ps(_mm256_max_ps(pointAScreenPixelX, _mm256_max_ps(pointBScreenPixelX, pointCScreenPixelX))), _mm256_set1_ps(FLOAT_OVERFLOW_CHECKER)));
-			const culling::M256F maxScreenPixelFloatY = _mm256_max_ps(_mm256_set1_ps(-FLOAT_OVERFLOW_CHECKER), _mm256_min_ps(_mm256_ceil_ps(_mm256_max_ps(pointAScreenPixelY, _mm256_max_ps(pointBScreenPixelY, pointCScreenPixelY))), _mm256_set1_ps(FLOAT_OVERFLOW_CHECKER)));
+			const culling::EVERYCULLING_M256F minScreenPixelFloatX = _mm256_max_ps(_mm256_set1_ps(-FLOAT_OVERFLOW_CHECKER), _mm256_min_ps(_mm256_floor_ps(_mm256_min_ps(pointAScreenPixelX, _mm256_min_ps(pointBScreenPixelX, pointCScreenPixelX))), _mm256_set1_ps(FLOAT_OVERFLOW_CHECKER)));
+			const culling::EVERYCULLING_M256F minScreenPixelFloatY = _mm256_max_ps(_mm256_set1_ps(-FLOAT_OVERFLOW_CHECKER), _mm256_min_ps(_mm256_floor_ps(_mm256_min_ps(pointAScreenPixelY, _mm256_min_ps(pointBScreenPixelY, pointCScreenPixelY))), _mm256_set1_ps(FLOAT_OVERFLOW_CHECKER)));
+			const culling::EVERYCULLING_M256F maxScreenPixelFloatX = _mm256_max_ps(_mm256_set1_ps(-FLOAT_OVERFLOW_CHECKER), _mm256_min_ps(_mm256_ceil_ps(_mm256_max_ps(pointAScreenPixelX, _mm256_max_ps(pointBScreenPixelX, pointCScreenPixelX))), _mm256_set1_ps(FLOAT_OVERFLOW_CHECKER)));
+			const culling::EVERYCULLING_M256F maxScreenPixelFloatY = _mm256_max_ps(_mm256_set1_ps(-FLOAT_OVERFLOW_CHECKER), _mm256_min_ps(_mm256_ceil_ps(_mm256_max_ps(pointAScreenPixelY, _mm256_max_ps(pointBScreenPixelY, pointCScreenPixelY))), _mm256_set1_ps(FLOAT_OVERFLOW_CHECKER)));
 
 
-			const culling::M256I minScreenPixelX = _mm256_cvttps_epi32(minScreenPixelFloatX);
-			const culling::M256I minScreenPixelY = _mm256_cvttps_epi32(minScreenPixelFloatY);
-			const culling::M256I maxScreenPixelX = _mm256_cvttps_epi32(maxScreenPixelFloatX);
-			const culling::M256I maxScreenPixelY = _mm256_cvttps_epi32(maxScreenPixelFloatY);
+			const culling::EVERYCULLING_M256I minScreenPixelX = _mm256_cvttps_epi32(minScreenPixelFloatX);
+			const culling::EVERYCULLING_M256I minScreenPixelY = _mm256_cvttps_epi32(minScreenPixelFloatY);
+			const culling::EVERYCULLING_M256I maxScreenPixelX = _mm256_cvttps_epi32(maxScreenPixelFloatX);
+			const culling::EVERYCULLING_M256I maxScreenPixelY = _mm256_cvttps_epi32(maxScreenPixelFloatY);
 			
 
 			// How "and" works?

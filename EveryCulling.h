@@ -8,7 +8,7 @@
 #include "DataType/Math/Matrix.h"
 
 
-#ifdef PROFILING_CULLING
+#ifdef EVERYCULLING_PROFILING_CULLING
 #include "EveryCullingProfiler.h"
 #endif
 
@@ -34,13 +34,13 @@ namespace culling
 		std::atomic<std::uint32_t> mRunningThreadCount;
 		
 		size_t mCameraCount;
-		std::array<culling::Mat4x4, MAX_CAMERA_COUNT> mCameraModelMatrixes;
-		std::array<culling::Mat4x4, MAX_CAMERA_COUNT> mCameraViewProjectionMatrixes;
-		std::array<culling::Vec3, MAX_CAMERA_COUNT> mCameraWorldPositions;
-		std::array<culling::Vec4, MAX_CAMERA_COUNT> mCameraRotations;
-		std::array<float, MAX_CAMERA_COUNT> mCameraFieldOfView;
-		std::array<float, MAX_CAMERA_COUNT> mFarClipPlaneDistance;
-		std::array<float, MAX_CAMERA_COUNT> mNearClipPlaneDistance;
+		std::array<culling::Mat4x4, EVERYCULLING_MAX_CAMERA_COUNT> mCameraModelMatrixes;
+		std::array<culling::Mat4x4, EVERYCULLING_MAX_CAMERA_COUNT> mCameraViewProjectionMatrixes;
+		std::array<culling::Vec3, EVERYCULLING_MAX_CAMERA_COUNT> mCameraWorldPositions;
+		std::array<culling::Vec4, EVERYCULLING_MAX_CAMERA_COUNT> mCameraRotations;
+		std::array<float, EVERYCULLING_MAX_CAMERA_COUNT> mCameraFieldOfView;
+		std::array<float, EVERYCULLING_MAX_CAMERA_COUNT> mFarClipPlaneDistance;
+		std::array<float, EVERYCULLING_MAX_CAMERA_COUNT> mNearClipPlaneDistance;
 
 		bool bmIsEntityBlockPoolInitialized;
 
@@ -80,7 +80,7 @@ namespace culling
 		std::unique_ptr<ViewFrustumCulling> mViewFrustumCulling;
 		std::unique_ptr<MaskedSWOcclusionCulling> mMaskedSWOcclusionCulling;
 
-#ifdef PROFILING_CULLING
+#ifdef EVERYCULLING_PROFILING_CULLING
 		EveryCullingProfiler mEveryCullingProfiler;
 #endif
 
@@ -145,32 +145,32 @@ namespace culling
 		}
 		EVERYCULLING_FORCE_INLINE const culling::Vec3& GetCameraWorldPosition(const size_t cameraIndex) const
 		{
-			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
+			assert(cameraIndex >= 0 && cameraIndex < EVERYCULLING_MAX_CAMERA_COUNT);
 			return mCameraWorldPositions[cameraIndex];
 		}
 		EVERYCULLING_FORCE_INLINE const culling::Mat4x4& GetCameraModelMatrix(const size_t cameraIndex) const
 		{
-			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
+			assert(cameraIndex >= 0 && cameraIndex < EVERYCULLING_MAX_CAMERA_COUNT);
 			return mCameraModelMatrixes[cameraIndex];
 		}
 		EVERYCULLING_FORCE_INLINE const culling::Mat4x4& GetCameraViewProjectionMatrix(const size_t cameraIndex) const
 		{
-			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
+			assert(cameraIndex >= 0 && cameraIndex < EVERYCULLING_MAX_CAMERA_COUNT);
 			return mCameraViewProjectionMatrixes[cameraIndex];
 		}
 		EVERYCULLING_FORCE_INLINE float GetCameraFieldOfView(const size_t cameraIndex) const
 		{
-			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
+			assert(cameraIndex >= 0 && cameraIndex < EVERYCULLING_MAX_CAMERA_COUNT);
 			return mCameraFieldOfView[cameraIndex];
 		}
 		EVERYCULLING_FORCE_INLINE float GetCameraFarClipPlaneDistance(const size_t cameraIndex) const
 		{
-			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
+			assert(cameraIndex >= 0 && cameraIndex < EVERYCULLING_MAX_CAMERA_COUNT);
 			return mFarClipPlaneDistance[cameraIndex];
 		}
 		EVERYCULLING_FORCE_INLINE float GetCameraNearClipPlaneDistance(const size_t cameraIndex) const
 		{
-			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
+			assert(cameraIndex >= 0 && cameraIndex < EVERYCULLING_MAX_CAMERA_COUNT);
 			return mNearClipPlaneDistance[cameraIndex];
 		}
 		

@@ -96,18 +96,18 @@ namespace culling
 	/// <returns></returns>
 	EVERYCULLING_FORCE_INLINE extern std::uint32_t TestTrianglesIsFrontFaceUsingSIMD
 	(
-		const culling::M256F* const verticesX,
-		const culling::M256F* const verticesY
+		const culling::EVERYCULLING_M256F* const verticesX,
+		const culling::EVERYCULLING_M256F* const verticesY
 	)
 	{
 		//I don't know How this Works.........
 		//https://stackoverflow.com/questions/67357115/i-found-back-face-culling-code-but-i-cant-know-how-this-works
-		const culling::M256F triArea1 = culling::M256F_MUL(culling::M256F_SUB(verticesX[1], verticesX[0]), culling::M256F_SUB(verticesY[2], verticesY[0]));
-		const culling::M256F triArea2 = culling::M256F_MUL(culling::M256F_SUB(verticesX[0], verticesX[2]), culling::M256F_SUB(verticesY[0], verticesY[1]));
-		const culling::M256F triArea = culling::M256F_SUB(triArea1, triArea2);
+		const culling::EVERYCULLING_M256F triArea1 = culling::EVERYCULLING_M256F_MUL(culling::EVERYCULLING_M256F_SUB(verticesX[1], verticesX[0]), culling::EVERYCULLING_M256F_SUB(verticesY[2], verticesY[0]));
+		const culling::EVERYCULLING_M256F triArea2 = culling::EVERYCULLING_M256F_MUL(culling::EVERYCULLING_M256F_SUB(verticesX[0], verticesX[2]), culling::EVERYCULLING_M256F_SUB(verticesY[0], verticesY[1]));
+		const culling::EVERYCULLING_M256F triArea = culling::EVERYCULLING_M256F_SUB(triArea1, triArea2);
 		
 		//_CMP_GT_OQ vs _CMP_GT_OQ : https://stackoverflow.com/questions/16988199/how-to-choose-avx-compare-predicate-variants
-		const culling::M256F ccwMask = _mm256_cmp_ps(triArea, _mm256_set1_ps(0.0f), _CMP_GT_OQ);
+		const culling::EVERYCULLING_M256F ccwMask = _mm256_cmp_ps(triArea, _mm256_set1_ps(0.0f), _CMP_GT_OQ);
 
 		//Set each bit of mask dst based on the most significant bit of the corresponding packed single-precision (32-bit) floating-point element in a.
 		//https://software.intel.com/sites/landingpage/IntrinsicsGuide/#techs=SSE,SSE2,SSE3,SSSE3,SSE4_1,SSE4_2,AVX&expand=2156,4979,4979,1731,4929,951,4979,3869&text=movemask
@@ -126,26 +126,26 @@ namespace culling
 	/// TriPoint[1] : Second Points Of Triangle
 	/// TriPoint[2] : Third Points Of Triangle
 	/// 
-	/// Passed culling::M256F* is pointer of 3 size array
+	/// Passed culling::EVERYCULLING_M256F* is pointer of 3 size array
 	/// 
 	/// </summary>
 	/// <param name="TriPointX"></param>
 	/// <param name="TriPointY"></param>
-	EVERYCULLING_FORCE_INLINE extern void Sort_8_2DTriangles(culling::M256F* TriPointX, culling::M256F* TriPointY)
+	EVERYCULLING_FORCE_INLINE extern void Sort_8_2DTriangles(culling::EVERYCULLING_M256F* TriPointX, culling::EVERYCULLING_M256F* TriPointY)
 	{
-		culling::M256F MASK;
+		culling::EVERYCULLING_M256F MASK;
 
 		MASK = _mm256_cmp_ps(TriPointY[0], TriPointY[1], _CMP_LT_OQ);
-		culling::M256F_SWAP(TriPointX[0], TriPointX[1], MASK);
-		culling::M256F_SWAP(TriPointY[0], TriPointY[1], MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointX[0], TriPointX[1], MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointY[0], TriPointY[1], MASK);
 
 		MASK = _mm256_cmp_ps(TriPointY[0], TriPointY[2], _CMP_LT_OQ);
-		culling::M256F_SWAP(TriPointX[0], TriPointX[2], MASK);
-		culling::M256F_SWAP(TriPointY[0], TriPointY[2], MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointX[0], TriPointX[2], MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointY[0], TriPointY[2], MASK);
 
 		MASK = _mm256_cmp_ps(TriPointY[1], TriPointY[2], _CMP_LT_OQ);
-		culling::M256F_SWAP(TriPointX[1], TriPointX[2], MASK);
-		culling::M256F_SWAP(TriPointY[1], TriPointY[2], MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointX[1], TriPointX[2], MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointY[1], TriPointY[2], MASK);
 	}
 
 	/// <summary>
@@ -157,124 +157,124 @@ namespace culling
 	/// TriPoint[1] : Second Points Of Triangle
 	/// TriPoint[2] : Third Points Of Triangle
 	/// 
-	/// Passed culling::M256F* is pointer of 3 size array
+	/// Passed culling::EVERYCULLING_M256F* is pointer of 3 size array
 	/// 
 	/// </summary>
-	/// <param name="TriPointX">3 size array culling::M256F</param>
-	/// <param name="TriPointY">3 size array culling::M256F</param>
-	/// <param name="TriPointZ">3 size array culling::M256F</param>
-	EVERYCULLING_FORCE_INLINE extern void Sort_8_3DTriangles(culling::M256F* TriPointX, culling::M256F* TriPointY, culling::M256F* TriPointZ)
+	/// <param name="TriPointX">3 size array culling::EVERYCULLING_M256F</param>
+	/// <param name="TriPointY">3 size array culling::EVERYCULLING_M256F</param>
+	/// <param name="TriPointZ">3 size array culling::EVERYCULLING_M256F</param>
+	EVERYCULLING_FORCE_INLINE extern void Sort_8_3DTriangles(culling::EVERYCULLING_M256F* TriPointX, culling::EVERYCULLING_M256F* TriPointY, culling::EVERYCULLING_M256F* TriPointZ)
 	{
-		culling::M256F MASK;
+		culling::EVERYCULLING_M256F MASK;
 
 		MASK = _mm256_cmp_ps(TriPointY[0], TriPointY[1], _CMP_LT_OQ);
-		culling::M256F_SWAP(TriPointX[0], TriPointX[1], MASK);
-		culling::M256F_SWAP(TriPointY[0], TriPointY[1], MASK);
-		culling::M256F_SWAP(TriPointZ[0], TriPointZ[1], MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointX[0], TriPointX[1], MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointY[0], TriPointY[1], MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointZ[0], TriPointZ[1], MASK);
 
 		MASK = _mm256_cmp_ps(TriPointY[0], TriPointY[2], _CMP_LT_OQ);
-		culling::M256F_SWAP(TriPointX[0], TriPointX[2], MASK);
-		culling::M256F_SWAP(TriPointY[0], TriPointY[2], MASK);
-		culling::M256F_SWAP(TriPointZ[0], TriPointZ[2], MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointX[0], TriPointX[2], MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointY[0], TriPointY[2], MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointZ[0], TriPointZ[2], MASK);
 
 		MASK = _mm256_cmp_ps(TriPointY[1], TriPointY[2], _CMP_LT_OQ);
-		culling::M256F_SWAP(TriPointX[1], TriPointX[2], MASK);
-		culling::M256F_SWAP(TriPointY[1], TriPointY[2], MASK);
-		culling::M256F_SWAP(TriPointZ[1], TriPointZ[2], MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointX[1], TriPointX[2], MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointY[1], TriPointY[2], MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointZ[1], TriPointZ[2], MASK);
 	}
 
 	EVERYCULLING_FORCE_INLINE extern void Sort_8_2DTriangles
 	(
-		culling::M256F& TriPointA_X,
-		culling::M256F& TriPointA_Y,
+		culling::EVERYCULLING_M256F& TriPointA_X,
+		culling::EVERYCULLING_M256F& TriPointA_Y,
 
-		culling::M256F& TriPointB_X,
-		culling::M256F& TriPointB_Y,
+		culling::EVERYCULLING_M256F& TriPointB_X,
+		culling::EVERYCULLING_M256F& TriPointB_Y,
 
-		culling::M256F& TriPointC_X,
-		culling::M256F& TriPointC_Y
+		culling::EVERYCULLING_M256F& TriPointC_X,
+		culling::EVERYCULLING_M256F& TriPointC_Y
 	)
 	{
-		culling::M256F MASK;
+		culling::EVERYCULLING_M256F MASK;
 		
 		MASK = _mm256_cmp_ps(TriPointA_Y, TriPointB_Y, _CMP_LT_OQ);
-		culling::M256F_SWAP(TriPointA_X, TriPointB_X, MASK);
-		culling::M256F_SWAP(TriPointA_Y, TriPointB_Y, MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointA_X, TriPointB_X, MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointA_Y, TriPointB_Y, MASK);
 
 		MASK = _mm256_cmp_ps(TriPointA_Y, TriPointC_Y, _CMP_LT_OQ);
-		culling::M256F_SWAP(TriPointA_X, TriPointC_X, MASK);
-		culling::M256F_SWAP(TriPointA_Y, TriPointC_Y, MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointA_X, TriPointC_X, MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointA_Y, TriPointC_Y, MASK);
 
 		MASK = _mm256_cmp_ps(TriPointB_Y, TriPointC_Y, _CMP_LT_OQ);
-		culling::M256F_SWAP(TriPointB_X, TriPointC_X, MASK);
-		culling::M256F_SWAP(TriPointB_Y, TriPointC_Y, MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointB_X, TriPointC_X, MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointB_Y, TriPointC_Y, MASK);
 	}
 
 	EVERYCULLING_FORCE_INLINE extern void Sort_8_3DTriangles
 	(
-		culling::M256F& TriPointA_X,
-		culling::M256F& TriPointA_Y,
-		culling::M256F& TriPointA_Z,
+		culling::EVERYCULLING_M256F& TriPointA_X,
+		culling::EVERYCULLING_M256F& TriPointA_Y,
+		culling::EVERYCULLING_M256F& TriPointA_Z,
 
-		culling::M256F& TriPointB_X,
-		culling::M256F& TriPointB_Y,
-		culling::M256F& TriPointB_Z,
+		culling::EVERYCULLING_M256F& TriPointB_X,
+		culling::EVERYCULLING_M256F& TriPointB_Y,
+		culling::EVERYCULLING_M256F& TriPointB_Z,
 
-		culling::M256F& TriPointC_X,
-		culling::M256F& TriPointC_Y,
-		culling::M256F& TriPointC_Z
+		culling::EVERYCULLING_M256F& TriPointC_X,
+		culling::EVERYCULLING_M256F& TriPointC_Y,
+		culling::EVERYCULLING_M256F& TriPointC_Z
 	)
 	{
-		culling::M256F MASK;
+		culling::EVERYCULLING_M256F MASK;
 
 		MASK = _mm256_cmp_ps(TriPointA_Y, TriPointB_Y, _CMP_LT_OQ);
-		culling::M256F_SWAP(TriPointA_X, TriPointB_X, MASK);
-		culling::M256F_SWAP(TriPointA_Y, TriPointB_Y, MASK);
-		culling::M256F_SWAP(TriPointA_Z, TriPointB_Z, MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointA_X, TriPointB_X, MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointA_Y, TriPointB_Y, MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointA_Z, TriPointB_Z, MASK);
 
 		MASK = _mm256_cmp_ps(TriPointA_Y, TriPointC_Y, _CMP_LT_OQ);
-		culling::M256F_SWAP(TriPointA_X, TriPointC_X, MASK);
-		culling::M256F_SWAP(TriPointA_Y, TriPointC_Y, MASK);
-		culling::M256F_SWAP(TriPointA_Z, TriPointC_Z, MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointA_X, TriPointC_X, MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointA_Y, TriPointC_Y, MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointA_Z, TriPointC_Z, MASK);
 
 		MASK = _mm256_cmp_ps(TriPointB_Y, TriPointC_Y, _CMP_LT_OQ);
-		culling::M256F_SWAP(TriPointB_X, TriPointC_X, MASK);
-		culling::M256F_SWAP(TriPointB_Y, TriPointC_Y, MASK);
-		culling::M256F_SWAP(TriPointB_Z, TriPointC_Z, MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointB_X, TriPointC_X, MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointB_Y, TriPointC_Y, MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointB_Z, TriPointC_Z, MASK);
 	}
 
 	EVERYCULLING_FORCE_INLINE extern void Sort_8_3DTriangles
 	(
-		culling::M256F& TriPointA_X,
-		culling::M256F& TriPointA_Y,
-		culling::M256F& TriPointA_Z,
+		culling::EVERYCULLING_M256F& TriPointA_X,
+		culling::EVERYCULLING_M256F& TriPointA_Y,
+		culling::EVERYCULLING_M256F& TriPointA_Z,
 		
-		culling::M256F& TriPointB_X,
-		culling::M256F& TriPointB_Y,
-		culling::M256F& TriPointB_Z,
+		culling::EVERYCULLING_M256F& TriPointB_X,
+		culling::EVERYCULLING_M256F& TriPointB_Y,
+		culling::EVERYCULLING_M256F& TriPointB_Z,
 		
-		culling::M256F& TriPointC_X,
-		culling::M256F& TriPointC_Y,
-		culling::M256F& TriPointC_Z,
+		culling::EVERYCULLING_M256F& TriPointC_X,
+		culling::EVERYCULLING_M256F& TriPointC_Y,
+		culling::EVERYCULLING_M256F& TriPointC_Z,
 
-		culling::M256I& mask
+		culling::EVERYCULLING_M256I& mask
 	)
 	{
-		culling::M256F MASK;
+		culling::EVERYCULLING_M256F MASK;
 
 		MASK = _mm256_cmp_ps(TriPointA_Y, TriPointB_Y, _CMP_LT_OQ);
-		culling::M256F_SWAP(TriPointA_X, TriPointB_X, MASK);
-		culling::M256F_SWAP(TriPointA_Y, TriPointB_Y, MASK);
-		culling::M256F_SWAP(TriPointA_Z, TriPointB_Z, MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointA_X, TriPointB_X, MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointA_Y, TriPointB_Y, MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointA_Z, TriPointB_Z, MASK);
 		
 		MASK = _mm256_cmp_ps(TriPointA_Y, TriPointC_Y, _CMP_LT_OQ);
-		culling::M256F_SWAP(TriPointA_X, TriPointC_X, MASK);
-		culling::M256F_SWAP(TriPointA_Y, TriPointC_Y, MASK);
-		culling::M256F_SWAP(TriPointA_Z, TriPointC_Z, MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointA_X, TriPointC_X, MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointA_Y, TriPointC_Y, MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointA_Z, TriPointC_Z, MASK);
 
 		MASK = _mm256_cmp_ps(TriPointB_Y, TriPointC_Y, _CMP_LT_OQ);
-		culling::M256F_SWAP(TriPointB_X, TriPointC_X, MASK);
-		culling::M256F_SWAP(TriPointB_Y, TriPointC_Y, MASK);
-		culling::M256F_SWAP(TriPointB_Z, TriPointC_Z, MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointB_X, TriPointC_X, MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointB_Y, TriPointC_Y, MASK);
+		culling::EVERYCULLING_M256F_SWAP(TriPointB_Z, TriPointC_Z, MASK);
 	}
 }

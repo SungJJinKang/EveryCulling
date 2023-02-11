@@ -9,24 +9,21 @@
 #include "VertexData.h"
 #include "Math/Matrix.h"
 
-#define PAGE_SIZE 4096
+#define EVERYCULLING_PAGE_SIZE 4096
+#define EVERYCULLING_ENTITY_COUNT_IN_ENTITY_BLOCK 16
 
 namespace culling
 {
-
-	//This code doesn't consider Memory alignment optimzation.
-	inline constexpr size_t ENTITY_COUNT_IN_ENTITY_BLOCK = 16;
-
 	/// <summary>
 	/// EntityBlock size should be less 4KB(Page size) for Block data being allocated in a page
 	/// </summary>
-	struct alignas(CACHE_LINE_SIZE) EntityBlock
+	struct alignas(EVERYCULLING_CACHE_LINE_SIZE) EntityBlock
 	{
 		/// <summary>
 		/// You don't need to worry about false sharing.
-		/// void* mRenderer[ENTITY_COUNT_IN_ENTITY_BLOCK] and mCurrentEntityCount isn't read during CullJob
+		/// void* mRenderer[EVERYCULLING_ENTITY_COUNT_IN_ENTITY_BLOCK] and mCurrentEntityCount isn't read during CullJob
 		/// </summary>
-		char mIsVisibleBitflag[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		char mIsVisibleBitflag[EVERYCULLING_ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 		/// <summary>
 		/// x, y, z : components is position of entity
@@ -34,43 +31,43 @@ namespace culling
 		/// 
 		/// Writeen in Pre Culling, Read in ViewFrustum Culling, Distance Culling
 		/// </summary>
-		alignas(CACHE_LINE_SIZE) culling::Position_BoundingSphereRadius mWorldPositionAndWorldBoundingSphereRadius[ENTITY_COUNT_IN_ENTITY_BLOCK]; // 4 * 16 byte
+		alignas(EVERYCULLING_CACHE_LINE_SIZE) culling::Position_BoundingSphereRadius mWorldPositionAndWorldBoundingSphereRadius[EVERYCULLING_ENTITY_COUNT_IN_ENTITY_BLOCK]; // 4 * 16 byte
 		
 		/**
 		 * \brief Written in BinTriangleStage, Read in BinTriangleStage.
 		 */
-		VertexData mVertexDatas[ENTITY_COUNT_IN_ENTITY_BLOCK]; // 4 * 16 byte
+		VertexData mVertexDatas[EVERYCULLING_ENTITY_COUNT_IN_ENTITY_BLOCK]; // 4 * 16 byte
 
 		// Written in PreCulling Stage ---------------------------------------------------------------------------------------------------
 
 		// This variable is for a camera
-		float mAABBMinScreenSpacePointX[ENTITY_COUNT_IN_ENTITY_BLOCK];
-		float mAABBMinScreenSpacePointY[ENTITY_COUNT_IN_ENTITY_BLOCK];
-		float mAABBMaxScreenSpacePointX[ENTITY_COUNT_IN_ENTITY_BLOCK];
-		float mAABBMaxScreenSpacePointY[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		float mAABBMinScreenSpacePointX[EVERYCULLING_ENTITY_COUNT_IN_ENTITY_BLOCK];
+		float mAABBMinScreenSpacePointY[EVERYCULLING_ENTITY_COUNT_IN_ENTITY_BLOCK];
+		float mAABBMaxScreenSpacePointX[EVERYCULLING_ENTITY_COUNT_IN_ENTITY_BLOCK];
+		float mAABBMaxScreenSpacePointY[EVERYCULLING_ENTITY_COUNT_IN_ENTITY_BLOCK];
 		/// <summary>
 		/// This values is set only when mIsAllAABBClipPointWPositive[entityIndex] is true
 		/// </summary>
-		float mAABBMinNDCZ[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		float mAABBMinNDCZ[EVERYCULLING_ENTITY_COUNT_IN_ENTITY_BLOCK];
 		/// <summary>
 		/// If All vertex's homogeneous w of object aabb is negative.
 		///	So AABBScreenSpacePoint is invalid
 		/// </summary>
-		bool mIsAllAABBClipPointWPositive[ENTITY_COUNT_IN_ENTITY_BLOCK];
-		bool mIsAllAABBClipPointWNegative[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		bool mIsAllAABBClipPointWPositive[EVERYCULLING_ENTITY_COUNT_IN_ENTITY_BLOCK];
+		bool mIsAllAABBClipPointWNegative[EVERYCULLING_ENTITY_COUNT_IN_ENTITY_BLOCK];
 		
 		
 		
 		// Below variables is written(set) before start culling. -----------------------------------------------------------------------------
 
-		alignas(CACHE_LINE_SIZE) culling::Vec4 mAABBMinWorldPoint[ENTITY_COUNT_IN_ENTITY_BLOCK];
-		culling::Vec4 mAABBMaxWorldPoint[ENTITY_COUNT_IN_ENTITY_BLOCK];
-		culling::Mat4x4 mModelMatrixes[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		alignas(EVERYCULLING_CACHE_LINE_SIZE) culling::Vec4 mAABBMinWorldPoint[EVERYCULLING_ENTITY_COUNT_IN_ENTITY_BLOCK];
+		culling::Vec4 mAABBMaxWorldPoint[EVERYCULLING_ENTITY_COUNT_IN_ENTITY_BLOCK];
+		culling::Mat4x4 mModelMatrixes[EVERYCULLING_ENTITY_COUNT_IN_ENTITY_BLOCK];
 		/// <summary>
 		/// Whether renderer component is enabled.
 		/// </summary>
-		bool mIsObjectEnabled[ENTITY_COUNT_IN_ENTITY_BLOCK];
-		float mDesiredMaxDrawDistance[ENTITY_COUNT_IN_ENTITY_BLOCK];
+		bool mIsObjectEnabled[EVERYCULLING_ENTITY_COUNT_IN_ENTITY_BLOCK];
+		float mDesiredMaxDrawDistance[EVERYCULLING_ENTITY_COUNT_IN_ENTITY_BLOCK];
 
 		/// <summary>
 		/// this variable is only used to decide whether to free this EntityBlock
@@ -87,7 +84,7 @@ namespace culling
 		EVERYCULLING_FORCE_INLINE void SetIsAllAABBClipPointWNegative(const size_t entityIndex, const bool isAllAABBClipPointWNegative)
 		{
 			// Setting value to invalid index is acceptable
-			assert(entityIndex < ENTITY_COUNT_IN_ENTITY_BLOCK);
+			assert(entityIndex < EVERYCULLING_ENTITY_COUNT_IN_ENTITY_BLOCK);
 
 			mIsAllAABBClipPointWNegative[entityIndex] = isAllAABBClipPointWNegative;
 		}
@@ -115,7 +112,7 @@ namespace culling
 		EVERYCULLING_FORCE_INLINE void SetIsAllAABBClipPointWPositive(const size_t entityIndex, const bool isAllAABBClipPointWPositive)
 		{
 			// Setting value to invalid index is acceptable
-			assert(entityIndex < ENTITY_COUNT_IN_ENTITY_BLOCK);
+			assert(entityIndex < EVERYCULLING_ENTITY_COUNT_IN_ENTITY_BLOCK);
 			
 			mIsAllAABBClipPointWPositive[entityIndex] = isAllAABBClipPointWPositive;
 		}
@@ -138,7 +135,7 @@ namespace culling
 		EVERYCULLING_FORCE_INLINE void UpdateIsCulled(const size_t entityIndex, const size_t cameraIndex, const bool isCullded)
 		{
 			// Setting value to invalid index is acceptable
-			assert(entityIndex < ENTITY_COUNT_IN_ENTITY_BLOCK);
+			assert(entityIndex < EVERYCULLING_ENTITY_COUNT_IN_ENTITY_BLOCK);
 
 			const char cullMask = ~((char)isCullded << cameraIndex);
 
@@ -193,12 +190,12 @@ namespace culling
 		
 		EVERYCULLING_FORCE_INLINE void ResetEntityBlock(const unsigned long long currentTickCount)
 		{
-			for(size_t entityIndex = 0 ; entityIndex < ENTITY_COUNT_IN_ENTITY_BLOCK ; entityIndex++)
+			for(size_t entityIndex = 0 ; entityIndex < EVERYCULLING_ENTITY_COUNT_IN_ENTITY_BLOCK ; entityIndex++)
 			{
 				mVertexDatas[entityIndex].Reset(currentTickCount);
 			}
-			std::memset(mIsVisibleBitflag, 0xFF, sizeof(char) * ENTITY_COUNT_IN_ENTITY_BLOCK);
-			std::memset(mIsAllAABBClipPointWPositive, 0xFF, sizeof(char) * ENTITY_COUNT_IN_ENTITY_BLOCK);
+			std::memset(mIsVisibleBitflag, 0xFF, sizeof(char) * EVERYCULLING_ENTITY_COUNT_IN_ENTITY_BLOCK);
+			std::memset(mIsAllAABBClipPointWPositive, 0xFF, sizeof(char) * EVERYCULLING_ENTITY_COUNT_IN_ENTITY_BLOCK);
 		}
 
 		EVERYCULLING_FORCE_INLINE void SetDesiredMaxDrawDistance(const size_t entityIndex, const float desiredMaxDrawDistance)
@@ -228,10 +225,10 @@ namespace culling
 	/// <summary>
 	/// Size of Entity block should be less than 4kb(page size)
 	/// </summary>
-	static_assert(sizeof(EntityBlock) < PAGE_SIZE);
+	static_assert(sizeof(EntityBlock) < EVERYCULLING_PAGE_SIZE);
 	static_assert(sizeof(culling::Position_BoundingSphereRadius) == 16);
 	/// <summary>
-	/// ENTITY_COUNT_IN_ENTITY_BLOCK should be even number
+	/// EVERYCULLING_ENTITY_COUNT_IN_ENTITY_BLOCK should be even number
 	/// </summary>
-	static_assert(ENTITY_COUNT_IN_ENTITY_BLOCK > 0 && ENTITY_COUNT_IN_ENTITY_BLOCK % 2 == 0);
+	static_assert(EVERYCULLING_ENTITY_COUNT_IN_ENTITY_BLOCK > 0 && EVERYCULLING_ENTITY_COUNT_IN_ENTITY_BLOCK % 2 == 0);
 }

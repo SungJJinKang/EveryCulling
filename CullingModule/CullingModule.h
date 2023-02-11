@@ -14,9 +14,9 @@ namespace culling
 
 	struct CullJobState
 	{
-		std::array<std::atomic<std::uint32_t>, MAX_CAMERA_COUNT> mCurrentCulledEntityBlockIndex;
+		std::array<std::atomic<std::uint32_t>, EVERYCULLING_MAX_CAMERA_COUNT> mCurrentCulledEntityBlockIndex;
 		char padding2[64];
-		std::array<std::atomic<std::uint32_t>, MAX_CAMERA_COUNT> mFinishedThreadCount;
+		std::array<std::atomic<std::uint32_t>, EVERYCULLING_MAX_CAMERA_COUNT> mFinishedThreadCount;
 	};
 	class CullingModule
 	{

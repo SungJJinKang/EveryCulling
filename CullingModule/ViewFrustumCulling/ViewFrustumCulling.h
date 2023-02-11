@@ -24,7 +24,7 @@ namespace culling
 	{
 	private:
 
-		SIMDFrustumPlanes mSIMDFrustumPlanes[MAX_CAMERA_COUNT];
+		SIMDFrustumPlanes mSIMDFrustumPlanes[EVERYCULLING_MAX_CAMERA_COUNT];
 
 		
 		//TODO : Add AVX2(__m256) version of this function

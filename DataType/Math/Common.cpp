@@ -2,6 +2,10 @@
 
 #include <cmath>
 
+float culling::PI = 3.14159265358979323846f;
+float culling::DEGREE_TO_RADIAN = PI / 180.0f;
+float culling::RADIAN_TO_DEGREE = 180.0f / PI;
+
 void culling::NormalizePlane(Vec4& plane) noexcept
 {
 	float mag = std::sqrt(plane[0] * plane[0] + plane[1] * plane[1] + plane[2] * plane[2]);

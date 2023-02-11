@@ -66,7 +66,7 @@ namespace culling
 		EVERYCULLING_FORCE_INLINE bool GetIsCulled(const std::uint32_t cameraIndex) const
 		{
 			assert(IsValid() == true);
-			assert(cameraIndex >= 0 && cameraIndex < MAX_CAMERA_COUNT);
+			assert(cameraIndex >= 0 && cameraIndex < EVERYCULLING_MAX_CAMERA_COUNT);
 			return mTargetEntityBlock->GetIsCulled(mEntityIndexInBlock, cameraIndex);
 		}
 

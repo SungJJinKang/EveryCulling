@@ -30,7 +30,7 @@ namespace culling
 		///
 		///
 		/// </summary>
-		culling::M256F L0SubTileMaxDepthValue;
+		culling::EVERYCULLING_M256F L0SubTileMaxDepthValue;
 
 		/// <summary>
 		/// Depth value of subtiles
@@ -39,7 +39,7 @@ namespace culling
 		/// A floating-point value represent Z0 Max DepthValue of A Subtile
 		/// 
 		/// </summary>
-		culling::M256F L1SubTileMaxDepthValue;
+		culling::EVERYCULLING_M256F L1SubTileMaxDepthValue;
 
 		/// <summary>
 		/// Posion where Current Z1 Depth MaxValue come from
@@ -52,7 +52,7 @@ namespace culling
 		/// 8 byte -> Subtile Count in A Tile
 		/// 
 		/// </summary>
-		//culling::M256I depthPosition;
+		//culling::EVERYCULLING_M256I depthPosition;
 
 
 		/*
@@ -81,7 +81,7 @@ namespace culling
 		// 7 : CoverageMask ( 224 ~ 256 )
 			
 		 */
-		culling::M256I L1CoverageMask;
+		culling::EVERYCULLING_M256I L1CoverageMask;
 
 		void Reset();
 
@@ -155,7 +155,7 @@ namespace culling
 	/// 
 	/// TwoDTriangle should be reserved after initialized!!!!
 	/// </summary>
-	struct alignas(CACHE_LINE_SIZE) TriangleData
+	struct alignas(EVERYCULLING_CACHE_LINE_SIZE) TriangleData
 	{
 		float PointAVertexX;
 		float PointAVertexY;
@@ -172,14 +172,14 @@ namespace culling
 		char padding[28];
 	};
 
-	static_assert(BIN_TRIANGLE_CAPACITY_PER_TILE_PER_OBJECT % 8 == 0);
+	static_assert(EVERYCULLING_BIN_TRIANGLE_CAPACITY_PER_TILE_PER_OBJECT % 8 == 0);
 
 	/// <summary>
 	/// 32 X 8 Tile
 	/// 
 	/// alignas(64) is for preventing false sharing
 	/// </summary>
-	class alignas(CACHE_LINE_SIZE) Tile
+	class alignas(EVERYCULLING_CACHE_LINE_SIZE) Tile
 	{
 		friend class SWDepthBuffer;
 	private:
@@ -241,16 +241,16 @@ namespace culling
 		/// </summary>
 		const std::uint32_t mRightTopTileOrginY;
 
-#if NDC_RANGE == MINUS_ONE_TO_POSITIVE_ONE
-		culling::M256F mReplicatedScreenHalfWidth;
-		culling::M256F mReplicatedScreenHalfHeight;
-		culling::M256F mReplicatedScreenWidth;
-		culling::M256F mReplicatedScreenHeight;
-#elif NDC_RANGE == ZERO_TO_POSITIVE_ONE
-		culling::M256F mReplicatedScreenHalfWidth;
-		culling::M256F mReplicatedScreenHalfHeight;
-		culling::M256F mReplicatedScreenWidth;
-		culling::M256F mReplicatedScreenHeight;
+#if EVERYCULLING_NDC_RANGE == EVERYCULLING_MINUS_ONE_TO_POSITIVE_ONE
+		culling::EVERYCULLING_M256F mReplicatedScreenHalfWidth;
+		culling::EVERYCULLING_M256F mReplicatedScreenHalfHeight;
+		culling::EVERYCULLING_M256F mReplicatedScreenWidth;
+		culling::EVERYCULLING_M256F mReplicatedScreenHeight;
+#elif EVERYCULLING_NDC_RANGE == EVERYCULLING_ZERO_TO_POSITIVE_ONE
+		culling::EVERYCULLING_M256F mReplicatedScreenHalfWidth;
+		culling::EVERYCULLING_M256F mReplicatedScreenHalfHeight;
+		culling::EVERYCULLING_M256F mReplicatedScreenWidth;
+		culling::EVERYCULLING_M256F mReplicatedScreenHeight;
 #endif
 
 		Resolution
@@ -263,10 +263,10 @@ namespace culling
 			const std::uint32_t leftBottomTileOrginY,
 			const std::uint32_t rightTopTileOrginX,
 			const std::uint32_t rightTopTileOrginY,
-			const culling::M256F replicatedScreenHalfWidth,
-			const culling::M256F replicatedScreenHalfHeight,
-			const culling::M256F replicatedScreenWidth,
-			const culling::M256F replicatedScreenHeight
+			const culling::EVERYCULLING_M256F replicatedScreenHalfWidth,
+			const culling::EVERYCULLING_M256F replicatedScreenHalfHeight,
+			const culling::EVERYCULLING_M256F replicatedScreenWidth,
+			const culling::EVERYCULLING_M256F replicatedScreenHeight
 		)
 			:
 			mWidth(width),
@@ -282,8 +282,8 @@ namespace culling
 			mReplicatedScreenWidth(replicatedScreenWidth),
 			mReplicatedScreenHeight(replicatedScreenHeight),
 
-			mRowSubTileCount(mRowTileCount * (TILE_HEIGHT / SUB_TILE_HEIGHT)),
-			mColumnSubTileCount(mColumnTileCount * (TILE_WIDTH / SUB_TILE_WIDTH))
+			mRowSubTileCount(mRowTileCount * (EVERYCULLING_TILE_HEIGHT / EVERYCULLING_SUB_TILE_HEIGHT)),
+			mColumnSubTileCount(mColumnTileCount * (EVERYCULLING_TILE_WIDTH / EVERYCULLING_SUB_TILE_WIDTH))
 		{
 		}
 	};

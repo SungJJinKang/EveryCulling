@@ -36,9 +36,9 @@
 /// </summary>
 /// <param name="coverageMask"></param>
 /// <returns></returns>
-EVERYCULLING_FORCE_INLINE culling::M256I culling::RasterizeOccludersStage::ShuffleCoverageMask(const culling::M256I& coverageMask) const
+EVERYCULLING_FORCE_INLINE culling::EVERYCULLING_M256I culling::RasterizeOccludersStage::ShuffleCoverageMask(const culling::EVERYCULLING_M256I& coverageMask) const
 {
-	static const culling::M256I shuffleMask
+	static const culling::EVERYCULLING_M256I shuffleMask
 	=
 	_mm256_setr_epi8
 	(
@@ -67,7 +67,7 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 	const culling::Vec2 tileOriginPoint{ static_cast<float>(tile->GetLeftBottomTileOrginX()), static_cast<float>(tile->GetLeftBottomTileOrginY()) };
 
 	size_t binnedTriangleCount = tile->mBinnedTriangleCount;
-	binnedTriangleCount = MIN(binnedTriangleCount, BIN_TRIANGLE_CAPACITY_PER_TILE);
+	binnedTriangleCount = EVERYCULLING_MIN(binnedTriangleCount, BIN_TRIANGLE_CAPACITY_PER_TILE);
 
 	for (size_t triangleIndex = 0; triangleIndex < binnedTriangleCount; triangleIndex++)
 	{
@@ -82,8 +82,8 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 		const float TriPointC_Y = tile->mBinnedTriangleList[triangleIndex].PointCVertexY;
 		const float TriPointC_Z = tile->mBinnedTriangleList[triangleIndex].PointCVertexZ;
 		
-		culling::M256I LeftSlopeEventOfTriangle;
-		culling::M256I RightSlopeEventOfTriangle;
+		culling::EVERYCULLING_M256I LeftSlopeEventOfTriangle;
+		culling::EVERYCULLING_M256I RightSlopeEventOfTriangle;
 
 
 		//second point ( pointB ) should be left(x) of third point ( pointA )
@@ -112,15 +112,15 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 			);
 
 
-			LeftSlopeEventOfTriangle = _mm256_max_epi32(_mm256_min_epi32(LeftSlopeEventOfTriangle, _mm256_set1_epi32(TILE_WIDTH)), _mm256_set1_epi32(0));
-			RightSlopeEventOfTriangle = _mm256_max_epi32(_mm256_min_epi32(RightSlopeEventOfTriangle, _mm256_set1_epi32(TILE_WIDTH)), _mm256_set1_epi32(0));
+			LeftSlopeEventOfTriangle = _mm256_max_epi32(_mm256_min_epi32(LeftSlopeEventOfTriangle, _mm256_set1_epi32(EVERYCULLING_TILE_WIDTH)), _mm256_set1_epi32(0));
+			RightSlopeEventOfTriangle = _mm256_max_epi32(_mm256_min_epi32(RightSlopeEventOfTriangle, _mm256_set1_epi32(EVERYCULLING_TILE_WIDTH)), _mm256_set1_epi32(0));
 		}
 		
-		culling::M256I CoverageMask = _mm256_setzero_si256(); // clear coverage mask
-		culling::M256F subTileMaxDepth = _mm256_set1_ps((float)MIN_DEPTH_VALUE); // clear subTileMaxDepth
+		culling::EVERYCULLING_M256I CoverageMask = _mm256_setzero_si256(); // clear coverage mask
+		culling::EVERYCULLING_M256F subTileMaxDepth = _mm256_set1_ps((float)EVERYCULLING_MIN_DEPTH_VALUE); // clear subTileMaxDepth
 
-		const float minY = MIN(MIN(TriPointA_Y, TriPointB_Y), TriPointC_Y);
-		const float maxY = MAX(MAX(TriPointA_Y, TriPointB_Y), TriPointC_Y);
+		const float minY = EVERYCULLING_MIN(EVERYCULLING_MIN(TriPointA_Y, TriPointB_Y), TriPointC_Y);
+		const float maxY = EVERYCULLING_MAX(EVERYCULLING_MAX(TriPointA_Y, TriPointB_Y), TriPointC_Y);
 
 		{
 
@@ -201,29 +201,29 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 
 
 				// exclude L1 depth of sub tile with zero coverage mask 
-		const culling::M256I tileCoverageMaskIsZero = _mm256_cmpeq_epi32(CoverageMask, _mm256_set1_epi32(0));
-		subTileMaxDepth = _mm256_blendv_ps(subTileMaxDepth, _mm256_set1_ps(-1.0f), *reinterpret_cast<const culling::M256F*>(&tileCoverageMaskIsZero));
+		const culling::EVERYCULLING_M256I tileCoverageMaskIsZero = _mm256_cmpeq_epi32(CoverageMask, _mm256_set1_epi32(0));
+		subTileMaxDepth = _mm256_blendv_ps(subTileMaxDepth, _mm256_set1_ps(-1.0f), *reinterpret_cast<const culling::EVERYCULLING_M256F*>(&tileCoverageMaskIsZero));
 
 		tile->mHizDatas.L1SubTileMaxDepthValue = _mm256_max_ps(tile->mHizDatas.L1SubTileMaxDepthValue, subTileMaxDepth);
 		tile->mHizDatas.L1CoverageMask = _mm256_or_si256(tile->mHizDatas.L1CoverageMask, CoverageMask);
 
-		const culling::M256I maskCoveredByOne = _mm256_cmpeq_epi32(tile->mHizDatas.L1CoverageMask, _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF));
-		tile->mHizDatas.L0SubTileMaxDepthValue = _mm256_blendv_ps(tile->mHizDatas.L0SubTileMaxDepthValue, _mm256_min_ps(tile->mHizDatas.L0SubTileMaxDepthValue, tile->mHizDatas.L1SubTileMaxDepthValue), *reinterpret_cast<const culling::M256F*>(&maskCoveredByOne));
-		tile->mHizDatas.L1SubTileMaxDepthValue = _mm256_blendv_ps(tile->mHizDatas.L1SubTileMaxDepthValue, _mm256_set1_ps((float)MIN_DEPTH_VALUE), *reinterpret_cast<const culling::M256F*>(&maskCoveredByOne));
-		const culling::M256F maskBlendResult = _mm256_blendv_ps(*reinterpret_cast<const culling::M256F*>(&(tile->mHizDatas.L1CoverageMask)), _mm256_setzero_ps(), *reinterpret_cast<const culling::M256F*>(&maskCoveredByOne));
-		tile->mHizDatas.L1CoverageMask = *reinterpret_cast<const culling::M256I*>(&maskBlendResult);
+		const culling::EVERYCULLING_M256I maskCoveredByOne = _mm256_cmpeq_epi32(tile->mHizDatas.L1CoverageMask, _mm256_set1_epi64x(0xFFFFFFFFFFFFFFFF));
+		tile->mHizDatas.L0SubTileMaxDepthValue = _mm256_blendv_ps(tile->mHizDatas.L0SubTileMaxDepthValue, _mm256_min_ps(tile->mHizDatas.L0SubTileMaxDepthValue, tile->mHizDatas.L1SubTileMaxDepthValue), *reinterpret_cast<const culling::EVERYCULLING_M256F*>(&maskCoveredByOne));
+		tile->mHizDatas.L1SubTileMaxDepthValue = _mm256_blendv_ps(tile->mHizDatas.L1SubTileMaxDepthValue, _mm256_set1_ps((float)EVERYCULLING_MIN_DEPTH_VALUE), *reinterpret_cast<const culling::EVERYCULLING_M256F*>(&maskCoveredByOne));
+		const culling::EVERYCULLING_M256F maskBlendResult = _mm256_blendv_ps(*reinterpret_cast<const culling::EVERYCULLING_M256F*>(&(tile->mHizDatas.L1CoverageMask)), _mm256_setzero_ps(), *reinterpret_cast<const culling::EVERYCULLING_M256F*>(&maskCoveredByOne));
+		tile->mHizDatas.L1CoverageMask = *reinterpret_cast<const culling::EVERYCULLING_M256I*>(&maskBlendResult);
 
 		// Compute max depth value of subtiles's L0 max depth value
 		float maxDepthValue = -1.0f;
 		for (size_t i = 0; i < 8; i++)
 		{
-			maxDepthValue = MAX(maxDepthValue, reinterpret_cast<const float*>(&(tile->mHizDatas.L0SubTileMaxDepthValue))[i]);
+			maxDepthValue = EVERYCULLING_MAX(maxDepthValue, reinterpret_cast<const float*>(&(tile->mHizDatas.L0SubTileMaxDepthValue))[i]);
 		}
 		tile->mHizDatas.L0MaxDepthValue = maxDepthValue;
 		assert(maxDepthValue >= -1.0f && maxDepthValue <= 1.0f);
 
-#ifdef DEBUG_CULLING
-		const culling::M256I test
+#ifdef EVERYCULLING_DEBUG_CULLING
+		const culling::EVERYCULLING_M256I test
 			=
 			_mm256_setr_epi8
 			(
@@ -237,7 +237,7 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 				10, 1, 11, 1
 			);
 
-		const culling::M256I correctTestResult
+		const culling::EVERYCULLING_M256I correctTestResult
 			=
 			_mm256_setr_epi8
 			(
@@ -252,7 +252,7 @@ void culling::RasterizeOccludersStage::RasterizeBinnedTriangles
 			);
 
 
-		const culling::M256I testResult = ShuffleCoverageMask(test);
+		const culling::EVERYCULLING_M256I testResult = ShuffleCoverageMask(test);
 
 		assert(_mm256_test_all_ones(_mm256_cmpeq_epi8(correctTestResult, testResult)));
 
@@ -304,7 +304,7 @@ void culling::RasterizeOccludersStage::ResetCullingModule(const unsigned long lo
 
 void culling::RasterizeOccludersStage::CullBlockEntityJob(const size_t cameraIndex, const unsigned long long currentTickCount)
 {
-	if (WHEN_TO_RASTERIZE_DEPTHBUFFER(currentTickCount))
+	if (EVERYCULLING_WHEN_TO_RASTERIZE_DEPTHBUFFER(currentTickCount))
 	{
 		if (mMaskedOcclusionCulling->GetIsOccluderExist() == true)
 		{

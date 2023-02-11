@@ -10,7 +10,7 @@ namespace culling
 	{
 	private:
 
-		std::array<std::atomic<size_t>, MAX_CAMERA_COUNT> mFinishedTileCount;
+		std::array<std::atomic<size_t>, EVERYCULLING_MAX_CAMERA_COUNT> mFinishedTileCount;
 		
 		
 
@@ -24,7 +24,7 @@ namespace culling
 		/// </summary>
 		/// <param name="coverageMask"></param>
 		/// <returns></returns>
-		EVERYCULLING_FORCE_INLINE culling::M256I ShuffleCoverageMask(const culling::M256I& coverageMask) const;
+		EVERYCULLING_FORCE_INLINE culling::EVERYCULLING_M256I ShuffleCoverageMask(const culling::EVERYCULLING_M256I& coverageMask) const;
 
 		/// <summary>
 		/// Compute Depth in Bin of Tile(Sub Tile)

@@ -4,9 +4,9 @@
 
 void culling::HizData::Reset()
 {
-	L0MaxDepthValue = (float)MAX_DEPTH_VALUE;
-	L0SubTileMaxDepthValue = _mm256_set1_ps((float)MAX_DEPTH_VALUE);
-	L1SubTileMaxDepthValue = _mm256_set1_ps((float)MIN_DEPTH_VALUE);
+	L0MaxDepthValue = (float)EVERYCULLING_MAX_DEPTH_VALUE;
+	L0SubTileMaxDepthValue = _mm256_set1_ps((float)EVERYCULLING_MAX_DEPTH_VALUE);
+	L1SubTileMaxDepthValue = _mm256_set1_ps((float)EVERYCULLING_MIN_DEPTH_VALUE);
 	ClearCoverageMaskAllSubTile();
 }
 
@@ -23,12 +23,12 @@ void culling::HizData::FillCoverageMask()
 
 void culling::Tile::Reset(const unsigned long long currentTickCount)
 {
-	if(WHEN_TO_RASTERIZE_DEPTHBUFFER(currentTickCount))
+	if(EVERYCULLING_WHEN_TO_RASTERIZE_DEPTHBUFFER(currentTickCount))
 	{
 		mHizDatas.Reset();
 	}
 
-	if (WHEN_TO_BIN_TRIANGLE(currentTickCount))
+	if (EVERYCULLING_WHEN_TO_BIN_TRIANGLE(currentTickCount))
 	{
 		mBinnedTriangleCount = 0;
 	}
@@ -39,10 +39,10 @@ culling::SWDepthBuffer::SWDepthBuffer(std::uint32_t width, std::uint32_t height)
 	: 
 	mResolution{
 	width, height,
-	height / TILE_HEIGHT,width / TILE_WIDTH,
+	height / EVERYCULLING_TILE_HEIGHT,width / EVERYCULLING_TILE_WIDTH,
 	0, 0,
-	( (width % TILE_WIDTH) > 0 ? width + (width - width % TILE_WIDTH) : width ) - TILE_WIDTH,
-	( (height % TILE_HEIGHT) > 0 ? height + (height - height % TILE_HEIGHT) : height ) - TILE_HEIGHT,
+	( (width % EVERYCULLING_TILE_WIDTH) > 0 ? width + (width - width % EVERYCULLING_TILE_WIDTH) : width ) - EVERYCULLING_TILE_WIDTH,
+	( (height % EVERYCULLING_TILE_HEIGHT) > 0 ? height + (height - height % EVERYCULLING_TILE_HEIGHT) : height ) - EVERYCULLING_TILE_HEIGHT,
 	
 	_mm256_set1_ps(static_cast<float>(width * 0.5f)),
 	_mm256_set1_ps(static_cast<float>(height * 0.5f)),
@@ -51,10 +51,10 @@ culling::SWDepthBuffer::SWDepthBuffer(std::uint32_t width, std::uint32_t height)
 	},
 	mTiles(nullptr)
 {
-	//"DepthBuffer's size should be multiple of TILE_WIDTH"
-	assert(mResolution.mWidth % TILE_WIDTH == 0);
-	//"DepthBuffer's size should be multiple of TILE_HEIGHT"
-	assert(mResolution.mHeight % TILE_HEIGHT == 0);
+	//"DepthBuffer's size should be multiple of EVERYCULLING_TILE_WIDTH"
+	assert(mResolution.mWidth % EVERYCULLING_TILE_WIDTH == 0);
+	//"DepthBuffer's size should be multiple of EVERYCULLING_TILE_HEIGHT"
+	assert(mResolution.mHeight % EVERYCULLING_TILE_HEIGHT == 0);
 
 	
 	const size_t tileCount = static_cast<size_t>(mResolution.mRowTileCount) * static_cast<size_t>(mResolution.mColumnTileCount);
@@ -66,8 +66,8 @@ culling::SWDepthBuffer::SWDepthBuffer(std::uint32_t width, std::uint32_t height)
 		for (std::uint32_t x = 0; x < mResolution.mColumnTileCount; x++)
 		{
 			culling::Tile* const tile = GetTile(y, x);
-			tile->mLeftBottomTileOrginX = x * (std::uint32_t)TILE_WIDTH;
-			tile->mLeftBottomTileOrginY = y * (std::uint32_t)TILE_HEIGHT;
+			tile->mLeftBottomTileOrginX = x * (std::uint32_t)EVERYCULLING_TILE_WIDTH;
+			tile->mLeftBottomTileOrginY = y * (std::uint32_t)EVERYCULLING_TILE_HEIGHT;
 		}
 	}
 

@@ -93,9 +93,9 @@ namespace culling
 
 		EVERYCULLING_FORCE_INLINE float sqrMagnitude() const
 		{
-			const culling::M128F mul0 = _mm_mul_ps(*reinterpret_cast<const culling::M128F*>(data()), *reinterpret_cast<const culling::M128F*>(data()));
-			const culling::M128F had0 = _mm_hadd_ps(mul0, mul0);
-			const culling::M128F had1 = _mm_hadd_ps(had0, had0);
+			const culling::EVERYCULLING_M128F mul0 = _mm_mul_ps(*reinterpret_cast<const culling::EVERYCULLING_M128F*>(data()), *reinterpret_cast<const culling::EVERYCULLING_M128F*>(data()));
+			const culling::EVERYCULLING_M128F had0 = _mm_hadd_ps(mul0, mul0);
+			const culling::EVERYCULLING_M128F had1 = _mm_hadd_ps(had0, had0);
 			return _mm_cvtss_f32(had1);
 		}
 
@@ -131,9 +131,9 @@ namespace culling
 
 		EVERYCULLING_FORCE_INLINE float sqrMagnitude() const
 		{
-			const culling::M128F mul0 = _mm_mul_ps(*reinterpret_cast<const culling::M128F*>(data()), *reinterpret_cast<const culling::M128F*>(data()));
-			const culling::M128F had0 = _mm_hadd_ps(mul0, mul0);
-			const culling::M128F had1 = _mm_hadd_ps(had0, had0);
+			const culling::EVERYCULLING_M128F mul0 = _mm_mul_ps(*reinterpret_cast<const culling::EVERYCULLING_M128F*>(data()), *reinterpret_cast<const culling::EVERYCULLING_M128F*>(data()));
+			const culling::EVERYCULLING_M128F had0 = _mm_hadd_ps(mul0, mul0);
+			const culling::EVERYCULLING_M128F had1 = _mm_hadd_ps(had0, had0);
 			return _mm_cvtss_f32(had1);
 		}
 
@@ -169,7 +169,7 @@ namespace culling
 	{
 		culling::Vec4 result;
 
-		*reinterpret_cast<culling::M128F*>(result.data()) = _mm_add_ps(*reinterpret_cast<const culling::M128F*>(a.data()), *reinterpret_cast<const culling::M128F*>(b.data()));
+		*reinterpret_cast<culling::EVERYCULLING_M128F*>(result.data()) = _mm_add_ps(*reinterpret_cast<const culling::EVERYCULLING_M128F*>(a.data()), *reinterpret_cast<const culling::EVERYCULLING_M128F*>(b.data()));
 
 		return result;
 	}
@@ -178,7 +178,7 @@ namespace culling
 	{
 		culling::Vec4 result;
 
-		*reinterpret_cast<culling::M128F*>(result.data()) = _mm_sub_ps(*reinterpret_cast<const culling::M128F*>(a.data()), *reinterpret_cast<const culling::M128F*>(b.data()));
+		*reinterpret_cast<culling::EVERYCULLING_M128F*>(result.data()) = _mm_sub_ps(*reinterpret_cast<const culling::EVERYCULLING_M128F*>(a.data()), *reinterpret_cast<const culling::EVERYCULLING_M128F*>(b.data()));
 
 		return result;
 	}

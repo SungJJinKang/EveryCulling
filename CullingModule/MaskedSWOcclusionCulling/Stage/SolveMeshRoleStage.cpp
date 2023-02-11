@@ -83,7 +83,7 @@ void culling::SolveMeshRoleStage::SolveMeshRole
 
 void culling::SolveMeshRoleStage::CullBlockEntityJob(const size_t cameraIndex, const unsigned long long currentTickCount)
 {
-	if (WHEN_TO_BIN_TRIANGLE(currentTickCount))
+	if (EVERYCULLING_WHEN_TO_BIN_TRIANGLE(currentTickCount))
 	{
 		bool isOccluderExist = false;
 		while (true)

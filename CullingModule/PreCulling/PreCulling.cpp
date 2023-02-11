@@ -18,10 +18,10 @@ EVERYCULLING_FORCE_INLINE void culling::PreCulling::ComputeScreenSpaceMinMaxAABB
 
 	const culling::Mat4x4& worldToClipSpaceMatrix = mCullingSystem->GetCameraViewProjectionMatrix(cameraIndex);
 	
-	culling::M256F aabbVertexX = _mm256_setr_ps(aabbMinWorldPoint.values[0], aabbMinWorldPoint.values[0], aabbMinWorldPoint.values[0], aabbMinWorldPoint.values[0], aabbMaxWorldPoint.values[0], aabbMaxWorldPoint.values[0], aabbMaxWorldPoint.values[0], aabbMaxWorldPoint.values[0]);
-	culling::M256F aabbVertexY = _mm256_setr_ps(aabbMinWorldPoint.values[1], aabbMinWorldPoint.values[1], aabbMaxWorldPoint.values[1], aabbMaxWorldPoint.values[1], aabbMinWorldPoint.values[1], aabbMinWorldPoint.values[1], aabbMaxWorldPoint.values[1], aabbMaxWorldPoint.values[1]);
-	culling::M256F aabbVertexZ = _mm256_setr_ps(aabbMinWorldPoint.values[2], aabbMaxWorldPoint.values[2], aabbMinWorldPoint.values[2], aabbMaxWorldPoint.values[2], aabbMinWorldPoint.values[2], aabbMaxWorldPoint.values[2], aabbMinWorldPoint.values[2], aabbMaxWorldPoint.values[2]);
-	culling::M256F aabbVertexW;
+	culling::EVERYCULLING_M256F aabbVertexX = _mm256_setr_ps(aabbMinWorldPoint.values[0], aabbMinWorldPoint.values[0], aabbMinWorldPoint.values[0], aabbMinWorldPoint.values[0], aabbMaxWorldPoint.values[0], aabbMaxWorldPoint.values[0], aabbMaxWorldPoint.values[0], aabbMaxWorldPoint.values[0]);
+	culling::EVERYCULLING_M256F aabbVertexY = _mm256_setr_ps(aabbMinWorldPoint.values[1], aabbMinWorldPoint.values[1], aabbMaxWorldPoint.values[1], aabbMaxWorldPoint.values[1], aabbMinWorldPoint.values[1], aabbMinWorldPoint.values[1], aabbMaxWorldPoint.values[1], aabbMaxWorldPoint.values[1]);
+	culling::EVERYCULLING_M256F aabbVertexZ = _mm256_setr_ps(aabbMinWorldPoint.values[2], aabbMaxWorldPoint.values[2], aabbMinWorldPoint.values[2], aabbMaxWorldPoint.values[2], aabbMinWorldPoint.values[2], aabbMaxWorldPoint.values[2], aabbMinWorldPoint.values[2], aabbMaxWorldPoint.values[2]);
+	culling::EVERYCULLING_M256F aabbVertexW;
 	
 	// Convert world space to clip space
 	culling::vertexTransformationHelper::TransformVertexToClipSpace
@@ -33,9 +33,9 @@ EVERYCULLING_FORCE_INLINE void culling::PreCulling::ComputeScreenSpaceMinMaxAABB
 		worldToClipSpaceMatrix.data()
 	);
 
-	const culling::M256F isHomogeneousWNegative = _mm256_cmp_ps(aabbVertexW, _mm256_set1_ps(std::numeric_limits<float>::epsilon()), _CMP_LT_OQ);
+	const culling::EVERYCULLING_M256F isHomogeneousWNegative = _mm256_cmp_ps(aabbVertexW, _mm256_set1_ps(std::numeric_limits<float>::epsilon()), _CMP_LT_OQ);
 
-	const culling::M256F oneDividedByW = culling::M256F_DIV(_mm256_set1_ps(1.0f), aabbVertexW);
+	const culling::EVERYCULLING_M256F oneDividedByW = culling::EVERYCULLING_M256F_DIV(_mm256_set1_ps(1.0f), aabbVertexW);
 
 	// Convert clip space to ndc space
 	culling::vertexTransformationHelper::ConvertClipSpaceVertexToNDCSpace
@@ -46,7 +46,7 @@ EVERYCULLING_FORCE_INLINE void culling::PreCulling::ComputeScreenSpaceMinMaxAABB
 		oneDividedByW
 	);
 
-	culling::M256F screenPixelPosX, screenPixelPosY;
+	culling::EVERYCULLING_M256F screenPixelPosX, screenPixelPosY;
 	culling::vertexTransformationHelper::ConvertNDCSpaceVertexToScreenPixelSpace
 	(
 		aabbVertexX,
@@ -75,16 +75,16 @@ EVERYCULLING_FORCE_INLINE void culling::PreCulling::ComputeScreenSpaceMinMaxAABB
 	screenPixelPosY = _mm256_blendv_ps(screenPixelPosY, _mm256_set1_ps(std::numeric_limits<float>::max()), isHomogeneousWNegative);
 	for(int i = 0 ; i < 8 ; i++)
 	{
-		minX = MIN(minX, reinterpret_cast<const float*>(&screenPixelPosX)[i]);
-		minY = MIN(minY, reinterpret_cast<const float*>(&screenPixelPosY)[i]);
+		minX = EVERYCULLING_MIN(minX, reinterpret_cast<const float*>(&screenPixelPosX)[i]);
+		minY = EVERYCULLING_MIN(minY, reinterpret_cast<const float*>(&screenPixelPosY)[i]);
 	}
 	
 	screenPixelPosX = _mm256_blendv_ps(screenPixelPosX, _mm256_set1_ps(-std::numeric_limits<float>::max()), isHomogeneousWNegative);
 	screenPixelPosY = _mm256_blendv_ps(screenPixelPosY, _mm256_set1_ps(-std::numeric_limits<float>::max()), isHomogeneousWNegative);
 	for (int i = 0; i < 8; i++)
 	{
-		maxX = MAX(maxX, reinterpret_cast<const float*>(&screenPixelPosX)[i]);
-		maxY = MAX(maxY, reinterpret_cast<const float*>(&screenPixelPosY)[i]);
+		maxX = EVERYCULLING_MAX(maxX, reinterpret_cast<const float*>(&screenPixelPosX)[i]);
+		maxY = EVERYCULLING_MAX(maxY, reinterpret_cast<const float*>(&screenPixelPosY)[i]);
 	}
 
 	entityBlock->mAABBMinScreenSpacePointX[entityIndex] = minX;
@@ -100,7 +100,7 @@ EVERYCULLING_FORCE_INLINE void culling::PreCulling::ComputeScreenSpaceMinMaxAABB
 	float aabbMinDepthValue = std::numeric_limits<float>::max();
 	for (size_t i = 0; i < 8; i++)
 	{
-		aabbMinDepthValue = MIN(aabbMinDepthValue, reinterpret_cast<const float*>(&aabbVertexZ)[i]);
+		aabbMinDepthValue = EVERYCULLING_MIN(aabbMinDepthValue, reinterpret_cast<const float*>(&aabbVertexZ)[i]);
 	}
 
 	entityBlock->mAABBMinNDCZ[entityIndex] = aabbMinDepthValue;

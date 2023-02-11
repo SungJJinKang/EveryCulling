@@ -22,22 +22,22 @@ culling::MaskedSWOcclusionCulling::MaskedSWOcclusionCulling
 	CullingModule{ everyCulling},
 	mEveryCulling{everyCulling},
 	mDepthBuffer { depthBufferWidth, depthBufferheight },
-	binCountInRow{ depthBufferWidth / SUB_TILE_WIDTH },
-	binCountInColumn{ depthBufferheight / SUB_TILE_HEIGHT },
+	binCountInRow{ depthBufferWidth / EVERYCULLING_SUB_TILE_WIDTH },
+	binCountInColumn{ depthBufferheight / EVERYCULLING_SUB_TILE_HEIGHT },
 	mBinTrianglesStage{this},
 	mRasterizeTrianglesStage{this},
 	mSolveMeshRoleStage{ this },
 	mQueryOccludeeStage{this},
 	mOccluderListManager{}
 {
-	assert(depthBufferWidth% TILE_WIDTH == 0);
-	assert(depthBufferheight% TILE_HEIGHT == 0);
+	assert(depthBufferWidth% EVERYCULLING_TILE_WIDTH == 0);
+	assert(depthBufferheight% EVERYCULLING_TILE_HEIGHT == 0);
 }
 
 void culling::MaskedSWOcclusionCulling::ResetState(const unsigned long long currentTickCount)
 {
 	ResetDepthBuffer(currentTickCount);
-	if (WHEN_TO_BIN_TRIANGLE(currentTickCount))
+	if (EVERYCULLING_WHEN_TO_BIN_TRIANGLE(currentTickCount))
 	{
 		mIsOccluderExist.store(false, std::memory_order_relaxed);
 	}
