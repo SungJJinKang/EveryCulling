@@ -7,4 +7,6 @@ TO-DO
 2. Support Mesh LOD
 	Rasterizing occluder mesh is really expensive.
 	You can lower the cost of rasterizing with lod.
+
+3. When a camera is in a mesh, ignore the mesh when rasterize occluder
 	
