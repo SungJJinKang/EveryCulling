@@ -1,12 +1,14 @@
 TO-DO
 
-1. Skip Occlusion Culling when the number of visible objects is low
-	Rasterizing occluder mesh is really expensive.
-	If the number of visible objects is low at the time(Frustum culling already culled a lot of objects), it's better to skip occlusion culling.
+#### Skip Occlusion Culling when the number of visible objects is low            
+Rasterizing occluder mesh is really expensive.         
+If the number of visible objects is low at the time(Frustum culling already culled a lot of objects), it's better to skip occlusion culling.        
 
-2. Support Mesh LOD
-	Rasterizing occluder mesh is really expensive.
-	You can lower the cost of rasterizing with lod.
+#### Support Mesh LOD           
+Rasterizing occluder mesh is really expensive.           
+You can lower the cost of rasterizing with lod.           
 
-3. When a camera is in a mesh, ignore the mesh when rasterize occluder
-	
+#### When a camera is in a mesh, ignore the mesh when rasterize occluder
+
+#### When i profiled, it shows threads are waiting for a lot of time until other threads finished their job.           
+This should be fixed up.       
