@@ -43,6 +43,13 @@ EVERYCULLING_FORCE_INLINE bool culling::SolveMeshRoleStage::CheckIsOccluderFromA
 	const float clampedAABBMaxScreenSpacePointX = CLAMP(currentEntityBlock->mAABBMaxScreenSpacePointX[entityIndex], 0.0f, (float)mMaskedOcclusionCulling->mDepthBuffer.mResolution.mWidth);
 	const float clampedAABBMaxScreenSpacePointY = CLAMP(currentEntityBlock->mAABBMaxScreenSpacePointY[entityIndex], 0.0f, (float)mMaskedOcclusionCulling->mDepthBuffer.mResolution.mHeight);
 
+	assert(clampedAABBMinScreenSpacePointX >= 0.0f);
+	assert(clampedAABBMinScreenSpacePointY >= 0.0f);
+	assert(clampedAABBMaxScreenSpacePointX >= 0.0f);
+	assert(clampedAABBMaxScreenSpacePointY >= 0.0f);
+	assert(clampedAABBMaxScreenSpacePointX >= clampedAABBMinScreenSpacePointX);
+	assert(clampedAABBMaxScreenSpacePointY >= clampedAABBMinScreenSpacePointY);
+
 	const float screenSpaceAABBArea
 		= (clampedAABBMaxScreenSpacePointX - clampedAABBMinScreenSpacePointX) *
 		  (clampedAABBMaxScreenSpacePointY - clampedAABBMinScreenSpacePointY);
