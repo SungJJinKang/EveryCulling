@@ -13,5 +13,5 @@ You can lower the cost of rasterizing with lod.
 #### When i profiled, it shows threads are waiting for a lot of time until other threads finished their job.           
 This should be fixed up.       
 
-### Merge Occludee Bounding Box
-When test bounding box of occludee aginst a depth buffer, the cost of the test can be decreased by merging bounding box of occuldee
+#### Merge Occludee Bounding Box
+When test bounding box of occludee aginst a depth buffer, the cost of the test can be decreased by merging bounding box of occuldee 
