@@ -118,10 +118,10 @@ void culling::EveryCulling::ThreadCullJob(const size_t cameraIndex, const unsign
 			culling::CullingModule* cullingModule = mUpdatedCullingModules[moduleIndex];
 			assert(cullingModule != nullptr);
 
-			OnStartCullingModule(cullingModule);
-
-			if(cullingModule->IsEnabled == true)
+			if (cullingModule->IsEnabled == true)
 			{
+				OnStartCullingModule(cullingModule);
+
 				cullingModule->ThreadCullJob(cameraIndex, currentTickCount);
 
 				std::atomic_thread_fence(std::memory_order_seq_cst);
@@ -130,9 +130,9 @@ void culling::EveryCulling::ThreadCullJob(const size_t cameraIndex, const unsign
 				{
 					
 				}
-			}
 
-			OnEndCullingModule(cullingModule);
+				OnEndCullingModule(cullingModule);
+			}
 		}
 	}
 }
