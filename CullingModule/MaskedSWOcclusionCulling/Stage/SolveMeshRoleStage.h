@@ -10,6 +10,8 @@ namespace culling
 	
 	private:
 		
+		float mOccluderAABBScreenSpaceMinArea = 500.0f;
+		float mOccluderLimitOfDistanceToCamera = 500.0f;
 
 		/*
 		bool CheckIsOccluderFromBoundingSphere
@@ -21,10 +23,11 @@ namespace culling
 		*/
 
 
-		EVERYCULLING_FORCE_INLINE bool CheckIsOccluderFromAABB
+		bool CheckIsOccluder
 		(
 			EntityBlock* const currentEntityBlock,
-			const size_t entityIndex
+			const size_t entityIndex,
+			const culling::Vec3& CameraWorldPos
 		) const;
 
 		void SolveMeshRole
@@ -36,13 +39,14 @@ namespace culling
 
 	public:
 		
-		float mOccluderAABBScreenSpaceMinArea = 500.0f;
-
 		SolveMeshRoleStage(MaskedSWOcclusionCulling* occlusionCulling);
 		
 		void CullBlockEntityJob(const size_t cameraIndex, const unsigned long long currentTickCount) override;
 		const char* GetCullingModuleName() const override;
 		void ResetCullingModule(const unsigned long long currentTickCount) override;
+
+		void SetOccluderAABBScreenSpaceMinArea(const float occluderAABBScreenSpaceMinArea);
+		void SetOccluderLimitOfDistanceToCamera(const float OccluderLimitOfDistanceToCamera);
 	};
 }
 
