@@ -74,6 +74,12 @@ namespace culling
 		/// </summary>
 		std::uint32_t mCurrentEntityCount;
 
+		/**
+		 * \brief This variable is used to check if a entity block
+		 */
+		std::uint64_t mEntityBlockUniqueID;
+		bool bIsValidEntityBlock;
+
 		// ----------------------------------------------------------------------------------------------------------------------
 
 		EVERYCULLING_FORCE_INLINE bool GetIsAllAABBClipPointWNegative(const size_t entityIndex) const
