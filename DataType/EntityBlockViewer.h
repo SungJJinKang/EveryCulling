@@ -90,10 +90,10 @@ namespace culling
 		void SetMeshVertexData
 		(
 			const culling::Vec3* const vertices,
-			const size_t verticeCount,
+			const std::uint64_t verticeCount,
 			const std::uint32_t* const indices,
-			const size_t indiceCount,
-			const size_t verticeStride
+			const std::uint64_t indiceCount,
+			const std::uint64_t verticeStride
 		);
 		
 		EVERYCULLING_FORCE_INLINE const culling::VertexData& GetVertexData() const
