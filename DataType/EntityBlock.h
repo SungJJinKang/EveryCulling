@@ -73,10 +73,7 @@ namespace culling
 		/// this variable is only used to decide whether to free this EntityBlock
 		/// </summary>
 		std::uint32_t mCurrentEntityCount;
-
-		/**
-		 * \brief This variable is used to check if a entity block
-		 */
+		
 		std::uint64_t mEntityBlockUniqueID;
 		bool bIsValidEntityBlock;
 
