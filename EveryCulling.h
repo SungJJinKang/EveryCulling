@@ -57,6 +57,8 @@ namespace culling
 		/// This objects will be released at destructor
 		/// </summary>
 		std::vector<EntityBlock*> mAllocatedEntityBlockChunkList;
+
+		std::uint64_t mEntityBlockUniqueIDCounter;
 		
 		void AllocateEntityBlockPool();
 		culling::EntityBlock* AllocateNewEntityBlockFromPool();

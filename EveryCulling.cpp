@@ -30,6 +30,8 @@ void culling::EveryCulling::FreeEntityBlock(EntityBlock* freedEntityBlock)
 
 	assert(IsSuccessToFind == true);
 
+	freedEntityBlock->bIsValidEntityBlock = false;
+	freedEntityBlock->mEntityBlockUniqueID = EVERYCULLING_INVALID_ENTITY_UNIQUE_ID_MAGIC_NUMBER;
 	mFreeEntityBlockList.push_back(freedEntityBlock);
 
 	if(IsSuccessToFind == true)
@@ -49,6 +51,11 @@ culling::EntityBlock* culling::EveryCulling::GetNewEntityBlockFromPool()
 
 	assert(mFreeEntityBlockList.size() != 0);
 	EntityBlock* entityBlock = mFreeEntityBlockList.back();
+
+	entityBlock->bIsValidEntityBlock = true;
+	entityBlock->mEntityBlockUniqueID = mEntityBlockUniqueIDCounter;
+	++mEntityBlockUniqueIDCounter;
+
 	mFreeEntityBlockList.pop_back();
 	return entityBlock;
 }
@@ -78,6 +85,9 @@ void culling::EveryCulling::AllocateEntityBlockPool()
 	EntityBlock* newEntityBlockChunk = new EntityBlock[EVERYCULLING_INITIAL_ENTITY_BLOCK_COUNT];
 	for (std::uint32_t i = 0; i < EVERYCULLING_INITIAL_ENTITY_BLOCK_COUNT; i++)
 	{
+		newEntityBlockChunk[i].bIsValidEntityBlock = false;
+		newEntityBlockChunk[i].mEntityBlockUniqueID = EVERYCULLING_INVALID_ENTITY_UNIQUE_ID_MAGIC_NUMBER;
+
 		mFreeEntityBlockList.push_back(newEntityBlockChunk + i);
 	}
 	mAllocatedEntityBlockChunkList.push_back(newEntityBlockChunk);
@@ -298,6 +308,7 @@ culling::EveryCulling::EveryCulling(const std::uint32_t resolutionWidth, const s
 #endif
 	, mCurrentTickCount()
 	, bmIsEntityBlockPoolInitialized(false)
+	, mEntityBlockUniqueIDCounter{0}
 {
 	//to protect 
 	mFreeEntityBlockList.reserve(EVERYCULLING_INITIAL_ENTITY_BLOCK_RESERVED_SIZE);
