@@ -74,6 +74,8 @@ namespace culling
 		/// </summary>
 		std::uint32_t mCurrentEntityCount;
 		
+		// this variable will be used to check if a entity block is the one was referenced by EntityBlockViewer when the entity block is reused after free
+		// The entityBlockViewer can't know if the entity block what it was referencing was freed.
 		std::uint64_t mEntityBlockUniqueID;
 		bool bIsValidEntityBlock;
 
