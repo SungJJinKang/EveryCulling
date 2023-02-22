@@ -1,11 +1,11 @@
 # EveryCulling
 
-This library integrate multiple culling system into One library.      
+This library integrates multiple culling methods into One library.      
 
 This System contain **ViewFrustumCulling**, **Masked SW Occlusion Culling**, **Distance Culling**            
-Most of Systems in this library is actually used in the commercial game engines.       
+All culling methods implemented in this library are actually used in the commercial game, game engines(Unreal engine, MS Flight Simulator 2020...)      
 
-This project tries to integrate them into one system and make them easy to use.  
+This project tries to integrate them into one library and make them easy to use.  
 
 - [Core Feature](https://github.com/SungJJinKang/EveryCulling#core-feature)
 - [Fully implemented features List](https://github.com/SungJJinKang/EveryCulling#fully-implemented-features)
@@ -17,8 +17,8 @@ This project tries to integrate them into one system and make them easy to use.
 ## Core Feature 
 This library is targeting Maximizing **SIMD, Cache hit, Multi Threading.**                 
 1. SIMD : Data is stored for using SIMD Intrinsics ( Object's Datas has SoA layout, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/main/DataType/EntityBlock.h) ) ( Require AVX2 ( _mm256 ) )                       
-2. Cache Hit : SoA!!. Datas about objects is stored in SoA layout. ( Structure of Arrays, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/main/DataType/EntityBlock.h) )           
-3. Multi Threading : All culling methods of this library is executed by multiple threads. Datas of objects is stored in a entity block and the entity block is aligned to cache line size. Then The threads work on each entity block. These structure of entity block prevents data race and cache coherency problem ( false sharing, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/main/DataType/EntityBlock.h) ), Locking is not required.               
+2. Cache Hit : SoA!!. Data of entities is stored in SoA layout. ( Structure of Arrays, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/main/DataType/EntityBlock.h) )           
+3. Multi Threading : All culling methods of this library is executed by multiple threads. Data of multiple objects is stored in a entity block and the entity block is aligned to cache line size. Then The threads work on each entity block. These structure of entity block prevents data race and cache coherency problem ( false sharing, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/main/DataType/EntityBlock.h) ), Locking is not required.               
                                  
                
 ## Fully implemented features
