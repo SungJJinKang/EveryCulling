@@ -18,7 +18,7 @@ This project tries to integrate them into one library and make them easy to use.
 This library is targeting Maximizing **SIMD, Cache hit, Multi Threading.**                 
 1. SIMD : Data is stored for using SIMD Intrinsics ( Object's Datas has SoA layout, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/main/DataType/EntityBlock.h) ) ( Require AVX2 ( _mm256 ) )                       
 2. Cache Hit : SoA!!. Data of entities is stored in SoA layout. ( Structure of Arrays, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/main/DataType/EntityBlock.h) )           
-3. Multi Threading : All culling methods of this library is executed by multiple threads. Data of multiple objects is stored in a entity block and the entity block is aligned to cache line size. Then The threads work on each entity block. These structure of entity block prevents data race and cache coherency problem ( false sharing, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/main/DataType/EntityBlock.h) ), Locking is not required.               
+3. Multi Threading : All culling methods of this library is executed by multiple threads. Data of multiple objects is stored in a entity block and the entity block is aligned to cache line size. Then The threads work on each entity block. The structure of entity block prevents data race and cache coherency problem ( false sharing, check [EntityBlock.h](https://github.com/SungJJinKang/EveryCulling/blob/main/DataType/EntityBlock.h) ), Locking is not required. And It reduces cache miss.                  
                                  
                
 ## Fully implemented features
